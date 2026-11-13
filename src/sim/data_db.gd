@@ -1,0 +1,144 @@
+class_name DataDB
+extends RefCounted
+## Carga y valida los JSON de data/. Los errores se acumulan en `errors`
+## con el archivo, la entrada y el campo que fallan.
+
+const PHASES_FILE: String = "phases.json"
+const TOOLS_FILE: String = "tools.json"
+const BUBBLES_FILE: String = "bubbles.json"
+
+## Campos requeridos y su tipo (TYPE_*) por archivo.
+const PHASE_FIELDS: Dictionary = {
+	"id": TYPE_STRING, "number": TYPE_INT, "name_es": TYPE_STRING, "name_en": TYPE_STRING,
+	"start_minute": TYPE_INT, "sheet_start": TYPE_DICTIONARY, "sheet_end": TYPE_DICTIONARY,
+}
+const SIZE_FIELDS: Dictionary = {"width": TYPE_INT, "height": TYPE_INT}
+const TOOL_FIELDS: Dictionary = {
+	"id": TYPE_STRING, "number": TYPE_INT, "name_es": TYPE_STRING, "name_en": TYPE_STRING,
+	"shape": TYPE_STRING, "unlock_phase": TYPE_INT, "balance": TYPE_DICTIONARY,
+}
+const BUBBLE_FIELDS: Dictionary = {
+	"id": TYPE_STRING, "type_id": TYPE_INT, "name_es": TYPE_STRING, "name_en": TYPE_STRING,
+	"shape": TYPE_STRING, "unlock_phase": TYPE_INT, "balance": TYPE_DICTIONARY,
+}
+const TOOL_SHAPES: PackedStringArray = ["cell", "circle", "segment", "rect"]
+
+var phases: Array[Dictionary] = []
+var tools: Array[Dictionary] = []
+var bubbles: Array[Dictionary] = []
+var errors: PackedStringArray = PackedStringArray()
+
+
+## Carga los tres JSON desde `dir`. Devuelve true si no hubo ningún error.
+func load_all(dir: String = "res://data") -> bool:
+	errors = PackedStringArray()
+	phases = _load_list(dir.path_join(PHASES_FILE), "phases", PHASE_FIELDS)
+	tools = _load_list(dir.path_join(TOOLS_FILE), "tools", TOOL_FIELDS)
+	bubbles = _load_list(dir.path_join(BUBBLES_FILE), "bubbles", BUBBLE_FIELDS)
+	_validate_phases()
+	_validate_tools()
+	_validate_bubbles()
+	return errors.is_empty()
+
+
+func get_phase(id: String) -> Dictionary:
+	return _find(phases, id)
+
+
+func get_tool(id: String) -> Dictionary:
+	return _find(tools, id)
+
+
+func get_bubble(id: String) -> Dictionary:
+	return _find(bubbles, id)
+
+
+func _find(list: Array[Dictionary], id: String) -> Dictionary:
+	for entry: Dictionary in list:
+		if str(entry.get("id", "")) == id:
+			return entry
+	return {}
+
+
+func _load_list(path: String, key: String, fields: Dictionary) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	var root: Variant = _read_json(path)
+	if not (root is Dictionary):
+		return out
+	var root_dict: Dictionary = root
+	if not root_dict.has(key) or not (root_dict[key] is Array):
+		errors.append("%s: falta la lista '%s'" % [path.get_file(), key])
+		return out
+	var items: Array = root_dict[key]
+	for i: int in items.size():
+		var item: Variant = items[i]
+		if not (item is Dictionary):
+			errors.append("%s: la entrada %d no es un objeto" % [path.get_file(), i])
+			continue
+		var entry: Dictionary = item
+		var label: String = "%s[%d:%s]" % [path.get_file(), i, str(entry.get("id", "?"))]
+		if _check_fields(entry, fields, label):
+			out.append(entry)
+	return out
+
+
+func _read_json(path: String) -> Variant:
+	if not FileAccess.file_exists(path):
+		errors.append("%s: el archivo no existe (%s)" % [path.get_file(), path])
+		return null
+	var text: String = FileAccess.get_file_as_string(path)
+	var json: JSON = JSON.new()
+	if json.parse(text) != OK:
+		errors.append("%s: JSON inválido en la línea %d: %s" % [path.get_file(), json.get_error_line(), json.get_error_message()])
+		return null
+	return json.data
+
+
+## Chequea que estén todos los campos con el tipo correcto. Devuelve true si está todo bien.
+func _check_fields(entry: Dictionary, fields: Dictionary, label: String) -> bool:
+	var ok: bool = true
+	for field: String in fields:
+		if not entry.has(field):
+			errors.append("%s: falta el campo '%s'" % [label, field])
+			ok = false
+			continue
+		var expected: int = fields[field]
+		if not _type_matches(typeof(entry[field]), expected):
+			errors.append("%s: el campo '%s' tiene un tipo incorrecto" % [label, field])
+			ok = false
+	return ok
+
+
+func _type_matches(actual: int, expected: int) -> bool:
+	if expected == TYPE_INT:
+		return actual == TYPE_INT or actual == TYPE_FLOAT # JSON numera todo como float
+	return actual == expected
+
+
+func _validate_phases() -> void:
+	for p: Dictionary in phases:
+		var label: String = "phases.json[%s]" % str(p["id"])
+		var start: Dictionary = p["sheet_start"]
+		var end: Dictionary = p["sheet_end"]
+		_check_fields(start, SIZE_FIELDS, label + ".sheet_start")
+		_check_fields(end, SIZE_FIELDS, label + ".sheet_end")
+
+
+func _validate_tools() -> void:
+	for t: Dictionary in tools:
+		if not TOOL_SHAPES.has(str(t["shape"])):
+			errors.append("tools.json[%s]: forma desconocida '%s'" % [str(t["id"]), str(t["shape"])])
+		_check_unlock(t, "tools.json")
+
+
+func _validate_bubbles() -> void:
+	for b: Dictionary in bubbles:
+		_check_unlock(b, "bubbles.json")
+
+
+func _check_unlock(entry: Dictionary, file: String) -> void:
+	var phase_number: int = int(entry["unlock_phase"])
+	for p: Dictionary in phases:
+		if int(p["number"]) == phase_number:
+			return
+	errors.append("%s[%s]: unlock_phase %d no existe en phases.json" % [file, str(entry["id"]), phase_number])

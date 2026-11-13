@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "phases": [
+    {"id": "table",     "number": 1, "name_es": "Mesa",            "name_en": "Table",       "start_minute": 0,   "sheet_start": {"width": 8,   "height": 8},   "sheet_end": {"width": 20,   "height": 20}},
+    {"id": "floor",     "number": 2, "name_es": "Piso",            "name_en": "Floor",       "start_minute": 35,  "sheet_start": {"width": 40,  "height": 40},  "sheet_end": {"width": 40,   "height": 40}},
+    {"id": "warehouse", "number": 3, "name_es": "Galpón",          "name_en": "Warehouse",   "start_minute": 90,  "sheet_start": {"width": 80,  "height": 80},  "sheet_end": {"width": 80,   "height": 80}},
+    {"id": "parking",   "number": 4, "name_es": "Estacionamiento", "name_en": "Parking lot", "start_minute": 150, "sheet_start": {"width": 150, "height": 150}, "sheet_end": {"width": 150,  "height": 150}},
+    {"id": "field",     "number": 5, "name_es": "Campo",           "name_en": "Field",       "start_minute": 210, "sheet_start": {"width": 300, "height": 300}, "sheet_end": {"width": 300,  "height": 300}},
+    {"id": "salt_flat", "number": 6, "name_es": "Salar",           "name_en": "Salt flat",   "start_minute": 285, "sheet_start": {"width": 600, "height": 600}, "sheet_end": {"width": 600,  "height": 600}},
+    {"id": "orbit",     "number": 7, "name_es": "Órbita",          "name_en": "Orbit",       "start_minute": 360, "sheet_start": {"width": 1000, "height": 1000}, "sheet_end": {"width": 1000, "height": 1000}}
+  ]
+}
