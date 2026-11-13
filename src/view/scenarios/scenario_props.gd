@@ -92,7 +92,7 @@ static func _table(root: Node3D, c: Vector2, e: Vector2, u: float) -> void:
 	lamp.add_child(bulb)
 	# Borde de una taza blanca vista desde arriba (un aro grueso con café adentro).
 	var cup: Node3D = Node3D.new()
-	cup.position = Vector3(c.x + e.x * 0.66, GROUND_Y, c.y - e.y * 0.52)
+	cup.position = Vector3(c.x + e.x * 0.9, GROUND_Y, c.y - e.y * 0.78)
 	root.add_child(cup)
 	var rim: TorusMesh = TorusMesh.new()
 	rim.inner_radius = 4.4 * u
@@ -106,7 +106,7 @@ static func _table(root: Node3D, c: Vector2, e: Vector2, u: float) -> void:
 	var colors: Array[Color] = [Color("#F2C230"), Color("#E85D4A"), Color("#4C9BD6")]
 	for i: int in 3:
 		var pencil: Node3D = Node3D.new()
-		pencil.position = Vector3(c.x + e.x * (0.5 + 0.06 * float(i)), GROUND_Y + 0.25 * u, c.y + e.y * (0.28 + 0.07 * float(i)))
+		pencil.position = Vector3(c.x + e.x * (0.78 + 0.06 * float(i)), GROUND_Y + 0.25 * u, c.y + e.y * (0.58 + 0.08 * float(i)))
 		pencil.rotation_degrees = Vector3(0.0, -18.0 + 14.0 * float(i), 0.0)
 		root.add_child(pencil)
 		_add(pencil, _cyl(0.25 * u, 0.25 * u, 7.0 * u, 6), _mat(colors[i], 0.4), Vector3.ZERO, Vector3(0.0, 0.0, 90.0))
