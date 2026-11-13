@@ -12,11 +12,15 @@ var grid: HexGrid
 var tool_model: ToolModel
 var sheet_view: SheetView
 var camera_rig: CameraRig
+var game: GameSim ## modo juego: la lámina y las herramientas son de GameSim
+var specials_view: SpecialsView
 var table: MeshInstance3D
+var table_material: StandardMaterial3D
 var light: DirectionalLight3D
 var environment: WorldEnvironment
 
 var _reload_timer: float = -1.0
+var deferred_sheet: bool = false ## true: no crea la lámina de prueba (lo hace attach)
 
 
 func _ready() -> void:
@@ -33,7 +37,39 @@ func _ready() -> void:
 	sheet_view = SheetView.new()
 	sheet_view.name = "SheetView"
 	add_child(sheet_view)
-	set_sheet_size(Cfg.integer(db.sheet, "default_width"), Cfg.integer(db.sheet, "default_height"))
+	specials_view = SpecialsView.new()
+	specials_view.name = "Specials"
+	add_child(specials_view)
+	if not deferred_sheet:
+		set_sheet_size(Cfg.integer(db.sheet, "default_width"), Cfg.integer(db.sheet, "default_height"))
+
+
+## Modo juego: usa la lámina de GameSim. Llamar después de agregar el nodo al árbol.
+func attach(sim: GameSim) -> void:
+	game = sim
+	camera_rig.screen_shift = 0.144
+	rebind_game_sheet(false)
+
+
+## Vuelve a conectar la vista con la lámina actual de GameSim (lámina nueva o reciclado).
+func rebind_game_sheet(roll_in: bool, animate_camera: float = 0.0) -> void:
+	sheet = game.sheet
+	grid = game.grid
+	tool_model = game.selected_tool()
+	sheet_view.bind(sheet, grid, db.juice, tool_model.resistance)
+	specials_view.bind(sheet, grid)
+	specials_view.visible = true
+	camera_rig.fit_to(sheet_view.center(), sheet_view.extents(), animate_camera)
+	apply_phase(game.phase())
+	if roll_in:
+		sheet_view.begin_roll_in()
+	sheet_replaced.emit()
+
+
+## Escenario según la fase: Mesa (madera) o Piso (cemento).
+func apply_phase(phase: int) -> void:
+	var colors: Array[Color] = [Color(0.55, 0.42, 0.30), Color(0.42, 0.45, 0.46)]
+	table_material.albedo_color = colors[mini(phase, colors.size()) - 1]
 
 
 func _process(delta: float) -> void:
@@ -45,6 +81,8 @@ func _process(delta: float) -> void:
 
 ## Crea una lámina nueva de w x h y la conecta con la vista y la herramienta.
 func set_sheet_size(w: int, h: int) -> void:
+	if game != null:
+		return
 	if sheet != null and sheet.reload_requested.is_connected(_on_reload_requested):
 		sheet.reload_requested.disconnect(_on_reload_requested)
 	sheet = SheetModel.new(w, h)
@@ -113,9 +151,10 @@ func _build_table() -> void:
 	var pm: PlaneMesh = PlaneMesh.new()
 	pm.size = Vector2(4000.0, 4000.0)
 	var m: StandardMaterial3D = StandardMaterial3D.new()
-	m.albedo_color = Color(0.72, 0.40, 0.22)
+	m.albedo_color = Color(0.55, 0.42, 0.30)
 	m.roughness = 0.65
 	pm.material = m
+	table_material = m
 	table = MeshInstance3D.new()
 	table.name = "Table"
 	table.mesh = pm

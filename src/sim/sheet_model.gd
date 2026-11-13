@@ -26,6 +26,10 @@ var type: PackedByteArray = PackedByteArray()
 var press: PackedFloat32Array = PackedFloat32Array()
 ## Fracción reventada a partir de la cual se pide lámina nueva (DESIGN 2).
 var reload_threshold: float = 0.9
+## Aire (DESIGN 3.2): una burbuja con presión >= tense_threshold está tensa; max_pressure la revienta.
+var tense_threshold: float = 1.5
+var max_pressure: float = 2.0
+var min_pressure: float = 0.4 ## una burbuja apretada no pierde aire por debajo de esto
 
 ## Motivo del último from_dict() fallido ("" si fue bien).
 var last_error: String = ""
@@ -72,6 +76,35 @@ func get_pressure(idx: int) -> float:
 func set_pressure(idx: int, value: float) -> void:
 	pressure[idx] = value
 	cells_changed.emit(PackedInt32Array([idx]))
+
+
+## Suma `amount` a la presión sin avisar (el llamador avisa en lote). Respeta max_pressure
+## y actualiza el estado intacta/tensa. Devuelve lo que realmente se sumó.
+func add_pressure_quiet(idx: int, amount: float) -> float:
+	var before: float = pressure[idx]
+	var after: float = clampf(before + amount, 0.0, max_pressure)
+	pressure[idx] = after
+	refresh_state(idx)
+	return after - before
+
+
+## Intacta o tensa según la presión (no toca las reventadas).
+func refresh_state(idx: int) -> void:
+	var s: int = state[idx]
+	if s == STATE_POPPED:
+		return
+	var wanted: int = STATE_TENSE if pressure[idx] >= tense_threshold else STATE_INTACT
+	if wanted != s:
+		_write_state(idx, wanted)
+
+
+## Presión total de las burbujas sin reventar (el aire nunca debe aumentar).
+func total_pressure() -> float:
+	var total: float = 0.0
+	for i: int in pressure.size():
+		if state[i] != STATE_POPPED:
+			total += pressure[i]
+	return total
 
 
 func get_press(idx: int) -> float:
@@ -210,6 +243,11 @@ func from_dict(data: Dictionary) -> bool:
 func _fail(message: String) -> bool:
 	last_error = message
 	return false
+
+
+## Recalcula los contadores por estado (después de escribir los arrays directamente).
+func reset_counts() -> void:
+	_recount()
 
 
 func _recount() -> void:

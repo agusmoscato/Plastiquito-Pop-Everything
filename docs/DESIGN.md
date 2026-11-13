@@ -177,7 +177,7 @@ La estética es de "juguete limpio": plástico brillante, formas simples y color
 
 ### Interfaz y accesibilidad
 
-- Fuente redondeada con licencia libre (OFL), paneles con aspecto de cinta de embalar y etiquetas.
+- La interfaz es el escritorio de un depósito de embalaje: cartón kraft, etiquetas de papel con inclinación fija, cinta de embalar, sellos de goma rojos, un contador mecánico (odómetro) y la tienda como "hoja de pedidos" con clip. Todo se dibuja por código, con fuentes OFL (Bowlby One, Archivo, Space Mono). Guía completa y lista de señales de IA prohibidas en [UI_STYLE.md](UI_STYLE.md).
 - Cada especial tiene forma y color propios. Hay modo para daltónicos.
 - Volumen separado por canal, opción de reducir el movimiento y juego completo con control.
 

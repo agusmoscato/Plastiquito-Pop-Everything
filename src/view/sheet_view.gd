@@ -105,6 +105,31 @@ func refresh_all(roll_in: bool) -> void:
 		begin_roll_in()
 
 
+## Reciclado: arruga la lámina (0..1) y la va enrollando hacia z (filas con z menor desaparecen).
+func set_recycle_progress(crumple: float, roll_z: float) -> void:
+	material.set_shader_parameter("crumple", crumple)
+	material.set_shader_parameter("roll_up_z", roll_z)
+	if _plane == null:
+		return
+	# La lámina base también se enrolla: queda solo lo que todavía no pasó el rollo.
+	var z_end: float = grid.row_step * float(grid.height) + grid.hex_size
+	var start: float = clampf(roll_z, -2.0, z_end)
+	var remain: float = maxf(0.0, z_end - start)
+	var full: float = z_end + 2.0
+	_plane.visible = remain > 0.05
+	_plane.scale = Vector3(1.0 - 0.15 * crumple, 1.0, maxf(remain / full, 0.001))
+	_plane.position.z = start + remain * 0.5 - 1.0
+
+
+func clear_recycle_effect() -> void:
+	if _plane != null:
+		_plane.visible = true
+		_plane.scale = Vector3.ONE
+		_plane.position.z = center().y
+	material.set_shader_parameter("crumple", 0.0)
+	material.set_shader_parameter("roll_up_z", -1.0e9)
+
+
 func begin_roll_in() -> void:
 	_roll_t = 0.0
 	_roll_end_z = grid.row_step * float(grid.height) + 4.0
@@ -239,7 +264,7 @@ func _build_plane() -> void:
 	pm.size = extents() + Vector2(grid.spacing, grid.spacing)
 	var m: StandardMaterial3D = StandardMaterial3D.new()
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	m.albedo_color = Color(0.55, 0.8, 1.0, 0.16)
+	m.albedo_color = Color(0.7, 0.9, 1.0, 0.1)
 	m.roughness = 0.08
 	m.metallic_specular = 1.0
 	m.render_priority = -1

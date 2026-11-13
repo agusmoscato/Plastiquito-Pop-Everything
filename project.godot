@@ -23,6 +23,7 @@ Settings="*res://src/autoload/settings.gd"
 PopAudio="*res://src/audio/pop_audio.gd"
 Juice="*res://src/autoload/juice.gd"
 Playtest="*res://src/autoload/playtest.gd"
+SaveSystem="*res://src/autoload/save_system.gd"
 
 [debug]
 
@@ -38,7 +39,8 @@ gdscript/warnings/unsafe_void_return=2
 
 window/size/viewport_width=1600
 window/size/viewport_height=900
-window/stretch/mode="disabled"
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
 
 [editor_plugins]
 

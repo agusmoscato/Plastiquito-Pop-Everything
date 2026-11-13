@@ -10,6 +10,7 @@ const BUSES: PackedStringArray = ["Master", "Pops", "Tools", "UI", "Music"]
 var volumes: Dictionary = {"Master": 0.8, "Pops": 1.0, "Tools": 1.0, "UI": 1.0, "Music": 0.0}
 var shake_enabled: bool = true
 var reduce_motion: bool = false
+var language: String = "es" ## "es" o "en"
 
 
 func _ready() -> void:
@@ -53,6 +54,7 @@ func save_settings() -> void:
 		cfg.set_value("audio", bus, get_volume(bus))
 	cfg.set_value("video", "shake_enabled", shake_enabled)
 	cfg.set_value("video", "reduce_motion", reduce_motion)
+	cfg.set_value("ui", "language", language)
 	cfg.save(PATH)
 
 
@@ -65,3 +67,4 @@ func load_settings() -> void:
 		volumes[bus] = clampf(v, 0.0, 1.0)
 	shake_enabled = cfg.get_value("video", "shake_enabled", shake_enabled)
 	reduce_motion = cfg.get_value("video", "reduce_motion", reduce_motion)
+	language = cfg.get_value("ui", "language", language)

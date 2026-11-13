@@ -9,6 +9,8 @@ const BUBBLES_FILE: String = "bubbles.json"
 const SHEET_FILE: String = "sheet.json"
 const JUICE_FILE: String = "juice.json"
 const AUDIO_FILE: String = "audio.json"
+const UPGRADES_FILE: String = "upgrades.json"
+const ECONOMY_FILE: String = "economy.json"
 
 ## Campos requeridos y su tipo (TYPE_*) por archivo.
 const PHASE_FIELDS: Dictionary = {
@@ -28,6 +30,8 @@ const SHEET_FIELDS: Dictionary = {
 	"default_width": TYPE_INT, "default_height": TYPE_INT, "bubble_radius": TYPE_FLOAT,
 	"resistance": TYPE_FLOAT, "recovery_per_second": TYPE_FLOAT,
 	"reload_threshold": TYPE_FLOAT, "reload_delay_seconds": TYPE_FLOAT,
+	"tense_threshold": TYPE_FLOAT, "max_pressure": TYPE_FLOAT, "min_pressure": TYPE_FLOAT,
+	"chain_k": TYPE_FLOAT, "chain_k_max": TYPE_FLOAT, "chain_budget_per_frame": TYPE_INT,
 }
 const JUICE_FIELDS: Dictionary = {
 	"hitstop_ms": TYPE_INT, "hitstop_every_streak": TYPE_INT, "mass_pop_radius": TYPE_FLOAT,
@@ -47,6 +51,20 @@ const AUDIO_FIELDS: Dictionary = {
 	"crackle_min_volume_db": TYPE_FLOAT, "large_chance": TYPE_FLOAT, "tense_pressure": TYPE_FLOAT,
 	"max_voices_per_frame": TYPE_INT, "squish_volume_db": TYPE_FLOAT, "pop_volume_db": TYPE_FLOAT,
 }
+const UPGRADE_FIELDS: Dictionary = {
+	"id": TYPE_STRING, "scope": TYPE_STRING, "tool": TYPE_STRING, "kind": TYPE_STRING,
+	"name_es": TYPE_STRING, "name_en": TYPE_STRING, "desc_es": TYPE_STRING, "desc_en": TYPE_STRING,
+	"base_cost": TYPE_FLOAT, "growth": TYPE_FLOAT, "max_level": TYPE_INT, "per_level": TYPE_FLOAT,
+	"effect_type": TYPE_STRING, "unit": TYPE_STRING, "requires": TYPE_DICTIONARY,
+}
+const ECONOMY_FIELDS: Dictionary = {
+	"phase_base_values": TYPE_ARRAY, "phase_cost_scales": TYPE_ARRAY, "phase_sheet_sizes": TYPE_ARRAY, "sheet_start_size": TYPE_INT,
+	"milestone_every": TYPE_INT, "milestone_multiplier": TYPE_FLOAT, "combo_window_seconds": TYPE_FLOAT,
+	"combo_rates": TYPE_ARRAY, "combo_multipliers": TYPE_ARRAY, "golden_multiplier": TYPE_FLOAT,
+	"chance_golden": TYPE_FLOAT, "chance_bomb": TYPE_FLOAT, "chance_line": TYPE_FLOAT,
+	"pellet_divisor": TYPE_FLOAT, "pellet_exponent": TYPE_FLOAT, "autosave_seconds": TYPE_FLOAT,
+	"first_level_cost_factor": TYPE_FLOAT, "reload_delay_manual": TYPE_FLOAT, "reload_delay_auto": TYPE_FLOAT, "chain_stamp_min": TYPE_INT,
+}
 const TOOL_SHAPES: PackedStringArray = ["cell", "circle", "segment", "rect"]
 
 var phases: Array[Dictionary] = []
@@ -55,6 +73,8 @@ var bubbles: Array[Dictionary] = []
 var sheet: Dictionary = {}
 var juice: Dictionary = {}
 var audio: Dictionary = {}
+var upgrades: Array[Dictionary] = []
+var economy: Dictionary = {}
 var errors: PackedStringArray = PackedStringArray()
 
 
@@ -67,6 +87,8 @@ func load_all(dir: String = "res://data") -> bool:
 	sheet = _load_section(dir.path_join(SHEET_FILE), "sheet", SHEET_FIELDS)
 	juice = _load_section(dir.path_join(JUICE_FILE), "juice", JUICE_FIELDS)
 	audio = _load_section(dir.path_join(AUDIO_FILE), "audio", AUDIO_FIELDS)
+	upgrades = _load_list(dir.path_join(UPGRADES_FILE), "upgrades", UPGRADE_FIELDS)
+	economy = _load_section(dir.path_join(ECONOMY_FILE), "economy", ECONOMY_FIELDS)
 	_validate_phases()
 	_validate_tools()
 	_validate_bubbles()
@@ -79,6 +101,10 @@ func get_phase(id: String) -> Dictionary:
 
 func get_tool(id: String) -> Dictionary:
 	return _find(tools, id)
+
+
+func get_upgrade(id: String) -> Dictionary:
+	return _find(upgrades, id)
 
 
 func get_bubble(id: String) -> Dictionary:

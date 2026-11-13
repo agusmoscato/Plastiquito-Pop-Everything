@@ -10,7 +10,7 @@ Requiere Godot 4.4.1 (ver [CLAUDE.md](CLAUDE.md)). Abrí la carpeta con el edito
 godot --path .
 ```
 
-En la Fase 0 todavía no hay escena jugable: solo la simulación pura en `src/sim/`.
+Controles: mantener apretado el botón izquierdo y arrastrar para reventar; 1, 2 y 3 eligen la herramienta; rueda para el zoom; Tab abre el reciclado; B el Burbujario; Esc el menú; F12 saca una captura.
 
 ## Correr los tests
 

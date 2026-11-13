@@ -27,6 +27,11 @@ GODOT="C:/Users/sopor/Desktop/Agustin/1-JUEGOS/Inflación Idle/tools/godot_bin/G
 
 Si se agregan clases con `class_name` nuevas, `run_tests.sh` ya corre `godot --headless --import` antes para registrarlas.
 
+## Interfaz y balance
+
+- La interfaz sigue [docs/UI_STYLE.md](docs/UI_STYLE.md): paleta fija, fuentes OFL, todo dibujado por código, sin señales de IA. Cada cambio visual se revisa con capturas (`--demo-shot=<carpeta>` en la escena principal).
+- Toda regla vive en `GameSim` y compañía (`src/sim/`); el simulador de balance (`tools/balance_sim.gd`) usa esas mismas clases. `run_tests.sh` corre lint, GUT y el paso "balance" (activo y casual, 3 semillas). `SKIP_BALANCE=1` lo saltea al iterar solo en código. Un cambio en `data/` obliga a correr el balance completo.
+
 ## Builds de playtest
 
 - `./tools/build.sh` (o `tools/build.ps1`): lint + tests, export Windows/Linux, zips y, si hay Inno Setup, instalador. Salida en `builds/<versión>/` (ignorada por git).

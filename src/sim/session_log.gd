@@ -14,6 +14,10 @@ var first_drag_s: float = -1.0
 var zoom_uses: int = 0
 var reloads: int = 0
 var volume_changes: PackedStringArray = PackedStringArray()
+var purchases: int = 0
+var max_chain: int = 0
+var first_recycle_min: float = -1.0
+var tool_uses: Dictionary = {} ## herramienta -> reventones
 
 var _pressing: bool = false
 var _press_is_drag: bool = false
@@ -53,6 +57,24 @@ func volume_changed(value: float, now_s: float) -> void:
 	volume_changes.append("%.2f@%.1f" % [value, now_s])
 
 
+func purchase(count: int) -> void:
+	purchases += count
+
+
+func chain(size: int) -> void:
+	max_chain = maxi(max_chain, size)
+
+
+func recycled(run_minutes: float) -> void:
+	if first_recycle_min < 0.0:
+		first_recycle_min = run_minutes
+
+
+func tool_pops(tool_id: String, count: int) -> void:
+	var cur: int = tool_uses.get(tool_id, 0)
+	tool_uses[tool_id] = cur + count
+
+
 func zoomed() -> void:
 	zoom_uses += 1
 
@@ -76,4 +98,14 @@ func to_csv(duration_s: float) -> String:
 	rows.append("usos_rueda_zoom,%d" % zoom_uses)
 	rows.append("recargas_lamina,%d" % reloads)
 	rows.append("racha_maxima,%d" % max_streak)
+	rows.append("compras_totales,%d" % purchases)
+	rows.append("cadena_maxima,%d" % max_chain)
+	rows.append("minuto_primer_reciclado,%s" % ("" if first_recycle_min < 0.0 else "%.1f" % first_recycle_min))
+	var uses: PackedStringArray = PackedStringArray()
+	var keys: Array = tool_uses.keys()
+	keys.sort()
+	for k: Variant in keys:
+		var uses_n: int = tool_uses[k]
+		uses.append("%s:%d" % [str(k), uses_n])
+	rows.append("uso_herramientas,%s" % ";".join(uses))
 	return "\n".join(rows) + "\n"

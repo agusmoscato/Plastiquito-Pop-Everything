@@ -23,7 +23,7 @@ func _copy_real(file: String) -> void:
 
 
 func _copy_others(except: Array[String]) -> void:
-	for f: String in ["phases.json", "tools.json", "bubbles.json", "sheet.json", "juice.json", "audio.json"]:
+	for f: String in ["phases.json", "tools.json", "bubbles.json", "sheet.json", "juice.json", "audio.json", "upgrades.json", "economy.json"]:
 		if not except.has(f):
 			_copy_real(f)
 

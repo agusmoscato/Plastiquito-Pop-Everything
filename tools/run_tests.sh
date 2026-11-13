@@ -32,4 +32,22 @@ if ! grep -qE "Passing Tests|Passing +[0-9]|Tests +[0-9]+" "$LOG"; then
   echo "run_tests: no se encontró el resumen de GUT (¿no corrieron los tests?)" >&2
   exit 1
 fi
-exit "$CODE"
+if [ "$CODE" != "0" ]; then
+  exit "$CODE"
+fi
+
+# Paso "balance": el simulador con los perfiles activo y casual, 3 semillas cada uno.
+# Se puede saltear con SKIP_BALANCE=1 (por ejemplo, para iterar rápido en código sin tocar data/).
+if [ "${SKIP_BALANCE:-0}" != "1" ]; then
+  for PROFILE in active casual; do
+    for SEED in 1 2 3; do
+      if ! "$GODOT_BIN" --headless --path . --script tools/balance_sim.gd --           --profile=$PROFILE --minutes=46 --seed=$SEED > "$LOG.balance" 2>&1; then
+        cat "$LOG.balance" >&2
+        echo "run_tests: el simulador de balance falló ($PROFILE, semilla $SEED)" >&2
+        exit 1
+      fi
+    done
+  done
+  echo "balance: activo y casual aprobados (3 semillas cada uno)"
+fi
+exit 0

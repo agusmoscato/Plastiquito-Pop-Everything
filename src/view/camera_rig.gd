@@ -24,6 +24,10 @@ var _target_pos: Vector3 = Vector3.ZERO
 var _noise: FastNoiseLite = FastNoiseLite.new()
 var _noise_t: float = 0.0
 var _drag_pan: bool = false
+var _smooth: float = SMOOTHING
+var _pull_left: float = 0.0
+## Fracción del ancho visible que se desplaza el encuadre hacia la izquierda (la tienda tapa la derecha).
+var screen_shift: float = 0.0
 
 
 func _init() -> void:
@@ -38,19 +42,26 @@ func _init() -> void:
 
 
 ## Encuadra una lámina de `extents` centrada en `center` (plano XZ).
-func fit_to(center: Vector2, extents: Vector2) -> void:
+func fit_to(center: Vector2, extents: Vector2, animate_seconds: float = 0.0) -> void:
 	bounds_center = center
 	bounds_half = extents * 0.5
 	var tan_half: float = tan(deg_to_rad(FOV) * 0.5)
 	var aspect: float = 16.0 / 9.0
 	var d_x: float = extents.x / (2.0 * tan_half * aspect)
 	var d_y: float = extents.y * sin(deg_to_rad(PITCH_DEGREES)) / (2.0 * tan_half)
-	var fit: float = maxf(d_x, d_y) * 1.08
+	var fit: float = maxf(d_x, d_y) * 1.3
 	min_zoom = 3.5
 	max_zoom = maxf(fit * 1.6, 12.0)
 	_target_zoom = clampf(fit, min_zoom, max_zoom)
+	var visible_w: float = 2.0 * _target_zoom * tan_half * aspect
+	_target_pos = Vector3(center.x + screen_shift * visible_w, 0.0, center.y)
+	if animate_seconds > 0.0:
+		_smooth = 4.0 / animate_seconds # alejarse suave (clip de reciclado)
+		_pull_left = animate_seconds
+		_zoom = minf(_zoom, _target_zoom * 0.5) # arranca cerca y se aleja
+		position = _target_pos
+		return
 	_zoom = _target_zoom
-	_target_pos = Vector3(center.x, 0.0, center.y)
 	position = _target_pos
 	_apply_zoom()
 
@@ -104,7 +115,11 @@ func _process(delta: float) -> void:
 		Input.get_axis("ui_left", "ui_right"), Input.get_axis("ui_up", "ui_down"))
 	if move != Vector2.ZERO:
 		_pan(move * PAN_SPEED * _zoom * delta)
-	var k: float = 1.0 - exp(-SMOOTHING * delta)
+	if _pull_left > 0.0:
+		_pull_left -= delta
+		if _pull_left <= 0.0:
+			_smooth = SMOOTHING
+	var k: float = 1.0 - exp(-_smooth * delta)
 	_zoom = lerpf(_zoom, _target_zoom, k)
 	position = position.lerp(_target_pos, k)
 	_apply_zoom()
