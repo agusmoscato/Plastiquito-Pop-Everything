@@ -1,6 +1,8 @@
 extends Node
 ## Ajustes del jugador, guardados en user://settings.cfg.
 
+signal volume_changed(bus: String, value: float)
+
 const PATH: String = "user://settings.cfg"
 const BUSES: PackedStringArray = ["Master", "Pops", "Tools", "UI", "Music"]
 
@@ -18,6 +20,7 @@ func _ready() -> void:
 func set_volume(bus: String, linear: float) -> void:
 	volumes[bus] = clampf(linear, 0.0, 1.0)
 	_apply_bus(bus)
+	volume_changed.emit(bus, get_volume(bus))
 
 
 func get_volume(bus: String) -> float:

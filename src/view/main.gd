@@ -11,6 +11,10 @@ var _prev_cursor: Vector2 = Vector2.ZERO
 var _cursor_valid: bool = false
 var _hitstop_bucket: int = 0
 var _demo: bool = false
+var _debug: bool = false
+var pause_menu: PauseMenu
+var _was_holding: bool = false
+var _press_cell: int = -1
 
 
 func _ready() -> void:
@@ -21,11 +25,18 @@ func _ready() -> void:
 	tool_view.name = "Finger"
 	add_child(tool_view)
 	tool_view.configure(world.db.juice)
-	overlay = DebugOverlay.new()
-	overlay.world = world
-	overlay.size_selected.connect(_on_size_selected)
-	overlay.mass_pop_requested.connect(_mass_pop)
-	add_child(overlay)
+	_debug = PlaytestMode.debug_allowed(PlaytestMode.current_tags())
+	if _debug: # en playtest/release no existen F3 ni el selector de tamaño
+		overlay = DebugOverlay.new()
+		overlay.world = world
+		overlay.size_selected.connect(_on_size_selected)
+		overlay.mass_pop_requested.connect(_mass_pop)
+		add_child(overlay)
+	pause_menu = PauseMenu.new()
+	add_child(pause_menu)
+	_add_version_label()
+	world.camera_rig.zoomed.connect(Playtest.log.zoomed)
+	world.sheet_reloaded.connect(Playtest.log.sheet_reloaded)
 	for arg: String in OS.get_cmdline_user_args():
 		if arg.begins_with("--demo-shot="):
 			_run_demo(arg.trim_prefix("--demo-shot="))
@@ -35,7 +46,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey:
 		var key: InputEventKey = event
 		if key.pressed and not key.echo:
-			if key.keycode == KEY_F3:
+			if key.keycode == KEY_F3 and overlay != null:
 				overlay.toggle()
 			elif key.keycode == KEY_F12:
 				save_screenshot()
@@ -47,9 +58,41 @@ func _process(delta: float) -> void:
 	var touched: PackedInt32Array = PackedInt32Array()
 	if holding and _cursor_valid:
 		touched = world.tool_model.cells_along(_prev_cursor, _cursor)
+	_track_press(holding, touched)
 	var popped: PackedInt32Array = world.tool_model.step(touched, delta)
 	_after_step(popped, holding, delta)
 	_prev_cursor = _cursor
+
+
+func _track_press(holding: bool, touched: PackedInt32Array) -> void:
+	var log: SessionLog = Playtest.log
+	if holding and not _was_holding:
+		log.press_started()
+		_press_cell = touched[0] if not touched.is_empty() else -1
+	elif holding and not touched.is_empty():
+		for idx: int in touched:
+			if idx != _press_cell:
+				log.press_moved_to_new_cell(Playtest.now_s())
+				break
+	elif not holding and _was_holding:
+		log.press_ended()
+	_was_holding = holding
+
+
+func _add_version_label() -> void:
+	var layer: CanvasLayer = CanvasLayer.new()
+	layer.layer = 10
+	var label: Label = Label.new()
+	label.text = "v%s %s" % [AppInfo.version(), "playtest" if Playtest.enabled else "dev"]
+	label.modulate = Color(1.0, 1.0, 1.0, 0.4)
+	label.add_theme_font_size_override("font_size", 13)
+	label.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	label.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	label.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	label.position = Vector2(-12.0, -8.0)
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(label)
+	add_child(layer)
 
 
 func save_screenshot() -> String:
@@ -95,6 +138,7 @@ func _after_step(popped: PackedInt32Array, holding: bool, delta: float) -> void:
 		PopAudio.play_squish()
 	if popped.is_empty():
 		return
+	Playtest.log.pops(popped.size(), PopAudio.streak())
 	tool_view.bounce(minf(float(popped.size()), 4.0) * 0.5)
 	Juice.pops_at(_positions(popped))
 	Juice.add_pop_trauma(popped.size())

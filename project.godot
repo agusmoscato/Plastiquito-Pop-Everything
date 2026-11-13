@@ -7,6 +7,7 @@ config_version=5
 
 config/name="Plastiquito: Pop Everything"
 run/main_scene="res://scenes/main.tscn"
+config/version="0.1.0"
 config/features=PackedStringArray("4.4", "Forward Plus")
 
 [audio]
@@ -18,6 +19,7 @@ buses/default_bus_layout="res://default_bus_layout.tres"
 Settings="*res://src/autoload/settings.gd"
 PopAudio="*res://src/audio/pop_audio.gd"
 Juice="*res://src/autoload/juice.gd"
+Playtest="*res://src/autoload/playtest.gd"
 
 [debug]
 
