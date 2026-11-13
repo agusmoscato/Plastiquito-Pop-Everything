@@ -5,9 +5,9 @@ extends SceneTree
 ## Escribe tools/out/balance_<perfil>_<seed>.csv y un resumen APROBADO/FALLÓ por métrica
 ## (sección 6 de la Fase 2). Sale con código 1 si alguna métrica falla (perfiles activo y casual).
 
-const DT: float = 1.0 / 30.0
 const OUT_DIR: String = "res://tools/out"
 
+var dt: float = 1.0 / 30.0
 var profile: String = "active"
 var minutes: float = 60.0
 var seed_value: int = 1
@@ -22,7 +22,24 @@ var press_timer: float = 0.0
 var click_cell: int = -1
 
 # Registro
-var csv: PackedStringArray = PackedStringArray(["segundo,evento,detalle,pops,pops_por_s"])
+var csv: PackedStringArray = PackedStringArray(["segundo,evento,detalle,pops,pops_por_s,pops_total"])
+var phase3_time: float = -1.0
+var phase4_time: float = -1.0
+var hands_time: float = -1.0
+var idle_stopped: bool = false
+var max_dry_gap_late: float = 0.0
+var _win60: Array[Vector2] = []
+var _next_sample: float = 0.0
+var run_peak: float = 0.0
+var prev_run_peak: float = 0.0
+var run_start: float = 0.0
+var prev_run_duration: float = 0.0
+var recovering: bool = false
+var recover_start: float = 0.0
+var recoveries: Array[Vector2] = [] ## (tiempo de recuperación, duración de la partida anterior)
+var tool_used: Dictionary = {}
+var new_tool_windows: Array[Dictionary] = []
+var new_tool_results: Array[Vector3] = [] ## (herramienta nueva, ritmo nuevo, pico anterior)
 var purchase_times: Array[float] = []
 var first_chain10: float = -1.0
 var first_golden: float = -1.0
@@ -69,24 +86,33 @@ func _parse_args() -> void:
 			minutes = float(arg.trim_prefix("--minutes="))
 		elif arg.begins_with("--seed="):
 			seed_value = int(arg.trim_prefix("--seed="))
+		elif arg.begins_with("--dt="):
+			dt = 1.0 / float(arg.trim_prefix("--dt="))
 
 
 func _run() -> void:
-	var steps: int = int(minutes * 60.0 / DT)
+	var steps: int = int(minutes * 60.0 / dt)
 	for i: int in steps:
 		_bot_input()
 		var was_phase: int = sim.phase()
-		sim.step(DT, pointer, press_timer > 0.0)
+		sim.step(dt, pointer, press_timer > 0.0)
 		_after_step(was_phase)
-		if profile != "idle":
-			_decide()
+		_decide()
 		_track_availability()
+		_sample(was_phase)
 
 
 # --- Bot -------------------------------------------------------------------------------
 
 func _bot_input() -> void:
 	if profile == "idle":
+		if sim.upgrades.level_with_bonus(sim.state, "unlock_hands") >= 1 and sim.upgrades.level_with_bonus(sim.state, "hands_count") >= 1:
+			if not idle_stopped:
+				idle_stopped = true
+				_log("idle_deja_de_clickear", "")
+			press_timer = 0.0
+			return
+		_move_casual() # hasta tener manitos, el perfil idle juega como casual
 		return
 	if profile == "active":
 		_move_active()
@@ -98,11 +124,17 @@ func _bot_input() -> void:
 ## de amasar barre filas arrastrando. Suelta entre clics para no contar como arrastre.
 func _move_active() -> void:
 	if sim.state.selected_tool == "rolling_pin":
-		_sweep_with_pin()
+		_sweep_with_pin(7.0)
 		return
-	click_timer -= DT
+	if sim.state.selected_tool == "iron":
+		_sweep_with_pin(4.0) # la plancha va más despacio: prepara las burbujas con calor
+		return
+	if sim.state.selected_tool == "boot":
+		_stomp_best()
+		return
+	click_timer -= dt
 	if press_timer > 0.0:
-		press_timer -= DT
+		press_timer -= dt
 		if not _still_pressing():
 			press_timer = 0.0
 		return
@@ -114,7 +146,33 @@ func _move_active() -> void:
 	click_timer = 1.0 / 8.0
 
 
-func _sweep_with_pin() -> void:
+## Bota: pisa donde hay más burbujas enteras cuando está recargada.
+func _stomp_best() -> void:
+	var tm: ToolModel = sim.selected_tool()
+	if press_timer > 0.0:
+		press_timer -= dt
+		return
+	if not tm.stomp_ready():
+		return
+	var best_idx: int = -1
+	var best_count: int = -1
+	for k: int in 14:
+		var idx: int = rng.randi() % sim.sheet.cell_count()
+		if sim.sheet.state[idx] == SheetModel.STATE_POPPED:
+			continue
+		var count: int = 0
+		for n: int in sim.grid.cells_in_circle(sim.grid.cell_to_world(idx), tm.radius):
+			if sim.sheet.state[n] != SheetModel.STATE_POPPED:
+				count += 1
+		if count > best_count:
+			best_count = count
+			best_idx = idx
+	if best_idx >= 0:
+		pointer = sim.grid.cell_to_world(best_idx)
+		press_timer = 2.0 * dt # un solo pisotón por apretada
+
+
+func _sweep_with_pin(cells_per_s: float) -> void:
 	press_timer = 1.0
 	if not has_target or pointer.distance_to(target) < sim.grid.spacing * 0.6:
 		var row_cell: int = _pick_cell(sim.grid.spacing * 8.0)
@@ -123,7 +181,7 @@ func _sweep_with_pin() -> void:
 		target = Vector2(x_far, y)
 		pointer = Vector2(pointer.x, y)
 		has_target = true
-	pointer = pointer.move_toward(target, sim.grid.spacing * 7.0 * DT)
+	pointer = pointer.move_toward(target, sim.grid.spacing * cells_per_s * dt)
 
 
 ## Sigue apretando mientras quede algo por reventar bajo la herramienta (la palma espera a
@@ -144,8 +202,8 @@ func _still_pressing() -> bool:
 ## Casual: ~3 clics por segundo cerca del centro. Mira la lámina: casi siempre elige una
 ## burbuja entera cercana al punto al que apuntaba (a veces falla y clickea una reventada).
 func _move_casual() -> void:
-	click_timer -= DT
-	press_timer -= DT
+	click_timer -= dt
+	press_timer -= dt
 	if click_timer <= 0.0:
 		var c: Vector2 = sim.center()
 		var ext: Vector2 = Vector2(sim.grid.spacing * float(sim.grid.width), sim.grid.row_step * float(sim.grid.height))
@@ -201,14 +259,50 @@ func _decide() -> void:
 
 
 func _pick_tool() -> void:
-	for id: String in ["rolling_pin", "palm", "finger"]:
+	for id: String in ["boot", "iron", "rolling_pin", "palm", "finger"]:
 		if sim.select_tool(id):
+			if not tool_used.has(id):
+				tool_used[id] = sim.now
+				if id == "rolling_pin" or id == "iron" or id == "boot":
+					new_tool_windows.append({"tool": id, "start": sim.now, "total": sim.state.pops_total, "peak": prev_run_peak})
 			return
 
 
+func _perm_sheet_cost() -> float:
+	var lvl: int = sim.state.perm_level("perm_sheet")
+	if lvl >= sim.upgrades.max_level("perm_sheet"):
+		return INF
+	return sim.upgrades.next_cost("perm_sheet", lvl)
+
+
 func _should_recycle() -> bool:
-	# Primer reciclado en cuanto da 1 Pellet; los siguientes cuando rinden bastante más.
-	return sim.recycle_gain() >= 1 + 3 * sim.state.recycles
+	# Mientras queden fases, se recicla en cuanto alcanza para "Lámina más grande".
+	# Con las fases abiertas, cuando el reciclado rinde bastante más y pasó un buen rato.
+	var cost: float = _perm_sheet_cost()
+	if cost < INF:
+		return sim.state.pellets + float(sim.recycle_gain()) >= cost
+	return sim.recycle_gain() >= 2 + 2 * sim.state.recycles and sim.state.run_time_s > 20.0 * 60.0
+
+
+## Primero "Lámina más grande"; con lo que sobra (guardando lo del próximo salto de fase) el resto.
+func _spend_pellets() -> void:
+	var r0: Dictionary = sim.buy("perm_sheet", 1)
+	var n0: int = r0["bought"]
+	if n0 > 0:
+		_log("compra_perm", "perm_sheet x%d" % n0)
+	var order: Array[String] = ["perm_bonus", "perm_finger", "perm_palm", "perm_pin", "perm_auto", "perm_iron", "perm_boot", "perm_golden", "perm_memory"]
+	for id: String in order:
+		var reserve: float = _perm_sheet_cost()
+		var lvl: int = sim.upgrades.level_of(sim.state, id)
+		if lvl >= sim.upgrades.max_level(id) or not sim.upgrades.is_available(sim.state, id):
+			continue
+		var cost: float = sim.upgrades.next_cost(id, lvl)
+		if cost > sim.state.pellets - (reserve if reserve < INF else 0.0):
+			continue
+		var r: Dictionary = sim.buy(id, 1)
+		var n: int = r["bought"]
+		if n > 0:
+			_log("compra_perm", "%s x%d" % [id, n])
 
 
 func _do_recycle() -> void:
@@ -217,14 +311,22 @@ func _do_recycle() -> void:
 	_log("reciclar", "pellets=%d pops_corrida=%.0f" % [gained, before])
 	if first_recycle < 0.0:
 		first_recycle = sim.now
-	for id: String in ["perm_sheet", "perm_bonus", "perm_finger", "perm_golden"]:
-		var r: Dictionary = sim.buy(id, -1)
-		var n: int = r["bought"]
-		if n > 0:
-			_log("compra_perm", "%s x%d" % [id, n])
+	_spend_pellets()
 	if sim.phase() >= 2 and phase2_time < 0.0:
 		phase2_time = sim.now
 		_log("hito", "fase 2 (Piso)")
+	if sim.phase() >= 3 and phase3_time < 0.0:
+		phase3_time = sim.now
+		_log("hito", "fase 3 (Galpón)")
+	if sim.phase() >= 4 and phase4_time < 0.0:
+		phase4_time = sim.now
+		_log("hito", "fase 4 (Estacionamiento)")
+	prev_run_peak = run_peak
+	prev_run_duration = sim.now - run_start
+	run_peak = 0.0
+	run_start = sim.now
+	recovering = true
+	recover_start = sim.now
 	has_target = false
 	click_cell = -1
 	press_timer = 0.0
@@ -255,6 +357,10 @@ func _gain(kind: String, level: int) -> float:
 			return 0.09
 		"auto_reload":
 			return 0.06
+		"count":
+			return 0.22
+		"smart":
+			return 0.0
 	return 0.02
 
 
@@ -301,6 +407,8 @@ func _purchase(id: String) -> void:
 	var ms: bool = r["milestone"]
 	if ms:
 		_log("hito", "%s nivel %d (x2)" % [id, level + 1])
+	if id == "unlock_hands" and hands_time < 0.0:
+		hands_time = sim.now
 	if id == "unlock_palm" and palm_time < 0.0:
 		palm_time = sim.now
 	elif id == "unlock_pin" and pin_time < 0.0:
@@ -334,6 +442,34 @@ func _after_step(_was_phase: int) -> void:
 		_log("minuto", "")
 
 
+## Una vez por segundo: ritmo de los últimos 60 s, pico de la partida, recuperación y herramientas nuevas.
+func _sample(_was_phase: int) -> void:
+	if sim.now < _next_sample:
+		return
+	_next_sample = sim.now + 1.0
+	_win60.append(Vector2(sim.now, sim.state.pops_total))
+	while _win60.size() > 2 and _win60[0].x < sim.now - 60.0:
+		_win60.pop_front()
+	var span: float = sim.now - _win60[0].x
+	if span < 59.0:
+		return
+	var rate: float = (sim.state.pops_total - _win60[0].y) / span
+	run_peak = maxf(run_peak, rate)
+	if recovering and prev_run_peak > 0.0 and rate >= prev_run_peak:
+		recoveries.append(Vector2(sim.now - recover_start, prev_run_duration))
+		recovering = false
+	var pending: Array[Dictionary] = []
+	for w: Dictionary in new_tool_windows:
+		var start: float = w["start"]
+		if sim.now - start >= 60.0:
+			var total0: float = w["total"]
+			var peak: float = w["peak"]
+			new_tool_results.append(Vector3(float(["rolling_pin", "iron", "boot"].find(str(w["tool"]))), (sim.state.pops_total - total0) / (sim.now - start), peak))
+		else:
+			pending.append(w)
+	new_tool_windows = pending
+
+
 func _income_per_s() -> float:
 	_income_window.append(Vector2(sim.now, sim.state.pops_total))
 	while _income_window.size() > 2 and _income_window[0].x < sim.now - 20.0:
@@ -347,7 +483,7 @@ func _income_per_s() -> float:
 
 ## "Siempre hay algo por comprar": una mejora pagable, o pagable en menos de 30 s de ingreso.
 func _track_availability() -> void:
-	if sim.now > 45.0 * 60.0:
+	if sim.now > 215.0 * 60.0:
 		return
 	var income: float = _income_per_s()
 	var affordable_now: bool = false
@@ -364,22 +500,26 @@ func _track_availability() -> void:
 			break
 		if income > 0.0 and (cost - sim.state.pops) / income <= 30.0:
 			near = true
-	counted_time += DT
+	counted_time += dt
 	if affordable_now or near:
-		near_buy_time += DT
+		near_buy_time += dt
 	if affordable_now:
 		_dry_since = -1.0
 	else:
 		if _dry_since < 0.0:
 			_dry_since = sim.now
-		if sim.now - _dry_since > max_dry_gap:
-			max_dry_gap = sim.now - _dry_since
-			max_dry_at = sim.now
+		var gap: float = sim.now - _dry_since
+		if sim.now < 45.0 * 60.0:
+			if gap > max_dry_gap:
+				max_dry_gap = gap
+				max_dry_at = sim.now
+		elif gap > max_dry_gap_late:
+			max_dry_gap_late = gap
 
 
 func _log(kind: String, detail: String) -> void:
 	var per_s: float = _income_per_s()
-	csv.append("%.1f,%s,%s,%.0f,%.1f" % [sim.now, kind, detail.replace(",", ";"), sim.state.pops, per_s])
+	csv.append("%.1f,%s,%s,%.0f,%.1f,%.0f" % [sim.now, kind, detail.replace(",", ";"), sim.state.pops, per_s, sim.state.pops_total])
 
 
 func _write_csv() -> void:
@@ -410,16 +550,94 @@ func _gaps(from_s: float, to_s: float) -> Array[float]:
 	return out
 
 
+## Métricas de la partida larga (45-210 min, fases 3 y 4, reciclado y herramientas nuevas).
+func _late_checks(checks: Array[Array]) -> void:
+	var mid: float = _median(_gaps(2700.0, 12600.0))
+	checks.append(["mediana entre compras 45-210 min", "30-120 s", mid, mid >= 30.0 and mid <= 120.0])
+	checks.append(["máx. sin poder comprar 45-210 min", "<= 180 s", max_dry_gap_late, max_dry_gap_late <= 180.0])
+	checks.append(["llegada al Galpón (min)", "72-108", phase3_time / 60.0, phase3_time >= 72.0 * 60.0 and phase3_time <= 108.0 * 60.0])
+	checks.append(["llegada al Estacionamiento (min)", "120-180", phase4_time / 60.0, phase4_time >= 120.0 * 60.0 and phase4_time <= 180.0 * 60.0])
+	var worst: float = 0.0
+	for r: Vector2 in recoveries:
+		worst = maxf(worst, r.x / maxf(r.y, 1.0))
+	checks.append(["recuperación tras reciclar (% de la partida anterior)", "< 40 %", worst * 100.0, recoveries.size() > 0 and worst < 0.4])
+	var min_leap: float = 99.0
+	for t: Vector3 in new_tool_results:
+		if t.z > 0.0:
+			min_leap = minf(min_leap, t.y / t.z)
+	checks.append(["herramienta nueva vs. la anterior al máximo (x)", ">= 2", min_leap if min_leap < 99.0 else 0.0, min_leap >= 2.0 and min_leap < 99.0])
+
+
+## Idle: tras comprar manitos, sus Pops/min deben ser entre el 20% y el 45% de los del perfil activo.
+func _report_idle() -> bool:
+	var active_path: String = OUT_DIR.path_join("balance_active_%d.csv" % seed_value)
+	if hands_time < 0.0 or not FileAccess.file_exists(active_path):
+		print("   idle: sin manitos o sin referencia del perfil activo (corré el activo antes)")
+		return minutes < 200.0
+	var from_s: float = hands_time + 10.0 * 60.0
+	var active_rate: float = _csv_rate(active_path, from_s, minutes * 60.0)
+	var idle_rate: float = _own_rate(from_s, minutes * 60.0)
+	var ratio: float = idle_rate / maxf(active_rate, 1.0)
+	var ok: bool = ratio >= 0.2 and ratio <= 0.45
+	print("   idle (manitos a los %.1f min): %.0f Pops/min contra %.0f del activo = %.0f%%  objetivo 20-45%%  %s" % [
+		hands_time / 60.0, idle_rate * 60.0, active_rate * 60.0, ratio * 100.0, "APROBADO" if ok else "FALLÓ"])
+	csv.append("0,metrica,idle contra activo (%%),%.1f,%s" % [ratio * 100.0, "APROBADO" if ok else "FALLO"])
+	return ok
+
+
+func _csv_rate(path: String, from_s: float, to_s: float) -> float:
+	var t0: float = -1.0
+	var p0: float = 0.0
+	var t1: float = -1.0
+	var p1: float = 0.0
+	for line: String in FileAccess.get_file_as_string(path).split("\n"):
+		var f: PackedStringArray = line.split(",")
+		if f.size() < 6 or f[1] != "minuto":
+			continue
+		var t: float = float(f[0])
+		if t >= from_s and t0 < 0.0:
+			t0 = t
+			p0 = float(f[5])
+		if t <= to_s:
+			t1 = t
+			p1 = float(f[5])
+	if t0 < 0.0 or t1 <= t0:
+		return 0.0
+	return (p1 - p0) / (t1 - t0)
+
+
+func _own_rate(from_s: float, to_s: float) -> float:
+	var t0: float = -1.0
+	var p0: float = 0.0
+	var t1: float = -1.0
+	var p1: float = 0.0
+	for line: String in csv:
+		var f: PackedStringArray = line.split(",")
+		if f.size() < 6 or f[1] != "minuto":
+			continue
+		var t: float = float(f[0])
+		if t >= from_s and t0 < 0.0:
+			t0 = t
+			p0 = float(f[5])
+		if t <= to_s:
+			t1 = t
+			p1 = float(f[5])
+	if t0 < 0.0 or t1 <= t0:
+		return 0.0
+	return (p1 - p0) / (t1 - t0)
+
+
 func _report(wall: float) -> bool:
 	print("== balance_sim perfil=%s minutos=%.0f semilla=%d (%.1f s de reloj)" % [profile, minutes, seed_value, wall])
 	var tm: ToolModel = sim.selected_tool()
 	print("   estado: herramienta=%s forma=%s radio=%.2f fuerza=%.2f lámina %d%% reventada, cursor=%s objetivo=%s" % [sim.state.selected_tool, tm.shape, tm.radius, tm.force_per_second, int(sim.sheet.popped_ratio() * 100.0), str(pointer), str(target)])
+	print("   fases: Piso %.1f Galpón %.1f Estacionamiento %.1f min; recuperaciones %d" % [phase2_time / 60.0, phase3_time / 60.0, phase4_time / 60.0, recoveries.size()])
 	print("   pops_total=%.0f pops=%.0f compras=%d cadena_max=%d reciclados=%d" % [
 		sim.state.pops_total, sim.state.pops, purchase_times.size(), sim.state.max_chain, sim.state.recycles])
 	print("   reventones=%d (herramienta %d, %.0f%% por cadena) cadenas>=10: %d" % [total_pop_events, tool_pop_events, 100.0 * float(total_pop_events - tool_pop_events) / maxf(float(total_pop_events), 1.0), chain_events])
+	var full: bool = minutes >= 200.0
 	if profile == "idle":
-		print("   (idle: sin métricas)")
-		return true
+		return _report_idle()
 	var checks: Array[Array] = []
 	var early: float = _median(_gaps(0.0, 600.0))
 	var late: float = _median(_gaps(600.0, 2700.0))
@@ -434,6 +652,8 @@ func _report(wall: float) -> bool:
 	checks.append(["palma comprada (min)", "< 8", palm_time / 60.0, palm_time >= 0.0 and palm_time < 480.0])
 	checks.append(["llegada a Piso / palo (min)", "28-42", phase2_time / 60.0, phase2_time >= 28.0 * 60.0 and phase2_time <= 42.0 * 60.0])
 	checks.append(["primer reciclado (min)", "28-42", first_recycle / 60.0, first_recycle >= 28.0 * 60.0 and first_recycle <= 42.0 * 60.0])
+	if full:
+		_late_checks(checks)
 	var all_ok: bool = true
 	for c: Array in checks:
 		var passed: bool = c[3]

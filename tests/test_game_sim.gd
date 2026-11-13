@@ -49,13 +49,13 @@ func test_value_scales_with_pressure_squared() -> void:
 	sim.sheet.refresh_state(c)
 	sim.chain.clear_events()
 	sim.chain.pop_now(c)
-	sim._collect_events()
+	sim._collect_events(false)
 	var tense_value: float = sim.ev_value[0]
 	var d: int = sim.grid.index(1, 1)
 	sim._clear_events()
 	sim.chain.clear_events()
 	sim.chain.pop_now(d)
-	sim._collect_events()
+	sim._collect_events(false)
 	assert_almost_eq(tense_value / sim.ev_value[0], 4.0, 0.001)
 
 
@@ -65,7 +65,7 @@ func test_golden_is_worth_ten_times() -> void:
 	sim.sheet.type[a] = GameSim.TYPE_GOLDEN
 	sim.chain.pop_now(a)
 	sim.chain.pop_now(b)
-	sim._collect_events()
+	sim._collect_events(false)
 	assert_almost_eq(sim.ev_value[0] / sim.ev_value[1], 10.0, 0.001)
 
 

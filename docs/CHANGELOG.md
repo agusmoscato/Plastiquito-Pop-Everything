@@ -1,5 +1,57 @@
 # Changelog
 
+## Fase 3 — Escala (2026-11-13)
+
+El juego llega jugable hasta el final del Estacionamiento (DESIGN 4), la lámina de 1.000x1.000 se dibuja de lejos con una textura de estado, hay cuatro escenarios con identidad, plancha, bota, Eco, Manitos y rodillo automático, reciclado completo con tablero de corcho, ganancias sin conexión y herramienta de clips. **El balance de las fases 3 y 4 solo está calibrado para el perfil activo; el casual y el idle no cumplen todas las métricas (ver abajo).**
+
+### Hecho
+- **Dibujo de lejos** (rama `fase-3-render`, `SheetView`, `FarView`, `StatePacker`, `shaders/far_sheet.gdshader`): textura de estado RGBA8 de un píxel por burbuja, subida solo por bloques que cambiaron; plano de lejos con domos falsos en el fragmento; fundido por bloque según la distancia; bloques lejanos apagados; láminas de más de 60.000 celdas usan un domo de 54 triángulos. Se activa con más de 20.000 celdas, así que la lámina de 150x150 ya lo usa. Detalle y límites en [BENCHMARK_FASE3.md](BENCHMARK_FASE3.md).
+- **Escenarios** (rama `fase-3-scen`, `src/view/scenarios/`): Mesa (madera con veta, lámpara, taza, lápices), Piso (damero, zócalo, pata de silla, ventana con persiana), Galpón (hormigón manchado, estanterías con cajas, luz cenital fría, polvo) y Estacionamiento (asfalto, líneas, conos, luz de atardecer), con ambiente sonoro propio por fase. Cada reciclado que abre fase cambia el escenario durante 3,5 s mientras la cámara se aleja (`ToyWorld.transition_to_phase`).
+- **Contenido** (sim pura, con tests): **Plancha** (calor que sube la presión hasta 1,4 antes de tocar, sin crear aire), **Bota** (pisotón con recarga visible en el HUD y onda expansiva pagada con el aire de lo pisado), **Eco** (se vuelve a inflar una sola vez a los 2 s), **Manitos** (dedos fantasma que respetan su ritmo y no tocan reventadas; las inteligentes están preparadas y bloqueadas hasta la Fase 6) y **rodillo automático** (barridas con velocidad y ancho mejorables). Se ven siempre en el mundo (`AutomationView`).
+- **Reciclado completo**: fases 3 y 4 con "Lámina más grande" (1, 18 y 110 Pellets), +5% global, herramientas iniciales mejoradas, automatización desde el arranque, probabilidad de especiales y "memoria del turno". Tablero de corcho con fichas clavadas con chinches e hilo rojo entre las que se requieren (`RecyclePanel`, `PermCard`).
+- **Ganancias sin conexión** (`OfflineEarnings`, `OfflineTicket`): lo que producen Manitos y rodillo, al 50% y con tope de 2 horas (en `data/economy.json`), con un ticket de etiquetadora que se imprime y un TOTAL que se suma al odómetro rodando. Si la hora retrocede no se otorga nada (tests).
+- **Descubrimiento de la tienda**: la primera vez que algo se vuelve pagable la etiqueta se despega más, el clip tiembla y una flecha dibujada con marcador la señala 3 s; después de la primera compra, nunca más (`Settings.discovery_done`).
+- **Íconos por categoría**: tamaño (herramienta junto a una regla), fuerza (reventando una burbuja de una grilla de 3x3), velocidad (estela), especial (burbuja al lado), cantidad (copias). Los SubViewports se crean recién cuando el ícono se ve.
+- **Herramienta de clips** (rama `fase-3-scen`, `scenes/clips/`, `tools/record_clip.*`): 4 clips con el Movie Maker de Godot, F9 oculta toda la interfaz. Duración y peso en [CLIPS.md](CLIPS.md).
+- **Save versión 3** con migración desde la 2 (y desde la 1): memoria del turno y datos de ganancias sin conexión. Tests de ida y vuelta y de migración.
+- Simulador de balance hasta 3 h 30 (`tools/balance_sim.gd --minutes=215`, `tools/balance_full.sh`); el paso "balance" de `run_tests.sh` sigue corriendo las fases 1 y 2 (activo y casual, 3 semillas).
+
+### Simulador (semilla 1, 215 min, `--dt=20`)
+| Métrica | Objetivo | Activo | Casual | Idle |
+| --- | --- | --- | --- | --- |
+| Mediana entre compras, 0-10 min | 15-40 s | 19,0 APROBADO | 21,0 APROBADO | n/a |
+| Mediana entre compras, 10-45 min | 30-90 s | 33,0 APROBADO | 36,9 APROBADO | n/a |
+| Mediana entre compras, 45-210 min | 30-120 s | 37,0 APROBADO | 4,4 FALLÓ | n/a |
+| Mayor espera sin comprar (0-45 / 45-210 min) | <= 120 / <= 180 s | 107 / 179 APROBADO | 83 / 113 APROBADO | n/a |
+| % del tiempo con compra pagable o a < 30 s | >= 70 % | 68,8 FALLÓ | 88,3 APROBADO | n/a |
+| Llegada al Piso | 28-42 min | 30,1 APROBADO | 36,9 APROBADO | 36,9 |
+| Llegada al Galpón | 72-108 min | 90,5 APROBADO | 86,9 APROBADO | 86,9 |
+| Llegada al Estacionamiento | 120-180 min | 147,8 APROBADO | 95,5 FALLÓ | no llega |
+| Recuperación tras reciclar | < 40 % de la partida | 2,3 % APROBADO | 63,6 % FALLÓ | n/a |
+| Herramienta nueva contra la anterior al máximo | >= 2x | 2,9x APROBADO | 1,3x FALLÓ | n/a |
+| Idle: Pops/min tras Manitos contra el activo | 20-45 % | n/a | n/a | ~0 % FALLÓ |
+
+**Qué no cumple y por qué.** Pasé muchas iteraciones calibrando el perfil activo y no alcanzó el tiempo para cerrar el casual y el idle:
+- La economía de las fases 3 y 4 está dominada por las cadenas sobre láminas de 6.400 y 22.500 burbujas (el 90% de los reventones). El bot casual arma cadenas enormes con la plancha y las Manitos (sube al Estacionamiento a los 95 min), mientras que las Manitos solas producen del orden de 0,002% de los Pops del activo al final. Para que el idle llegue al 20-45% hay que bajar la dominancia de las cadenas (por ejemplo, `chain_k` o un tope de tamaño de cadena por frame) y volver a calibrar todo.
+- La métrica "% del tiempo con compra pagable" del activo queda en 68,8% (a 1,2 puntos); el hueco está justo después de cada reciclado de fase.
+- **Propuesta**: antes de la Fase 4, limitar la ganancia de las cadenas grandes (valor decreciente por reventón pasado cierto tamaño) y recalibrar con las Manitos como fuente principal del perfil idle.
+
+### Decisiones y desvíos de DESIGN.md
+- **Base por fase x100** (no x50): `phase_base_values` = 1, 100, 10.000, 1.000.000, con escalas de costo [1, 320, 40.000, 8.000.000]. El x50 de DESIGN dejaba la primera hora de la fase siguiente por debajo del pico de la anterior.
+- **"Lámina más grande"** abre una fase por nivel con costos a mano (1, 18 y 110 Pellets), `cost_table` en `data/upgrades.json`.
+- **Cadenas**: `chain_k_max` bajó de 0,9 a 0,62 y la mejora de aire comprimido tiene 3 niveles (antes 10); el umbral de tensión mínimo es 1,4. Sin ese tope, las láminas grandes se despejaban enteras de un golpe.
+- **Plancha**: el calor sube la presión hasta `iron_heat_cap` = 1,4 (menor que el umbral de tensión de 1,5): prepara las cadenas sin crear aire por encima de lo que dicen las reglas. **Bota**: la onda se paga con `min(wave_k, 1 - chain_k)` de la presión pisada, así el aire total nunca aumenta.
+- **Manitos inteligentes** existen en `data/upgrades.json` con requisito de fase 6 (nunca disponibles en esta fase).
+- **Eco** vuelve a inflarse como burbuja normal (no repite). El aviso de brillo previo al reinflado quedó pendiente.
+- La plancha del clip 3 sigue simulando el calor a mano (`_apply_heat()` del clip); falta enchufar el `ToolModel` real.
+- Linux: no hay WSL ni VM en esta máquina, así que la build de Linux se genera pero no se pudo ejecutar.
+- El shader de lejos no soporta todavía el rollo de reciclado (las láminas de más de 20.000 celdas se reciclan sin la animación de enrollado).
+
+### Pendiente
+- Cerrar el balance del casual y el idle (ver arriba) y repetir las capturas con ese cambio.
+- Aviso de brillo del Eco, vapor de la plancha y polvo de la bota con partículas propias.
+- Sonido real y mezcla.
+
 ## Fase 2 — Núcleo (2026-11-13)
 
 La primera hora (Mesa y Piso) completa: aire y cadenas, 3 herramientas, 3 especiales, economía, tienda, HUD, combo, reciclado básico, guardado y simulador de balance v1.

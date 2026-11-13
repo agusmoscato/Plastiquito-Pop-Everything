@@ -11,6 +11,7 @@ var volumes: Dictionary = {"Master": 0.8, "Pops": 1.0, "Tools": 1.0, "UI": 1.0, 
 var shake_enabled: bool = true
 var reduce_motion: bool = false
 var language: String = "es" ## "es" o "en"
+var discovery_done: bool = false ## ya compró algo: nunca más se señala la tienda
 
 
 func _ready() -> void:
@@ -55,6 +56,7 @@ func save_settings() -> void:
 	cfg.set_value("video", "shake_enabled", shake_enabled)
 	cfg.set_value("video", "reduce_motion", reduce_motion)
 	cfg.set_value("ui", "language", language)
+	cfg.set_value("ui", "discovery_done", discovery_done)
 	cfg.save(PATH)
 
 
@@ -68,3 +70,4 @@ func load_settings() -> void:
 	shake_enabled = cfg.get_value("video", "shake_enabled", shake_enabled)
 	reduce_motion = cfg.get_value("video", "reduce_motion", reduce_motion)
 	language = cfg.get_value("ui", "language", language)
+	discovery_done = cfg.get_value("ui", "discovery_done", discovery_done)

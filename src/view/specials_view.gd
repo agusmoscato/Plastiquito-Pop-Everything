@@ -7,6 +7,7 @@ extends Node3D
 const TYPE_GOLDEN: int = 1
 const TYPE_BOMB: int = 2
 const TYPE_LINE: int = 3
+const TYPE_ECHO: int = 4
 const MAX_NODES: int = 800
 
 var sheet: SheetModel
@@ -117,6 +118,9 @@ func _spawn(idx: int, type_id: int) -> void:
 		_add(node, "fuse", "fuse", Vector3(0.12, 0.42, 0.0), Vector3(0.0, 0.0, -25.0))
 		var spark: MeshInstance3D = _add(node, "spark", "spark", Vector3(0.22, 0.62, 0.0), Vector3.ZERO)
 		spark.name = "Spark"
+	elif type_id == TYPE_ECHO:
+		_add(node, "echo_ball", "echo", Vector3.ZERO, Vector3.ZERO)
+		_add(node, "echo_ring", "echo_ring", Vector3(0.0, 0.0, 0.0), Vector3(90.0, 0.0, 0.0))
 	elif type_id == TYPE_LINE:
 		_add(node, "capsule", "line", Vector3.ZERO, Vector3(0.0, 0.0, 90.0))
 		for dx: float in [-0.32, 0.0, 0.32]:
@@ -170,6 +174,20 @@ func _build_assets() -> void:
 	band.bottom_radius = 0.215
 	band.height = 0.07
 	_meshes["band"] = band
+	var echo_ball: SphereMesh = SphereMesh.new()
+	echo_ball.radius = 0.28
+	echo_ball.height = 0.56
+	_meshes["echo_ball"] = echo_ball
+	var ring: TorusMesh = TorusMesh.new()
+	ring.inner_radius = 0.36
+	ring.outer_radius = 0.46
+	_meshes["echo_ring"] = ring
+	var echo_mat: StandardMaterial3D = ToolMeshes.material(Color("#BFE9FF"), 0.0)
+	echo_mat.emission_enabled = true
+	echo_mat.emission = Color("#8FD0F2")
+	echo_mat.emission_energy_multiplier = 0.9
+	_mats["echo"] = echo_mat
+	_mats["echo_ring"] = echo_mat
 	var gold: StandardMaterial3D = ToolMeshes.material(Color("#F2C94C"), 0.9)
 	gold.emission_enabled = true
 	gold.emission = Color("#F2B531")

@@ -66,7 +66,13 @@
    "balance": {
     "placeholder": true,
     "force": 1.0,
-    "size": 4.0
+    "size": 4.0,
+    "force_per_second": 4.5,
+    "radius_cells": 2.5,
+    "drag_entry_fraction": 0.35,
+    "air_share": 0.3,
+    "direction_bias": 0.0,
+    "center_falloff": 0.0
    }
   },
   {
@@ -79,7 +85,13 @@
    "balance": {
     "placeholder": true,
     "force": 1.0,
-    "size": 6.0
+    "size": 6.0,
+    "force_per_second": 30.0,
+    "radius_cells": 3.0,
+    "drag_entry_fraction": 1.0,
+    "air_share": 0.0,
+    "direction_bias": 0.0,
+    "center_falloff": 0.0
    }
   },
   {

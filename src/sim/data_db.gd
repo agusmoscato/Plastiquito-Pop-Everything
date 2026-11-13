@@ -63,7 +63,12 @@ const ECONOMY_FIELDS: Dictionary = {
 	"combo_rates": TYPE_ARRAY, "combo_multipliers": TYPE_ARRAY, "golden_multiplier": TYPE_FLOAT,
 	"chance_golden": TYPE_FLOAT, "chance_bomb": TYPE_FLOAT, "chance_line": TYPE_FLOAT,
 	"pellet_divisor": TYPE_FLOAT, "pellet_exponent": TYPE_FLOAT, "autosave_seconds": TYPE_FLOAT,
-	"first_level_cost_factor": TYPE_FLOAT, "reload_delay_manual": TYPE_FLOAT, "reload_delay_auto": TYPE_FLOAT, "chain_stamp_min": TYPE_INT,
+	"first_level_cost_factor": TYPE_FLOAT,
+	"chance_echo": TYPE_FLOAT, "echo_delay_seconds": TYPE_FLOAT, "offline_efficiency": TYPE_FLOAT,
+	"offline_cap_hours": TYPE_FLOAT, "hand_base_rate": TYPE_FLOAT, "roller_base_speed": TYPE_FLOAT,
+	"roller_base_halfwidth": TYPE_FLOAT, "iron_heat_rate": TYPE_FLOAT, "iron_heat_cap": TYPE_FLOAT,
+	"iron_heat_reach": TYPE_FLOAT, "boot_cooldown_seconds": TYPE_FLOAT, "boot_wave_k": TYPE_FLOAT,
+	"boot_wave_reach": TYPE_FLOAT, "reload_delay_manual": TYPE_FLOAT, "reload_delay_auto": TYPE_FLOAT, "chain_stamp_min": TYPE_INT,
 }
 const TOOL_SHAPES: PackedStringArray = ["cell", "circle", "segment", "rect"]
 

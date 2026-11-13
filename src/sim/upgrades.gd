@@ -10,17 +10,21 @@ var eco: Dictionary
 var order: Array[String] = [] ## ids en el orden del catálogo
 ## Las mejoras en Pops cuestan más en cada fase (x base de la fase, DESIGN 4); lo fija GameSim.
 var cost_scale: float = 1.0
+var _defs: Dictionary = {}
 
 
 func _init(p_db: DataDB) -> void:
 	db = p_db
 	eco = db.economy
 	for u: Dictionary in db.upgrades:
-		order.append(str(u["id"]))
+		var uid: String = str(u["id"])
+		order.append(uid)
+		_defs[uid] = u
 
 
 func def(id: String) -> Dictionary:
-	return db.get_upgrade(id)
+	var d: Dictionary = _defs[id]
+	return d
 
 
 func is_perm(id: String) -> bool:
@@ -42,10 +46,14 @@ func milestone(level: int) -> float:
 ## Costo del próximo nivel (en Pops, o en Pellets si es permanente).
 func next_cost(id: String, level: int) -> float:
 	var d: Dictionary = def(id)
+	if d.has("cost_table"): # escalones a mano (por ejemplo, "Lámina más grande")
+		var table: Array = d["cost_table"]
+		var price: float = table[mini(level, table.size() - 1)]
+		return price
 	var scale: float = 1.0 if str(d["scope"]) == PERM else cost_scale
 	# Primer pedido barato: la primera compra de fuerza o de valor sale pronto (en unos 30 s).
 	var kind: String = str(d["kind"])
-	if level == 0 and str(d["scope"]) != PERM and (kind == "force" or kind == "value") and cost_scale <= 1.0:
+	if level == 0 and str(d["scope"]) != PERM and (kind == "force" or kind == "value"):
 		scale *= Cfg.num(eco, "first_level_cost_factor")
 	return ceilf(Economy.cost(Cfg.num(d, "base_cost"), Cfg.num(d, "growth"), level) * scale)
 
@@ -88,10 +96,29 @@ func is_available(state: GameState, id: String) -> bool:
 		var ph: float = req["phase"]
 		if phase_of(state) < int(ph):
 			return false
+	if req.has("sheet"):
+		var sh: float = req["sheet"]
+		if state.perm_level("perm_sheet") + 1 < int(sh):
+			return false
 	if req.has("upgrade"):
-		if state.level(str(req["upgrade"])) < 1:
+		var need: String = str(req["upgrade"])
+		var have: int = state.perm_level(need) if need.begins_with("perm_") else level_with_bonus(state, need)
+		if have < 1:
 			return false
 	return true
+
+
+## Nivel efectivo de una mejora: el comprado más lo que regala la automatización permanente.
+func level_with_bonus(state: GameState, id: String) -> int:
+	var lv: int = state.level(id)
+	var auto: int = state.perm_level("perm_auto")
+	if id == "unlock_hands" and auto >= 2:
+		lv = maxi(lv, 1)
+	elif id == "unlock_roller" and auto >= 3:
+		lv = maxi(lv, 1)
+	elif id == "hands_count" and auto >= 2:
+		lv += 3 * (auto - 1)
+	return lv
 
 
 func phase_of(state: GameState) -> int:
@@ -105,6 +132,10 @@ func tool_unlocked(state: GameState, tool_id: String) -> bool:
 		return state.level("unlock_palm") >= 1
 	if tool_id == "rolling_pin":
 		return state.level("unlock_pin") >= 1
+	if tool_id == "iron":
+		return state.level("unlock_iron") >= 1
+	if tool_id == "boot":
+		return state.level("unlock_boot") >= 1
 	return false
 
 
@@ -129,7 +160,7 @@ func _tool_effect(state: GameState, tool_id: String, kind: String) -> float:
 	for id: String in ids_for_tool(tool_id):
 		var d: Dictionary = def(id)
 		if str(d["kind"]) == kind:
-			return effect(id, state.level(id) + _start_levels(state, id))
+			return effect(id, level_with_bonus(state, id) + _start_levels(state, id))
 	return 0.0
 
 
@@ -137,14 +168,17 @@ func _tool_mult(state: GameState, tool_id: String, kind: String) -> float:
 	for id: String in ids_for_tool(tool_id):
 		var d: Dictionary = def(id)
 		if str(d["kind"]) == kind:
-			return effect(id, state.level(id) + _start_levels(state, id))
+			return effect(id, level_with_bonus(state, id) + _start_levels(state, id))
 	return 1.0
 
 
 ## "Dedo con experiencia": el dedo arranca con niveles de fuerza regalados.
 func _start_levels(state: GameState, id: String) -> int:
-	if id == "finger_force":
-		return int(effect("perm_finger", state.perm_level("perm_finger")))
+	var map: Dictionary = {"finger_force": "perm_finger", "palm_force": "perm_palm", "pin_force": "perm_pin",
+		"iron_force": "perm_iron", "boot_force": "perm_boot"}
+	if map.has(id):
+		var perm_id: String = str(map[id])
+		return int(effect(perm_id, state.perm_level(perm_id)))
 	return 0
 
 
@@ -156,6 +190,8 @@ func tool_params(state: GameState, tool_id: String, spacing: float) -> Dictionar
 	p["shape"] = str(t["shape"]) if tool_id != "finger" else "single"
 	if tool_id == "palm":
 		p["shape"] = "circle"
+	if tool_id == "boot":
+		p["shape"] = "stomp"
 	var radius_cells: float = Cfg.num(b, "radius_cells") + _tool_effect(state, tool_id, "size")
 	p["radius"] = radius_cells * spacing
 	if tool_id == "finger" and radius_cells > 0.0:
@@ -167,27 +203,54 @@ func tool_params(state: GameState, tool_id: String, spacing: float) -> Dictionar
 	var bias: float = Cfg.num(b, "direction_bias")
 	if tool_id == "rolling_pin":
 		bias += special
-	else:
+	elif tool_id != "iron" and tool_id != "boot":
 		air += special
 	p["air_share"] = minf(air, 0.95)
 	p["direction_bias"] = bias
 	p["center_falloff"] = Cfg.num(b, "center_falloff")
+	p["heat_rate"] = 0.0
+	p["cooldown"] = Cfg.num(eco, "boot_cooldown_seconds")
+	p["wave_reach"] = Cfg.num(eco, "boot_wave_reach")
+	if tool_id == "iron":
+		p["heat_rate"] = Cfg.num(eco, "iron_heat_rate") * (1.0 + special)
+	if tool_id == "boot":
+		p["cooldown"] = maxf(1.0, Cfg.num(eco, "boot_cooldown_seconds") - _tool_effect(state, tool_id, "speed"))
+		p["wave_reach"] = Cfg.num(eco, "boot_wave_reach") * (1.0 + special)
+		p["drag_entry_fraction"] = 1.0
 	return p
+
+
+## Parámetros de las Manitos: cantidad, ritmo por manito e inteligencia (bloqueada hasta la Fase 6).
+func hands_params(state: GameState) -> Dictionary:
+	var count: int = 0
+	if level_with_bonus(state, "unlock_hands") >= 1:
+		count = level_with_bonus(state, "hands_count")
+	var speed_add: float = effect("hands_speed", state.level("hands_speed"))
+	return {"count": count, "rate": Cfg.num(eco, "hand_base_rate") * (1.0 + speed_add), "smart": state.level("hands_smart") >= 1}
+
+
+## Parámetros del rodillo automático.
+func roller_params(state: GameState) -> Dictionary:
+	var on: bool = level_with_bonus(state, "unlock_roller") >= 1
+	return {"enabled": on, "speed": Cfg.num(eco, "roller_base_speed") * (1.0 + effect("roller_speed", state.level("roller_speed"))),
+		"half_width": Cfg.num(eco, "roller_base_halfwidth") + effect("roller_size", state.level("roller_size"))}
 
 
 ## Parámetros globales derivados de los niveles.
 func global_stats(state: GameState) -> Dictionary:
 	var sheet_cfg: Dictionary = db.sheet
 	var g: Dictionary = {}
-	g["tense_threshold"] = maxf(1.3, Cfg.num(sheet_cfg, "tense_threshold") - effect("global_tense", state.level("global_tense")))
+	g["tense_threshold"] = maxf(1.4, Cfg.num(sheet_cfg, "tense_threshold") - effect("global_tense", state.level("global_tense")))
 	g["chain_k"] = minf(Cfg.num(sheet_cfg, "chain_k_max"), Cfg.num(sheet_cfg, "chain_k") + effect("global_chain", state.level("global_chain")))
 	var special_add: float = effect("global_special", state.level("global_special"))
-	g["chance_golden"] = Cfg.num(eco, "chance_golden") + special_add + effect("perm_golden", state.perm_level("perm_golden"))
-	g["chance_bomb"] = Cfg.num(eco, "chance_bomb") + special_add * 0.5
-	g["chance_line"] = Cfg.num(eco, "chance_line") + special_add * 0.5
+	var perm_special: float = effect("perm_golden", state.perm_level("perm_golden"))
+	g["chance_golden"] = Cfg.num(eco, "chance_golden") + special_add + perm_special
+	g["chance_bomb"] = Cfg.num(eco, "chance_bomb") + special_add * 0.5 + perm_special * 0.5
+	g["chance_line"] = Cfg.num(eco, "chance_line") + special_add * 0.5 + perm_special * 0.5
+	g["chance_echo"] = Cfg.num(eco, "chance_echo") + special_add * 0.5 + perm_special * 0.5
 	g["value_mult"] = effect("global_value", state.level("global_value")) * (1.0 + effect("perm_bonus", state.perm_level("perm_bonus")))
 	g["sheet_growth"] = int(effect("global_sheet", state.level("global_sheet")))
-	g["auto_reload"] = state.level("global_reload") >= 1
+	g["auto_reload"] = state.level("global_reload") >= 1 or state.perm_level("perm_auto") >= 1
 	g["phase"] = phase_of(state)
 	return g
 
@@ -228,8 +291,20 @@ func effect_text(id: String, level: int, lang: String) -> String:
 			return NumberFormat.decimal(minf(Cfg.num(db.sheet, "chain_k_max"), Cfg.num(db.sheet, "chain_k") + v), 2, lang)
 		"sheet_growth":
 			return "+" + str(int(v))
+		"count":
+			return "+" + str(int(v))
+		"smart":
+			return "-"
+		"automation":
+			return "Nv " + str(level)
+		"memory":
+			return NumberFormat.decimal(v * 100.0, 0, lang) + "%"
+		"iron_start", "boot_start", "palm_start", "pin_start":
+			return "+" + str(int(v)) + " niv" if lang == "es" else "+" + str(int(v)) + " lv"
 		"sheet_size":
-			return ("Mesa" if lang == "es" else "Table") if level < 1 else ("Piso 40x40" if lang == "es" else "Floor 40x40")
+			var names_es: Array[String] = ["Mesa", "Piso", "Galpón", "Estacionamiento"]
+			var names_en: Array[String] = ["Table", "Floor", "Warehouse", "Parking lot"]
+			return (names_es if lang == "es" else names_en)[clampi(level, 0, 3)]
 		"global_bonus":
 			return "+" + NumberFormat.decimal(v * 100.0, 0, lang) + "%"
 		"finger_start":

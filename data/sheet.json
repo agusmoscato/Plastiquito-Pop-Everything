@@ -14,7 +14,7 @@
     "max_pressure": 2.0,
     "min_pressure": 0.4,
     "chain_k": 0.5,
-    "chain_k_max": 0.9,
+    "chain_k_max": 0.62,
     "chain_budget_per_frame": 40
   }
 }

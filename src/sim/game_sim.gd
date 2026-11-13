@@ -7,6 +7,7 @@ extends RefCounted
 const TYPE_GOLDEN: int = 1
 const TYPE_BOMB: int = 2
 const TYPE_LINE: int = 3
+const TYPE_ECHO: int = 4
 
 var db: DataDB
 var upgrades: Upgrades
@@ -18,6 +19,8 @@ var sheet: SheetModel
 var grid: HexGrid
 var chain: ChainSolver
 var tools: Dictionary = {} ## id -> ToolModel
+var hands: HandsModel
+var roller: AutoRoller
 var combo: ComboTracker = ComboTracker.new()
 var stats: Dictionary = {}
 var now: float = 0.0
@@ -33,6 +36,8 @@ var ev_chain_ended_value: float = 0.0
 var ev_new_specials: Array[int] = []
 var ev_reloaded: bool = false
 var ev_squish: bool = false
+var ev_revived: PackedInt32Array = PackedInt32Array() ## Ecos que se volvieron a inflar
+var ev_auto_from: int = 0 ## desde este índice de ev_* los reventones son de la automatización
 
 var chain_count: int = 0 ## tamaño de la cadena en curso (0 si no hay)
 var chain_value: float = 0.0
@@ -40,6 +45,8 @@ var reload_timer: float = -1.0
 
 var _prev_pointer: Vector2 = Vector2.ZERO
 var _chain_active: bool = false
+var _prev_pressing: bool = false
+var _echoes: Array[Vector2] = [] ## (índice, segundos que faltan para volver a inflarse)
 
 
 func _init(p_db: DataDB, seed_value: int = 1) -> void:
@@ -96,12 +103,15 @@ func new_sheet() -> void:
 func _build_models() -> void:
 	chain = ChainSolver.new(sheet, grid)
 	tools.clear()
-	for id: String in ["finger", "palm", "rolling_pin"]:
+	for id: String in ["finger", "palm", "rolling_pin", "iron", "boot"]:
 		var tm: ToolModel = ToolModel.new(sheet, grid)
 		tm.resistance = Cfg.num(db.sheet, "resistance")
 		tm.recovery_per_second = Cfg.num(db.sheet, "recovery_per_second")
 		tools[id] = tm
 	sheet.reload_threshold = Cfg.num(db.sheet, "reload_threshold")
+	hands = HandsModel.new(sheet, grid, rng.randi())
+	roller = AutoRoller.new(sheet, grid)
+	_echoes = []
 
 
 func _apply_to_sheet() -> void:
@@ -111,6 +121,14 @@ func _apply_to_sheet() -> void:
 	chain.k = Cfg.num(stats, "chain_k")
 	for id: String in tools:
 		_configure_tool(id)
+	var hp: Dictionary = upgrades.hands_params(state)
+	hands.set_count(Cfg.integer(hp, "count"))
+	hands.rate = Cfg.num(hp, "rate")
+	hands.smart = Cfg.flag(hp, "smart")
+	var rp: Dictionary = upgrades.roller_params(state)
+	roller.enabled = Cfg.flag(rp, "enabled")
+	roller.speed = Cfg.num(rp, "speed")
+	roller.half_width = Cfg.num(rp, "half_width")
 
 
 func _configure_tool(id: String) -> void:
@@ -123,6 +141,14 @@ func _configure_tool(id: String) -> void:
 	tm.air_share = Cfg.num(p, "air_share")
 	tm.direction_bias = Cfg.num(p, "direction_bias")
 	tm.center_falloff = Cfg.num(p, "center_falloff")
+	tm.heat_rate = Cfg.num(p, "heat_rate")
+	tm.heat_cap = Cfg.num(eco, "iron_heat_cap")
+	tm.heat_reach = Cfg.num(eco, "iron_heat_reach")
+	tm.cooldown = Cfg.num(p, "cooldown")
+	tm.wave_k = Cfg.num(eco, "boot_wave_k")
+	tm.wave_reach = Cfg.num(p, "wave_reach")
+	if tm.shape == "rect":
+		tm.heat_reach = Cfg.num(eco, "iron_heat_reach")
 
 
 ## Reparte las burbujas especiales al generar la lámina; avisa las que el jugador no conocía.
@@ -131,6 +157,7 @@ func _generate_specials() -> void:
 		[TYPE_GOLDEN, Cfg.num(stats, "chance_golden"), 1],
 		[TYPE_BOMB, Cfg.num(stats, "chance_bomb"), 2],
 		[TYPE_LINE, Cfg.num(stats, "chance_line"), 2],
+		[TYPE_ECHO, Cfg.num(stats, "chance_echo"), 4],
 	]
 	var present: Dictionary = {}
 	for i: int in sheet.cell_count():
@@ -184,14 +211,26 @@ func step(dt: float, pointer: Vector2, pressing: bool) -> void:
 		if reload_timer < 0.0:
 			_do_reload()
 	var tm: ToolModel = selected_tool()
+	tm.tick_cooldown(dt)
 	var touched: PackedInt32Array = PackedInt32Array()
 	var dir: Vector2 = Vector2.ZERO
-	if pressing and reload_timer < 0.0:
+	var live: bool = reload_timer < 0.0
+	if pressing and live:
 		touched = tm.cells_for(_prev_pointer, pointer)
 		dir = pointer - _prev_pointer
-	var popped: PackedInt32Array = tm.step(touched, dt, tm.last_weights, dir)
+	var popped: PackedInt32Array = PackedInt32Array()
+	if tm.shape == ToolModel.SHAPE_STOMP:
+		if pressing and not _prev_pressing and live:
+			popped = tm.stomp(pointer, chain.k)
+			_enqueue_overloaded(tm.last_wave_cells)
+	else:
+		popped = tm.step(touched, dt, tm.last_weights, dir)
+		if tm.shape == ToolModel.SHAPE_RECT and live:
+			tm.cells_for(_prev_pointer, pointer) # orienta la plancha hacia donde se mueve
+			tm.apply_heat(pointer, dt)
+		ev_squish = tm.new_pressed > 0
 	_prev_pointer = pointer
-	ev_squish = tm.new_pressed > 0
+	_prev_pressing = pressing
 	chain.clear_events()
 	for idx: int in popped:
 		chain.pop_now(idx)
@@ -202,8 +241,62 @@ func step(dt: float, pointer: Vector2, pressing: bool) -> void:
 		state.tool_pops[state.selected_tool] = prev_pops + ev_tool_pops
 	chain.budget_per_frame = maxi(1, roundi(float(Cfg.integer(db.sheet, "chain_budget_per_frame")) * dt * 60.0))
 	chain.step()
-	_collect_events()
+	_collect_events(false)
+	ev_auto_from = ev_idx.size()
+	_step_automation(dt)
+	_tick_echoes(dt)
 	_track_chain()
+
+
+## Manitos y rodillo automático: revientan solos; su valor no lleva combo (premia jugar activo).
+func _step_automation(dt: float) -> void:
+	if reload_timer >= 0.0:
+		return
+	var hand_cells: PackedInt32Array = hands.step(dt)
+	var roll_cells: PackedInt32Array = roller.step(dt)
+	if hand_cells.is_empty() and roll_cells.is_empty():
+		return
+	chain.clear_events()
+	chain.budget_per_frame = maxi(1, roundi(float(Cfg.integer(db.sheet, "chain_budget_per_frame")) * dt * 30.0))
+	for idx: int in hand_cells:
+		chain.pop_now(idx)
+	for idx: int in roll_cells:
+		chain.pop_now(idx)
+	chain.step()
+	_collect_events(true)
+	_count_tool_pops("hands", hand_cells.size())
+	_count_tool_pops("auto_roller", roll_cells.size())
+
+
+func _count_tool_pops(tool_id: String, n: int) -> void:
+	if n <= 0:
+		return
+	var prev: int = state.tool_pops.get(tool_id, 0)
+	state.tool_pops[tool_id] = prev + n
+
+
+## Las celdas que la onda llevó al máximo revientan solas (entran a la cola de cadenas).
+func _enqueue_overloaded(cells: PackedInt32Array) -> void:
+	for n: int in cells:
+		if sheet.pressure[n] >= sheet.max_pressure:
+			chain.enqueue(n)
+
+
+## Eco: pasados `echo_delay_seconds` de reventar, vuelve a inflarse UNA vez (queda como normal).
+func _tick_echoes(dt: float) -> void:
+	var keep: Array[Vector2] = []
+	for e: Vector2 in _echoes:
+		var left: float = e.y - dt
+		if left > 0.0:
+			keep.append(Vector2(e.x, left))
+			continue
+		var idx: int = int(e.x)
+		if sheet.state[idx] == SheetModel.STATE_POPPED:
+			sheet.type[idx] = 0
+			sheet.revive(idx)
+			ev_revived.append(idx)
+			sheet.notify_changed(PackedInt32Array([idx]))
+	_echoes = keep
 
 
 func _do_reload() -> void:
@@ -222,13 +315,15 @@ func _clear_events() -> void:
 	ev_new_specials = []
 	ev_reloaded = false
 	ev_squish = false
+	ev_revived = PackedInt32Array()
+	ev_auto_from = 0
 
 
 ## Valor de cada reventón del step (base * p^2 * tipo * combo * global) y suma a los Pops.
-func _collect_events() -> void:
+func _collect_events(auto: bool) -> void:
 	var bases: Array = eco["phase_base_values"]
 	var base: float = bases[mini(phase(), bases.size()) - 1]
-	var m_combo: float = combo.multiplier(now)
+	var m_combo: float = 1.0 if auto else combo.multiplier(now)
 	var m_global: float = Cfg.num(stats, "value_mult")
 	for i: int in chain.events_idx.size():
 		var t: int = chain.events_type[i]
@@ -238,6 +333,8 @@ func _collect_events() -> void:
 		ev_value.append(v)
 		ev_pressure.append(chain.events_pressure[i])
 		ev_type.append(t)
+		if t == TYPE_ECHO:
+			_echoes.append(Vector2(float(chain.events_idx[i]), Cfg.num(eco, "echo_delay_seconds")))
 		state.pops += v
 		state.pops_run += v
 		state.pops_total += v
@@ -331,23 +428,73 @@ func recycle() -> int:
 	var gained: int = recycle_gain()
 	if gained < 1:
 		return 0
+	var previous: Dictionary = state.levels.duplicate()
 	Prestige.recycle(state, gained)
+	state.last_levels = previous
+	_apply_memory(previous)
 	combo.reset()
 	refresh_stats()
 	new_sheet()
-	_apply_perm_start()
+	_echoes = []
 	return gained
 
 
-func _apply_perm_start() -> void:
-	refresh_stats()
+## "Memoria del turno": arrancás con un % de los niveles de la partida anterior.
+func _apply_memory(previous: Dictionary) -> void:
+	var mem: float = upgrades.effect("perm_memory", state.perm_level("perm_memory"))
+	if mem <= 0.0:
+		return
+	for key: Variant in previous:
+		var id: String = str(key)
+		var prev_level: int = previous[key]
+		var restored: int = int(floorf(float(prev_level) * mem))
+		if restored > 0 and upgrades.max_level(id) > 1:
+			state.levels[id] = mini(restored, upgrades.max_level(id))
 
 
 # --- Guardado ----------------------------------------------------------------------------------
 
-func save_dict() -> Dictionary:
+func save_dict(now_unix: float = 0.0) -> Dictionary:
 	state.sheet = sheet.to_dict()
+	if now_unix > 0.0:
+		state.saved_at_unix = now_unix
+		state.max_unix_seen = maxf(state.max_unix_seen, now_unix)
 	return state.to_dict()
+
+
+# --- Ganancias mientras no jugás -----------------------------------------------------------
+
+## Reventones por segundo de la automatización: (manitos, rodillo).
+func automation_rates() -> Vector2:
+	var hands_s: float = float(hands.count) * hands.rate
+	var roller_s: float = 0.0
+	if roller.enabled:
+		roller_s = roller.speed * 2.0 * roller.half_width * 0.9
+	return Vector2(hands_s, roller_s)
+
+
+## Valor medio de un reventón automático (base de la fase x multiplicador global, sin combo).
+func average_pop_value() -> float:
+	var bases: Array = eco["phase_base_values"]
+	var base: float = bases[mini(phase(), bases.size()) - 1]
+	return base * 1.2 * Cfg.num(stats, "value_mult")
+
+
+## Lo que produjo la automatización mientras el juego estuvo cerrado (ver OfflineEarnings).
+func compute_offline(now_unix: float) -> Dictionary:
+	var rates: Vector2 = automation_rates()
+	return OfflineEarnings.compute(now_unix, state.saved_at_unix, state.max_unix_seen, rates.x, rates.y,
+		average_pop_value(), Cfg.num(eco, "offline_efficiency"), Cfg.num(eco, "offline_cap_hours"))
+
+
+## Acredita el resultado de compute_offline() y actualiza la hora más alta vista.
+func apply_offline(result: Dictionary, now_unix: float) -> void:
+	var pops: float = result["pops"]
+	state.pops += pops
+	state.pops_run += pops
+	state.pops_total += pops
+	state.offline_total += pops
+	state.max_unix_seen = maxf(state.max_unix_seen, now_unix)
 
 
 ## Carga un save (migrándolo). Devuelve false si es inválido (el estado queda intacto).

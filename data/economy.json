@@ -5,11 +5,15 @@
   "placeholder": true,
   "phase_base_values": [
    1.0,
-   50.0
+   100.0,
+   10000.0,
+   1000000.0
   ],
   "phase_sheet_sizes": [
    20,
-   40
+   40,
+   80,
+   150
   ],
   "sheet_start_size": 8,
   "milestone_every": 25,
@@ -41,8 +45,23 @@
   "chain_stamp_min": 10,
   "phase_cost_scales": [
    1.0,
-   160.0
+   320.0,
+   40000.0,
+   8000000.0
   ],
-  "first_level_cost_factor": 0.15
+  "first_level_cost_factor": 0.15,
+  "chance_echo": 0.012,
+  "echo_delay_seconds": 2.0,
+  "offline_efficiency": 0.5,
+  "offline_cap_hours": 2.0,
+  "hand_base_rate": 0.5,
+  "roller_base_speed": 3.0,
+  "roller_base_halfwidth": 2.0,
+  "iron_heat_rate": 0.25,
+  "iron_heat_cap": 1.4,
+  "iron_heat_reach": 1.6,
+  "boot_cooldown_seconds": 4.0,
+  "boot_wave_k": 0.5,
+  "boot_wave_reach": 2.5
  }
 }

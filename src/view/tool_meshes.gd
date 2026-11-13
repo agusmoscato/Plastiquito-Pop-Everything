@@ -7,6 +7,10 @@ const TIER_COLORS: Dictionary = {
 	"finger": [Color("#E8795F"), Color("#E5A13A"), Color("#D5D8DB"), Color("#F2C94C")],
 	"palm": [Color("#D9694E"), Color("#C7922F"), Color("#C9CDD1"), Color("#F2C94C")],
 	"rolling_pin": [Color("#B98552"), Color("#9C6B3A"), Color("#C9CDD1"), Color("#F2C94C")],
+	"iron": [Color("#C9CDD1"), Color("#9AA3AA"), Color("#E5A13A"), Color("#F2C94C")],
+	"boot": [Color("#5A4330"), Color("#3E2F22"), Color("#8E6B47"), Color("#F2C94C")],
+	"hands": [Color("#F4EFE6"), Color("#F4EFE6"), Color("#F4EFE6"), Color("#F2C94C")],
+	"auto_roller": [Color("#B98552"), Color("#9C6B3A"), Color("#C9CDD1"), Color("#F2C94C")],
 }
 
 
@@ -49,8 +53,15 @@ static func build(tool_id: String, radius: float, tier: int = 0) -> Node3D:
 		mat.albedo_color.a = 0.78
 	if tool_id == "palm":
 		_build_palm(root, mat, maxf(radius, 1.0) * 0.85)
-	elif tool_id == "rolling_pin":
+	elif tool_id == "rolling_pin" or tool_id == "auto_roller":
 		_build_pin(root, mat, maxf(radius, 1.0))
+	elif tool_id == "iron":
+		_build_iron(root, mat, maxf(radius, 1.0))
+	elif tool_id == "boot":
+		_build_boot(root, mat, maxf(radius, 1.0))
+	elif tool_id == "hands":
+		mat.albedo_color = Color(0.96, 0.94, 0.9, 0.55)
+		_build_finger(root, mat, 0.0)
 	else:
 		_build_finger(root, mat, radius)
 	return root
@@ -89,6 +100,46 @@ static func _build_palm(root: Node3D, mat: StandardMaterial3D, radius: float) ->
 	knob.radius = radius * 0.2
 	knob.height = radius * 0.34
 	_part(body, knob, material(mat.albedo_color.lightened(0.15), mat.metallic), Vector3(0.0, 0.62, 0.0))
+
+
+static func _build_iron(root: Node3D, mat: StandardMaterial3D, half: float) -> void:
+	var body: Node3D = Node3D.new()
+	body.name = "Body"
+	root.add_child(body)
+	var base: BoxMesh = BoxMesh.new()
+	base.size = Vector3(half * 2.0, 0.3, half * 0.9)
+	_part(body, base, mat, Vector3(0.0, 0.2, 0.0))
+	var top: BoxMesh = BoxMesh.new()
+	top.size = Vector3(half * 1.5, 0.3, half * 0.65)
+	_part(body, top, material(mat.albedo_color.darkened(0.2), mat.metallic), Vector3(0.0, 0.48, 0.0))
+	var handle: BoxMesh = BoxMesh.new()
+	handle.size = Vector3(half * 0.9, 0.18, 0.2)
+	_part(body, handle, material(Color("#C8322B")), Vector3(0.0, 0.8, 0.0))
+	var post_a: BoxMesh = BoxMesh.new()
+	post_a.size = Vector3(0.16, 0.4, 0.2)
+	_part(body, post_a, material(Color("#C8322B")), Vector3(-half * 0.4, 0.64, 0.0))
+	_part(body, post_a, material(Color("#C8322B")), Vector3(half * 0.4, 0.64, 0.0))
+
+
+static func _build_boot(root: Node3D, mat: StandardMaterial3D, radius: float) -> void:
+	var body: Node3D = Node3D.new()
+	body.name = "Body"
+	root.add_child(body)
+	var sole: BoxMesh = BoxMesh.new()
+	sole.size = Vector3(radius * 0.8, 0.4, radius * 1.5)
+	_part(body, sole, material(Color("#2B2A33")), Vector3(0.0, 0.2, 0.0))
+	var upper: BoxMesh = BoxMesh.new()
+	upper.size = Vector3(radius * 0.7, 0.5, radius * 1.1)
+	_part(body, upper, mat, Vector3(0.0, 0.62, -radius * 0.1))
+	var shaft: CylinderMesh = CylinderMesh.new()
+	shaft.top_radius = radius * 0.34
+	shaft.bottom_radius = radius * 0.36
+	shaft.height = radius * 1.1
+	_part(body, shaft, mat, Vector3(0.0, 1.3, -radius * 0.32))
+	for i: int in 4: # dibujo de la suela
+		var lug: BoxMesh = BoxMesh.new()
+		lug.size = Vector3(radius * 0.75, 0.08, 0.14)
+		_part(body, lug, material(Color("#1E1B18")), Vector3(0.0, -0.02, -radius * 0.5 + float(i) * radius * 0.33))
 
 
 static func _build_pin(root: Node3D, mat: StandardMaterial3D, half_length: float) -> void:

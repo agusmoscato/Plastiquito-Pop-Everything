@@ -18,6 +18,10 @@ var _crackle: AudioStreamPlayer
 var _ui_streams: Dictionary = {} ## nombre -> AudioStream (assets/audio/ui)
 var _ui_players: Array[AudioStreamPlayer] = []
 var _ui_next: int = 0
+var _ambient_streams: Dictionary = {} ## fase -> AudioStream (assets/audio/ambient)
+var _ambient_players: Array[AudioStreamPlayer] = []
+var _ambient_active: int = 0
+var _ambient_phase: int = -1
 
 
 func _ready() -> void:
@@ -85,6 +89,51 @@ func play_special(type_id: int) -> void:
 		_play(PopAudioLogic.CATEGORY_LARGE, 0.55, Cfg.num(_cfg, "pop_volume_db") + 4.0, "Pops")
 	elif type_id == 3:
 		_play(PopAudioLogic.CATEGORY_SMALL, 1.3, Cfg.num(_cfg, "pop_volume_db") + 2.0, "Pops")
+
+
+## Ambiente del escenario de la fase (1..4): pasa de uno al otro con un fundido de 2 s.
+func set_ambient(phase: int) -> void:
+	if phase == _ambient_phase:
+		return
+	_ambient_phase = phase
+	if _ambient_players.is_empty():
+		for i: int in 2:
+			var p: AudioStreamPlayer = AudioStreamPlayer.new()
+			p.name = "Ambient%d" % i
+			p.bus = "Tools" if AudioServer.get_bus_index("Tools") >= 0 else "Master"
+			p.volume_db = -80.0
+			add_child(p)
+			_ambient_players.append(p)
+	var stream: AudioStream = _ambient_streams.get(phase)
+	if stream == null:
+		stream = _load_ambient(phase)
+	if stream == null:
+		return
+	var old: AudioStreamPlayer = _ambient_players[_ambient_active]
+	_ambient_active = 1 - _ambient_active
+	var nxt: AudioStreamPlayer = _ambient_players[_ambient_active]
+	nxt.stream = stream
+	nxt.volume_db = -80.0
+	nxt.play()
+	var tw: Tween = create_tween().set_parallel(true)
+	tw.tween_property(nxt, "volume_db", -22.0, 2.0)
+	tw.tween_property(old, "volume_db", -80.0, 2.0)
+	tw.chain().tween_callback(old.stop)
+
+
+func _load_ambient(phase: int) -> AudioStream:
+	for file: String in _list_audio_files("res://assets/audio/ambient"):
+		if not file.contains("_%d." % phase):
+			continue
+		var stream: AudioStream = load("res://assets/audio/ambient".path_join(file)) as AudioStream
+		if stream is AudioStreamWAV:
+			var wav: AudioStreamWAV = stream
+			wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
+			wav.loop_begin = 0
+			wav.loop_end = wav.data.size() >> 1 if wav.format == AudioStreamWAV.FORMAT_16_BITS else wav.data.size()
+		_ambient_streams[phase] = stream
+		return stream
+	return null
 
 
 func play_squish() -> void:

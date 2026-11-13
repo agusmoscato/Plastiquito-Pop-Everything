@@ -32,6 +32,8 @@ Si se agregan clases con `class_name` nuevas, `run_tests.sh` ya corre `godot --h
 - La interfaz sigue [docs/UI_STYLE.md](docs/UI_STYLE.md): paleta fija, fuentes OFL, todo dibujado por código, sin señales de IA. Cada cambio visual se revisa con capturas (`--demo-shot=<carpeta>` en la escena principal).
 - Toda regla vive en `GameSim` y compañía (`src/sim/`); el simulador de balance (`tools/balance_sim.gd`) usa esas mismas clases. `run_tests.sh` corre lint, GUT y el paso "balance" (activo y casual, 3 semillas). `SKIP_BALANCE=1` lo saltea al iterar solo en código. Un cambio en `data/` obliga a correr el balance completo.
 
+- `./tools/balance_full.sh` corre el simulador hasta 3 h 30 (activo, casual e idle); tarda unos 5 minutos y hoy el casual y el idle no cumplen todas las métricas (ver docs/CHANGELOG.md, Fase 3). Las partes de render y escenarios tienen su documentación en docs/BENCHMARK_FASE3.md y docs/CLIPS.md.
+
 ## Builds de playtest
 
 - `./tools/build.sh` (o `tools/build.ps1`): lint + tests, export Windows/Linux, zips y, si hay Inno Setup, instalador. Salida en `builds/<versión>/` (ignorada por git).

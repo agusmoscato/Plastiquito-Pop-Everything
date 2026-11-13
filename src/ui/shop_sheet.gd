@@ -8,7 +8,7 @@ signal tag_affordable(id: String)
 
 const W: float = 452.0
 const H: float = 790.0
-const TABS: Array[String] = ["finger", "palm", "rolling_pin", "global"]
+const TABS: Array[String] = ["finger", "palm", "rolling_pin", "iron", "boot", "hands", "auto_roller", "global"]
 
 var sim: GameSim
 var buy_mode_value: int = 1
@@ -19,6 +19,7 @@ var _tags: Dictionary = {} ## upgrade id -> UpgradeTag
 var _current: String = "finger"
 var _mode_buttons: Array[StampButton] = []
 var _scroll: ScrollContainer
+var _clip_shake: float = 0.0
 
 
 func setup(p_sim: GameSim) -> void:
@@ -31,6 +32,17 @@ func setup(p_sim: GameSim) -> void:
 	_build_mode_buttons()
 	_build_pages()
 	select_tab("finger")
+
+
+## El clip de la hoja de pedidos tiembla (se usa la primera vez que algo se puede pagar).
+func shake_clip(seconds: float) -> void:
+	_clip_shake = seconds
+
+
+func _process(delta: float) -> void:
+	if _clip_shake > 0.0:
+		_clip_shake = maxf(0.0, _clip_shake - delta)
+		queue_redraw()
 
 
 func buy_mode() -> int:
@@ -49,22 +61,32 @@ func select_tab(tab: String) -> void:
 
 
 func _build_tabs() -> void:
-	var labels: Dictionary = {"finger": "DEDO", "palm": "PALMA", "rolling_pin": "PALO", "global": "GLOBAL"}
-	var x: float = 24.0
-	for t: String in TABS:
+	for i: int in TABS.size():
+		var t: String = TABS[i]
 		var b: StampButton = StampButton.new()
-		b.setup(str(labels[t]), Vector2(96.0, 84.0), UiKit.CARDBOARD_DARK)
-		b.font_size = 12
+		b.setup(Tx.t("tool_" + t), Vector2(96.0, 62.0), UiKit.CARDBOARD_DARK)
+		b.font_size = 11
 		b.text_bottom = true
-		b.position = Vector2(x, 132.0)
+		@warning_ignore("integer_division")
+		b.position = Vector2(24.0 + float(i % 4) * 100.0, 128.0 + float(i / 4) * 66.0)
 		b.pressed.connect(select_tab.bind(t))
 		add_child(b)
 		var icon: ToolIcon = ToolIcon.new()
-		icon.setup(t if t != "global" else "bubble", 52, 0)
-		icon.position = Vector2(22.0, 8.0)
+		icon.setup(t if t != "global" else "bubble", 38, 0)
+		icon.position = Vector2(29.0, 4.0)
 		b.add_child(icon)
 		_tabs[t] = b
-		x += 100.0
+
+
+## Muestra solo las pestañas de lo que ya está al alcance (la plancha y las manitos desde el Galpón,
+## la bota y el rodillo desde el Estacionamiento).
+func refresh_tabs() -> void:
+	var phase: int = sim.phase()
+	var need: Dictionary = {"iron": 3, "hands": 3, "boot": 4, "auto_roller": 4}
+	for t: String in _tabs:
+		var b: StampButton = _tabs[t]
+		var min_phase: int = need.get(t, 1)
+		b.visible = phase >= min_phase
 
 
 func _build_mode_buttons() -> void:
@@ -91,8 +113,8 @@ func _set_mode(m: int) -> void:
 
 func _build_pages() -> void:
 	_scroll = ScrollContainer.new()
-	_scroll.position = Vector2(20.0, 228.0)
-	_scroll.size = Vector2(W - 40.0, H - 252.0)
+	_scroll.position = Vector2(20.0, 266.0)
+	_scroll.size = Vector2(W - 40.0, H - 290.0)
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_scroll.mouse_filter = Control.MOUSE_FILTER_PASS
 	add_child(_scroll)
@@ -119,6 +141,10 @@ func tag_for(id: String) -> UpgradeTag:
 	return t
 
 
+func tag_ids() -> Array:
+	return _tags.keys()
+
+
 func tab_of(id: String) -> String:
 	var d: Dictionary = sim.upgrades.def(id)
 	var tool_id: String = str(d["tool"])
@@ -137,7 +163,8 @@ func _draw() -> void:
 		draw_line(Vector2(paper.position.x + 8.0, y), Vector2(paper.end.x - 8.0, y), Color(0.5, 0.65, 0.8, 0.12), 1.0)
 		y += 26.0
 	# Clip metálico.
-	var clip: Rect2 = Rect2(Vector2(W * 0.5 - 62.0, 2.0), Vector2(124.0, 50.0))
+	var jitter: Vector2 = Vector2(sin(Time.get_ticks_msec() * 0.09) * 3.0, 0.0) * minf(_clip_shake, 1.0)
+	var clip: Rect2 = Rect2(Vector2(W * 0.5 - 62.0, 2.0) + jitter, Vector2(124.0, 50.0))
 	draw_rect(Rect2(clip.position + Vector2(3.0, 4.0), clip.size), Color(0, 0, 0, 0.3))
 	draw_rect(clip, Color("#9AA0A6"))
 	draw_rect(Rect2(clip.position + Vector2(6.0, 6.0), clip.size - Vector2(12.0, 22.0)), Color("#C9CED3"))

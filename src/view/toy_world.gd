@@ -15,7 +15,8 @@ var camera_rig: CameraRig
 var game: GameSim ## modo juego: la lámina y las herramientas son de GameSim
 var specials_view: SpecialsView
 var table: MeshInstance3D
-var table_material: StandardMaterial3D
+var ground_material: ShaderMaterial
+var scenario: ScenarioDirector ## escenario de la fase actual (piso, objetos, luz y ambiente)
 var light: DirectionalLight3D
 var environment: WorldEnvironment
 
@@ -30,6 +31,11 @@ func _ready() -> void:
 	_build_environment()
 	_build_light()
 	_build_table()
+	scenario = ScenarioDirector.new()
+	scenario.name = "Scenario"
+	add_child(scenario)
+	scenario.setup(light, environment.environment, ground_material)
+	scenario.apply(1, Vector2(10.0, 8.0), Vector2(20.0, 20.0))
 	camera_rig = CameraRig.new()
 	camera_rig.name = "CameraRig"
 	camera_rig.shake_cfg = db.juice
@@ -52,7 +58,7 @@ func attach(sim: GameSim) -> void:
 
 
 ## Vuelve a conectar la vista con la lámina actual de GameSim (lámina nueva o reciclado).
-func rebind_game_sheet(roll_in: bool, animate_camera: float = 0.0) -> void:
+func rebind_game_sheet(roll_in: bool, animate_camera: float = 0.0, scenario_seconds: float = 0.0) -> void:
 	sheet = game.sheet
 	grid = game.grid
 	tool_model = game.selected_tool()
@@ -60,16 +66,32 @@ func rebind_game_sheet(roll_in: bool, animate_camera: float = 0.0) -> void:
 	specials_view.bind(sheet, grid)
 	specials_view.visible = true
 	camera_rig.fit_to(sheet_view.center(), sheet_view.extents(), animate_camera)
-	apply_phase(game.phase())
+	if scenario_seconds > 0.0 and not scenario.matches(game.phase(), sheet_view.extents()):
+		transition_to_phase(game.phase(), scenario_seconds)
+	else:
+		apply_phase(game.phase())
 	if roll_in:
 		sheet_view.begin_roll_in()
 	sheet_replaced.emit()
 
 
-## Escenario según la fase: Mesa (madera) o Piso (cemento).
+## Escenario según la fase (1 Mesa, 2 Piso, 3 Galpón, 4 Estacionamiento), de golpe.
 func apply_phase(phase: int) -> void:
-	var colors: Array[Color] = [Color(0.55, 0.42, 0.30), Color(0.42, 0.45, 0.46)]
-	table_material.albedo_color = colors[mini(phase, colors.size()) - 1]
+	if sheet_view != null and sheet_view.grid != null:
+		if scenario.matches(phase, sheet_view.extents()):
+			return
+		scenario.apply(phase, sheet_view.center(), sheet_view.extents())
+	else:
+		scenario.apply(phase, Vector2(10.0, 8.0), Vector2(20.0, 20.0))
+
+
+## Cambio de escenario suave (3-4 s): piso, luz, objetos y cámara cambian juntos, sin cortes.
+## La cámara se aleja más con cada fase.
+func transition_to_phase(phase: int, seconds: float = 3.5) -> void:
+	var c: Vector2 = sheet_view.center()
+	var e: Vector2 = sheet_view.extents()
+	scenario.transition(phase, seconds, c, e)
+	camera_rig.fit_to(c, e * scenario.camera_factor(), seconds)
 
 
 func _process(delta: float) -> void:
@@ -150,11 +172,10 @@ func _build_light() -> void:
 func _build_table() -> void:
 	var pm: PlaneMesh = PlaneMesh.new()
 	pm.size = Vector2(4000.0, 4000.0)
-	var m: StandardMaterial3D = StandardMaterial3D.new()
-	m.albedo_color = Color(0.55, 0.42, 0.30)
-	m.roughness = 0.65
+	var m: ShaderMaterial = ShaderMaterial.new()
+	m.shader = load("res://shaders/scenario_ground.gdshader") as Shader
 	pm.material = m
-	table_material = m
+	ground_material = m
 	table = MeshInstance3D.new()
 	table.name = "Table"
 	table.mesh = pm

@@ -9,6 +9,7 @@ const VARIANTS: int = 10
 const OUT_POPS: String = "res://assets/audio/pops"
 const OUT_LOOPS: String = "res://assets/audio/loops"
 const OUT_UI: String = "res://assets/audio/ui"
+const OUT_AMBIENT: String = "res://assets/audio/ambient"
 
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
@@ -28,6 +29,9 @@ func _init() -> void:
 	_save(_milestone(), OUT_UI.path_join("ph_milestone.wav"))
 	_save(_chain_hit(), OUT_UI.path_join("ph_chain_hit.wav"))
 	_save(_whoosh(), OUT_UI.path_join("ph_recycle.wav"))
+	DirAccess.make_dir_recursive_absolute(OUT_AMBIENT)
+	for phase: int in range(1, 5):
+		_save(_ambient(phase), OUT_AMBIENT.path_join("ph_ambient_%d.wav" % phase))
 	print("gen_placeholder_sfx: listo")
 	quit(0)
 
@@ -187,6 +191,58 @@ func _whoosh() -> PackedFloat32Array:
 		lp += a * 0.5 * (_rng.randf_range(-1.0, 1.0) - lp)
 		out[i] = lp * sin(PI * x)
 	return _normalize(out, 0.6)
+
+
+## Ruido de fondo que cierra sin costura (crossfade de la cola con el principio).
+func _loop_noise(n: int, fade: int, cutoff: float) -> PackedFloat32Array:
+	var buf: PackedFloat32Array = PackedFloat32Array()
+	buf.resize(n + fade)
+	var lp: float = 0.0
+	var a: float = clampf(2.0 * PI * cutoff / float(RATE), 0.0, 1.0)
+	for i: int in n + fade:
+		lp += a * (_rng.randf_range(-1.0, 1.0) - lp)
+		buf[i] = lp
+	var out: PackedFloat32Array = PackedFloat32Array()
+	out.resize(n)
+	for i: int in n:
+		out[i] = buf[i]
+	for i: int in fade:
+		var w: float = float(i) / float(fade)
+		out[i] = buf[i] * w + buf[n + i] * (1.0 - w)
+	return out
+
+
+## Ambiente de cada escenario (loop de 6 s): Mesa = cuarto con reloj, Piso = zumbido de heladera
+## y pájaros lejanos, Galpón = zumbido grave y un golpe metálico, Estacionamiento = viento y un auto.
+func _ambient(phase: int) -> PackedFloat32Array:
+	var n: int = RATE * 6
+	var out: PackedFloat32Array = _loop_noise(n, 4000, 300.0 + 150.0 * float(phase))
+	for i: int in n:
+		out[i] *= 0.5
+	if phase == 1:
+		for k: int in 6:
+			_add_tone(out, float(k) + 0.1, 2400.0, 0.05, 0.008, 0.5)
+			_add_tone(out, float(k) + 0.1, 900.0, 0.08, 0.02, 0.2)
+	elif phase == 2:
+		for i: int in n:
+			var t: float = float(i) / float(RATE)
+			out[i] += 0.12 * sin(TAU * 55.0 * t) + 0.05 * sin(TAU * 110.0 * t)
+		_add_tone(out, 1.6, 3100.0, 0.12, 0.05, 0.22)
+		_add_tone(out, 1.75, 3500.0, 0.1, 0.04, 0.2)
+		_add_tone(out, 4.2, 2900.0, 0.14, 0.06, 0.2)
+	elif phase == 3:
+		for i: int in n:
+			var t: float = float(i) / float(RATE)
+			out[i] += 0.18 * sin(TAU * 50.0 * t) + 0.08 * sin(TAU * 100.0 * t)
+		_add_tone(out, 2.7, 1750.0, 0.5, 0.12, 0.35)
+	else:
+		for i: int in n:
+			var t: float = float(i) / float(RATE)
+			var gust: float = 0.5 + 0.5 * sin(TAU * t / 6.0 * 2.0)
+			out[i] *= 0.4 + 1.2 * gust
+			var pass_env: float = exp(-pow((t - 3.0) / 0.7, 2.0))
+			out[i] += pass_env * 0.25 * sin(TAU * (90.0 + 25.0 * pass_env) * t)
+	return _normalize(out, 0.4)
 
 
 func _normalize(s: PackedFloat32Array, peak: float) -> PackedFloat32Array:
