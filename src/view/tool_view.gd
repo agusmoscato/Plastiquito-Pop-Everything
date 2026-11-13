@@ -28,6 +28,8 @@ var _grow: float = 1.0 ## animación de "crece" al subir de tamaño
 var _yaw: float = 0.0
 var _yaw_target: float = 0.0
 var _built_key: String = ""
+var _press_rate: float = 22.0
+var _depth_scale: float = 1.0
 
 
 func configure(juice: Dictionary) -> void:
@@ -39,9 +41,11 @@ func configure(juice: Dictionary) -> void:
 
 
 ## Define qué herramienta se muestra, su tamaño en el mundo, el hito (color) y la velocidad (0..1).
-func set_tool(id: String, p_radius: float, p_tier: int, speed01: float) -> void:
+func set_tool(id: String, p_radius: float, p_tier: int, speed01: float, force_ratio: float = 1.0) -> void:
 	var key: String = "%s|%.2f|%d" % [id, p_radius, p_tier]
 	_follow = lerpf(16.0, 60.0, clampf(speed01, 0.0, 1.0))
+	_press_rate = 22.0 * clampf(0.8 + 0.12 * force_ratio, 0.8, 2.2) # más fuerza: aprieta más rápido y más hondo
+	_depth_scale = clampf(0.85 + 0.05 * force_ratio, 0.85, 1.25)
 	if key == _built_key:
 		return
 	var grew: bool = id == tool_id and p_radius > radius
@@ -93,14 +97,14 @@ func _process(delta: float) -> void:
 	position.z = lerpf(position.z, _target.y, k)
 	_yaw = lerp_angle(_yaw, _yaw_target, 1.0 - exp(-14.0 * delta))
 	rotation.y = _yaw if tool_id == "rolling_pin" else 0.0
-	_press = lerpf(_press, _press_target, 1.0 - exp(-22.0 * delta))
+	_press = lerpf(_press, _press_target, 1.0 - exp(-_press_rate * delta))
 	_squish_boost = maxf(0.0, _squish_boost - delta * 6.0)
 	_grow = lerpf(_grow, 1.0, 1.0 - exp(-9.0 * delta))
 	var accel: float = -stiffness * _offset - damping * _velocity
 	_velocity += accel * delta
 	_offset += _velocity * delta
 	var hover: float = hover_height + (0.35 if tool_id != "finger" else 0.0)
-	position.y = maxf(hover - press_depth * _press + _offset, 0.05)
+	position.y = maxf(hover - press_depth * _depth_scale * _press + _offset, 0.05)
 	if _body == null:
 		return
 	var squash: float = _press * 0.22 + _squish_boost * 0.08

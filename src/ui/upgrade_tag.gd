@@ -40,6 +40,7 @@ func setup(p_sim: GameSim, p_id: String, p_buy_mode: Callable) -> void:
 	var tool_id: String = str(d["tool"])
 	_icon.setup(tool_id if tool_id != "" else "bubble", 64, 0)
 	_icon.position = Vector2(14.0, 20.0)
+	_icon.set_variant(str(d["kind"]))
 	add_child(_icon)
 	_was_affordable = sim.can_afford_next(id)
 	mouse_entered.connect(func() -> void: _hover = true; queue_redraw())

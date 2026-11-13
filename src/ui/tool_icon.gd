@@ -5,6 +5,7 @@ extends SubViewportContainer
 
 var kind: String = "finger"
 var tier: int = 0
+var variant: String = "" ## "size", "force", "speed" o "special": distingue las mejoras de una misma herramienta
 
 var _spin: Node3D
 var _vp: SubViewport
@@ -47,6 +48,15 @@ func setup(p_kind: String, px: int, p_tier: int = 0) -> void:
 	_spin.position = Vector3(0.0, 0.1, 0.0)
 
 
+func set_variant(p_variant: String) -> void:
+	variant = p_variant
+	if _spin == null:
+		return
+	for c: Node in _spin.get_children():
+		c.queue_free()
+	_spin.add_child(_make_model())
+
+
 func set_tier(p_tier: int) -> void:
 	if p_tier == tier or _spin == null:
 		return
@@ -70,10 +80,24 @@ func _make_model() -> Node3D:
 		mi.material_override = m
 		root.add_child(mi)
 		return root
-	var model: Node3D = ToolMeshes.build(kind, 1.2, tier)
+	var use_tier: int = tier + (2 if variant == "force" else 0) # fuerza: se ve de metal
+	var model: Node3D = ToolMeshes.build(kind, 1.9 if variant == "size" else 1.2, use_tier)
+	if variant == "size":
+		model.scale = Vector3(0.8, 0.8, 0.8)
+	if variant == "special":
+		var orb: MeshInstance3D = MeshInstance3D.new()
+		orb.mesh = BubbleMesh.build(0.45, 0.9, 8, 16)
+		var om: StandardMaterial3D = StandardMaterial3D.new()
+		om.albedo_color = Color(0.55, 0.82, 1.0, 0.7)
+		om.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		om.rim_enabled = true
+		om.rim = 0.8
+		orb.material_override = om
+		orb.position = Vector3(1.0, 0.0, 0.6)
+		model.add_child(orb)
 	return model
 
 
 func _process(delta: float) -> void:
 	if _spin != null:
-		_spin.rotation.y += delta * 0.8
+		_spin.rotation.y += delta * (2.6 if variant == "speed" else 0.8)

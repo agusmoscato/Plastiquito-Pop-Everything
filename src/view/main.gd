@@ -202,7 +202,7 @@ func _refresh_tool_view() -> void:
 	for up_id: String in sim.upgrades.ids_for_tool(id):
 		@warning_ignore("integer_division")
 		tier = maxi(tier, sim.state.level(up_id) / every)
-	tool_view.set_tool(id, tm.radius, mini(tier, 3), tm.drag_entry_fraction)
+	tool_view.set_tool(id, tm.radius, mini(tier, 3), tm.drag_entry_fraction, tm.force_per_second / 6.0)
 
 
 func _on_purchased(id: String, count: int, _milestone: bool) -> void:
@@ -458,6 +458,10 @@ func _run_demo(dir: String) -> void:
 	_shot(dir, "08_reciclado_rollo")
 	await _wait(3.2)
 	_shot(dir, "09_reciclado_nueva")
+	pause_menu.toggle()
+	await _wait(0.4)
+	_shot(dir, "10_pausa")
+	get_tree().paused = false
 	get_tree().quit()
 
 

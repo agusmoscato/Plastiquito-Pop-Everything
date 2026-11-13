@@ -139,10 +139,10 @@ func _add(parent: Node3D, mesh_key: String, mat_key: String, pos: Vector3, rot_d
 
 func _build_assets() -> void:
 	var sphere: SphereMesh = SphereMesh.new()
-	sphere.radius = 0.36
-	sphere.height = 0.72
-	sphere.radial_segments = 8
-	sphere.rings = 4
+	sphere.radius = 0.42
+	sphere.height = 0.84
+	sphere.radial_segments = 6
+	sphere.rings = 3
 	_meshes["gem"] = _flat(sphere)
 	var ball: SphereMesh = SphereMesh.new()
 	ball.radius = 0.34
