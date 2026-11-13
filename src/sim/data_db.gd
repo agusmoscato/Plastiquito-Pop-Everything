@@ -6,6 +6,9 @@ extends RefCounted
 const PHASES_FILE: String = "phases.json"
 const TOOLS_FILE: String = "tools.json"
 const BUBBLES_FILE: String = "bubbles.json"
+const SHEET_FILE: String = "sheet.json"
+const JUICE_FILE: String = "juice.json"
+const AUDIO_FILE: String = "audio.json"
 
 ## Campos requeridos y su tipo (TYPE_*) por archivo.
 const PHASE_FIELDS: Dictionary = {
@@ -21,11 +24,37 @@ const BUBBLE_FIELDS: Dictionary = {
 	"id": TYPE_STRING, "type_id": TYPE_INT, "name_es": TYPE_STRING, "name_en": TYPE_STRING,
 	"shape": TYPE_STRING, "unlock_phase": TYPE_INT, "balance": TYPE_DICTIONARY,
 }
+const SHEET_FIELDS: Dictionary = {
+	"default_width": TYPE_INT, "default_height": TYPE_INT, "bubble_radius": TYPE_FLOAT,
+	"resistance": TYPE_FLOAT, "recovery_per_second": TYPE_FLOAT,
+	"reload_threshold": TYPE_FLOAT, "reload_delay_seconds": TYPE_FLOAT,
+}
+const JUICE_FIELDS: Dictionary = {
+	"hitstop_ms": TYPE_INT, "hitstop_every_streak": TYPE_INT, "mass_pop_radius": TYPE_FLOAT,
+	"shake_per_pop": TYPE_FLOAT, "shake_max_trauma": TYPE_FLOAT, "shake_decay_per_second": TYPE_FLOAT,
+	"shake_max_offset": TYPE_FLOAT, "shake_max_angle_degrees": TYPE_FLOAT, "shake_noise_speed": TYPE_FLOAT,
+	"particle_pool_size": TYPE_INT, "shards_per_pop": TYPE_INT, "dust_per_pop": TYPE_INT,
+	"max_fx_per_frame": TYPE_INT, "pop_anim_inflate_ms": TYPE_INT, "pop_anim_collapse_ms": TYPE_INT,
+	"pop_anim_inflate_amount": TYPE_FLOAT, "popped_height": TYPE_FLOAT, "roll_in_seconds": TYPE_FLOAT,
+	"finger_hover_height": TYPE_FLOAT, "finger_press_depth": TYPE_FLOAT,
+	"finger_spring_stiffness": TYPE_FLOAT, "finger_spring_damping": TYPE_FLOAT,
+	"finger_bounce_impulse": TYPE_FLOAT,
+}
+const AUDIO_FIELDS: Dictionary = {
+	"voices": TYPE_INT, "pitch_variation": TYPE_FLOAT, "streak_reset_seconds": TYPE_FLOAT,
+	"streak_pitch_per_pop": TYPE_FLOAT, "streak_pitch_max": TYPE_FLOAT, "crackle_threshold": TYPE_INT,
+	"crackle_rate_for_full_volume": TYPE_FLOAT, "crackle_smoothing_per_second": TYPE_FLOAT,
+	"crackle_min_volume_db": TYPE_FLOAT, "large_chance": TYPE_FLOAT, "tense_pressure": TYPE_FLOAT,
+	"max_voices_per_frame": TYPE_INT, "squish_volume_db": TYPE_FLOAT, "pop_volume_db": TYPE_FLOAT,
+}
 const TOOL_SHAPES: PackedStringArray = ["cell", "circle", "segment", "rect"]
 
 var phases: Array[Dictionary] = []
 var tools: Array[Dictionary] = []
 var bubbles: Array[Dictionary] = []
+var sheet: Dictionary = {}
+var juice: Dictionary = {}
+var audio: Dictionary = {}
 var errors: PackedStringArray = PackedStringArray()
 
 
@@ -35,6 +64,9 @@ func load_all(dir: String = "res://data") -> bool:
 	phases = _load_list(dir.path_join(PHASES_FILE), "phases", PHASE_FIELDS)
 	tools = _load_list(dir.path_join(TOOLS_FILE), "tools", TOOL_FIELDS)
 	bubbles = _load_list(dir.path_join(BUBBLES_FILE), "bubbles", BUBBLE_FIELDS)
+	sheet = _load_section(dir.path_join(SHEET_FILE), "sheet", SHEET_FIELDS)
+	juice = _load_section(dir.path_join(JUICE_FILE), "juice", JUICE_FIELDS)
+	audio = _load_section(dir.path_join(AUDIO_FILE), "audio", AUDIO_FIELDS)
 	_validate_phases()
 	_validate_tools()
 	_validate_bubbles()
@@ -58,6 +90,21 @@ func _find(list: Array[Dictionary], id: String) -> Dictionary:
 		if str(entry.get("id", "")) == id:
 			return entry
 	return {}
+
+
+## Carga un objeto único (no lista) y valida sus campos. Devuelve {} si hay errores.
+func _load_section(path: String, key: String, fields: Dictionary) -> Dictionary:
+	var root: Variant = _read_json(path)
+	if not (root is Dictionary):
+		return {}
+	var root_dict: Dictionary = root
+	if not root_dict.has(key) or not (root_dict[key] is Dictionary):
+		errors.append("%s: falta el objeto '%s'" % [path.get_file(), key])
+		return {}
+	var section: Dictionary = root_dict[key]
+	if not _check_fields(section, fields, "%s[%s]" % [path.get_file(), key]):
+		return {}
+	return section
 
 
 func _load_list(path: String, key: String, fields: Dictionary) -> Array[Dictionary]:
@@ -110,7 +157,7 @@ func _check_fields(entry: Dictionary, fields: Dictionary, label: String) -> bool
 
 
 func _type_matches(actual: int, expected: int) -> bool:
-	if expected == TYPE_INT:
+	if expected == TYPE_INT or expected == TYPE_FLOAT:
 		return actual == TYPE_INT or actual == TYPE_FLOAT # JSON numera todo como float
 	return actual == expected
 

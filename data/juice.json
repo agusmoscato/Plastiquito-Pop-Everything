@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "_note": "Parámetros de sensación (vista). Afinar acá sin tocar código.",
+  "juice": {
+    "hitstop_ms": 45,
+    "hitstop_every_streak": 25,
+    "mass_pop_radius": 15.0,
+    "shake_per_pop": 0.04,
+    "shake_max_trauma": 0.8,
+    "shake_decay_per_second": 1.6,
+    "shake_max_offset": 0.25,
+    "shake_max_angle_degrees": 1.2,
+    "shake_noise_speed": 35.0,
+    "particle_pool_size": 14,
+    "shards_per_pop": 6,
+    "dust_per_pop": 5,
+    "max_fx_per_frame": 6,
+    "pop_anim_inflate_ms": 100,
+    "pop_anim_collapse_ms": 90,
+    "pop_anim_inflate_amount": 0.10,
+    "popped_height": 0.15,
+    "roll_in_seconds": 0.8,
+    "finger_hover_height": 0.9,
+    "finger_press_depth": 0.55,
+    "finger_spring_stiffness": 260.0,
+    "finger_spring_damping": 16.0,
+    "finger_bounce_impulse": 3.5
+  }
+}

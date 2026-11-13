@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "_note": "Parámetros de audio. Las muestras se cargan por carpeta desde assets/audio/pops/.",
+  "audio": {
+    "voices": 24,
+    "pitch_variation": 0.08,
+    "streak_reset_seconds": 0.6,
+    "streak_pitch_per_pop": 0.025,
+    "streak_pitch_max": 0.6,
+    "crackle_threshold": 30,
+    "crackle_rate_for_full_volume": 800.0,
+    "crackle_smoothing_per_second": 5.0,
+    "crackle_min_volume_db": -40.0,
+    "large_chance": 0.25,
+    "tense_pressure": 1.5,
+    "max_voices_per_frame": 8,
+    "squish_volume_db": -14.0,
+    "pop_volume_db": -4.0
+  }
+}
