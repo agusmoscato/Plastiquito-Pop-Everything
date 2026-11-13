@@ -3,6 +3,8 @@ extends Node3D
 ## Cámara en perspectiva inclinada (~55°). Zoom con la rueda entre límites, movimiento
 ## suave por interpolación y sacudida por trauma. Sin rotación libre.
 
+signal zoomed
+
 const PITCH_DEGREES: float = 55.0
 const FOV: float = 40.0
 const ZOOM_STEP: float = 1.12
@@ -86,8 +88,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		var mb: InputEventMouseButton = event
 		if mb.pressed and mb.button_index == MOUSE_BUTTON_WHEEL_UP:
 			_target_zoom = clampf(_target_zoom / ZOOM_STEP, min_zoom, max_zoom)
+			zoomed.emit()
 		elif mb.pressed and mb.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			_target_zoom = clampf(_target_zoom * ZOOM_STEP, min_zoom, max_zoom)
+			zoomed.emit()
 		elif mb.button_index == MOUSE_BUTTON_MIDDLE:
 			_drag_pan = mb.pressed
 	elif event is InputEventMouseMotion and _drag_pan:

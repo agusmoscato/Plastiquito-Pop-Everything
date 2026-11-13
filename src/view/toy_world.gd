@@ -4,6 +4,7 @@ extends Node3D
 ## Lo comparten main.tscn y benchmark.tscn.
 
 signal sheet_replaced
+signal sheet_reloaded ## la lámina se recargó sola (llegó al umbral)
 
 var db: DataDB = DataDB.new()
 var sheet: SheetModel
@@ -75,6 +76,7 @@ func _reload_sheet() -> void:
 	sheet_view.refresh_all(true)
 	PopAudio.play_crinkle()
 	sheet_replaced.emit()
+	sheet_reloaded.emit()
 
 
 func _build_environment() -> void:

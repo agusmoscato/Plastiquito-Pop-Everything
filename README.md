@@ -21,3 +21,11 @@ Los tests usan [GUT](https://github.com/bitwes/Gut) y corren sin pantalla:
 ```
 
 El script usa `godot` del PATH, o el ejecutable indicado en la variable de entorno `GODOT`. Devuelve un código de salida distinto de 0 si algún test falla.
+
+## Builds para playtest
+
+```
+./tools/build.sh      # o tools/build.ps1 en Windows
+```
+
+Corre lint y tests, exporta Windows y Linux a `builds/<versión>/`, arma los zips portables y, si hay Inno Setup, el instalador de Windows. La versión sale de `application/config/version` en `project.godot`. Guía para testers: [docs/PLAYTEST_TESTERS.md](docs/PLAYTEST_TESTERS.md).

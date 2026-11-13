@@ -1,5 +1,31 @@
 # Changelog
 
+## Fase 1b — Builds e instalador para playtest (2026-11-13)
+
+Sistema operativo de esta máquina: Windows 11.
+
+### Hecho
+- Versión única en `application/config/version` (`0.1.0`); `AppInfo` la lee y el juego la muestra tenue abajo a la derecha ("v0.1.0 playtest" / "dev").
+- `export_presets.cfg` con "Windows" y "Linux" (x86_64, .pck embebido, feature tag `playtest`, excluye tests/, addons/gut/, tools/, docs/, installer/ y la escena de benchmark).
+- Ícono generado por código (`tools/gen_icon.gd`): `icon.png` y `icon.ico` con 256/128/64/48/32/16 px, usado como ícono del proyecto y del .exe (rcedit v2.0.0 descargado a `tools/bin/`, ignorado por git, y configurado en los ajustes del editor de Godot).
+- Modo playtest/release (`PlaytestMode`, `Playtest`, `PauseMenu`): sin F3 ni selector de tamaño, F12 sí, pantalla completa sin bordes, Alt+Enter, menú Esc (volumen, sacudida, "Abrir carpeta de datos", salir), y registro de sesión `sesion_<fecha>.csv` cada 10 s y al salir (`SessionLog`).
+- `config/use_custom_user_dir`: los datos van a `%APPDATA%\Plastiquito` (Linux `~/.local/share/Plastiquito`) en vez de la carpeta larga con el nombre del proyecto.
+- `tools/build.sh` y `tools/build.ps1`: lint + tests, export, zips (con `LEEME.txt`) e instalador. `tools/zip_dir.py` arma los zips y marca ejecutable el binario de Linux.
+- `installer/plastiquito.iss` (Inno Setup 6.7.3, instalado con winget): por usuario sin admin, accesos en Inicio y escritorio, desinstalador, español e inglés, "Jugar ahora".
+- `docs/PLAYTEST_TESTERS.md` y `docs/PLAYTEST_GATE1.md` actualizado.
+- 9 tests nuevos (64 en total): versión, SessionLog y PlaytestMode.
+
+### Verificado
+- `tools/build.sh` de punta a punta en esta máquina. La build exportada (no el editor) arranca, revienta (79 reventones en la prueba con mouse simulado) y escribe el CSV. El instalador instala en silencio, el .exe instalado corre y el desinstalador lo borra.
+
+### Decisiones y notas
+- Solo se extrajeron del .tpz oficial (1,2 GB, verificado con CRC) las plantillas de release de Windows y Linux, que son las que usa el build; la descarga completa iba a tardar ~1 hora.
+- El .exe pesa ~98 MB (la plantilla es casi todo); el zip de Windows 32 MB y el instalador 24 MB.
+- Sin firma de código: Windows muestra "Windows protegió su PC" (explicado en PLAYTEST_TESTERS.md).
+- El clic suelto se cuenta como apretar y soltar sin salir de la celda; en la prueba con mouse simulado el temblor del cursor puede sumar algún arrastre/clic de más.
+- Los sonidos siguen siendo provisorios.
+- No se probó el build de Linux (solo se generó y se verificó el contenido del zip).
+
 ## Fase 1 — Juguete (2026-11-13)
 
 ### Hecho
