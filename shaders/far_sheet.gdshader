@@ -131,16 +131,17 @@ void fragment() {
 		a = 0.0;
 	}
 	if (flat_k > 0.0) {
-		vec3 flat_col = mix(vec3(0.64, 0.69, 0.77), vec3(0.73, 0.85, 0.96), avg.b);
+		vec3 flat_col = mix(vec3(0.46, 0.55, 0.66), vec3(0.55, 0.72, 0.9), avg.b);
 		float flat_a = 0.95;
 		col_rgb = mix(col_rgb, flat_col, flat_k);
 		a = mix(a, flat_a, flat_k);
 		nz = mix(nz, 1.0, flat_k);
+		rough = mix(rough, 0.7, flat_k);
 		nw = normalize(mix(nw, vec3(0.0, 1.0, 0.0), flat_k));
 	}
 	ALBEDO = col_rgb;
 	ROUGHNESS = rough;
-	SPECULAR = 1.0;
+	SPECULAR = mix(1.0, 0.25, flat_k);
 	EMISSION = emis + col_rgb * (1.0 - nz) * 0.4;
 	vec3 nview = (VIEW_MATRIX * vec4(nw, 0.0)).xyz;
 	NORMAL = dot(nview, nview) > 0.0001 ? normalize(nview) : vec3(0.0, 0.0, 1.0);
