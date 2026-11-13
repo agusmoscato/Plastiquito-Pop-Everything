@@ -47,6 +47,9 @@ func fit_to(center: Vector2, extents: Vector2, animate_seconds: float = 0.0) -> 
 	bounds_half = extents * 0.5
 	var tan_half: float = tan(deg_to_rad(FOV) * 0.5)
 	var aspect: float = 16.0 / 9.0
+	if is_inside_tree():
+		var vs: Vector2 = get_viewport().get_visible_rect().size
+		aspect = vs.x / maxf(vs.y, 1.0) # horizontal, vertical (clips para shorts) o cualquier ventana
 	var d_x: float = extents.x / (2.0 * tan_half * aspect)
 	var d_y: float = extents.y * sin(deg_to_rad(PITCH_DEGREES)) / (2.0 * tan_half)
 	var fit: float = maxf(d_x, d_y) * 1.3

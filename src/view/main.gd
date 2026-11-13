@@ -13,6 +13,7 @@ var tool_view: ToolView
 var hud: Hud
 var overlay: DebugOverlay
 var pause_menu: PauseMenu
+var _version_layer: CanvasLayer
 
 var _cursor: Vector2 = Vector2.ZERO
 var _prev_cursor: Vector2 = Vector2.ZERO
@@ -89,9 +90,21 @@ func _unhandled_input(event: InputEvent) -> void:
 			_on_key(key.keycode)
 
 
+## F9: oculta o muestra TODA la interfaz (HUD, versión y overlay), para grabar clips.
+func _toggle_ui() -> void:
+	var show: bool = not hud.visible
+	hud.visible = show
+	if _version_layer != null:
+		_version_layer.visible = show
+	if overlay != null and not show:
+		overlay.visible = false
+
+
 func _on_key(code: int) -> void:
 	if code == KEY_F3 and overlay != null:
 		overlay.toggle()
+	elif code == KEY_F9:
+		_toggle_ui()
 	elif code == KEY_F12:
 		save_screenshot()
 	elif code == KEY_1:
@@ -393,6 +406,7 @@ func _add_version_label() -> void:
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	layer.add_child(label)
 	add_child(layer)
+	_version_layer = layer
 
 
 # --- Modo demo para capturas automáticas ---------------------------------------------------------------------
