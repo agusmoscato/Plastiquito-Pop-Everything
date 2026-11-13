@@ -62,6 +62,13 @@
   "iron_heat_reach": 1.6,
   "boot_cooldown_seconds": 4.0,
   "boot_wave_k": 0.5,
-  "boot_wave_reach": 2.5
+  "boot_wave_reach": 2.5,
+  "idle_hand_mult": 16.0,
+  "idle_hand_after_seconds": 8.0,
+  "chain_dr_size": 60,
+  "chain_dr_alpha": 0.6,
+  "special_cap_k": 1.6,
+  "new_phase_discount_levels": 3,
+  "new_phase_discount": 0.4
  }
 }

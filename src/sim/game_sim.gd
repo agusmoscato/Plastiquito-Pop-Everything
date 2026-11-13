@@ -45,6 +45,10 @@ var reload_timer: float = -1.0
 
 var _prev_pointer: Vector2 = Vector2.ZERO
 var _chain_active: bool = false
+var idle_s: float = 0.0 ## segundos sin apretar
+var hands_power: float = 1.0 ## multiplicador de valor del toque de las Manitos
+var _hands_in_events: int = 0
+var _dr_count: int = 0 ## reventones de la cadena en curso (rendimientos decrecientes)
 var _prev_pressing: bool = false
 var _echoes: Array[Vector2] = [] ## (índice, segundos que faltan para volver a inflarse)
 
@@ -83,6 +87,8 @@ func refresh_stats() -> void:
 	stats = upgrades.global_stats(state)
 	var scales: Array = eco["phase_cost_scales"]
 	upgrades.cost_scale = scales[mini(phase(), scales.size()) - 1]
+	var discounted: bool = phase() >= 2 and state.run_buys < Cfg.integer(eco, "new_phase_discount_levels")
+	upgrades.discount = Cfg.num(eco, "new_phase_discount") if discounted else 1.0
 	if sheet != null:
 		_apply_to_sheet()
 
@@ -125,6 +131,7 @@ func _apply_to_sheet() -> void:
 	hands.set_count(Cfg.integer(hp, "count"))
 	hands.rate = Cfg.num(hp, "rate")
 	hands.smart = Cfg.flag(hp, "smart")
+	hands_power = Cfg.num(hp, "power")
 	var rp: Dictionary = upgrades.roller_params(state)
 	roller.enabled = Cfg.flag(rp, "enabled")
 	roller.speed = Cfg.num(rp, "speed")
@@ -160,6 +167,7 @@ func _generate_specials() -> void:
 		[TYPE_ECHO, Cfg.num(stats, "chance_echo"), 4],
 	]
 	var present: Dictionary = {}
+	var picked: Array[Vector2i] = []
 	for i: int in sheet.cell_count():
 		var roll: float = rng.randf()
 		var acc: float = 0.0
@@ -171,9 +179,15 @@ func _generate_specials() -> void:
 				continue
 			acc += chance
 			if roll < acc:
-				sheet.type[i] = t
-				present[t] = true
+				picked.append(Vector2i(i, t))
 				break
+	# Tope por lámina: crece como la raíz del área (si no, las especiales dominarían las láminas grandes).
+	var cap: int = maxi(4, roundi(Cfg.num(eco, "special_cap_k") * sqrt(float(sheet.cell_count()))))
+	while picked.size() > cap:
+		picked.remove_at(rng.randi() % picked.size())
+	for pick: Vector2i in picked:
+		sheet.type[pick.x] = pick.y
+		present[pick.y] = true
 	for t: int in present:
 		if not state.is_discovered(t):
 			state.discover(t)
@@ -214,6 +228,7 @@ func step(dt: float, pointer: Vector2, pressing: bool) -> void:
 	tm.tick_cooldown(dt)
 	var touched: PackedInt32Array = PackedInt32Array()
 	var dir: Vector2 = Vector2.ZERO
+	idle_s = 0.0 if pressing else idle_s + dt
 	var live: bool = reload_timer < 0.0
 	if pressing and live:
 		touched = tm.cells_for(_prev_pointer, pointer)
@@ -241,7 +256,7 @@ func step(dt: float, pointer: Vector2, pressing: bool) -> void:
 		state.tool_pops[state.selected_tool] = prev_pops + ev_tool_pops
 	chain.budget_per_frame = maxi(1, roundi(float(Cfg.integer(db.sheet, "chain_budget_per_frame")) * dt * 60.0))
 	chain.step()
-	_collect_events(false)
+	_collect_events(false, ev_tool_pops)
 	ev_auto_from = ev_idx.size()
 	_step_automation(dt)
 	_tick_echoes(dt)
@@ -263,9 +278,18 @@ func _step_automation(dt: float) -> void:
 	for idx: int in roll_cells:
 		chain.pop_now(idx)
 	chain.step()
-	_collect_events(true)
+	_hands_in_events = hand_cells.size()
+	_collect_events(true, hand_cells.size() + roll_cells.size())
 	_count_tool_pops("hands", hand_cells.size())
 	_count_tool_pops("auto_roller", roll_cells.size())
+
+
+## Las Manitos rinden más cuando nadie toca (turno de noche): x`idle_hand_mult` tras
+## `idle_hand_after_seconds` sin apretar. Es la fuente principal del perfil idle.
+func hands_idle_mult() -> float:
+	if idle_s >= Cfg.num(eco, "idle_hand_after_seconds"):
+		return Cfg.num(eco, "idle_hand_mult")
+	return 1.0
 
 
 func _count_tool_pops(tool_id: String, n: int) -> void:
@@ -320,7 +344,7 @@ func _clear_events() -> void:
 
 
 ## Valor de cada reventón del step (base * p^2 * tipo * combo * global) y suma a los Pops.
-func _collect_events(auto: bool) -> void:
+func _collect_events(auto: bool, direct: int = 0) -> void:
 	var bases: Array = eco["phase_base_values"]
 	var base: float = bases[mini(phase(), bases.size()) - 1]
 	var m_combo: float = 1.0 if auto else combo.multiplier(now)
@@ -329,6 +353,11 @@ func _collect_events(auto: bool) -> void:
 		var t: int = chain.events_type[i]
 		var m_type: float = Cfg.num(eco, "golden_multiplier") if t == TYPE_GOLDEN else 1.0
 		var v: float = Economy.pop_value(base, chain.events_pressure[i], m_type, m_combo, m_global)
+		if auto and i < _hands_in_events:
+			v *= hands_power * hands_idle_mult()
+		if i >= direct:
+			_dr_count += 1
+			v *= Economy.chain_factor(_dr_count, Cfg.integer(eco, "chain_dr_size"), Cfg.num(eco, "chain_dr_alpha"))
 		ev_idx.append(chain.events_idx[i])
 		ev_value.append(v)
 		ev_pressure.append(chain.events_pressure[i])
@@ -354,6 +383,7 @@ func _track_chain() -> void:
 		chain_value += value
 		if chain.is_idle():
 			_chain_active = false
+			_dr_count = 0
 			ev_chain_ended_count = chain_count
 			ev_chain_ended_value = chain_value
 			state.max_chain = maxi(state.max_chain, chain_count)
@@ -394,6 +424,7 @@ func buy(id: String, count: int) -> Dictionary:
 	else:
 		state.pops -= price
 		state.levels[id] = level + n
+		state.run_buys += n
 	var every: int = Cfg.integer(eco, "milestone_every")
 	@warning_ignore("integer_division")
 	out["milestone"] = (level + n) / every > level / every
@@ -466,7 +497,7 @@ func save_dict(now_unix: float = 0.0) -> Dictionary:
 
 ## Reventones por segundo de la automatización: (manitos, rodillo).
 func automation_rates() -> Vector2:
-	var hands_s: float = float(hands.count) * hands.rate
+	var hands_s: float = float(hands.count) * hands.rate * hands_power * Cfg.num(eco, "idle_hand_mult") # sin conexión = nadie toca
 	var roller_s: float = 0.0
 	if roller.enabled:
 		roller_s = roller.speed * 2.0 * roller.half_width * 0.9

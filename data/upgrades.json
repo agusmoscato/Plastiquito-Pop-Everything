@@ -612,6 +612,25 @@
    }
   },
   {
+   "id": "hands_power",
+   "scope": "tool",
+   "tool": "hands",
+   "kind": "value",
+   "name_es": "Guantes de trabajo",
+   "name_en": "Work gloves",
+   "desc_es": "Cada toque rinde más. +100% de valor por toque.",
+   "desc_en": "Every tap pays more. +100% value per tap.",
+   "base_cost": 300.0,
+   "growth": 1.22,
+   "max_level": 60,
+   "per_level": 0.5,
+   "effect_type": "mult",
+   "unit": "valor",
+   "requires": {
+    "upgrade": "unlock_hands"
+   }
+  },
+  {
    "id": "hands_smart",
    "scope": "tool",
    "tool": "hands",

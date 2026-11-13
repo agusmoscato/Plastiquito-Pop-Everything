@@ -1,8 +1,8 @@
 class_name ScenarioProps
 extends RefCounted
-## Objetos de cada escenario, armados solo con primitivas de Godot. Se ubican alrededor de la
-## lámina (centro `c`, tamaño `e`, en el plano XZ) y escalan con ella para que se reconozcan
-## igual con una lámina de 8x8 o de 150x150.
+## Objetos de cada escenario: modelos .glb (art/models) a ESCALA REAL (1 unidad = 1 cm, una burbuja
+## mide ~1 cm; un lápiz 17 cm) más algo de geometría simple. Se ubican FUERA de la lámina
+## (centro `c`, tamaño `e`, en el plano XZ): enmarcan los bordes y nunca se cruzan con ella.
 
 const GROUND_Y: float = -0.05
 
@@ -60,6 +60,17 @@ static func _add(parent: Node3D, mesh: Mesh, mat: Material, pos: Vector3, rot_de
 	return mi
 
 
+## Instancia un modelo (en metros) a escala real: 1 m = 100 unidades.
+static func _glb(root: Node3D, file: String, pos: Vector3, yaw_deg: float = 0.0, scale_factor: float = 100.0) -> Node3D:
+	var ps: PackedScene = load("res://assets/models/%s.glb" % file) as PackedScene
+	var m: Node3D = ps.instantiate() as Node3D
+	m.position = pos
+	m.rotation_degrees = Vector3(0.0, yaw_deg, 0.0)
+	m.scale = Vector3.ONE * scale_factor
+	root.add_child(m)
+	return m
+
+
 static func _box(size: Vector3) -> BoxMesh:
 	var b: BoxMesh = BoxMesh.new()
 	b.size = size
@@ -75,43 +86,25 @@ static func _cyl(top: float, bottom: float, height: float, segments: int = 24) -
 	return m
 
 
-# --- Mesa: lámpara cálida, borde de taza y lápices ------------------------------------------------------
+# --- Mesa: lámpara cálida, taza y lápices (todo fuera de la lámina) -------------------------------------
 
-static func _table(root: Node3D, c: Vector2, e: Vector2, u: float) -> void:
+static func _table(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
+	var h: Vector2 = e * 0.5
 	var lamp: Node3D = Node3D.new()
-	lamp.position = Vector3(c.x - e.x * 0.58, GROUND_Y, c.y - e.y * 0.3)
+	lamp.position = Vector3(c.x - h.x - 9.0, GROUND_Y, c.y - h.y - 4.0)
 	root.add_child(lamp)
-	_add(lamp, _cyl(1.1 * u, 1.3 * u, 0.35 * u), _mat(Color("#2B2622"), 0.4, 0.5), Vector3(0.0, 0.17 * u, 0.0))
-	_add(lamp, _cyl(0.12 * u, 0.12 * u, 4.0 * u, 12), _mat(Color("#B8893A"), 0.3, 0.8), Vector3(0.0, 2.2 * u, 0.0))
-	_add(lamp, _cyl(0.6 * u, 2.0 * u, 1.8 * u), _emissive(Color("#FFB45A"), 1.6), Vector3(0.0, 4.6 * u, 0.0))
+	_add(lamp, _cyl(2.6, 3.0, 0.8), _mat(Color("#2B2622"), 0.4, 0.5), Vector3(0.0, 0.4, 0.0))
+	_add(lamp, _cyl(0.25, 0.25, 9.0, 12), _mat(Color("#B8893A"), 0.3, 0.8), Vector3(0.0, 4.8, 0.0))
+	_add(lamp, _cyl(1.4, 4.2, 4.0), _emissive(Color("#FFB45A"), 1.6), Vector3(0.0, 10.0, 0.0))
 	var bulb: OmniLight3D = OmniLight3D.new()
 	bulb.light_color = Color("#FFA650")
 	bulb.light_energy = 2.2
-	bulb.omni_range = 40.0 * u
-	bulb.position = Vector3(0.0, 3.8 * u, 0.0)
+	bulb.omni_range = 90.0
+	bulb.position = Vector3(0.0, 8.0, 0.0)
 	lamp.add_child(bulb)
-	# Borde de una taza blanca vista desde arriba (un aro grueso con café adentro).
-	var cup: Node3D = Node3D.new()
-	cup.position = Vector3(c.x + e.x * 0.9, GROUND_Y, c.y - e.y * 0.78)
-	root.add_child(cup)
-	var rim: TorusMesh = TorusMesh.new()
-	rim.inner_radius = 4.4 * u
-	rim.outer_radius = 5.5 * u
-	rim.rings = 40
-	rim.ring_segments = 14
-	_add(cup, rim, _mat(Color("#EFE9DD"), 0.2), Vector3(0.0, 2.4 * u, 0.0))
-	_add(cup, _cyl(4.6 * u, 4.6 * u, 2.4 * u, 40), _mat(Color("#EFE9DD"), 0.2), Vector3(0.0, 1.2 * u, 0.0))
-	_add(cup, _cyl(4.4 * u, 4.4 * u, 0.1 * u, 40), _mat(Color("#3B2412"), 0.15), Vector3(0.0, 2.3 * u, 0.0))
-	# Lápices amarillos con punta y goma.
-	var colors: Array[Color] = [Color("#F2C230"), Color("#E85D4A"), Color("#4C9BD6")]
+	_glb(root, "prop_cup", Vector3(c.x + h.x + 8.0, GROUND_Y, c.y - h.y * 0.2), 200.0)
 	for i: int in 3:
-		var pencil: Node3D = Node3D.new()
-		pencil.position = Vector3(c.x + e.x * (0.78 + 0.06 * float(i)), GROUND_Y + 0.25 * u, c.y + e.y * (0.58 + 0.08 * float(i)))
-		pencil.rotation_degrees = Vector3(0.0, -18.0 + 14.0 * float(i), 0.0)
-		root.add_child(pencil)
-		_add(pencil, _cyl(0.25 * u, 0.25 * u, 7.0 * u, 6), _mat(colors[i], 0.4), Vector3.ZERO, Vector3(0.0, 0.0, 90.0))
-		_add(pencil, _cyl(0.0, 0.25 * u, 0.9 * u, 6), _mat(Color("#E7C79A"), 0.8), Vector3(-3.95 * u, 0.0, 0.0), Vector3(0.0, 0.0, 90.0))
-		_add(pencil, _cyl(0.25 * u, 0.25 * u, 0.5 * u, 6), _mat(Color("#E9A0A0"), 0.7), Vector3(3.75 * u, 0.0, 0.0), Vector3(0.0, 0.0, 90.0))
+		_glb(root, "prop_pencil", Vector3(c.x - h.x - 3.0 - 1.4 * float(i), GROUND_Y, c.y + h.y * 0.3 + 2.0 * float(i)), 4.0 * float(i) - 4.0)
 
 
 # --- Piso: zócalo, pata de silla y ventana con persiana --------------------------------------------------
@@ -126,35 +119,16 @@ static func _floor(root: Node3D, c: Vector2, e: Vector2, u: float) -> void:
 	for i: int in 7:
 		_add(root, _box(Vector3(11.6 * u, 0.55 * u, 0.5 * u)), _mat(Color("#8D8777"), 0.6), win + Vector3(0.0, (float(i) - 3.0) * 1.55 * u, 0.3 * u))
 	_add(root, _box(Vector3(12.2 * u, 0.6 * u, 0.7 * u)), _mat(Color("#F1EEE6"), 0.5), win + Vector3(0.0, -6.3 * u, 0.2 * u))
-	# Pata de silla con travesaño.
-	var leg: Vector3 = Vector3(c.x - e.x * 0.64, 0.0, c.y + e.y * 0.05)
-	_add(root, _cyl(0.55 * u, 0.4 * u, 16.0 * u, 16), _mat(Color("#7C7F86"), 0.3, 0.8), leg + Vector3(0.0, 8.0 * u, 0.0))
-	_add(root, _cyl(0.5 * u, 0.5 * u, 0.4 * u, 16), _mat(Color("#222222"), 0.9), leg + Vector3(0.0, 0.2 * u, 0.0))
-	_add(root, _cyl(0.2 * u, 0.2 * u, 7.0 * u, 12), _mat(Color("#7C7F86"), 0.3, 0.8), leg + Vector3(3.5 * u, 4.0 * u, 0.0), Vector3(0.0, 0.0, 90.0))
+	# Pata de silla (modelo real, 42 cm) junto al borde izquierdo, fuera de la lámina.
+	_glb(root, "prop_chair_leg", Vector3(c.x - e.x * 0.5 - 6.0, 0.0, c.y + e.y * 0.1))
 
 
 # --- Galpón: estanterías con cajas, líneas de seguridad y polvo ----------------------------------------
 
 static func _warehouse(root: Node3D, c: Vector2, e: Vector2, u: float) -> void:
-	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
-	rng.seed = 33
-	var steel: StandardMaterial3D = _mat(Color("#2F4F6F"), 0.4, 0.6)
-	var plank: StandardMaterial3D = _mat(Color("#D9792B"), 0.5, 0.3)
-	for s: int in 2:
-		var base: Vector3 = Vector3(c.x + (float(s) - 0.5) * e.x * 0.9, 0.0, c.y - e.y * 0.62)
-		for px: float in [-5.2, 5.2]:
-			for pz: float in [-1.2, 1.2]:
-				_add(root, _box(Vector3(0.5 * u, 14.0 * u, 0.5 * u)), steel, base + Vector3(px * u, 7.0 * u, pz * u))
-		for level: int in 3:
-			var y: float = (1.0 + float(level) * 4.6) * u
-			_add(root, _box(Vector3(11.2 * u, 0.4 * u, 3.0 * u)), plank, base + Vector3(0.0, y, 0.0))
-			var x: float = -4.6
-			while x < 4.0:
-				var w: float = rng.randf_range(1.6, 3.0)
-				var h: float = rng.randf_range(1.4, 3.6)
-				var kraft: Color = Color("#B98A56").lerp(Color("#8E6B47"), rng.randf())
-				_add(root, _box(Vector3(w * u, h * u, 2.4 * u)), _mat(kraft, 0.9), base + Vector3((x + w * 0.5) * u, y + (h * 0.5 + 0.2) * u, 0.0), Vector3(0.0, rng.randf_range(-4.0, 4.0), 0.0))
-				x += w + rng.randf_range(0.1, 0.5)
+	for sx: int in 2:
+		var bx: float = c.x + (float(sx) - 0.5) * e.x * 0.8
+		_glb(root, "prop_shelf", Vector3(bx, 0.0, c.y - e.y * 0.5 - 20.0))
 	# Líneas amarillas de seguridad pintadas a los costados.
 	var yellow: StandardMaterial3D = _mat(Color("#E8C21C"), 0.7)
 	_add(root, _box(Vector3(0.5 * u, 0.06, e.y * 1.5)), yellow, Vector3(c.x - e.x * 0.68, GROUND_Y + 0.04, c.y))
@@ -196,14 +170,15 @@ static func _dust(c: Vector2, e: Vector2, u: float) -> GPUParticles3D:
 # --- Estacionamiento: conos, cordón y farol ----------------------------------------------------------------
 
 static func _parking(root: Node3D, c: Vector2, e: Vector2, u: float) -> void:
-	var cone_spots: Array[Vector2] = [Vector2(-0.62, -0.5), Vector2(0.64, -0.46), Vector2(-0.66, 0.35), Vector2(0.6, 0.5)]
-	for spot: Vector2 in cone_spots:
-		_cone(root, Vector3(c.x + e.x * spot.x, 0.0, c.y + e.y * spot.y), u)
-	_add(root, _box(Vector3(e.x * 2.4, 1.2 * u, 1.8 * u)), _mat(Color("#8C8E92"), 0.9), Vector3(c.x, 0.6 * u, c.y - e.y * 0.66))
-	_add(root, _box(Vector3(e.x * 2.4, 0.12 * u, 1.9 * u)), _mat(Color("#E8C21C"), 0.7), Vector3(c.x, 1.25 * u, c.y - e.y * 0.66))
-	var post: Vector3 = Vector3(c.x + e.x * 0.74, 0.0, c.y - e.y * 0.58)
+	var h: Vector2 = e * 0.5
+	var spots: Array[Vector2] = [Vector2(-h.x - 14.0, -h.y * 0.6), Vector2(-h.x - 14.0, h.y * 0.5), Vector2(-h.x * 0.4, -h.y - 14.0), Vector2(h.x * 0.2, -h.y - 14.0)]
+	for spot: Vector2 in spots:
+		_glb(root, "prop_cone", Vector3(c.x + spot.x, 0.0, c.y + spot.y), spot.x * 7.0)
+	_add(root, _box(Vector3(e.x * 2.4, 1.2 * u, 1.8 * u)), _mat(Color("#8C8E92"), 0.9), Vector3(c.x, 0.6 * u, c.y - e.y * 0.66 - 14.0))
+	_add(root, _box(Vector3(e.x * 2.4, 0.12 * u, 1.9 * u)), _mat(Color("#E8C21C"), 0.7), Vector3(c.x, 1.25 * u, c.y - e.y * 0.66 - 14.0))
+	var post: Vector3 = Vector3(c.x - e.x * 0.74, 0.0, c.y - e.y * 0.58)
 	_add(root, _cyl(0.35 * u, 0.5 * u, 20.0 * u, 12), _mat(Color("#33353A"), 0.5, 0.6), post + Vector3(0.0, 10.0 * u, 0.0))
-	_add(root, _box(Vector3(4.0 * u, 0.7 * u, 1.4 * u)), _emissive(Color("#FFD59A"), 2.0), post + Vector3(-1.6 * u, 20.2 * u, 0.0))
+	_add(root, _box(Vector3(4.0 * u, 0.7 * u, 1.4 * u)), _emissive(Color("#FFD59A"), 2.0), post + Vector3(1.6 * u, 20.2 * u, 0.0))
 
 
 static func _cone(root: Node3D, pos: Vector3, u: float) -> void:

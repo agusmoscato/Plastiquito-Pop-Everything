@@ -7,6 +7,7 @@ extends Node3D
 ## del mundo la pone quien lo usa.
 
 const MODEL: String = "res://assets/models/hand.glb"
+const MODEL_GHOST: String = "res://assets/models/hand_ghost.glb"
 const FINGERS: Array[String] = ["index", "middle", "ring", "pinky"]
 
 
@@ -46,7 +47,7 @@ var _pose_rate: float = 18.0
 
 
 func setup(pose: String, material: Material) -> void:
-	var ps: PackedScene = load(MODEL) as PackedScene
+	var ps: PackedScene = load(MODEL_GHOST if material is ShaderMaterial else MODEL) as PackedScene
 	var model: Node3D = ps.instantiate() as Node3D
 	add_child(model)
 	skeleton = model.find_child("Skeleton3D", true, false) as Skeleton3D

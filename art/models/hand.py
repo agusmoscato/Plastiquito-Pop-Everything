@@ -107,7 +107,8 @@ lib.apply_modifiers(hand)
 lib.apply_modifiers(cuff)
 lib.apply_modifiers(arm)
 lib.apply_modifiers(palm_obj)
-body = lib.join([hand, cuff, arm, palm_obj], "hand_glove")
+NO_ARM = "--no-arm" in sys.argv  # variante para las manitos fantasma: sin antebrazo
+body = lib.join([hand, cuff, palm_obj] if NO_ARM else [hand, cuff, arm, palm_obj], "hand_glove")
 lib.smooth(body, 50.0)
 lib.unwrap(body)
 
@@ -164,5 +165,5 @@ print("TRIS", lib.triangles(body))
 
 if A["out"]:
     lib.export_glb(A["out"])
-if A["render"]:
+if A["render"] and not NO_ARM:
     lib.render_set(A["render"], "hand", target=(0.0, -0.06, 0.0), dist=0.5, elev=0.7)

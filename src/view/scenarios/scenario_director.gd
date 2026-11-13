@@ -11,7 +11,7 @@ const SETTINGS: Array[Dictionary] = [
 	{"rot": Vector3(-50.0, -30.0, 0.0), "color": Color("#FFC98C"), "energy": 1.0, "amb": Color("#E6C7A0"), "amb_e": 0.45, "bg": Color("#2A1D14"), "shadow": 80.0},
 	{"rot": Vector3(-34.0, -68.0, 0.0), "color": Color("#FFF0C8"), "energy": 1.25, "amb": Color("#BFD0E0"), "amb_e": 0.5, "bg": Color("#8B9498"), "shadow": 100.0},
 	{"rot": Vector3(-86.0, 0.0, 0.0), "color": Color("#CFE6FF"), "energy": 0.95, "amb": Color("#7F95B8"), "amb_e": 0.3, "bg": Color("#14181F"), "shadow": 140.0},
-	{"rot": Vector3(-13.0, -112.0, 0.0), "color": Color("#FF8C3A"), "energy": 1.7, "amb": Color("#E6A28C"), "amb_e": 0.4, "bg": Color("#E9976A"), "shadow": 400.0},
+	{"rot": Vector3(-24.0, -112.0, 0.0), "color": Color("#FFD2A8"), "energy": 1.45, "amb": Color("#C9C4C2"), "amb_e": 0.45, "bg": Color("#E9976A"), "shadow": 400.0},
 ]
 
 ## Cuánto más lejos se ve cada fase (la cámara se aleja con cada reciclado que abre fase).
@@ -51,6 +51,7 @@ func apply(new_phase: int, c: Vector2, e: Vector2) -> void:
 	_material.set_shader_parameter("kind_a", phase)
 	_material.set_shader_parameter("kind_b", phase)
 	_material.set_shader_parameter("blend", 0.0)
+	_material.set_shader_parameter("sheet_rect", Vector4(c.x, c.y, e.x * 0.5, e.y * 0.5))
 	_push(_settings_for(phase))
 	_ambient()
 
@@ -70,6 +71,7 @@ func transition(new_phase: int, seconds: float, c: Vector2, e: Vector2) -> void:
 	_new_props.scale = Vector3(1.0, 0.001, 1.0)
 	add_child(_new_props)
 	props = _new_props
+	_material.set_shader_parameter("sheet_rect", Vector4(c.x, c.y, e.x * 0.5, e.y * 0.5))
 	_material.set_shader_parameter("kind_a", phase)
 	_material.set_shader_parameter("kind_b", target)
 	_material.set_shader_parameter("blend", 0.0)

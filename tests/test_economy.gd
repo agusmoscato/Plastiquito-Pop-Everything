@@ -103,3 +103,10 @@ func test_prestige_formula() -> void:
 	assert_eq(Prestige.pellets_for(4.0e5, 1.0e5, 0.5), 2)
 	assert_eq(Prestige.pellets_for(1.0e7, 1.0e5, 0.5), 10)
 	assert_almost_eq(Prestige.pops_needed(10, 1.0e5, 0.5), 1.0e7, 1.0)
+
+
+func test_chain_factor_diminishing_returns() -> void:
+	assert_eq(Economy.chain_factor(10, 60, 0.6), 1.0)
+	assert_eq(Economy.chain_factor(60, 60, 0.6), 1.0)
+	assert_almost_eq(Economy.chain_factor(120, 60, 0.6), pow(0.5, 0.6), 0.0001)
+	assert_lt(Economy.chain_factor(1000, 60, 0.6), Economy.chain_factor(500, 60, 0.6))

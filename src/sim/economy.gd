@@ -8,6 +8,14 @@ static func pop_value(base: float, pressure: float, m_type: float, m_combo: floa
 	return base * pressure * pressure * m_type * m_combo * m_global
 
 
+## Rendimientos decrecientes de las cadenas grandes: el reventón número `n` de una cadena vale
+## (size / n)^alpha de su valor cuando n supera `size`. El sello de cadena muestra el número completo.
+static func chain_factor(n: int, size: int, alpha: float) -> float:
+	if n <= size:
+		return 1.0
+	return pow(float(size) / float(n), alpha)
+
+
 ## Costo del nivel `level` -> `level + 1`: base * g^level.
 static func cost(base: float, growth: float, level: int) -> float:
 	return base * pow(growth, float(level))

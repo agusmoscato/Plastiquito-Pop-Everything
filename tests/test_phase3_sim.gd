@@ -222,11 +222,11 @@ func test_game_sim_offline_uses_automation() -> void:
 	assert_eq(Cfg.num(cheat, "pops"), 0.0)
 
 
-func test_save_v3_roundtrip_and_v2_migration() -> void:
+func test_save_v4_roundtrip_and_v2_v3_migration() -> void:
 	var sim: GameSim = GameSim.new(db, 6)
 	sim.state.last_levels = {"finger_force": 7}
 	var data: Dictionary = sim.save_dict(555.0)
-	assert_eq(Cfg.integer(data, "version"), 3)
+	assert_eq(Cfg.integer(data, "version"), 4)
 	var other: GameSim = GameSim.new(db, 8)
 	var parsed: Dictionary = JSON.parse_string(JSON.stringify(data))
 	assert_true(other.load_dict(parsed))
@@ -240,9 +240,15 @@ func test_save_v3_roundtrip_and_v2_migration() -> void:
 	v2.erase("offline_total")
 	var migrated: Dictionary = GameState.migrate(v2)
 	assert_false(migrated.is_empty())
-	assert_eq(Cfg.integer(migrated, "version"), 3)
+	assert_eq(Cfg.integer(migrated, "version"), 4)
+	assert_eq(Cfg.integer(migrated, "run_buys"), 0)
 	assert_true(other.load_dict(v2))
 	assert_eq(other.state.saved_at_unix, 0.0)
+	var v3: Dictionary = data.duplicate(true)
+	v3["version"] = 3
+	v3.erase("run_buys")
+	assert_true(other.load_dict(v3))
+	assert_eq(other.state.run_buys, 0)
 
 
 func test_memory_restores_part_of_previous_levels() -> void:
@@ -293,3 +299,31 @@ func test_new_upgrade_text_limits() -> void:
 	for u: Dictionary in db.upgrades:
 		assert_lte(str(u["desc_es"]).length(), 60, str(u["id"]))
 		assert_lte(str(u["desc_en"]).length(), 60, str(u["id"]))
+
+
+func test_special_cap_grows_with_root_of_area() -> void:
+	var sim: GameSim = GameSim.new(db, 12)
+	sim.state.perm["perm_sheet"] = 3 # Estacionamiento: 22.500 celdas
+	sim.state.levels["golden_chance"] = 10
+	sim.refresh_stats()
+	sim.new_sheet()
+	var count: int = 0
+	for i: int in sim.sheet.cell_count():
+		if sim.sheet.type[i] != 0:
+			count += 1
+	var cap: int = roundi(Cfg.num(sim.eco, "special_cap_k") * sqrt(float(sim.sheet.cell_count())))
+	assert_lte(count, cap)
+
+
+func test_new_phase_discount_applies_to_first_buys_only() -> void:
+	var sim: GameSim = GameSim.new(db, 13)
+	sim.state.perm["perm_sheet"] = 1 # Piso
+	sim.refresh_stats()
+	var full: float = sim.upgrades.next_cost("finger_force", 1)
+	assert_eq(sim.state.run_buys, 0)
+	assert_lt(full, sim.upgrades.next_cost("finger_force", 1) * 1.0001)
+	sim.state.pops = 1.0e12
+	sim.buy("finger_force", 3)
+	assert_eq(sim.state.run_buys, 3)
+	assert_eq(sim.upgrades.discount, 1.0)
+	assert_gt(sim.upgrades.next_cost("finger_force", 3), 0.0)

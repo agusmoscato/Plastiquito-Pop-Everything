@@ -8,6 +8,8 @@ uniform int kind_a = 1;
 uniform int kind_b = 1;
 uniform float blend : hint_range(0.0, 1.0) = 0.0;
 
+uniform vec4 sheet_rect = vec4(0.0, 0.0, 0.0, 0.0); // centro x,z y medio lado x,z de la lámina
+
 varying vec3 wpos;
 
 float hash21(vec2 p) {
@@ -91,12 +93,14 @@ vec3 concrete(vec2 p, out float rough) {
 vec3 asphalt(vec2 p, out float rough) {
 	float n = fbm(p * 0.35);
 	float speck = step(0.8, hash21(floor(p * 9.0))) * (1.0 - smoothstep(0.4, 1.2, fwidth(p.x) * 9.0));
-	vec3 col = vec3(0.09, 0.09, 0.105) * (0.8 + 0.5 * n) + speck * 0.05;
+	vec3 col = vec3(0.15, 0.155, 0.165) * (0.8 + 0.5 * n) + speck * 0.05; // gris oscuro neutro
 	// Líneas de estacionamiento: rayas separadas y una línea larga de demarcación.
 	float col_x = abs(fract(p.x / 6.5) - 0.5) * 6.5;
 	float stall = smoothstep(0.26, 0.2, col_x) * step(0.0, sin(p.y * 0.04 + 1.0));
 	float band = smoothstep(0.22, 0.16, abs(mod(p.y, 38.0) - 19.0));
-	float paint = max(stall, band);
+	vec2 dd = abs(wpos.xz - sheet_rect.xy) - sheet_rect.zw;
+	float outside = smoothstep(3.0, 9.0, max(dd.x, dd.y)); // sin pintura debajo de la lámina
+	float paint = max(stall, band) * outside;
 	float wear = smoothstep(0.08, 0.4, fbm(p * 0.7 + 3.0));
 	col = mix(col, vec3(0.86, 0.84, 0.74), paint * wear);
 	rough = 0.9;

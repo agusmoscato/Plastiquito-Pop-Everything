@@ -10,6 +10,7 @@ function Run($script, $name, $extra) {
     & $bl -b --factory-startup -P "art/models/$script.py" -- --out "$out\$name.glb" --render $ren @extra |
         Select-String -Pattern "TRIS|Error|Traceback"
 }
+Run "hand" "hand_ghost" @("--no-arm")
 foreach ($m in "hand", "pin", "iron", "boot", "roller") { Run $m $m @() }
 foreach ($w in "gem", "bomb", "line") { Run "specials" "special_$w" @("--which", $w) }
 foreach ($w in "cup", "pencil", "chair_leg", "shelf", "cone") { Run "props" "prop_$w" @("--which", $w) }

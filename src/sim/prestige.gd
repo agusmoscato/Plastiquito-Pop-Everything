@@ -25,6 +25,7 @@ static func recycle(state: GameState, gained: int) -> int:
 	state.pops_run = 0.0
 	state.levels = {}
 	state.run_time_s = 0.0
+	state.run_buys = 0
 	state.sheet = {}
 	state.selected_tool = "finger"
 	return gained

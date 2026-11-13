@@ -7,6 +7,7 @@ const PERM: String = "perm"
 
 var db: DataDB
 var eco: Dictionary
+var discount: float = 1.0 ## factor de costo de las primeras compras de una fase nueva
 var order: Array[String] = [] ## ids en el orden del catálogo
 ## Las mejoras en Pops cuestan más en cada fase (x base de la fase, DESIGN 4); lo fija GameSim.
 var cost_scale: float = 1.0
@@ -55,6 +56,9 @@ func next_cost(id: String, level: int) -> float:
 	var kind: String = str(d["kind"])
 	if level == 0 and str(d["scope"]) != PERM and (kind == "force" or kind == "value"):
 		scale *= Cfg.num(eco, "first_level_cost_factor")
+	# Fases nuevas: las primeras compras tras reciclar salen con descuento (lo fija GameSim).
+	if str(d["scope"]) != PERM:
+		scale *= discount
 	return ceilf(Economy.cost(Cfg.num(d, "base_cost"), Cfg.num(d, "growth"), level) * scale)
 
 
@@ -226,7 +230,8 @@ func hands_params(state: GameState) -> Dictionary:
 	if level_with_bonus(state, "unlock_hands") >= 1:
 		count = level_with_bonus(state, "hands_count")
 	var speed_add: float = effect("hands_speed", state.level("hands_speed"))
-	return {"count": count, "rate": Cfg.num(eco, "hand_base_rate") * (1.0 + speed_add), "smart": state.level("hands_smart") >= 1}
+	return {"count": count, "rate": Cfg.num(eco, "hand_base_rate") * (1.0 + speed_add), "smart": state.level("hands_smart") >= 1,
+		"power": _tool_mult(state, "hands", "value")}
 
 
 ## Parámetros del rodillo automático.

@@ -112,20 +112,23 @@ func _spawn(idx: int, type_id: int) -> void:
 	node.position = Vector3(p.x, 0.32, p.y)
 	add_child(node)
 	if type_id == TYPE_GOLDEN:
-		_add(node, "gem", "gold", Vector3.ZERO, Vector3.ZERO)
+		_add_model(node, "special_gem", 1.6, Vector3(0.0, -0.3, 0.0))
 	elif type_id == TYPE_BOMB:
-		_add(node, "ball", "bomb", Vector3.ZERO, Vector3.ZERO)
-		_add(node, "fuse", "fuse", Vector3(0.12, 0.42, 0.0), Vector3(0.0, 0.0, -25.0))
-		var spark: MeshInstance3D = _add(node, "spark", "spark", Vector3(0.22, 0.62, 0.0), Vector3.ZERO)
-		spark.name = "Spark"
+		_add_model(node, "special_bomb", 1.15, Vector3(0.0, -0.34, 0.0))
 	elif type_id == TYPE_ECHO:
 		_add(node, "echo_ball", "echo", Vector3.ZERO, Vector3.ZERO)
 		_add(node, "echo_ring", "echo_ring", Vector3(0.0, 0.0, 0.0), Vector3(90.0, 0.0, 0.0))
 	elif type_id == TYPE_LINE:
-		_add(node, "capsule", "line", Vector3.ZERO, Vector3(0.0, 0.0, 90.0))
-		for dx: float in [-0.32, 0.0, 0.32]:
-			_add(node, "band", "band", Vector3(dx, 0.0, 0.0), Vector3(0.0, 0.0, 90.0))
+		_add_model(node, "special_line", 1.15, Vector3(0.0, -0.24, 0.0))
 	_nodes[idx] = node
+
+
+func _add_model(parent: Node3D, file: String, scale_factor: float, offset: Vector3) -> void:
+	var ps: PackedScene = load("res://assets/models/%s.glb" % file) as PackedScene
+	var m: Node3D = ps.instantiate() as Node3D
+	m.scale = Vector3.ONE * scale_factor
+	m.position = offset
+	parent.add_child(m)
 
 
 func _add(parent: Node3D, mesh_key: String, mat_key: String, pos: Vector3, rot_deg: Vector3) -> MeshInstance3D:

@@ -4,7 +4,7 @@ render_mode blend_mix, cull_back, unshaded, depth_draw_never, shadows_disabled;
 
 uniform vec3 core_color : source_color = vec3(0.22, 0.78, 0.9);
 uniform vec3 rim_color : source_color = vec3(0.82, 1.0, 1.0);
-uniform float base_alpha = 0.2;
+uniform float base_alpha = 0.3;
 uniform float rim_alpha = 0.6;
 uniform float rim_power = 2.4;
 

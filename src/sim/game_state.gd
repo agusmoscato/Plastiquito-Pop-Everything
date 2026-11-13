@@ -2,7 +2,7 @@ class_name GameState
 extends RefCounted
 ## Estado completo y serializable de la partida (DESIGN 8). Lógica pura.
 
-const SAVE_VERSION: int = 3
+const SAVE_VERSION: int = 4
 
 var pops: float = 0.0 ## moneda actual
 var pops_run: float = 0.0 ## Pops ganados en esta corrida (base de la fórmula de Pellets)
@@ -24,6 +24,7 @@ var last_levels: Dictionary = {} ## niveles de la partida anterior (para "Memori
 var saved_at_unix: float = 0.0 ## hora del último guardado (ganancias sin conexión)
 var max_unix_seen: float = 0.0 ## la hora más alta vista (protección contra el reloj atrasado)
 var offline_total: float = 0.0 ## Pops ganados sin conexión (estadística)
+var run_buys: int = 0 ## niveles comprados desde el último reciclado (descuento de las primeras compras)
 
 
 func level(id: String) -> int:
@@ -53,7 +54,7 @@ func to_dict() -> Dictionary:
 		"recycles": recycles, "first_recycle_s": first_recycle_s, "max_chain": max_chain,
 		"sheets_done": sheets_done, "tool_pops": tool_pops.duplicate(), "sheet": sheet,
 		"last_levels": last_levels.duplicate(), "saved_at_unix": saved_at_unix,
-		"max_unix_seen": max_unix_seen, "offline_total": offline_total,
+		"max_unix_seen": max_unix_seen, "offline_total": offline_total, "run_buys": run_buys,
 	}
 
 
@@ -88,6 +89,7 @@ func from_dict(data: Dictionary) -> bool:
 	saved_at_unix = Cfg.num(d, "saved_at_unix")
 	max_unix_seen = Cfg.num(d, "max_unix_seen")
 	offline_total = Cfg.num(d, "offline_total")
+	run_buys = Cfg.integer(d, "run_buys")
 	return true
 
 
@@ -114,11 +116,16 @@ static func migrate(data: Dictionary) -> Dictionary:
 		d["max_unix_seen"] = 0.0
 		d["offline_total"] = 0.0
 		version = 3
+	if version == 3:
+		# v3 -> v4: contador de compras desde el último reciclado (descuento de fase nueva).
+		d["version"] = 4
+		d["run_buys"] = 0
+		version = 4
 	if version != SAVE_VERSION:
 		return {}
 	for key: String in ["pops", "pops_run", "pops_total", "pellets", "levels", "perm", "discovered",
 			"selected_tool", "playtime_s", "run_time_s", "recycles", "first_recycle_s", "max_chain",
-			"sheets_done", "tool_pops", "sheet", "last_levels", "saved_at_unix", "max_unix_seen", "offline_total"]:
+			"sheets_done", "tool_pops", "sheet", "last_levels", "saved_at_unix", "max_unix_seen", "offline_total", "run_buys"]:
 		if not d.has(key):
 			return {}
 	return d
