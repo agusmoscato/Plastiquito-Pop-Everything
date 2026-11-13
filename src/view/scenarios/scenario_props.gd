@@ -159,10 +159,6 @@ static func _warehouse(root: Node3D, c: Vector2, e: Vector2, u: float) -> void:
 	var yellow: StandardMaterial3D = _mat(Color("#E8C21C"), 0.7)
 	_add(root, _box(Vector3(0.5 * u, 0.06, e.y * 1.5)), yellow, Vector3(c.x - e.x * 0.68, GROUND_Y + 0.04, c.y))
 	_add(root, _box(Vector3(0.5 * u, 0.06, e.y * 1.5)), yellow, Vector3(c.x + e.x * 0.68, GROUND_Y + 0.04, c.y))
-	# Lámparas colgantes frías (se ven como discos brillantes arriba).
-	for i: int in 3:
-		var lamp: Vector3 = Vector3(c.x + (float(i) - 1.0) * e.x * 0.6, 17.0 * u, c.y - e.y * 0.2)
-		_add(root, _cyl(2.2 * u, 0.6 * u, 1.1 * u, 20), _emissive(Color("#DFF0FF"), 1.8), lamp)
 	root.add_child(_dust(c, e, u))
 
 

@@ -19,6 +19,8 @@ var t: float = 0.0
 
 var _prev_pos: Vector2 = Vector2.ZERO
 var _first_step: bool = true
+var _shot_dir: String = ""
+var _shots_taken: int = 0
 
 
 func _ready() -> void:
@@ -36,6 +38,9 @@ func _ready() -> void:
 	for arg: String in OS.get_cmdline_user_args():
 		if arg.begins_with("--clip-seconds="):
 			duration = float(arg.trim_prefix("--clip-seconds="))
+		elif arg.begins_with("--clip-shots="):
+			_shot_dir = arg.trim_prefix("--clip-shots=")
+			DirAccess.make_dir_recursive_absolute(_shot_dir)
 	setup()
 
 
@@ -136,8 +141,21 @@ func _process(delta: float) -> void:
 	if chain != null:
 		chain.step()
 		_effects(delta)
+	_maybe_shot()
 	if t >= duration:
 		get_tree().quit()
+
+
+## Con --clip-shots=<carpeta> guarda 4 cuadros repartidos en el clip (para revisarlo sin grabar).
+func _maybe_shot() -> void:
+	if _shot_dir.is_empty() or _shots_taken >= 4:
+		return
+	var at: float = duration * (0.18 + 0.22 * float(_shots_taken))
+	if t >= at:
+		var img: Image = get_viewport().get_texture().get_image()
+		if img != null:
+			img.save_png("%s/%s_%d.png" % [_shot_dir, scene_file_path.get_file().get_basename(), _shots_taken])
+		_shots_taken += 1
 
 
 func _effects(delta: float) -> void:

@@ -60,14 +60,16 @@ vec3 tiles(vec2 p, out float rough) {
 	float checker = mod(floor(q.x) + floor(q.y), 2.0);
 	vec3 a = vec3(0.80, 0.76, 0.66);
 	vec3 b = vec3(0.36, 0.46, 0.44);
-	vec3 col = mix(a, b, checker);
-	col *= 0.93 + 0.14 * vnoise(p * 3.0);
+	float px = fwidth(q.x) + fwidth(q.y); // tamaño de baldosa en píxeles: de lejos se promedia
+	float far_k = smoothstep(0.35, 0.9, px);
+	vec3 col = mix(mix(a, b, checker), (a + b) * 0.5, far_k);
+	col *= 0.93 + 0.14 * vnoise(p * 3.0) * (1.0 - far_k);
 	vec2 f = fract(q);
 	float grout = smoothstep(0.0, 0.025, f.x) * smoothstep(0.0, 0.025, 1.0 - f.x) * smoothstep(0.0, 0.025, f.y) * smoothstep(0.0, 0.025, 1.0 - f.y);
-	col = mix(vec3(0.22, 0.21, 0.19), col, grout);
+	col = mix(vec3(0.22, 0.21, 0.19), col, mix(grout, 1.0, far_k));
 	// Sombras de persiana: franjas diagonales de luz de ventana.
 	float s = sin((p.x * 0.8 + p.y * 0.55) * 0.9);
-	float lit = smoothstep(-0.12, 0.12, s);
+	float lit = mix(smoothstep(-0.12, 0.12, s), 0.5, far_k);
 	col *= mix(0.6, 1.08, lit);
 	rough = 0.3;
 	return col;
@@ -88,7 +90,7 @@ vec3 concrete(vec2 p, out float rough) {
 
 vec3 asphalt(vec2 p, out float rough) {
 	float n = fbm(p * 0.35);
-	float speck = step(0.8, hash21(floor(p * 9.0)));
+	float speck = step(0.8, hash21(floor(p * 9.0))) * (1.0 - smoothstep(0.4, 1.2, fwidth(p.x) * 9.0));
 	vec3 col = vec3(0.09, 0.09, 0.105) * (0.8 + 0.5 * n) + speck * 0.05;
 	// Líneas de estacionamiento: rayas separadas y una línea larga de demarcación.
 	float col_x = abs(fract(p.x / 6.5) - 0.5) * 6.5;
