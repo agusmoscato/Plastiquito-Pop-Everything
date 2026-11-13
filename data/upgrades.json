@@ -320,7 +320,7 @@
    "desc_en": "Chains travel further. +0.04.",
    "base_cost": 138600.0,
    "growth": 1.3,
-   "max_level": 10,
+   "max_level": 3,
    "per_level": 0.04,
    "effect_type": "add",
    "unit": "k",
@@ -697,12 +697,17 @@
    "desc_es": "Abre la fase siguiente. Pide más Pellets.",
    "desc_en": "Opens the next phase. Costs more Pellets.",
    "base_cost": 1.0,
-   "growth": 3.5,
+   "growth": 18.0,
    "max_level": 3,
    "per_level": 1.0,
    "effect_type": "add",
    "unit": "",
-   "requires": {}
+   "requires": {},
+   "cost_table": [
+    1.0,
+    18.0,
+    110.0
+   ]
   },
   {
    "id": "perm_bonus",

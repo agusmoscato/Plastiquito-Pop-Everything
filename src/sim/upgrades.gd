@@ -46,10 +46,14 @@ func milestone(level: int) -> float:
 ## Costo del próximo nivel (en Pops, o en Pellets si es permanente).
 func next_cost(id: String, level: int) -> float:
 	var d: Dictionary = def(id)
+	if d.has("cost_table"): # escalones a mano (por ejemplo, "Lámina más grande")
+		var table: Array = d["cost_table"]
+		var price: float = table[mini(level, table.size() - 1)]
+		return price
 	var scale: float = 1.0 if str(d["scope"]) == PERM else cost_scale
 	# Primer pedido barato: la primera compra de fuerza o de valor sale pronto (en unos 30 s).
 	var kind: String = str(d["kind"])
-	if level == 0 and str(d["scope"]) != PERM and (kind == "force" or kind == "value") and cost_scale <= 1.0:
+	if level == 0 and str(d["scope"]) != PERM and (kind == "force" or kind == "value"):
 		scale *= Cfg.num(eco, "first_level_cost_factor")
 	return ceilf(Economy.cost(Cfg.num(d, "base_cost"), Cfg.num(d, "growth"), level) * scale)
 
@@ -236,7 +240,7 @@ func roller_params(state: GameState) -> Dictionary:
 func global_stats(state: GameState) -> Dictionary:
 	var sheet_cfg: Dictionary = db.sheet
 	var g: Dictionary = {}
-	g["tense_threshold"] = maxf(1.3, Cfg.num(sheet_cfg, "tense_threshold") - effect("global_tense", state.level("global_tense")))
+	g["tense_threshold"] = maxf(1.4, Cfg.num(sheet_cfg, "tense_threshold") - effect("global_tense", state.level("global_tense")))
 	g["chain_k"] = minf(Cfg.num(sheet_cfg, "chain_k_max"), Cfg.num(sheet_cfg, "chain_k") + effect("global_chain", state.level("global_chain")))
 	var special_add: float = effect("global_special", state.level("global_special"))
 	var perm_special: float = effect("perm_golden", state.perm_level("perm_golden"))
