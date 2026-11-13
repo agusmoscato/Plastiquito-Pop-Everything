@@ -3,6 +3,8 @@
 Objetivo: confirmar que reventar da gusto antes de construir el resto (DESIGN.md, sección 10). Se prueba con **5 personas sin contexto**, de a una.
 
 ## Preparación
+- Pasarle a cada persona el instalador o el zip (ver [PLAYTEST_TESTERS.md](PLAYTEST_TESTERS.md)); las builds salen de `tools/build.sh`.
+- Cada sesión escribe un CSV en `%APPDATA%\Plastiquito\playtest` (Windows). Se recoge al final de cada prueba. Es un **complemento** de las anotaciones de quien observa, no las reemplaza.
 - Build o editor con `scenes/main.tscn`, resolución 1600x900, auriculares o parlantes decentes.
 - Volumen inicial de Master en 80% (valor por defecto). Anotar si la persona lo cambia.
 - Grabar pantalla y audio si la persona lo permite. F12 guarda capturas en `user://screenshots`.
@@ -24,6 +26,12 @@ Anotar:
 | ¿Sube el volumen o se acerca al parlante? | |
 | ¿Usa la rueda para acercar o alejar? | |
 | ¿Se frustra o se queda quieta sin saber qué hacer? | |
+
+## Datos del CSV de sesión
+Campos: duración, reventones totales, segundo del primer arrastre, clics sueltos y arrastres, cambios de volumen (`valor@segundo`), usos de la rueda, recargas de lámina y racha máxima. Cruzarlos con lo observado:
+- Duración mayor a 120 s y reventones que siguen creciendo: apoya el criterio de "sigue jugando solo".
+- Primer arrastre tardío o ningún arrastre: el gesto no se descubre solo (ajustar el cursor o la pista visual).
+- Cambios de volumen hacia arriba: suma a la señal de que el sonido gusta.
 
 ## 4 preguntas al final
 1. ¿Qué te dio ganas de seguir?

@@ -27,6 +27,13 @@ GODOT="C:/Users/sopor/Desktop/Agustin/1-JUEGOS/Inflación Idle/tools/godot_bin/G
 
 Si se agregan clases con `class_name` nuevas, `run_tests.sh` ya corre `godot --headless --import` antes para registrarlas.
 
+## Builds de playtest
+
+- `./tools/build.sh` (o `tools/build.ps1`): lint + tests, export Windows/Linux, zips y, si hay Inno Setup, instalador. Salida en `builds/<versión>/` (ignorada por git).
+- La versión vive solo en `application/config/version` de `project.godot`.
+- Plantillas de exportación 4.4.1 (solo las de release de Windows y Linux, extraídas del .tpz oficial) en `%APPDATA%\Godot\export_templates\4.4.1.stable`; rcedit en `tools/bin/` (ignorado) y configurado en los ajustes del editor.
+- En builds `playtest`/`release` no existen F3 ni el selector de tamaño (`PlaytestMode`).
+
 ## Arquitectura (reglas de oro)
 
 - `src/sim/` es **lógica pura**: clases `RefCounted`, sin nodos, sin escenas, sin acceso a la pantalla. La vista (`src/view/`) solo lee el estado.
