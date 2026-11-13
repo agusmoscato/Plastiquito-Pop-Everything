@@ -53,6 +53,15 @@ func fit_to(center: Vector2, extents: Vector2) -> void:
 	_apply_zoom()
 
 
+## Coloca la cámara de golpe (sin interpolar). Para el benchmark.
+func focus(center: Vector2, distance: float) -> void:
+	_target_zoom = clampf(distance, min_zoom, max_zoom)
+	_zoom = _target_zoom
+	_target_pos = Vector3(center.x, 0.0, center.y)
+	position = _target_pos
+	_apply_zoom()
+
+
 func zoom_distance() -> float:
 	return _zoom
 
