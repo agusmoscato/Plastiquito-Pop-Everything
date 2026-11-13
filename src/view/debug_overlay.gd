@@ -2,10 +2,8 @@ class_name DebugOverlay
 extends CanvasLayer
 ## Overlay de debug (F3): estadísticas, tamaño de lámina, pop masivo y ajustes rápidos.
 
-signal size_selected(w: int, h: int)
+signal cheat_pops_requested
 signal mass_pop_requested
-
-const SIZES: Array[Vector2i] = [Vector2i(20, 20), Vector2i(100, 100), Vector2i(500, 500), Vector2i(1000, 1000)]
 
 var world: ToyWorld
 var panel: PanelContainer
@@ -24,7 +22,10 @@ func _ready() -> void:
 	_label = Label.new()
 	_label.custom_minimum_size = Vector2(300.0, 0.0)
 	box.add_child(_label)
-	box.add_child(_size_selector())
+	var cheat: Button = Button.new()
+	cheat.text = "+1M Pops (trampa)"
+	cheat.pressed.connect(func() -> void: cheat_pops_requested.emit())
+	box.add_child(cheat)
 	var mass: Button = Button.new()
 	mass.text = "Pop masivo (radio 15)"
 	mass.pressed.connect(func() -> void: mass_pop_requested.emit())
@@ -52,14 +53,6 @@ func _process(delta: float) -> void:
 		s.popped_ratio() * 100.0, PopAudio.active_voices(), PopAudio.streak(),
 		RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME),
 		world.sheet_view.chunk_count()]
-
-
-func _size_selector() -> OptionButton:
-	var opt: OptionButton = OptionButton.new()
-	for s: Vector2i in SIZES:
-		opt.add_item("Lámina %dx%d" % [s.x, s.y])
-	opt.item_selected.connect(func(i: int) -> void: size_selected.emit(SIZES[i].x, SIZES[i].y))
-	return opt
 
 
 func _check(text: String, value: bool, on_toggled: Callable) -> CheckBox:

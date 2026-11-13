@@ -15,7 +15,9 @@ var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var _voices: Array[AudioStreamPlayer] = []
 var _streams: Dictionary = {} ## ruta -> AudioStream
 var _crackle: AudioStreamPlayer
-var _pops_this_second: int = 0
+var _ui_streams: Dictionary = {} ## nombre -> AudioStream (assets/audio/ui)
+var _ui_players: Array[AudioStreamPlayer] = []
+var _ui_next: int = 0
 
 
 func _ready() -> void:
@@ -30,6 +32,7 @@ func _ready() -> void:
 	_load_categories()
 	_build_voices()
 	_build_crackle()
+	_load_ui()
 
 
 func active_voices() -> int:
@@ -59,6 +62,29 @@ func report_frame(pops: int, max_pressure: float, delta: float) -> void:
 		_play(category, logic.pop_pitch(_rng), Cfg.num(_cfg, "pop_volume_db") + _rng.randf_range(-2.0, 1.0), "Pops")
 	if pops > count:
 		logic.register_pops(pops - count, now)
+
+
+## Sonido de interfaz por nombre ("tic", "stamp", "milestone", "chain_hit", "recycle").
+func play_ui(kind: String, pitch: float = 1.0, volume_db: float = 0.0) -> void:
+	var stream: AudioStream = _ui_streams.get(kind)
+	if stream == null or _ui_players.is_empty():
+		return
+	var p: AudioStreamPlayer = _ui_players[_ui_next]
+	_ui_next = (_ui_next + 1) % _ui_players.size()
+	p.stream = stream
+	p.pitch_scale = pitch
+	p.volume_db = volume_db
+	p.play()
+
+
+## Sonido propio de cada especial: misma familia de muestras, tono y volumen distintos.
+func play_special(type_id: int) -> void:
+	if type_id == 1:
+		_play(PopAudioLogic.CATEGORY_TENSE, 1.55, Cfg.num(_cfg, "pop_volume_db") + 3.0, "Pops")
+	elif type_id == 2:
+		_play(PopAudioLogic.CATEGORY_LARGE, 0.55, Cfg.num(_cfg, "pop_volume_db") + 4.0, "Pops")
+	elif type_id == 3:
+		_play(PopAudioLogic.CATEGORY_SMALL, 1.3, Cfg.num(_cfg, "pop_volume_db") + 2.0, "Pops")
 
 
 func play_squish() -> void:
@@ -139,6 +165,20 @@ func _load_categories() -> void:
 				_streams[path] = stream
 				paths.append(path)
 		logic.set_samples(category, paths)
+
+
+func _load_ui() -> void:
+	for i: int in 4:
+		var p: AudioStreamPlayer = AudioStreamPlayer.new()
+		p.name = "UiVoice%d" % i
+		p.bus = "UI" if AudioServer.get_bus_index("UI") >= 0 else "Master"
+		add_child(p)
+		_ui_players.append(p)
+	for file: String in _list_audio_files("res://assets/audio/ui"):
+		var stream: AudioStream = load("res://assets/audio/ui".path_join(file)) as AudioStream
+		if stream != null:
+			var key: String = file.get_basename().trim_prefix("ph_")
+			_ui_streams[key] = stream
 
 
 func _load_loop() -> AudioStream:

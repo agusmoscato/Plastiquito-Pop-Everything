@@ -8,6 +8,7 @@ const RATE: int = 44100
 const VARIANTS: int = 10
 const OUT_POPS: String = "res://assets/audio/pops"
 const OUT_LOOPS: String = "res://assets/audio/loops"
+const OUT_UI: String = "res://assets/audio/ui"
 
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
@@ -21,6 +22,12 @@ func _init() -> void:
 			_save(samples, OUT_POPS.path_join(category).path_join("ph_%s_%02d.wav" % [category, i]))
 	DirAccess.make_dir_recursive_absolute(OUT_LOOPS)
 	_save(_make_crackle_loop(), OUT_LOOPS.path_join("ph_crackle_loop.wav"))
+	DirAccess.make_dir_recursive_absolute(OUT_UI)
+	_save(_tic(), OUT_UI.path_join("ph_tic.wav"))
+	_save(_stamp(), OUT_UI.path_join("ph_stamp.wav"))
+	_save(_milestone(), OUT_UI.path_join("ph_milestone.wav"))
+	_save(_chain_hit(), OUT_UI.path_join("ph_chain_hit.wav"))
+	_save(_whoosh(), OUT_UI.path_join("ph_recycle.wav"))
 	print("gen_placeholder_sfx: listo")
 	quit(0)
 
@@ -113,6 +120,73 @@ func _make_crackle_loop() -> PackedFloat32Array:
 		for i: int in range(0, 300):
 			out[(start + i) % n] += _rng.randf_range(-1.0, 1.0) * exp(-float(i) / tau) * amp
 	return _normalize(out, 0.7)
+
+
+## Tono con envolvente exponencial, sumado en `out` desde el instante `start_s`.
+func _add_tone(out: PackedFloat32Array, start_s: float, freq: float, dur: float, tau: float, amp: float) -> void:
+	var first: int = int(start_s * RATE)
+	var n: int = int(dur * RATE)
+	for i: int in n:
+		if first + i >= out.size():
+			break
+		var t: float = float(i) / float(RATE)
+		var env: float = exp(-t / tau) * minf(t / 0.002, 1.0)
+		out[first + i] += (sin(TAU * freq * t) + 0.35 * sin(TAU * freq * 2.0 * t)) * env * amp
+
+
+func _blank(seconds: float) -> PackedFloat32Array:
+	var out: PackedFloat32Array = PackedFloat32Array()
+	out.resize(int(seconds * RATE))
+	return out
+
+
+## Tic suave: aviso de que algo se puede comprar.
+func _tic() -> PackedFloat32Array:
+	var out: PackedFloat32Array = _blank(0.09)
+	_add_tone(out, 0.0, 2300.0, 0.09, 0.018, 0.6)
+	return _normalize(out, 0.45)
+
+
+## Ka-chunk del sello de goma: golpe grave + clic seco.
+func _stamp() -> PackedFloat32Array:
+	var out: PackedFloat32Array = _blank(0.28)
+	_add_tone(out, 0.0, 95.0, 0.28, 0.06, 1.0)
+	_add_tone(out, 0.0, 60.0, 0.28, 0.09, 0.7)
+	for i: int in 700:
+		out[i] += _rng.randf_range(-1.0, 1.0) * exp(-float(i) / 160.0) * 0.8
+	return _normalize(out, 0.85)
+
+
+## Hito: arpegio corto ascendente.
+func _milestone() -> PackedFloat32Array:
+	var out: PackedFloat32Array = _blank(0.75)
+	var notes: Array[float] = [523.25, 659.25, 783.99, 1046.5]
+	for i: int in notes.size():
+		_add_tone(out, float(i) * 0.1, notes[i], 0.45, 0.16, 0.6)
+	return _normalize(out, 0.7)
+
+
+## Golpe del sello de cadena: bombo con cola.
+func _chain_hit() -> PackedFloat32Array:
+	var out: PackedFloat32Array = _blank(0.55)
+	_add_tone(out, 0.0, 70.0, 0.55, 0.14, 1.0)
+	_add_tone(out, 0.0, 140.0, 0.3, 0.05, 0.5)
+	for i: int in 1400:
+		out[i] += _rng.randf_range(-1.0, 1.0) * exp(-float(i) / 350.0) * 0.5
+	return _normalize(out, 0.9)
+
+
+## Reciclado: soplido de ruido que sube y baja.
+func _whoosh() -> PackedFloat32Array:
+	var n: int = int(0.9 * RATE)
+	var out: PackedFloat32Array = _blank(0.9)
+	var lp: float = 0.0
+	for i: int in n:
+		var x: float = float(i) / float(n)
+		var a: float = clampf(0.02 + 0.5 * sin(PI * x), 0.0, 1.0)
+		lp += a * 0.5 * (_rng.randf_range(-1.0, 1.0) - lp)
+		out[i] = lp * sin(PI * x)
+	return _normalize(out, 0.6)
 
 
 func _normalize(s: PackedFloat32Array, peak: float) -> PackedFloat32Array:

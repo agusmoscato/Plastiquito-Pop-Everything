@@ -23,6 +23,8 @@ uniform float wrinkle_strength = 0.55;
 uniform float reveal_z = 1.0e9; // las filas con z mayor todavía no aparecieron
 uniform float reveal_width = 2.0; // ancho de la "curva" del rollo
 uniform float roll_lift = 0.7;
+uniform float roll_up_z = -1.0e9; // reciclado: las filas con z menor ya se enrollaron
+uniform float crumple : hint_range(0.0, 1.0) = 0.0; // reciclado: la lámina se arruga
 
 varying float v_pressure;
 varying float v_squash;
@@ -72,6 +74,17 @@ void vertex() {
 	float k = clamp((reveal_z - v_origin.z) / reveal_width, 0.0, 1.0);
 	float visible_scale = smoothstep(0.0, 0.25, k);
 	float lift = (1.0 - k) * roll_lift;
+	float k2 = clamp((v_origin.z - roll_up_z) / reveal_width, 0.0, 1.0);
+	visible_scale *= smoothstep(0.0, 0.25, k2);
+	lift += (1.0 - k2) * roll_lift;
+	// Burbujas especiales: las dibuja SpecialsView mientras estén enteras.
+	float hidden = step(0.5, v_type) * (1.0 - step(0.001, v_pop));
+	visible_scale *= 1.0 - hidden;
+	// Arrugado: se achican y se desparraman en altura de forma desigual.
+	float h1 = hash21(v_origin.xz * 3.17);
+	float h2 = hash21(v_origin.xz * 1.93 + 5.0);
+	w *= 1.0 - 0.3 * crumple * h1;
+	h *= 1.0 + 1.1 * crumple * (h2 - 0.3);
 
 	VERTEX.xz *= w * infl * visible_scale;
 	VERTEX.y *= h * infl * visible_scale;

@@ -77,7 +77,7 @@ func test_csv_format() -> void:
 	log.sheet_reloaded()
 	var lines: PackedStringArray = log.to_csv(125.0).strip_edges().split("\n")
 	assert_eq(lines[0], "campo,valor")
-	assert_eq(lines.size(), 12)
+	assert_eq(lines.size(), 16)
 	assert_true(lines.has("version,0.1.0"))
 	assert_true(lines.has("duracion_s,125.0"))
 	assert_true(lines.has("reventones_totales,4"))

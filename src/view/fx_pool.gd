@@ -10,6 +10,8 @@ var _next: int = 0
 var _max_per_frame: int = 6
 var _frame: int = -1
 var _used_this_frame: int = 0
+var _special: Dictionary = {} ## tipo -> Array[GPUParticles3D] (partículas propias de cada especial)
+var _special_next: Dictionary = {}
 
 
 func setup(cfg: Dictionary) -> void:
@@ -29,6 +31,48 @@ func setup(cfg: Dictionary) -> void:
 		_entries.append(holder)
 		_shards.append(shards)
 		_dust.append(dust)
+	_build_special_emitters()
+
+
+## Partículas propias: Dorada = chispas amarillas hacia arriba, Bomba = brasas naranjas, Línea = rayas celestes.
+func _build_special_emitters() -> void:
+	var defs: Dictionary = {
+		1: {"color": Color(1.0, 0.82, 0.25, 0.9), "size": 0.12, "amount": 26, "vel": 4.5, "spread": 60.0, "grav": -2.0},
+		2: {"color": Color(1.0, 0.45, 0.12, 0.9), "size": 0.16, "amount": 34, "vel": 6.0, "spread": 180.0, "grav": -6.0},
+		3: {"color": Color(0.35, 0.85, 0.95, 0.9), "size": 0.1, "amount": 22, "vel": 7.0, "spread": 25.0, "grav": 0.0},
+	}
+	for type_id: int in defs:
+		var d: Dictionary = defs[type_id]
+		var proc: ParticleProcessMaterial = ParticleProcessMaterial.new()
+		var up: Vector3 = Vector3(0.0, 1.0, 0.0) if type_id != 3 else Vector3(1.0, 0.2, 0.0)
+		proc.direction = up
+		proc.spread = Cfg.num(d, "spread")
+		proc.initial_velocity_min = Cfg.num(d, "vel") * 0.5
+		proc.initial_velocity_max = Cfg.num(d, "vel")
+		proc.gravity = Vector3(0.0, Cfg.num(d, "grav"), 0.0)
+		proc.color_ramp = _fade_ramp()
+		proc.scale_min = 0.6
+		proc.scale_max = 1.4
+		var color: Color = d["color"]
+		var mesh: QuadMesh = _quad(Cfg.num(d, "size"), color, 1.0)
+		var list: Array[GPUParticles3D] = []
+		for i: int in 3:
+			var e: GPUParticles3D = _emitter(proc, mesh, Cfg.integer(d, "amount"), 0.7)
+			add_child(e)
+			list.append(e)
+		_special[type_id] = list
+		_special_next[type_id] = 0
+
+
+func emit_special(pos: Vector3, type_id: int) -> void:
+	if not _special.has(type_id):
+		return
+	var list: Array = _special[type_id]
+	var idx: int = _special_next[type_id]
+	var e: GPUParticles3D = list[idx]
+	_special_next[type_id] = (idx + 1) % list.size()
+	e.global_position = pos
+	e.restart()
 
 
 func pool_size() -> int:
@@ -86,6 +130,7 @@ func _quad(size: float, color: Color, glow: float) -> QuadMesh:
 	m.billboard_keep_scale = true
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.vertex_color_use_as_albedo = true
+	m.albedo_texture = _soft_dot()
 	m.emission_enabled = glow > 0.0
 	q.material = m
 	return q
@@ -119,6 +164,21 @@ func _dust_process() -> ParticleProcessMaterial:
 	m.scale_max = 1.6
 	m.color_ramp = _fade_ramp()
 	return m
+
+
+## Punto redondo suave (centro opaco, borde transparente) para que las partículas no sean cuadrados.
+func _soft_dot() -> GradientTexture2D:
+	var g: Gradient = Gradient.new()
+	g.set_color(0, Color(1, 1, 1, 1))
+	g.set_color(1, Color(1, 1, 1, 0))
+	var t: GradientTexture2D = GradientTexture2D.new()
+	t.gradient = g
+	t.fill = GradientTexture2D.FILL_RADIAL
+	t.fill_from = Vector2(0.5, 0.5)
+	t.fill_to = Vector2(1.0, 0.5)
+	t.width = 32
+	t.height = 32
+	return t
 
 
 func _fade_ramp() -> GradientTexture1D:

@@ -186,3 +186,48 @@ func global_stats(state: GameState) -> Dictionary:
 	g["auto_reload"] = state.level("global_reload") >= 1
 	g["phase"] = phase_of(state)
 	return g
+
+
+# --- Textos -------------------------------------------------------------------------------
+
+func name_of(id: String, lang: String) -> String:
+	return str(def(id)["name_" + lang])
+
+
+func desc_of(id: String, lang: String) -> String:
+	return str(def(id)["desc_" + lang])
+
+
+## Efecto acumulado a `level`, listo para mostrar ("x1,40", "+1,0 radio", "umbral 1,45"...).
+func effect_text(id: String, level: int, lang: String) -> String:
+	var d: Dictionary = def(id)
+	var kind: String = str(d["kind"])
+	var v: float = effect(id, level)
+	match kind:
+		"unlock":
+			return "-"
+		"force", "value":
+			return "x" + NumberFormat.decimal(v, 2, lang)
+		"size":
+			return "+" + NumberFormat.decimal(v, 1, lang)
+		"speed":
+			return "+" + NumberFormat.decimal(v * 100.0, 0, lang) + "%"
+		"special":
+			if str(d["tool"]) == "rolling_pin":
+				return "+" + NumberFormat.decimal(v, 1, lang)
+			return "+" + NumberFormat.decimal(v * 100.0, 0, lang) + "%"
+		"special_chance", "golden_chance":
+			return "+" + NumberFormat.decimal(v * 100.0, 1, lang) + "%"
+		"tense":
+			return NumberFormat.decimal(maxf(1.3, Cfg.num(db.sheet, "tense_threshold") - v), 2, lang)
+		"chain_k":
+			return NumberFormat.decimal(minf(Cfg.num(db.sheet, "chain_k_max"), Cfg.num(db.sheet, "chain_k") + v), 2, lang)
+		"sheet_growth":
+			return "+" + str(int(v))
+		"sheet_size":
+			return ("Mesa" if lang == "es" else "Table") if level < 1 else ("Piso 40x40" if lang == "es" else "Floor 40x40")
+		"global_bonus":
+			return "+" + NumberFormat.decimal(v * 100.0, 0, lang) + "%"
+		"finger_start":
+			return "+" + str(int(v)) + " niv" if lang == "es" else "+" + str(int(v)) + " lv"
+	return NumberFormat.decimal(v, 2, lang)

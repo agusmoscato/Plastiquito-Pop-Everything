@@ -55,6 +55,11 @@ func add_pop_trauma(pops: int) -> void:
 	trauma = minf(Cfg.num(cfg, "shake_max_trauma"), trauma + Cfg.num(cfg, "shake_per_pop") * float(pops))
 
 
+func special_at(pos: Vector3, type_id: int) -> void:
+	if fx != null:
+		fx.emit_special(pos, type_id)
+
+
 func pops_at(positions: PackedVector3Array) -> void:
 	if fx != null:
 		fx.emit_at(positions)
