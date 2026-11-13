@@ -286,7 +286,7 @@ func _mass_pop() -> void:
 	sim.chain.clear_events()
 	for idx: int in cells:
 		sim.chain.pop_now(idx)
-	sim._collect_events()
+	sim._collect_events(false)
 	_pop_fx()
 	PopAudio.report_frame(sim.ev_idx.size(), 1.0, 0.016)
 	Juice.add_pop_trauma(sim.ev_idx.size())
@@ -476,7 +476,7 @@ func _demo_chain() -> void:
 	sim.sheet.type[mid] = GameSim.TYPE_BOMB
 	sim.chain.clear_events()
 	sim.chain.pop_now(mid)
-	sim._collect_events()
+	sim._collect_events(false)
 	sim._track_chain()
 	_pop_fx()
 	hud.on_sim_step(0.016)

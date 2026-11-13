@@ -2,7 +2,7 @@ class_name GameState
 extends RefCounted
 ## Estado completo y serializable de la partida (DESIGN 8). Lógica pura.
 
-const SAVE_VERSION: int = 2
+const SAVE_VERSION: int = 3
 
 var pops: float = 0.0 ## moneda actual
 var pops_run: float = 0.0 ## Pops ganados en esta corrida (base de la fórmula de Pellets)
@@ -20,6 +20,10 @@ var max_chain: int = 0
 var sheets_done: int = 0
 var tool_pops: Dictionary = {} ## herramienta -> reventones
 var sheet: Dictionary = {} ## SheetModel.to_dict() de la lámina en curso (vacío si no hay)
+var last_levels: Dictionary = {} ## niveles de la partida anterior (para "Memoria del turno")
+var saved_at_unix: float = 0.0 ## hora del último guardado (ganancias sin conexión)
+var max_unix_seen: float = 0.0 ## la hora más alta vista (protección contra el reloj atrasado)
+var offline_total: float = 0.0 ## Pops ganados sin conexión (estadística)
 
 
 func level(id: String) -> int:
@@ -48,6 +52,8 @@ func to_dict() -> Dictionary:
 		"selected_tool": selected_tool, "playtime_s": playtime_s, "run_time_s": run_time_s,
 		"recycles": recycles, "first_recycle_s": first_recycle_s, "max_chain": max_chain,
 		"sheets_done": sheets_done, "tool_pops": tool_pops.duplicate(), "sheet": sheet,
+		"last_levels": last_levels.duplicate(), "saved_at_unix": saved_at_unix,
+		"max_unix_seen": max_unix_seen, "offline_total": offline_total,
 	}
 
 
@@ -77,6 +83,11 @@ func from_dict(data: Dictionary) -> bool:
 	tool_pops = tp.duplicate()
 	var sh: Dictionary = d["sheet"]
 	sheet = sh
+	var ll: Dictionary = d["last_levels"]
+	last_levels = _int_dict(ll)
+	saved_at_unix = Cfg.num(d, "saved_at_unix")
+	max_unix_seen = Cfg.num(d, "max_unix_seen")
+	offline_total = Cfg.num(d, "offline_total")
 	return true
 
 
@@ -95,11 +106,19 @@ static func migrate(data: Dictionary) -> Dictionary:
 		var out: Dictionary = fresh.to_dict()
 		out["sheet"] = d
 		return out
+	if version == 2:
+		# v2 -> v3: se agregan memoria del turno y datos de ganancias sin conexión.
+		d["version"] = 3
+		d["last_levels"] = {}
+		d["saved_at_unix"] = 0.0
+		d["max_unix_seen"] = 0.0
+		d["offline_total"] = 0.0
+		version = 3
 	if version != SAVE_VERSION:
 		return {}
 	for key: String in ["pops", "pops_run", "pops_total", "pellets", "levels", "perm", "discovered",
 			"selected_tool", "playtime_s", "run_time_s", "recycles", "first_recycle_s", "max_chain",
-			"sheets_done", "tool_pops", "sheet"]:
+			"sheets_done", "tool_pops", "sheet", "last_levels", "saved_at_unix", "max_unix_seen", "offline_total"]:
 		if not d.has(key):
 			return {}
 	return d

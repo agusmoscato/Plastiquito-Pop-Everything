@@ -98,6 +98,15 @@ func refresh_state(idx: int) -> void:
 		_write_state(idx, wanted)
 
 
+## Eco: la burbuja reventada vuelve a inflarse (intacta, presión inicial). No avisa; lo hace el llamador.
+func revive(idx: int) -> void:
+	if state[idx] != STATE_POPPED:
+		return
+	_write_state(idx, STATE_INTACT)
+	pressure[idx] = INITIAL_PRESSURE
+	press[idx] = 0.0
+
+
 ## Presión total de las burbujas sin reventar (el aire nunca debe aumentar).
 func total_pressure() -> float:
 	var total: float = 0.0
