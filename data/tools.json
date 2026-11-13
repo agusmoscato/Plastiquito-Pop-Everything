@@ -2,7 +2,7 @@
   "version": 1,
   "_note": "Los valores dentro de 'balance' son PLACEHOLDERS (placeholder: true) hasta que exista el simulador de balance.",
   "tools": [
-    {"id": "finger",         "number": 1, "name_es": "Dedo",             "name_en": "Finger",         "shape": "cell",    "unlock_phase": 1, "balance": {"placeholder": true, "force": 1.0, "size": 1.0}},
+    {"id": "finger",         "number": 1, "name_es": "Dedo",             "name_en": "Finger",         "shape": "cell",    "unlock_phase": 1, "balance": {"placeholder": true, "force": 1.0, "size": 1.0, "force_per_second": 8.0, "drag_entry_fraction": 1.0}},
     {"id": "palm",           "number": 2, "name_es": "Palma",            "name_en": "Palm",           "shape": "circle",  "unlock_phase": 1, "balance": {"placeholder": true, "force": 1.0, "size": 2.0}},
     {"id": "rolling_pin",    "number": 3, "name_es": "Palo de amasar",   "name_en": "Rolling pin",    "shape": "segment", "unlock_phase": 2, "balance": {"placeholder": true, "force": 1.0, "size": 4.0}},
     {"id": "iron",           "number": 4, "name_es": "Plancha",          "name_en": "Iron",           "shape": "rect",    "unlock_phase": 3, "balance": {"placeholder": true, "force": 1.0, "size": 4.0}},

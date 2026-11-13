@@ -73,8 +73,10 @@ func test_dict_roundtrip_identical() -> void:
 	sheet.set_pressure(7, 1.63)
 	sheet.set_state(7, SheetModel.STATE_TENSE)
 	sheet.set_type(9, 3)
+	sheet.press[12] = 0.37
 	var data: Dictionary = sheet.to_dict()
-	assert_eq(data["version"], SheetModel.SAVE_VERSION)
+	var version: int = data["version"]
+	assert_eq(version, SheetModel.SAVE_VERSION)
 	var other: SheetModel = SheetModel.new()
 	assert_true(other.from_dict(data))
 	assert_eq(other.width, sheet.width)
@@ -82,6 +84,7 @@ func test_dict_roundtrip_identical() -> void:
 	assert_eq(other.pressure, sheet.pressure)
 	assert_eq(other.state, sheet.state)
 	assert_eq(other.type, sheet.type)
+	assert_eq(other.press, sheet.press)
 	assert_eq(other.count_popped(), 1)
 	assert_eq(other.count_tense(), 1)
 	assert_eq(other.to_dict(), data)

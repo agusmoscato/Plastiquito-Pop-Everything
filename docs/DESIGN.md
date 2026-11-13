@@ -237,7 +237,7 @@ La regla que manda: **la simulación no sabe que existe la pantalla.** Toda la l
 
 ### Versión y configuración
 
-- La última versión estable de Godot 4 al arrancar, fijada en el repo. No se actualiza en medio del desarrollo salvo que un bug lo obligue.
+- Godot 4.4.1-stable, la misma versión que INFLATION, fijada en el repo. Actualizar se evalúa una sola vez, cuando arranque el desarrollo completo después del lanzamiento de INFLATION.
 - Render Forward+ (Vulkan), que funciona en Steam Deck.
 - GDScript con tipado estático obligatorio, con las advertencias de tipos tratadas como errores.
 
@@ -275,7 +275,7 @@ Plastiquito-Pop-Everything/
 
 ### Tests
 
-- Se usa **GUT** (Godot Unit Test) y se corre sin pantalla desde la línea de comandos.
+- Se usa **GUT** (Godot Unit Test) v9.4.0, del repo bitwes/Gut, y se corre sin pantalla desde la línea de comandos.
 - Casos obligatorios: vecinos hexagonales y bordes, formas de golpe, que el aire se conserve, que toda cadena termine, que las fórmulas de costo y Pellets den lo esperado, que guardar y cargar devuelva el mismo estado, y que los saves viejos se migren bien.
 - Ningún commit con tests rotos.
 

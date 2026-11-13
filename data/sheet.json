@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "_note": "Valores PLACEHOLDER hasta que exista el simulador de balance.",
+  "sheet": {
+    "placeholder": true,
+    "default_width": 20,
+    "default_height": 20,
+    "bubble_radius": 0.5,
+    "resistance": 1.0,
+    "recovery_per_second": 1.5,
+    "reload_threshold": 0.9,
+    "reload_delay_seconds": 0.5
+  }
+}
