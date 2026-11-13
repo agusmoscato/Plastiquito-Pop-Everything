@@ -58,6 +58,11 @@ func phase() -> int:
 	return upgrades.phase_of(state)
 
 
+## Centro de la lámina en el plano XZ.
+func center() -> Vector2:
+	return Vector2(grid.spacing * (float(grid.width) - 0.5) * 0.5, grid.row_step * float(grid.height - 1) * 0.5)
+
+
 func sheet_dimension() -> int:
 	var sizes: Array = eco["phase_sheet_sizes"]
 	if phase() >= 2:
@@ -69,6 +74,8 @@ func sheet_dimension() -> int:
 
 func refresh_stats() -> void:
 	stats = upgrades.global_stats(state)
+	var scales: Array = eco["phase_cost_scales"]
+	upgrades.cost_scale = scales[mini(phase(), scales.size()) - 1]
 	if sheet != null:
 		_apply_to_sheet()
 
@@ -241,7 +248,7 @@ func _track_chain() -> void:
 	var value: float = 0.0
 	for v: float in ev_value:
 		value += v
-	if not _chain_active and n > 0 and not chain.is_idle():
+	if not _chain_active and n > 0 and (not chain.is_idle() or n > ev_tool_pops):
 		_chain_active = true
 		chain_count = 0
 		chain_value = 0.0

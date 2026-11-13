@@ -70,11 +70,11 @@ func test_golden_is_worth_ten_times() -> void:
 
 
 func test_buy_spends_and_levels_up() -> void:
-	sim.state.pops = 1000.0
+	sim.state.pops = 1.0e6
 	var r: Dictionary = sim.buy("finger_force", 1)
 	assert_eq(_int(r, "bought"), 1)
 	assert_eq(sim.state.level("finger_force"), 1)
-	assert_almost_eq(sim.state.pops, 1000.0 - sim.upgrades.next_cost("finger_force", 0), 0.001)
+	assert_almost_eq(sim.state.pops, 1.0e6 - sim.upgrades.next_cost("finger_force", 0), 0.001)
 	var before_force: float = _tool("finger").force_per_second
 	sim.buy("finger_force", 5)
 	assert_gt(_tool("finger").force_per_second, before_force, "la compra cambia la herramienta real")
@@ -82,7 +82,7 @@ func test_buy_spends_and_levels_up() -> void:
 
 
 func test_buy_max_and_cannot_exceed_budget() -> void:
-	sim.state.pops = 100.0
+	sim.state.pops = sim.upgrades.next_cost("finger_force", 0) * 12.0
 	var r: Dictionary = sim.buy("finger_force", -1)
 	assert_gt(_int(r, "bought"), 1)
 	assert_true(sim.state.pops >= 0.0)
@@ -95,7 +95,7 @@ func test_milestone_flag_at_25_levels() -> void:
 	assert_false(_flag(r, "milestone"))
 	r = sim.buy("finger_force", 1)
 	assert_true(_flag(r, "milestone"))
-	assert_almost_eq(sim.upgrades.effect("finger_force", 25), pow(1.2, 25.0) * 2.0, 0.01)
+	assert_almost_eq(sim.upgrades.effect("finger_force", 25), (1.0 + 0.2 * 25.0) * 2.0, 0.01)
 
 
 func test_unlock_palm_then_select() -> void:
@@ -134,7 +134,7 @@ func test_chain_event_reported_when_it_ends() -> void:
 func test_recycle_flow_and_permanent_upgrades() -> void:
 	assert_false(sim.can_recycle())
 	assert_eq(sim.recycle(), 0)
-	sim.state.pops_run = 4.0e5
+	sim.state.pops_run = 4.0 * Cfg.num(db.economy, "pellet_divisor")
 	sim.state.pops = 1234.0
 	sim.state.levels["finger_force"] = 3
 	assert_eq(sim.recycle_gain(), 2)

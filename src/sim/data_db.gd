@@ -58,7 +58,7 @@ const UPGRADE_FIELDS: Dictionary = {
 	"effect_type": TYPE_STRING, "unit": TYPE_STRING, "requires": TYPE_DICTIONARY,
 }
 const ECONOMY_FIELDS: Dictionary = {
-	"phase_base_values": TYPE_ARRAY, "phase_sheet_sizes": TYPE_ARRAY, "sheet_start_size": TYPE_INT,
+	"phase_base_values": TYPE_ARRAY, "phase_cost_scales": TYPE_ARRAY, "phase_sheet_sizes": TYPE_ARRAY, "sheet_start_size": TYPE_INT,
 	"milestone_every": TYPE_INT, "milestone_multiplier": TYPE_FLOAT, "combo_window_seconds": TYPE_FLOAT,
 	"combo_rates": TYPE_ARRAY, "combo_multipliers": TYPE_ARRAY, "golden_multiplier": TYPE_FLOAT,
 	"chance_golden": TYPE_FLOAT, "chance_bomb": TYPE_FLOAT, "chance_line": TYPE_FLOAT,

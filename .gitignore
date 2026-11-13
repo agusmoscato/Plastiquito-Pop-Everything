@@ -29,3 +29,6 @@ Thumbs.db
 
 # Salida de tools/build.sh
 /builds/
+
+# Salida del simulador de balance
+/tools/out/

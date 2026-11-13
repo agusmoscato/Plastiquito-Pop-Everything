@@ -17,10 +17,10 @@
   "combo_window_seconds": 2.0,
   "combo_rates": [
    0.0,
-   2.0,
-   4.0,
-   6.0,
-   8.0
+   0.75,
+   1.5,
+   2.25,
+   3.0
   ],
   "combo_multipliers": [
    1.0,
@@ -33,11 +33,15 @@
   "chance_golden": 0.02,
   "chance_bomb": 0.012,
   "chance_line": 0.012,
-  "pellet_divisor": 100000.0,
+  "pellet_divisor": 2300000.0,
   "pellet_exponent": 0.5,
   "autosave_seconds": 30.0,
   "reload_delay_manual": 1.2,
   "reload_delay_auto": 0.2,
-  "chain_stamp_min": 10
+  "chain_stamp_min": 10,
+  "phase_cost_scales": [
+   1.0,
+   175.0
+  ]
  }
 }

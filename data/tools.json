@@ -15,7 +15,7 @@
     "force_per_second": 6.0,
     "drag_entry_fraction": 0.4,
     "radius_cells": 0.0,
-    "air_share": 0.4,
+    "air_share": 0.5,
     "direction_bias": 0.0,
     "center_falloff": 0.0
    }
@@ -33,7 +33,7 @@
     "force_per_second": 3.5,
     "radius_cells": 2.0,
     "drag_entry_fraction": 0.25,
-    "air_share": 0.5,
+    "air_share": 0.6,
     "direction_bias": 0.0,
     "center_falloff": 1.5
    }
@@ -51,7 +51,7 @@
     "force_per_second": 5.0,
     "radius_cells": 3.0,
     "drag_entry_fraction": 0.4,
-    "air_share": 0.55,
+    "air_share": 0.6,
     "direction_bias": 2.0,
     "center_falloff": 0.0
    }

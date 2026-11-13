@@ -8,6 +8,8 @@ const PERM: String = "perm"
 var db: DataDB
 var eco: Dictionary
 var order: Array[String] = [] ## ids en el orden del catálogo
+## Las mejoras en Pops cuestan más en cada fase (x base de la fase, DESIGN 4); lo fija GameSim.
+var cost_scale: float = 1.0
 
 
 func _init(p_db: DataDB) -> void:
@@ -40,7 +42,8 @@ func milestone(level: int) -> float:
 ## Costo del próximo nivel (en Pops, o en Pellets si es permanente).
 func next_cost(id: String, level: int) -> float:
 	var d: Dictionary = def(id)
-	return ceilf(Economy.cost(Cfg.num(d, "base_cost"), Cfg.num(d, "growth"), level))
+	var scale: float = 1.0 if str(d["scope"]) == PERM else cost_scale
+	return ceilf(Economy.cost(Cfg.num(d, "base_cost"), Cfg.num(d, "growth"), level) * scale)
 
 
 ## Costo de `n` niveles más, redondeado hacia arriba por nivel (coincide con comprar de a uno).
@@ -70,7 +73,7 @@ func effect(id: String, level: int) -> float:
 	var per: float = Cfg.num(d, "per_level")
 	var ms: float = milestone(level)
 	if str(d["effect_type"]) == "mult":
-		return pow(1.0 + per, float(level)) * ms
+		return (1.0 + per * float(level)) * ms ## "mult": 1 + per*nivel (rinde menos a más nivel)
 	return per * float(level) * (ms if level > 0 else 1.0)
 
 
