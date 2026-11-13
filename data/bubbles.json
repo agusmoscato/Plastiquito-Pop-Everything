@@ -1,13 +1,98 @@
 {
-  "version": 1,
-  "_note": "type_id es el valor del campo 'type' de SheetModel (0 = normal, sin entrada). 'shape' describe el área de efecto/ocupación. 'balance' son PLACEHOLDERS.",
-  "bubbles": [
-    {"id": "golden",  "type_id": 1, "name_es": "Dorada",  "name_en": "Golden",  "shape": "single", "unlock_phase": 1, "balance": {"placeholder": true, "spawn_chance": 0.02, "value_multiplier": 10.0}},
-    {"id": "bomb",    "type_id": 2, "name_es": "Bomba",   "name_en": "Bomb",    "shape": "circle", "unlock_phase": 2, "balance": {"placeholder": true, "spawn_chance": 0.01, "radius": 3.0}},
-    {"id": "line",    "type_id": 3, "name_es": "Línea",   "name_en": "Line",    "shape": "row",    "unlock_phase": 3, "balance": {"placeholder": true, "spawn_chance": 0.005}},
-    {"id": "echo",    "type_id": 4, "name_es": "Eco",     "name_en": "Echo",    "shape": "single", "unlock_phase": 4, "balance": {"placeholder": true, "spawn_chance": 0.01, "reinflations": 1}},
-    {"id": "giant",   "type_id": 5, "name_es": "Gigante", "name_en": "Giant",   "shape": "hex7",   "unlock_phase": 5, "balance": {"placeholder": true, "spawn_chance": 0.005, "cells": 7, "pressure_multiplier": 7.0}},
-    {"id": "ice",     "type_id": 6, "name_es": "Hielo",   "name_en": "Ice",     "shape": "single", "unlock_phase": 6, "balance": {"placeholder": true, "spawn_chance": 0.01, "hits_to_pop": 2}},
-    {"id": "rainbow", "type_id": 7, "name_es": "Arcoíris","name_en": "Rainbow", "shape": "single", "unlock_phase": 6, "balance": {"placeholder": true, "spawn_chance": 0.003, "duration_seconds": 10.0, "multiplier": 2.0}}
-  ]
+ "version": 1,
+ "_note": "type_id es el valor del campo 'type' de SheetModel (0 = normal, sin entrada). 'shape' describe el área de efecto/ocupación. 'balance' son PLACEHOLDERS.",
+ "bubbles": [
+  {
+   "id": "golden",
+   "type_id": 1,
+   "name_es": "Dorada",
+   "name_en": "Golden",
+   "shape": "single",
+   "unlock_phase": 1,
+   "balance": {
+    "placeholder": true,
+    "spawn_chance": 0.02,
+    "value_multiplier": 10.0
+   }
+  },
+  {
+   "id": "bomb",
+   "type_id": 2,
+   "name_es": "Bomba",
+   "name_en": "Bomb",
+   "shape": "circle",
+   "unlock_phase": 2,
+   "balance": {
+    "placeholder": true,
+    "spawn_chance": 0.01,
+    "radius": 3.0
+   }
+  },
+  {
+   "id": "line",
+   "type_id": 3,
+   "name_es": "Línea",
+   "name_en": "Line",
+   "shape": "row",
+   "unlock_phase": 2,
+   "balance": {
+    "placeholder": true,
+    "spawn_chance": 0.005
+   }
+  },
+  {
+   "id": "echo",
+   "type_id": 4,
+   "name_es": "Eco",
+   "name_en": "Echo",
+   "shape": "single",
+   "unlock_phase": 4,
+   "balance": {
+    "placeholder": true,
+    "spawn_chance": 0.01,
+    "reinflations": 1
+   }
+  },
+  {
+   "id": "giant",
+   "type_id": 5,
+   "name_es": "Gigante",
+   "name_en": "Giant",
+   "shape": "hex7",
+   "unlock_phase": 5,
+   "balance": {
+    "placeholder": true,
+    "spawn_chance": 0.005,
+    "cells": 7,
+    "pressure_multiplier": 7.0
+   }
+  },
+  {
+   "id": "ice",
+   "type_id": 6,
+   "name_es": "Hielo",
+   "name_en": "Ice",
+   "shape": "single",
+   "unlock_phase": 6,
+   "balance": {
+    "placeholder": true,
+    "spawn_chance": 0.01,
+    "hits_to_pop": 2
+   }
+  },
+  {
+   "id": "rainbow",
+   "type_id": 7,
+   "name_es": "Arcoíris",
+   "name_en": "Rainbow",
+   "shape": "single",
+   "unlock_phase": 6,
+   "balance": {
+    "placeholder": true,
+    "spawn_chance": 0.003,
+    "duration_seconds": 10.0,
+    "multiplier": 2.0
+   }
+  }
+ ]
 }

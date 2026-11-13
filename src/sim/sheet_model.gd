@@ -245,6 +245,11 @@ func _fail(message: String) -> bool:
 	return false
 
 
+## Recalcula los contadores por estado (después de escribir los arrays directamente).
+func reset_counts() -> void:
+	_recount()
+
+
 func _recount() -> void:
 	_state_counts = PackedInt32Array([0, 0, 0])
 	for s: int in state:

@@ -1,14 +1,125 @@
 {
-  "version": 1,
-  "_note": "Los valores dentro de 'balance' son PLACEHOLDERS (placeholder: true) hasta que exista el simulador de balance.",
-  "tools": [
-    {"id": "finger",         "number": 1, "name_es": "Dedo",             "name_en": "Finger",         "shape": "cell",    "unlock_phase": 1, "balance": {"placeholder": true, "force": 1.0, "size": 1.0, "force_per_second": 8.0, "drag_entry_fraction": 1.0}},
-    {"id": "palm",           "number": 2, "name_es": "Palma",            "name_en": "Palm",           "shape": "circle",  "unlock_phase": 1, "balance": {"placeholder": true, "force": 1.0, "size": 2.0}},
-    {"id": "rolling_pin",    "number": 3, "name_es": "Palo de amasar",   "name_en": "Rolling pin",    "shape": "segment", "unlock_phase": 2, "balance": {"placeholder": true, "force": 1.0, "size": 4.0}},
-    {"id": "iron",           "number": 4, "name_es": "Plancha",          "name_en": "Iron",           "shape": "rect",    "unlock_phase": 3, "balance": {"placeholder": true, "force": 1.0, "size": 4.0}},
-    {"id": "boot",           "number": 5, "name_es": "Bota",             "name_en": "Boot",           "shape": "circle",  "unlock_phase": 4, "balance": {"placeholder": true, "force": 1.0, "size": 6.0}},
-    {"id": "steamroller",    "number": 6, "name_es": "Aplanadora",       "name_en": "Steamroller",    "shape": "segment", "unlock_phase": 5, "balance": {"placeholder": true, "force": 1.0, "size": 20.0}},
-    {"id": "hydraulic_press","number": 7, "name_es": "Prensa hidráulica","name_en": "Hydraulic press","shape": "rect",    "unlock_phase": 6, "balance": {"placeholder": true, "force": 1.0, "size": 40.0}},
-    {"id": "meteor",         "number": 8, "name_es": "Meteorito",        "name_en": "Meteor",         "shape": "circle",  "unlock_phase": 7, "balance": {"placeholder": true, "force": 1.0, "size": 200.0}}
-  ]
+ "version": 1,
+ "_note": "Los valores dentro de 'balance' son PLACEHOLDERS (placeholder: true) hasta que exista el simulador de balance.",
+ "tools": [
+  {
+   "id": "finger",
+   "number": 1,
+   "name_es": "Dedo",
+   "name_en": "Finger",
+   "shape": "cell",
+   "unlock_phase": 1,
+   "balance": {
+    "placeholder": true,
+    "force": 6.0,
+    "force_per_second": 6.0,
+    "drag_entry_fraction": 0.4,
+    "radius_cells": 0.0,
+    "air_share": 0.4,
+    "direction_bias": 0.0,
+    "center_falloff": 0.0
+   }
+  },
+  {
+   "id": "palm",
+   "number": 2,
+   "name_es": "Palma",
+   "name_en": "Palm",
+   "shape": "circle",
+   "unlock_phase": 1,
+   "balance": {
+    "placeholder": true,
+    "force": 3.5,
+    "force_per_second": 3.5,
+    "radius_cells": 2.0,
+    "drag_entry_fraction": 0.25,
+    "air_share": 0.5,
+    "direction_bias": 0.0,
+    "center_falloff": 1.5
+   }
+  },
+  {
+   "id": "rolling_pin",
+   "number": 3,
+   "name_es": "Palo de amasar",
+   "name_en": "Rolling pin",
+   "shape": "segment",
+   "unlock_phase": 2,
+   "balance": {
+    "placeholder": true,
+    "force": 5.0,
+    "force_per_second": 5.0,
+    "radius_cells": 3.0,
+    "drag_entry_fraction": 0.4,
+    "air_share": 0.55,
+    "direction_bias": 2.0,
+    "center_falloff": 0.0
+   }
+  },
+  {
+   "id": "iron",
+   "number": 4,
+   "name_es": "Plancha",
+   "name_en": "Iron",
+   "shape": "rect",
+   "unlock_phase": 3,
+   "balance": {
+    "placeholder": true,
+    "force": 1.0,
+    "size": 4.0
+   }
+  },
+  {
+   "id": "boot",
+   "number": 5,
+   "name_es": "Bota",
+   "name_en": "Boot",
+   "shape": "circle",
+   "unlock_phase": 4,
+   "balance": {
+    "placeholder": true,
+    "force": 1.0,
+    "size": 6.0
+   }
+  },
+  {
+   "id": "steamroller",
+   "number": 6,
+   "name_es": "Aplanadora",
+   "name_en": "Steamroller",
+   "shape": "segment",
+   "unlock_phase": 5,
+   "balance": {
+    "placeholder": true,
+    "force": 1.0,
+    "size": 20.0
+   }
+  },
+  {
+   "id": "hydraulic_press",
+   "number": 7,
+   "name_es": "Prensa hidráulica",
+   "name_en": "Hydraulic press",
+   "shape": "rect",
+   "unlock_phase": 6,
+   "balance": {
+    "placeholder": true,
+    "force": 1.0,
+    "size": 40.0
+   }
+  },
+  {
+   "id": "meteor",
+   "number": 8,
+   "name_es": "Meteorito",
+   "name_en": "Meteor",
+   "shape": "circle",
+   "unlock_phase": 7,
+   "balance": {
+    "placeholder": true,
+    "force": 1.0,
+    "size": 200.0
+   }
+  }
+ ]
 }
