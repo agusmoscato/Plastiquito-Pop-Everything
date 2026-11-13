@@ -36,7 +36,7 @@ frame_pts = [(0.150, 0.0, R + 0.003), (0.152, 0.0, 0.085), (0.120, 0.0, 0.122), 
 frame = lib.tube_along("frame", frame_pts, [0.0045] * 5, sides=8)
 frame.data.materials.append(steel)
 parts.append(frame)
-handle = lib.tube_along("handle", [(-0.060, 0.0, 0.130), (-0.12, 0.0, 0.150), (-0.20, 0.0, 0.178), (-0.28, 0.0, 0.205)], [0.010, 0.0150, 0.0175, 0.0140], sides=14)
+handle = lib.tube_along("handle", [(-0.060, 0.0, 0.130), (-0.100, 0.0, 0.142), (-0.150, 0.0, 0.156), (-0.200, 0.0, 0.170)], [0.010, 0.0150, 0.0175, 0.0140], sides=14)
 lib.subsurf(handle, 1)
 handle.data.materials.append(grip)
 parts.append(handle)

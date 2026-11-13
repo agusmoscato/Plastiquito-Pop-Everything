@@ -24,6 +24,8 @@
     "finger_press_depth": 0.55,
     "finger_spring_stiffness": 260.0,
     "finger_spring_damping": 16.0,
-    "finger_bounce_impulse": 3.5
+    "finger_bounce_impulse": 3.5,
+    "hand_style": "glove",
+    "hand_skin_color": "#E8B896"
   }
 }

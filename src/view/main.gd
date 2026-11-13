@@ -86,11 +86,13 @@ func _ready() -> void:
 			_run_demo(arg.trim_prefix("--demo-shot="))
 		elif arg.begins_with("--demo3="):
 			_run_demo3(arg.trim_prefix("--demo3="))
+		elif arg.begins_with("--demo-tools="):
+			_run_demo_tools(arg.trim_prefix("--demo-tools="))
 
 
 func _has_demo_arg() -> bool:
 	for arg: String in OS.get_cmdline_user_args():
-		if arg.begins_with("--demo-shot=") or arg.begins_with("--demo3="):
+		if arg.begins_with("--demo-shot=") or arg.begins_with("--demo3=") or arg.begins_with("--demo-tools="):
 			return true
 	return false
 
@@ -585,4 +587,32 @@ func _run_demo3(dir: String) -> void:
 		_refresh_tool_view()
 		await _wait(1.2)
 		_shot(dir, "36_escenario_%d" % ph)
+	get_tree().quit()
+
+
+## Capturas de las herramientas 3D: cada una sobre la lámina, suelta y apretando.
+func _run_demo_tools(dir: String) -> void:
+	_demo = true
+	DirAccess.make_dir_recursive_absolute(dir)
+	await _wait(1.0)
+	var plan: Dictionary[String, int] = {"finger": 1, "palm": 1, "rolling_pin": 2, "iron": 3, "boot": 4}
+	for id: String in plan:
+		_demo3_phase(plan[id], 5.0e8)
+		sim.select_tool(id)
+		_refresh_tool_view()
+		var c: Vector2 = sim.center()
+		tool_view.snap_to(c)
+		for i: int in 40:
+			_cursor = c + Vector2(float(i) * 0.04 - 0.8, 0.0)
+			_cursor_valid = true
+			tool_view.set_cursor(_cursor)
+			tool_view.set_drag_direction(Vector2(1.0, 0.0))
+			tool_view.set_pressing(false)
+			await get_tree().process_frame
+		await _wait(0.5)
+		_shot(dir, "tool_%s_suelto" % id)
+		tool_view.set_pressing(true)
+		await _wait(0.35)
+		_shot(dir, "tool_%s_apretando" % id)
+		tool_view.set_pressing(false)
 	get_tree().quit()

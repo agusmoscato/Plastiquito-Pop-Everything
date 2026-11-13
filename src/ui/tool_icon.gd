@@ -88,7 +88,7 @@ func _make_model() -> Node3D:
 		root.add_child(mi)
 		return root
 	var use_tier: int = tier
-	var model: Node3D = ToolMeshes.build(kind, 1.2, use_tier)
+	var model: Node3D = ToolMeshes.build(kind, 1.2, use_tier, true)
 	match variant:
 		"size":
 			_add_ruler(model)
@@ -148,7 +148,7 @@ func _add_bubble_grid(model: Node3D) -> void:
 func _add_trail(model: Node3D) -> void:
 	model.scale = Vector3(0.8, 0.8, 0.8)
 	for i: int in 3:
-		var ghost: Node3D = ToolMeshes.build(kind, 1.2, tier)
+		var ghost: Node3D = ToolMeshes.build(kind, 1.2, tier, true)
 		for c: Node in ghost.get_children():
 			_fade_node(c, 0.35 - 0.1 * float(i))
 		ghost.position = Vector3(-0.9 * float(i + 1), 0.0, 0.0)
@@ -185,7 +185,7 @@ func _add_orb(model: Node3D) -> void:
 func _add_copies(model: Node3D) -> void:
 	model.scale = Vector3(0.75, 0.75, 0.75)
 	for i: int in 2:
-		var copy: Node3D = ToolMeshes.build(kind, 1.2, tier)
+		var copy: Node3D = ToolMeshes.build(kind, 1.2, tier, true)
 		copy.position = Vector3(1.0 - 2.0 * float(i), 0.0, -0.9)
 		model.add_child(copy)
 

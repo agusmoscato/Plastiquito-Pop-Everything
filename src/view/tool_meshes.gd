@@ -3,9 +3,16 @@ extends RefCounted
 ## Las herramientas 3D armadas con primitivas (sin modelos). Las usan el cursor del mundo
 ## (ToolView) y los íconos en vivo de la tienda (ToolIcon). La punta/contacto queda en y = 0.
 
+const MODELS: String = "res://assets/models/"
+const HAND_SCALE: float = 28.0 ## el dedo mide ~1,5 burbujas de ancho (el guante real mide 1,76 cm)
+
+## Estilo de la mano: "glove" (guante de nitrilo, por defecto) o "skin" (piel con subsurface).
+static var hand_style: String = "glove"
+static var skin_color: Color = Color("#E8B896")
+
 const TIER_COLORS: Dictionary = {
-	"finger": [Color("#E8795F"), Color("#E5A13A"), Color("#D5D8DB"), Color("#F2C94C")],
-	"palm": [Color("#D9694E"), Color("#C7922F"), Color("#C9CDD1"), Color("#F2C94C")],
+	"finger": [Color("#3D6FD6"), Color("#2F9E6B"), Color("#D5D8DB"), Color("#F2C94C")],
+	"palm": [Color("#3D6FD6"), Color("#2F9E6B"), Color("#D5D8DB"), Color("#F2C94C")],
 	"rolling_pin": [Color("#B98552"), Color("#9C6B3A"), Color("#C9CDD1"), Color("#F2C94C")],
 	"iron": [Color("#C9CDD1"), Color("#9AA3AA"), Color("#E5A13A"), Color("#F2C94C")],
 	"boot": [Color("#5A4330"), Color("#3E2F22"), Color("#8E6B47"), Color("#F2C94C")],
@@ -43,123 +50,154 @@ static func _part(parent: Node3D, mesh: Mesh, mat: Material, pos: Vector3, rot_d
 	return mi
 
 
-## Devuelve un Node3D con la herramienta. `radius` es el tamaño del golpe en el mundo.
-static func build(tool_id: String, radius: float, tier: int = 0) -> Node3D:
-	var root: Node3D = Node3D.new()
-	var metallic: float = 0.85 if tier >= 2 else 0.0
-	var mat: StandardMaterial3D = material(tier_color(tool_id, tier), metallic)
-	if tool_id != "finger": # las herramientas de área son translúcidas: dejan ver lo que aplastan
-		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		mat.albedo_color.a = 0.78
-	if tool_id == "palm":
-		_build_palm(root, mat, maxf(radius, 1.0) * 0.85)
-	elif tool_id == "rolling_pin" or tool_id == "auto_roller":
-		_build_pin(root, mat, maxf(radius, 1.0))
-	elif tool_id == "iron":
-		_build_iron(root, mat, maxf(radius, 1.0))
-	elif tool_id == "boot":
-		_build_boot(root, mat, maxf(radius, 1.0))
-	elif tool_id == "hands":
-		mat.albedo_color = Color(0.96, 0.94, 0.9, 0.55)
-		_build_finger(root, mat, 0.0)
+## Aplica el estilo de la mano desde data/juice.json.
+static func configure(juice: Dictionary) -> void:
+	hand_style = str(juice.get("hand_style", "glove"))
+	skin_color = Color(str(juice.get("hand_skin_color", "#E8B896")))
+
+
+static func glove_material(tint: Color) -> Material:
+	var m: StandardMaterial3D = StandardMaterial3D.new()
+	var noise: FastNoiseLite = FastNoiseLite.new()
+	noise.frequency = 0.9
+	var nt: NoiseTexture2D = NoiseTexture2D.new()
+	nt.noise = noise
+	nt.as_normal_map = true
+	nt.bump_strength = 1.2
+	nt.seamless = true
+	nt.width = 256
+	nt.height = 256
+	m.normal_enabled = true
+	m.normal_texture = nt
+	m.normal_scale = 0.35
+	m.uv1_scale = Vector3(6.0, 6.0, 1.0)
+	m.roughness = 0.45
+	m.clearcoat_enabled = true
+	m.clearcoat = 0.5
+	m.clearcoat_roughness = 0.35
+	if hand_style == "skin":
+		m.albedo_color = skin_color
+		m.roughness = 0.62
+		m.clearcoat_enabled = false
+		m.subsurf_scatter_enabled = true
+		m.subsurf_scatter_strength = 0.6
 	else:
-		_build_finger(root, mat, radius)
+		m.albedo_color = tint
+	return m
+
+
+static func ghost_material() -> ShaderMaterial:
+	var sm: ShaderMaterial = ShaderMaterial.new()
+	sm.shader = load("res://shaders/ghost_hand.gdshader") as Shader
+	return sm
+
+
+static func _instance(file: String) -> Node3D:
+	var ps: PackedScene = load(MODELS + file + ".glb") as PackedScene
+	return ps.instantiate() as Node3D
+
+
+## Tiñe los materiales importados con el color del hito (los hitos 1+ cambian el material).
+static func _tint(node: Node, color: Color, amount: float, metallic: float) -> void:
+	if node is MeshInstance3D:
+		var mi: MeshInstance3D = node as MeshInstance3D
+		for i: int in mi.mesh.get_surface_count():
+			var src: StandardMaterial3D = mi.mesh.surface_get_material(i) as StandardMaterial3D
+			if src == null:
+				continue
+			var m: StandardMaterial3D = src.duplicate() as StandardMaterial3D
+			m.albedo_color = src.albedo_color.lerp(color, amount)
+			m.metallic = maxf(m.metallic, metallic)
+			mi.set_surface_override_material(i, m)
+	for c: Node in node.get_children():
+		_tint(c, color, amount, metallic)
+
+
+static func _hand(pose: String, tint: Color, ghost: bool) -> HandRig:
+	var rig: HandRig = HandRig.new()
+	rig.setup(pose, ghost_material() if ghost else glove_material(tint))
+	return rig
+
+
+## Devuelve un Node3D con la herramienta. `radius` es el tamaño del golpe en el mundo.
+## `icon`: encuadrada y centrada para los íconos de la tienda.
+static func build(tool_id: String, radius: float, tier: int = 0, icon: bool = false) -> Node3D:
+	var root: Node3D = Node3D.new()
+	var body: Node3D = Node3D.new()
+	body.name = "Body"
+	root.add_child(body)
+	var color: Color = tier_color(tool_id, tier)
+	var half: float = maxf(radius, 1.0)
+	var amount: float = 0.0 if tier == 0 else 0.45
+	var metal: float = 0.85 if tier >= 2 else 0.0
+	match tool_id:
+		"palm":
+			_add_hand(body, "palm", tier, false, half * 1.8 / 0.085, Vector3.ZERO, Vector3(0.0, 24.0, 0.0))
+		"hands":
+			_add_hand(body, "point", tier, true, HAND_SCALE * 0.2, Vector3.ZERO, Vector3(-12.0, 28.0, 0.0))
+		"rolling_pin":
+			var s: float = half * 2.0 / 0.619
+			_add_model(body, "pin", s, color, amount, metal)
+			_add_hand(body, "grab", tier, false, s * 1.25, Vector3(0.222, 0.056, 0.0) * s, Vector3(0.0, 0.0, 0.0))
+		"iron":
+			var s2: float = half * 2.0 / 0.30
+			_add_model(body, "iron", s2, color, amount, metal)
+			_add_hand(body, "grab", tier, false, s2 * 1.1, Vector3(0.0, 0.158, -0.005) * s2, Vector3(0.0, 0.0, 0.0))
+		"boot":
+			_add_model(body, "boot", half * 1.8 / 0.33, color, amount, metal)
+		"auto_roller":
+			_add_model(body, "roller", half * 2.0 / 0.26, color, amount, metal)
+		_:
+			_add_hand(body, "point", tier, false, HAND_SCALE * (1.0 + 0.08 * radius), Vector3.ZERO, Vector3(-12.0, 28.0, 0.0))
+	if icon:
+		_fit_icon(root)
 	return root
 
 
-static func _build_finger(root: Node3D, mat: StandardMaterial3D, radius: float) -> void:
-	var body: Node3D = Node3D.new()
-	root.add_child(body)
-	body.name = "Body"
-	var capsule: CapsuleMesh = CapsuleMesh.new()
-	capsule.radius = 0.34 + radius * 0.25
-	capsule.height = 1.9 + radius * 0.5
-	capsule.radial_segments = 24
-	capsule.rings = 8
-	_part(body, capsule, mat, Vector3(0.0, capsule.height * 0.5 - capsule.radius * 0.8, 0.0))
-	body.rotation_degrees = Vector3(28.0, 0.0, 0.0)
+static func _add_model(body: Node3D, file: String, scale_factor: float, color: Color, amount: float, metal: float) -> void:
+	var m: Node3D = _instance(file)
+	m.scale = Vector3.ONE * scale_factor
+	if amount > 0.0 or metal > 0.0:
+		_tint(m, color, amount, metal)
+	body.add_child(m)
 
 
-static func _build_palm(root: Node3D, mat: StandardMaterial3D, radius: float) -> void:
-	var body: Node3D = Node3D.new()
-	body.name = "Body"
-	root.add_child(body)
-	var plate: CylinderMesh = CylinderMesh.new()
-	plate.top_radius = radius * 0.92
-	plate.bottom_radius = radius
-	plate.height = 0.3
-	plate.radial_segments = 40
-	_part(body, plate, mat, Vector3(0.0, 0.16, 0.0))
-	var dome: CylinderMesh = CylinderMesh.new()
-	dome.top_radius = radius * 0.5
-	dome.bottom_radius = radius * 0.86
-	dome.height = 0.28
-	dome.radial_segments = 40
-	_part(body, dome, mat, Vector3(0.0, 0.4, 0.0))
-	var knob: SphereMesh = SphereMesh.new()
-	knob.radius = radius * 0.2
-	knob.height = radius * 0.34
-	_part(body, knob, material(mat.albedo_color.lightened(0.15), mat.metallic), Vector3(0.0, 0.62, 0.0))
+static func _add_hand(body: Node3D, pose: String, tier: int, ghost: bool, scale_factor: float, pos: Vector3, rot_deg: Vector3) -> void:
+	var pivot: Node3D = Node3D.new()
+	pivot.name = "HandPivot"
+	pivot.position = pos
+	pivot.rotation_degrees = rot_deg
+	pivot.scale = Vector3.ONE * scale_factor
+	body.add_child(pivot)
+	var rig: HandRig = _hand(pose, tier_color("finger", tier), ghost)
+	pivot.add_child(rig)
 
 
-static func _build_iron(root: Node3D, mat: StandardMaterial3D, half: float) -> void:
-	var body: Node3D = Node3D.new()
-	body.name = "Body"
-	root.add_child(body)
-	var base: BoxMesh = BoxMesh.new()
-	base.size = Vector3(half * 2.0, 0.3, half * 0.9)
-	_part(body, base, mat, Vector3(0.0, 0.2, 0.0))
-	var top: BoxMesh = BoxMesh.new()
-	top.size = Vector3(half * 1.5, 0.3, half * 0.65)
-	_part(body, top, material(mat.albedo_color.darkened(0.2), mat.metallic), Vector3(0.0, 0.48, 0.0))
-	var handle: BoxMesh = BoxMesh.new()
-	handle.size = Vector3(half * 0.9, 0.18, 0.2)
-	_part(body, handle, material(Color("#C8322B")), Vector3(0.0, 0.8, 0.0))
-	var post_a: BoxMesh = BoxMesh.new()
-	post_a.size = Vector3(0.16, 0.4, 0.2)
-	_part(body, post_a, material(Color("#C8322B")), Vector3(-half * 0.4, 0.64, 0.0))
-	_part(body, post_a, material(Color("#C8322B")), Vector3(half * 0.4, 0.64, 0.0))
+## Escala y centra el modelo para que entre en ~2,4 unidades (cámara de los íconos).
+static func _fit_icon(root: Node3D) -> void:
+	var box: AABB = _bounds(root, Transform3D.IDENTITY)
+	var longest: float = maxf(box.size.x, maxf(box.size.y, box.size.z))
+	if longest <= 0.0001:
+		return
+	var f: float = 2.4 / longest
+	var body: Node3D = root.get_node("Body") as Node3D
+	body.scale = Vector3.ONE * f
+	body.position = -box.get_center() * f
 
 
-static func _build_boot(root: Node3D, mat: StandardMaterial3D, radius: float) -> void:
-	var body: Node3D = Node3D.new()
-	body.name = "Body"
-	root.add_child(body)
-	var sole: BoxMesh = BoxMesh.new()
-	sole.size = Vector3(radius * 0.8, 0.4, radius * 1.5)
-	_part(body, sole, material(Color("#2B2A33")), Vector3(0.0, 0.2, 0.0))
-	var upper: BoxMesh = BoxMesh.new()
-	upper.size = Vector3(radius * 0.7, 0.5, radius * 1.1)
-	_part(body, upper, mat, Vector3(0.0, 0.62, -radius * 0.1))
-	var shaft: CylinderMesh = CylinderMesh.new()
-	shaft.top_radius = radius * 0.34
-	shaft.bottom_radius = radius * 0.36
-	shaft.height = radius * 1.1
-	_part(body, shaft, mat, Vector3(0.0, 1.3, -radius * 0.32))
-	for i: int in 4: # dibujo de la suela
-		var lug: BoxMesh = BoxMesh.new()
-		lug.size = Vector3(radius * 0.75, 0.08, 0.14)
-		_part(body, lug, material(Color("#1E1B18")), Vector3(0.0, -0.02, -radius * 0.5 + float(i) * radius * 0.33))
-
-
-static func _build_pin(root: Node3D, mat: StandardMaterial3D, half_length: float) -> void:
-	var body: Node3D = Node3D.new()
-	body.name = "Body"
-	root.add_child(body)
-	var roller: CylinderMesh = CylinderMesh.new()
-	roller.top_radius = 0.42
-	roller.bottom_radius = 0.42
-	roller.height = half_length * 2.0
-	roller.radial_segments = 28
-	_part(body, roller, mat, Vector3(0.0, 0.42, 0.0), Vector3(0.0, 0.0, 90.0))
-	var handle_mat: StandardMaterial3D = material(mat.albedo_color.darkened(0.25), mat.metallic)
-	for side: float in [-1.0, 1.0]:
-		var handle: CylinderMesh = CylinderMesh.new()
-		handle.top_radius = 0.16
-		handle.bottom_radius = 0.16
-		handle.height = 0.9
-		_part(body, handle, handle_mat, Vector3(side * (half_length + 0.4), 0.42, 0.0), Vector3(0.0, 0.0, 90.0))
-		var cap: SphereMesh = SphereMesh.new()
-		cap.radius = 0.2
-		cap.height = 0.4
-		_part(body, cap, handle_mat, Vector3(side * (half_length + 0.85), 0.42, 0.0))
+static func _bounds(node: Node, xf: Transform3D) -> AABB:
+	var result: AABB = AABB()
+	var first: bool = true
+	if node is MeshInstance3D:
+		result = xf * (node as MeshInstance3D).get_aabb()
+		first = false
+	for c: Node in node.get_children():
+		var ct: Transform3D = xf
+		if c is Node3D:
+			ct = xf * (c as Node3D).transform
+		var sub: AABB = _bounds(c, ct)
+		if sub.size == Vector3.ZERO:
+			continue
+		result = sub if first else result.merge(sub)
+		first = false
+	return result

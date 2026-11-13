@@ -17,6 +17,7 @@ var tier: int = 0
 
 var _holder: Node3D
 var _body: Node3D
+var _rig: HandRig
 var _offset: float = 0.0 ## desplazamiento vertical respecto de la altura de reposo
 var _velocity: float = 0.0
 var _press: float = 0.0 ## 0 suelto .. 1 apretando (suavizado)
@@ -38,6 +39,7 @@ func configure(juice: Dictionary) -> void:
 	stiffness = Cfg.num(juice, "finger_spring_stiffness")
 	damping = Cfg.num(juice, "finger_spring_damping")
 	bounce_impulse = Cfg.num(juice, "finger_bounce_impulse")
+	ToolMeshes.configure(juice)
 
 
 ## Define qué herramienta se muestra, su tamaño en el mundo, el hito (color) y la velocidad (0..1).
@@ -58,6 +60,10 @@ func set_tool(id: String, p_radius: float, p_tier: int, speed01: float, force_ra
 	_holder = ToolMeshes.build(id, p_radius, p_tier)
 	add_child(_holder)
 	_body = _holder.get_node("Body") as Node3D
+	_rig = null
+	for n: Node in _holder.find_children("*", "Node3D", true, false):
+		if n is HandRig:
+			_rig = n as HandRig
 	if id == "iron":
 		_holder.add_child(_make_heat_aura(p_radius))
 	if grew:
@@ -127,6 +133,8 @@ func _process(delta: float) -> void:
 	_offset += _velocity * delta
 	var hover: float = hover_height + (0.35 if tool_id != "finger" else 0.0)
 	position.y = maxf(hover - press_depth * _depth_scale * _press + _offset, 0.05)
+	if _rig != null:
+		_rig.set_press(_press)
 	if _body == null:
 		return
 	var squash: float = _press * 0.22 + _squish_boost * 0.08
