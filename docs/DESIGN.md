@@ -147,6 +147,19 @@ El juego tiene 7 fases, una por escenario. El final llega a las 6,5 horas y el 1
 - **Ritmo:** algo nuevo (mejora, especial o herramienta) cada 3 a 5 minutos en la primera hora, y cada 10 a 15 minutos después.
 - **Escalada:** cada fase multiplica la base de Pops por unos 50. Los números grandes aparecen, pero no son el foco: el foco es la lámina.
 
+### Lo que cambió al implementar las fases 3 y 4 (Fase 3 del desarrollo)
+
+- **Escalada x100, no x50:** la base de Pops por fase es 1, 100, 10.000 y 1.000.000. Los costos de las mejoras en Pops se multiplican por una escala propia de cada fase (1, 320, 40.000, 8.000.000) porque las láminas grandes amplifican por cadenas.
+- **Lámina más grande** abre una fase por nivel y cuesta 1, 18 y 110 Pellets (escalones a mano). Tiempos que logra el perfil activo del simulador: Piso a los 30 min, Galpón a los 90 y Estacionamiento a los 148.
+- **Cadenas:** `k` máximo 0,62 y umbral de tensión mínimo 1,4. Con los valores originales (0,9 y 1,3) las láminas de 6.400 y 22.500 burbujas se despejaban enteras de un golpe y rompían la economía.
+- **Plancha (3.3):** el calor sube la presión de las burbujas del aura hasta 1,4 antes de tocarlas; no crea aire por encima del tope (menor que el umbral de tensión). Su aura se ve como un rectángulo anaranjado que pulsa.
+- **Bota (3.3):** un pisotón por apretada, con recarga de 4 s (mejorable) visible en el HUD. La onda expansiva empuja hacia afuera una parte de la presión de lo pisado, limitada para que el aire total nunca aumente.
+- **Eco (3.4):** vuelve a inflarse una sola vez a los 2 s y queda como burbuja normal.
+- **Automatización (3.5):** las **Manitos** (Galpón) y el **rodillo automático** (Estacionamiento) revientan sin combo, así que jugar activo siempre rinde más; las manitos inteligentes existen pero requieren la Fase 6. Con el juego cerrado producen al 50% de eficiencia con tope de 2 horas.
+- **Reciclado (3.7):** además de la lámina más grande, hay mejoras permanentes por herramienta inicial, automatización desde el arranque, probabilidad de especiales y "memoria del turno" (arrancás con un porcentaje de los niveles de la partida anterior). Se compran en un tablero de corcho.
+- **Escenarios (pilar 3):** cada fase tiene su escenario (madera, baldosas, hormigón, asfalto) y cambia durante la transición del reciclado.
+
+
 ## 5. Estilo visual (todo por código)
 
 La estética es de "juguete limpio": plástico brillante, formas simples y colores saturados. Todo sale de shaders y de las formas primitivas de Godot, sin modelos ni texturas dibujadas a mano.
