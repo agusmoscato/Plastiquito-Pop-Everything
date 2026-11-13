@@ -18,10 +18,11 @@ if which == "cup":
     body = lib.revolve_profile("cup", [(0.0, 0.0), (0.030, 0.0), (0.036, 0.004), (0.046, 0.045), (0.048, 0.085), (0.044, 0.085), (0.040, 0.080), (0.0, 0.080)], 28)
     body.data.materials.append(ceramic)
     lib.bevel(body, 0.0012, 1)
-    liquid = lib.revolve_profile("liquid", [(0.0, 0.0), (0.043, 0.0), (0.0, 0.0)], 24)
+    liquid = lib.revolve_profile("liquid", [(0.0, -0.002), (0.043, -0.002), (0.043, 0.0), (0.0, 0.0)], 24)
     liquid.location = (0, 0, 0.070)
     liquid.data.materials.append(coffee)
-    handle = lib.tube_along("handle", [(0.045, 0, 0.070), (0.072, 0, 0.068), (0.078, 0, 0.045), (0.060, 0, 0.022), (0.040, 0, 0.020)], [0.007, 0.0075, 0.0075, 0.0075, 0.007], sides=10)
+    handle = lib.tube_along("handle", [(0.040, 0, 0.072), (0.060, 0, 0.074), (0.074, 0, 0.064), (0.080, 0, 0.048), (0.074, 0, 0.032), (0.060, 0, 0.022), (0.042, 0, 0.022)], [0.007] * 7, sides=10)
+    lib.subsurf(handle, 1)
     handle.data.materials.append(ceramic)
     parts += [body, liquid, handle]
 elif which == "pencil":
@@ -50,7 +51,7 @@ elif which == "pencil":
 elif which == "chair_leg":
     wood = lib.material("chair_wood", lib.hex_color("#8A5A34"), rough=0.6)
     metal = lib.material("chair_cap", lib.hex_color("#2B2A33"), rough=0.5)
-    leg = lib.revolve_profile("leg", [(0.0, 0.02), (0.018, 0.02), (0.020, 0.12), (0.024, 0.28), (0.026, 0.40), (0.026, 0.42), (0.0, 0.42)], 12)
+    leg = lib.revolve_profile("leg", [(0.0, 0.02), (0.018, 0.02), (0.019, 0.10), (0.017, 0.14), (0.0225, 0.17), (0.0235, 0.22), (0.0275, 0.25), (0.0235, 0.28), (0.0265, 0.34), (0.028, 0.40), (0.028, 0.42), (0.0, 0.42)], 12)
     leg.data.materials.append(wood)
     lib.bevel(leg, 0.002, 1)
     cap = lib.revolve_profile("cap", [(0.0, 0.0), (0.017, 0.0), (0.019, 0.010), (0.018, 0.022), (0.0, 0.022)], 14)

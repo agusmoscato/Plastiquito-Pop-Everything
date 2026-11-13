@@ -14,26 +14,35 @@ which = "gem"
 if "--which" in sys.argv:
     which = sys.argv[sys.argv.index("--which") + 1]
 lib.reset()
-gold = lib.material("gold", lib.hex_color("#F2C94C"), rough=0.2, metal=0.95, emission=lib.hex_color("#F2B531"))
+gold = lib.material("gold", lib.hex_color("#E0A92A"), rough=0.18, metal=0.95, emission=lib.hex_color("#8A5A0A"))
 parts = []
 if which == "gem":
-    # Joya: una pirámide doble facetada (corona + pabellón) con tabla plana, ligeramente irregular.
+    # Burbuja-domo con talla de gema: faja vertical, tres anillos de facetas alternadas y tabla plana.
     bm = bmesh.new()
-    ring_top = []
-    ring_mid = []
-    n = 8
-    for i in range(n):
-        a = 2 * math.pi * i / n
-        j = 1.0 + 0.04 * math.sin(3 * a)
-        ring_top.append(bm.verts.new((0.16 * math.cos(a) * j, 0.16 * math.sin(a) * j, 0.28)))
-        ring_mid.append(bm.verts.new((0.30 * math.cos(a + 0.2) * j, 0.30 * math.sin(a + 0.2) * j, 0.20)))
-    apex = bm.verts.new((0.0, 0.0, 0.0))
-    table = bm.verts.new((0.0, 0.0, 0.30))
-    for i in range(n):
-        k = (i + 1) % n
-        bm.faces.new((ring_top[i], ring_top[k], table))
-        bm.faces.new((ring_mid[i], ring_mid[k], ring_top[k], ring_top[i]))
-        bm.faces.new((ring_mid[k], ring_mid[i], apex))
+    n = 36
+    levels = [(0.30, 0.0, 0.0), (0.30, 0.07, 0.0), (0.262, 0.15, 0.5), (0.196, 0.225, 0.0), (0.118, 0.28, 0.5)]
+    rings = []
+    for (r, z, off) in levels:
+        ring = []
+        for i in range(n):
+            a = 2 * math.pi * (i + off) / n
+            j = 1.0 + 0.012 * math.sin(5 * a)
+            ring.append(bm.verts.new((r * math.cos(a) * j, r * math.sin(a) * j, z)))
+        rings.append(ring)
+    for k in range(len(rings) - 1):
+        lo, hi = rings[k], rings[k + 1]
+        for i in range(n):
+            m = (i + 1) % n
+            if k == 0:
+                bm.faces.new((lo[i], lo[m], hi[m], hi[i]))
+            elif levels[k + 1][2] > levels[k][2]:
+                bm.faces.new((lo[i], lo[m], hi[i]))
+                bm.faces.new((lo[m], hi[m], hi[i]))
+            else:
+                bm.faces.new((lo[i], lo[m], hi[m]))
+                bm.faces.new((lo[i], hi[m], hi[i]))
+    bm.faces.new(list(reversed(rings[0])))
+    bm.faces.new(rings[-1])
     me = bpy.data.meshes.new("gem")
     bm.to_mesh(me)
     bm.free()
@@ -80,4 +89,4 @@ else:
         stripe.location = (x, 0, 0.2)
         stripe.data.materials.append(white)
         parts.append(stripe)
-lib.finish(parts, "special_" + which, A)
+lib.finish(parts, "special_" + which, A, angle=(8.0 if which == "gem" else 50.0))

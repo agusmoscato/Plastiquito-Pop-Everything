@@ -52,7 +52,9 @@ def material(name, color, rough=0.5, metal=0.0, clearcoat=0.0, emission=None, al
 
 def hex_color(h):
     h = h.lstrip("#")
-    return tuple(int(h[i:i + 2], 16) / 255.0 for i in (0, 2, 4))
+    def lin(c):
+        return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+    return tuple(lin(int(h[i:i + 2], 16) / 255.0) for i in (0, 2, 4))
 
 
 def new_object(name, verts, faces, edges=None):
@@ -73,6 +75,9 @@ def select_only(obj):
 def smooth(obj, angle=40.0):
     """Sombreado suave con auto-smooth por ángulo (Blender 4.1+ usa 'Smooth by Angle')."""
     select_only(obj)
+    if angle <= 10.0:
+        bpy.ops.object.shade_flat()
+        return
     bpy.ops.object.shade_smooth()
     try:
         bpy.ops.object.shade_auto_smooth(angle=math.radians(angle))
