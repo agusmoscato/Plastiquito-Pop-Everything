@@ -23,6 +23,7 @@ var _holding: bool = false
 var _hold_time: float = 0.0
 var _next_buy: float = 0.0
 var _hover: bool = false
+var discovery: bool = false ## la primera vez que se puede pagar: se despega más
 
 
 func setup(p_sim: GameSim, p_id: String, p_buy_mode: Callable) -> void:
@@ -119,7 +120,7 @@ func _draw() -> void:
 	var maxed: bool = lvl >= max_lvl
 	var available: bool = sim.upgrades.is_available(sim.state, id)
 	var afford: bool = sim.can_afford_next(id)
-	var lift: float = _lift * 2.0 + (1.0 if _hover and available else 0.0)
+	var lift: float = _lift * 2.0 + (1.0 if _hover and available else 0.0) + (5.0 + sin(Time.get_ticks_msec() * 0.01) * 1.5 if discovery else 0.0)
 	var dx: float = (UiKit.hash01(id, 3) - 0.5) * 16.0 # cada etiqueta se pegó un poco corrida
 	var origin: Vector2 = Vector2(4.0 + dx, 5.0 - lift)
 	var is_gold: bool = lvl > 0 and lvl % Cfg.integer(sim.eco, "milestone_every") == 0

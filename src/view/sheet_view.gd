@@ -215,6 +215,9 @@ func _on_cells_changed(indices: PackedInt32Array) -> void:
 				if _far_only[ch] == 1:
 					continue # de lejos no se ve la animación: queda directamente reventada
 			_anims[idx] = Vector2(0.0, _squash_shown[idx])
+		elif sheet.state[idx] != SheetModel.STATE_POPPED and _popped_shown[idx] == 1:
+			_popped_shown[idx] = 0 # Eco: volvió a inflarse
+			_anims.erase(idx)
 
 
 func _advance_roll(delta: float) -> void:

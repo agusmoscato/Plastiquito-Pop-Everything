@@ -13,6 +13,8 @@ var tool_view: ToolView
 var hud: Hud
 var overlay: DebugOverlay
 var pause_menu: PauseMenu
+var automation: AutomationView
+var _offline: Dictionary = {}
 var _version_layer: CanvasLayer
 
 var _cursor: Vector2 = Vector2.ZERO
@@ -40,7 +42,8 @@ func _ready() -> void:
 	if not _has_demo_arg():
 		SaveSystem.sim = sim # las capturas de prueba no tocan el guardado
 		SaveSystem.interval = Cfg.num(db.economy, "autosave_seconds")
-		SaveSystem.load_into(sim)
+		if SaveSystem.load_into(sim):
+			_offline = sim.compute_offline(Time.get_unix_time_from_system())
 	world = ToyWorld.new()
 	world.name = "World"
 	world.deferred_sheet = true
@@ -59,6 +62,13 @@ func _ready() -> void:
 	hud.recycle_confirmed.connect(_start_recycle)
 	hud.chain_slammed.connect(_on_chain_slammed)
 	world.camera_rig.zoomed.connect(Playtest.log.zoomed)
+	automation = AutomationView.new()
+	automation.name = "Automation"
+	add_child(automation)
+	automation.bind(sim)
+	hud.offline_ticket.collected.connect(_collect_offline)
+	if not _offline.is_empty() and Cfg.num(_offline, "pops") > 0.0:
+		hud.show_offline(_offline)
 	_debug = PlaytestMode.debug_allowed(PlaytestMode.current_tags())
 	if _debug: # en playtest/release no existen F3 ni las trampas de desarrollo
 		overlay = DebugOverlay.new()
@@ -74,11 +84,13 @@ func _ready() -> void:
 	for arg: String in OS.get_cmdline_user_args():
 		if arg.begins_with("--demo-shot="):
 			_run_demo(arg.trim_prefix("--demo-shot="))
+		elif arg.begins_with("--demo3="):
+			_run_demo3(arg.trim_prefix("--demo3="))
 
 
 func _has_demo_arg() -> bool:
 	for arg: String in OS.get_cmdline_user_args():
-		if arg.begins_with("--demo-shot="):
+		if arg.begins_with("--demo-shot=") or arg.begins_with("--demo3="):
 			return true
 	return false
 
@@ -113,6 +125,10 @@ func _on_key(code: int) -> void:
 		_select_tool("palm")
 	elif code == KEY_3:
 		_select_tool("rolling_pin")
+	elif code == KEY_4:
+		_select_tool("iron")
+	elif code == KEY_5:
+		_select_tool("boot")
 	elif code == KEY_TAB:
 		if hud.is_modal_open():
 			hud.close_recycle_panel()
@@ -219,6 +235,12 @@ func _refresh_tool_view() -> void:
 	tool_view.set_tool(id, tm.radius, mini(tier, 3), tm.drag_entry_fraction, tm.force_per_second / 6.0)
 
 
+func _collect_offline() -> void:
+	sim.apply_offline(_offline, Time.get_unix_time_from_system())
+	_offline = {}
+	PopAudio.play_ui("stamp")
+
+
 func _on_purchased(id: String, count: int, _milestone: bool) -> void:
 	Playtest.log.purchase(count)
 	_refresh_tool_view()
@@ -251,7 +273,7 @@ func _after_step(_holding: bool, delta: float) -> void:
 	if sim.ev_tool_pops > 0:
 		tool_view.bounce(minf(float(sim.ev_tool_pops), 4.0) * 0.5)
 	_pop_fx()
-	Juice.add_pop_trauma(n)
+	Juice.add_pop_trauma(n * 3 if sim.state.selected_tool == "boot" and sim.ev_tool_pops > 0 else n)
 	_check_hitstop()
 	if sim.ev_chain_ended_count >= Cfg.integer(sim.eco, "chain_stamp_min"):
 		Playtest.log.chain(sim.ev_chain_ended_count)
@@ -382,7 +404,7 @@ func _finish_recycle() -> void:
 		_recycle_roll.queue_free()
 	var gained: int = sim.recycle()
 	world.sheet_view.clear_recycle_effect()
-	world.rebind_game_sheet(true, 3.5)
+	world.rebind_game_sheet(true, 3.5, 3.5) # cámara y escenario cambian juntos durante 3,5 s
 	world.tool_model = sim.selected_tool()
 	_refresh_tool_view()
 	_announce_new_specials()
@@ -494,3 +516,73 @@ func _demo_chain() -> void:
 	sim._track_chain()
 	_pop_fx()
 	hud.on_sim_step(0.016)
+
+
+## Capturas de la Fase 3: escenarios, plancha, manitos, bota, rodillo, tablero de corcho y bienvenida.
+func _demo3_phase(phase: int, pops: float) -> void:
+	sim.state.perm["perm_sheet"] = phase - 1
+	sim.state.pops = pops
+	sim.state.pellets = 40.0
+	for id: String in ["unlock_palm", "unlock_pin", "unlock_iron", "unlock_hands", "unlock_boot", "unlock_roller"]:
+		sim.state.levels[id] = 1
+	sim.state.levels["hands_count"] = 6
+	sim.state.levels["finger_force"] = 4
+	sim.state.levels["iron_size"] = 2
+	sim.state.levels["boot_force"] = 30
+	sim.refresh_stats()
+	sim.new_sheet()
+	world.rebind_game_sheet(false, 0.0, 0.0)
+	automation.bind(sim)
+	_refresh_tool_view()
+
+
+func _run_demo3(dir: String) -> void:
+	_demo = true
+	DirAccess.make_dir_recursive_absolute(dir)
+	await _wait(1.0)
+	_demo3_phase(3, 5.0e7)
+	sim.select_tool("iron")
+	_refresh_tool_view()
+	hud.shop.select_tab("iron")
+	var c: Vector2 = sim.center()
+	tool_view.snap_to(c)
+	for i: int in 60:
+		_cursor = c + Vector2(float(i) * 0.05 - 1.5, 0.0)
+		_cursor_valid = true
+		tool_view.set_cursor(_cursor)
+		tool_view.set_drag_direction(Vector2(1.0, 0.0))
+		sim.step(0.016, _cursor, false)
+		await get_tree().process_frame
+	await _wait(1.0)
+	_shot(dir, "30_galpon_plancha_manitos")
+	hud.shop.select_tab("finger")
+	await _wait(0.3)
+	_shot(dir, "31_tienda_iconos")
+	_demo3_phase(4, 5.0e8)
+	sim.select_tool("boot")
+	_refresh_tool_view()
+	hud.shop.select_tab("boot")
+	await _wait(1.0)
+	sim.step(0.016, sim.center(), true)
+	sim.step(0.016, sim.center(), true)
+	await _wait(0.5)
+	_shot(dir, "32_estacionamiento_bota")
+	hud.shop.select_tab("auto_roller")
+	await _wait(0.4)
+	_shot(dir, "33_estacionamiento_rodillo")
+	sim.state.pops_run = 300.0 * Cfg.num(db.economy, "pellet_divisor") * 100.0
+	hud.open_recycle_panel()
+	await _wait(0.8)
+	_shot(dir, "34_tablero_corcho")
+	hud.close_recycle_panel()
+	hud.show_offline({"efficiency": 0.5, "seconds": 7200.0, "hands_pops": 21000.0, "roller_pops": 27213.0, "pops": 4.8e9})
+	await _wait(2.6)
+	_shot(dir, "35_bienvenida")
+	hud.offline_ticket.visible = false
+	for ph: int in [1, 2, 3, 4]:
+		_demo3_phase(ph, 1.0e6)
+		sim.select_tool("finger" if ph < 3 else "iron")
+		_refresh_tool_view()
+		await _wait(1.2)
+		_shot(dir, "36_escenario_%d" % ph)
+	get_tree().quit()

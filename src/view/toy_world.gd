@@ -58,7 +58,7 @@ func attach(sim: GameSim) -> void:
 
 
 ## Vuelve a conectar la vista con la lámina actual de GameSim (lámina nueva o reciclado).
-func rebind_game_sheet(roll_in: bool, animate_camera: float = 0.0) -> void:
+func rebind_game_sheet(roll_in: bool, animate_camera: float = 0.0, scenario_seconds: float = 0.0) -> void:
 	sheet = game.sheet
 	grid = game.grid
 	tool_model = game.selected_tool()
@@ -66,7 +66,10 @@ func rebind_game_sheet(roll_in: bool, animate_camera: float = 0.0) -> void:
 	specials_view.bind(sheet, grid)
 	specials_view.visible = true
 	camera_rig.fit_to(sheet_view.center(), sheet_view.extents(), animate_camera)
-	apply_phase(game.phase())
+	if scenario_seconds > 0.0 and not scenario.matches(game.phase(), sheet_view.extents()):
+		transition_to_phase(game.phase(), scenario_seconds)
+	else:
+		apply_phase(game.phase())
 	if roll_in:
 		sheet_view.begin_roll_in()
 	sheet_replaced.emit()

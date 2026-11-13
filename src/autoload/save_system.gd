@@ -22,7 +22,7 @@ func save_now() -> bool:
 	_timer = 0.0
 	if sim == null:
 		return false
-	return write_file(PATH, sim.save_dict())
+	return write_file(PATH, sim.save_dict(Time.get_unix_time_from_system()))
 
 
 ## Carga el save en `target`. false si no hay archivo o es inválido (la partida queda como estaba).

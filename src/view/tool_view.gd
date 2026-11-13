@@ -58,8 +58,30 @@ func set_tool(id: String, p_radius: float, p_tier: int, speed01: float, force_ra
 	_holder = ToolMeshes.build(id, p_radius, p_tier)
 	add_child(_holder)
 	_body = _holder.get_node("Body") as Node3D
+	if id == "iron":
+		_holder.add_child(_make_heat_aura(p_radius))
 	if grew:
 		_grow = 0.55 # vuelve a 1 con rebote: se ve crecer
+
+
+## Aura de calor de la plancha: un rectángulo anaranjado translúcido que pulsa sobre la lámina.
+func _make_heat_aura(half: float) -> MeshInstance3D:
+	var mi: MeshInstance3D = MeshInstance3D.new()
+	mi.name = "Heat"
+	var pm: PlaneMesh = PlaneMesh.new()
+	pm.size = Vector2(half * 2.0 * 1.6, half * 0.9 * 1.6)
+	var m: StandardMaterial3D = StandardMaterial3D.new()
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.albedo_color = Color(1.0, 0.55, 0.2, 0.22)
+	m.emission_enabled = true
+	m.emission = Color(1.0, 0.4, 0.1)
+	m.emission_energy_multiplier = 0.8
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	pm.material = m
+	mi.mesh = pm
+	mi.position = Vector3(0.0, -0.6, 0.0)
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return mi
 
 
 ## Mueve el dedo a la posición (x, z) del plano.
@@ -75,7 +97,7 @@ func snap_to(pos: Vector2) -> void:
 
 ## Dirección del arrastre (el palo de amasar se orienta perpendicular a ella).
 func set_drag_direction(dir: Vector2) -> void:
-	if tool_id == "rolling_pin" and dir.length_squared() > 0.0001:
+	if (tool_id == "rolling_pin" or tool_id == "iron") and dir.length_squared() > 0.0001:
 		var n: Vector2 = Vector2(-dir.y, dir.x).normalized()
 		_yaw_target = atan2(-n.y, n.x)
 
@@ -96,7 +118,7 @@ func _process(delta: float) -> void:
 	position.x = lerpf(position.x, _target.x, k)
 	position.z = lerpf(position.z, _target.y, k)
 	_yaw = lerp_angle(_yaw, _yaw_target, 1.0 - exp(-14.0 * delta))
-	rotation.y = _yaw if tool_id == "rolling_pin" else 0.0
+	rotation.y = _yaw if (tool_id == "rolling_pin" or tool_id == "iron") else 0.0
 	_press = lerpf(_press, _press_target, 1.0 - exp(-_press_rate * delta))
 	_squish_boost = maxf(0.0, _squish_boost - delta * 6.0)
 	_grow = lerpf(_grow, 1.0, 1.0 - exp(-9.0 * delta))
@@ -111,3 +133,8 @@ func _process(delta: float) -> void:
 	var stretch: float = clampf(_velocity * 0.03, -0.12, 0.18)
 	var s: Vector3 = Vector3(1.0 + squash - stretch * 0.5, 1.0 - squash + stretch, 1.0 + squash - stretch * 0.5)
 	_body.scale = s * _grow
+	var heat: Node3D = _holder.get_node_or_null("Heat") as Node3D
+	if heat != null:
+		var pulse: float = 0.85 + 0.15 * sin(Time.get_ticks_msec() * 0.006)
+		heat.scale = Vector3(pulse, 1.0, pulse)
+		heat.position.y = -position.y + 0.04

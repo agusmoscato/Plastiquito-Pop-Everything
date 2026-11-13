@@ -40,6 +40,11 @@ var _banner_text: String = ""
 var _banner_joke: String = ""
 var _last_vp: Vector2 = Vector2.ZERO
 var _banner_ctl: Control
+var _tab_timer: float = 0.0
+var offline_ticket: OfflineTicket
+var _arrow_t: float = 0.0
+var _arrow_id: String = ""
+var _arrow_ctl: Control
 
 
 func setup(p_sim: GameSim, p_camera: Camera3D) -> void:
@@ -86,6 +91,14 @@ func setup(p_sim: GameSim, p_camera: Camera3D) -> void:
 	_banner_ctl.draw.connect(_draw_banner)
 	_banner_ctl.material = UiKit.paper_material()
 	root.add_child(_banner_ctl)
+	_arrow_ctl = Control.new()
+	_arrow_ctl.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_arrow_ctl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_arrow_ctl.draw.connect(_draw_arrow)
+	root.add_child(_arrow_ctl)
+	offline_ticket = OfflineTicket.new()
+	offline_ticket.setup()
+	root.add_child(offline_ticket)
 	recycle_panel = RecyclePanel.new()
 	recycle_panel.setup(sim)
 	recycle_panel.recycle_requested.connect(func() -> void: recycle_confirmed.emit())
@@ -99,7 +112,7 @@ func setup(p_sim: GameSim, p_camera: Camera3D) -> void:
 
 
 func is_modal_open() -> bool:
-	return recycle_panel.visible
+	return recycle_panel.visible or offline_ticket.visible
 
 
 func open_recycle_panel() -> void:
@@ -113,18 +126,18 @@ func close_recycle_panel() -> void:
 # --- Construcción ---------------------------------------------------------------------------
 
 func _build_toolbar() -> void:
-	var tools: Array[String] = ["finger", "palm", "rolling_pin"]
+	var tools: Array[String] = ["finger", "palm", "rolling_pin", "iron", "boot"]
 	for i: int in tools.size():
 		var id: String = tools[i]
 		var b: StampButton = StampButton.new()
-		b.setup("%d %s" % [i + 1, Tx.t("tool_" + id)], Vector2(128.0, 92.0), UiKit.CARDBOARD_DARK)
+		b.setup("%d %s" % [i + 1, Tx.t("tool_" + id)], Vector2(112.0, 92.0), UiKit.CARDBOARD_DARK)
 		b.font_size = 13
 		b.text_bottom = true
 		b.pressed.connect(func() -> void: tool_selected.emit(id))
 		root.add_child(b)
 		var icon: ToolIcon = ToolIcon.new()
 		icon.setup(id, 60, 0)
-		icon.position = Vector2(34.0, 6.0)
+		icon.position = Vector2(26.0, 6.0)
 		b.add_child(icon)
 		_tool_buttons[id] = b
 
@@ -156,7 +169,7 @@ func _layout() -> void:
 	for id: String in _tool_buttons:
 		var b: StampButton = _tool_buttons[id]
 		b.position = Vector2(x, vp.y - 104.0)
-		x += 136.0
+		x += 118.0
 	_recycle_button.position = Vector2(free_w - 210.0, vp.y - 84.0)
 	_log_button.position = Vector2(free_w - 170.0, 76.0)
 	bubble_log.position = Vector2(free_w - 380.0, 124.0)
@@ -228,7 +241,57 @@ func _on_flyer_arrived(value: float) -> void:
 	pops_panel.pulse()
 
 
+func show_offline(result: Dictionary) -> void:
+	offline_ticket.show_result(result)
+
+
+## Primera vez que algo se vuelve pagable: la etiqueta se despega más, el clip tiembla y una flecha
+## dibujada con marcador la señala 3 s. Después de la primera compra, nunca más.
+func _discover(id: String) -> void:
+	_arrow_id = id
+	_arrow_t = 3.0
+	shop.select_tab(shop.tab_of(id))
+	shop.shake_clip(2.0)
+	var tag: UpgradeTag = shop.tag_for(id)
+	if tag != null:
+		tag.discovery = true
+
+
+func _draw_arrow() -> void:
+	if _arrow_t <= 0.0:
+		return
+	var tag: UpgradeTag = shop.tag_for(_arrow_id)
+	if tag == null or not tag.is_visible_in_tree():
+		return
+	var r: Rect2 = tag.get_global_rect()
+	var to: Vector2 = Vector2(r.position.x - 6.0, r.position.y + r.size.y * 0.5)
+	var wob: float = sin(Time.get_ticks_msec() * 0.012) * 4.0
+	var from: Vector2 = to + Vector2(-190.0 + wob, -80.0)
+	var ctrl: Vector2 = to + Vector2(-120.0, 20.0)
+	var a: float = clampf(_arrow_t * 2.0, 0.0, 1.0)
+	var pts: PackedVector2Array = PackedVector2Array()
+	for i: int in 17:
+		var t: float = float(i) / 16.0
+		var wiggle: float = sin(t * 9.0) * 2.0 # el trazo de marcador no es perfecto
+		pts.append(from.lerp(ctrl, t).lerp(ctrl.lerp(to, t), t) + Vector2(0.0, wiggle))
+	var ink: Color = Color(UiKit.STAMP_RED.r, UiKit.STAMP_RED.g, UiKit.STAMP_RED.b, 0.9 * a)
+	_arrow_ctl.draw_polyline(pts, ink, 6.0, true)
+	_arrow_ctl.draw_polyline(pts, Color(1.0, 0.45, 0.4, 0.35 * a), 2.0, true)
+	var head: Vector2 = (pts[16] - pts[14]).normalized()
+	var left: Vector2 = pts[16] - head.rotated(0.5) * 30.0
+	var right: Vector2 = pts[16] - head.rotated(-0.5) * 30.0
+	_arrow_ctl.draw_polyline(PackedVector2Array([left, pts[16], right]), ink, 6.0, true)
+
+
 func _on_tag_bought(id: String, count: int, milestone: bool) -> void:
+	if not Settings.discovery_done:
+		Settings.discovery_done = true
+		Settings.save_settings()
+		_arrow_t = 0.0
+		for tid: String in shop.tag_ids():
+			var tg: UpgradeTag = shop.tag_for(tid)
+			if tg != null:
+				tg.discovery = false
 	PopAudio.play_ui("stamp", randf_range(0.95, 1.05), 0.0)
 	_shake_t = 0.22
 	if milestone:
@@ -241,7 +304,9 @@ func _on_tag_bought(id: String, count: int, milestone: bool) -> void:
 	purchased.emit(id, count, milestone)
 
 
-func _on_affordable(_id: String) -> void:
+func _on_affordable(id: String) -> void:
+	if not Settings.discovery_done and _arrow_t <= 0.0:
+		_discover(id)
 	# El tic de "ya se puede comprar" suena como mucho una vez cada 3 s.
 	if _tic_cooldown <= 0.0:
 		_tic_cooldown = 3.0
@@ -256,6 +321,13 @@ func _process(delta: float) -> void:
 	if get_viewport().get_visible_rect().size != _last_vp:
 		_layout()
 	_tic_cooldown = maxf(0.0, _tic_cooldown - delta)
+	if _arrow_t > 0.0:
+		_arrow_t -= delta
+		_arrow_ctl.queue_redraw()
+		if _arrow_t <= 0.0:
+			var shown: UpgradeTag = shop.tag_for(_arrow_id)
+			if shown != null:
+				shown.discovery = false
 	_banner_t = maxf(0.0, _banner_t - delta)
 	_banner_ctl.queue_redraw()
 	_update_shake(delta)
@@ -275,6 +347,10 @@ func _process(delta: float) -> void:
 		next_bar.refresh()
 	_update_toolbar()
 	_update_recycle_button()
+	_tab_timer -= delta
+	if _tab_timer <= 0.0:
+		_tab_timer = 0.5
+		shop.refresh_tabs()
 
 
 func _update_shake(delta: float) -> void:
@@ -290,7 +366,11 @@ func _update_toolbar() -> void:
 		var b: StampButton = _tool_buttons[id]
 		var unlocked: bool = sim.upgrades.tool_unlocked(sim.state, id)
 		b.disabled = not unlocked
+		b.visible = unlocked or sim.phase() >= (3 if id == "iron" else (4 if id == "boot" else 1)) or id == "finger" or id == "palm" or id == "rolling_pin"
 		b.toggled_on = sim.state.selected_tool == id
+		if id == "boot" and unlocked:
+			var tm: ToolModel = sim.tools["boot"]
+			b.sub_text = Tx.t("boot_ready") if tm.cooldown_left <= 0.0 else "%.1f s" % tm.cooldown_left
 
 
 func _update_recycle_button() -> void:
