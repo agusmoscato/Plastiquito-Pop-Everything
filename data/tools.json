@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "_note": "Los valores dentro de 'balance' son PLACEHOLDERS (placeholder: true) hasta que exista el simulador de balance.",
+  "tools": [
+    {"id": "finger",         "number": 1, "name_es": "Dedo",             "name_en": "Finger",         "shape": "cell",    "unlock_phase": 1, "balance": {"placeholder": true, "force": 1.0, "size": 1.0}},
+    {"id": "palm",           "number": 2, "name_es": "Palma",            "name_en": "Palm",           "shape": "circle",  "unlock_phase": 1, "balance": {"placeholder": true, "force": 1.0, "size": 2.0}},
+    {"id": "rolling_pin",    "number": 3, "name_es": "Palo de amasar",   "name_en": "Rolling pin",    "shape": "segment", "unlock_phase": 2, "balance": {"placeholder": true, "force": 1.0, "size": 4.0}},
+    {"id": "iron",           "number": 4, "name_es": "Plancha",          "name_en": "Iron",           "shape": "rect",    "unlock_phase": 3, "balance": {"placeholder": true, "force": 1.0, "size": 4.0}},
+    {"id": "boot",           "number": 5, "name_es": "Bota",             "name_en": "Boot",           "shape": "circle",  "unlock_phase": 4, "balance": {"placeholder": true, "force": 1.0, "size": 6.0}},
+    {"id": "steamroller",    "number": 6, "name_es": "Aplanadora",       "name_en": "Steamroller",    "shape": "segment", "unlock_phase": 5, "balance": {"placeholder": true, "force": 1.0, "size": 20.0}},
+    {"id": "hydraulic_press","number": 7, "name_es": "Prensa hidráulica","name_en": "Hydraulic press","shape": "rect",    "unlock_phase": 6, "balance": {"placeholder": true, "force": 1.0, "size": 40.0}},
+    {"id": "meteor",         "number": 8, "name_es": "Meteorito",        "name_en": "Meteor",         "shape": "circle",  "unlock_phase": 7, "balance": {"placeholder": true, "force": 1.0, "size": 200.0}}
+  ]
+}

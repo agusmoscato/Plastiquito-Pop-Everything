@@ -1,0 +1,28 @@
+# Godot 4
+.godot/
+.import/
+*.translation
+export.cfg
+export_credentials.cfg
+/builds/
+/export/
+*.apk
+*.aab
+*.exe
+*.pck
+*.zip
+
+# Mono (por las dudas)
+.mono/
+data_*/
+mono_crash.*.json
+
+# Herramientas locales (binarios de Godot, etc.)
+/tools/bin/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+.claude/
