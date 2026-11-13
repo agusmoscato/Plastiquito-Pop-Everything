@@ -7,6 +7,10 @@ extends Node3D
 const CHUNK: int = 64
 const FLOATS_PER_INSTANCE: int = 16 ## 12 de transform + 4 de custom data
 const FAR_AWAY: float = 1.0e9
+## Láminas con más celdas que esto usan el dibujo de lejos (textura de estado + plano por bloque).
+const FAR_MIN_CELLS: int = 20000
+## Láminas con más celdas que esto usan un domo de pocos triángulos.
+const LOW_POLY_CELLS: int = 60000
 
 var sheet: SheetModel
 var grid: HexGrid
@@ -19,6 +23,13 @@ var _multimeshes: Array[MultiMesh] = []
 var _nodes: Array[MultiMeshInstance3D] = []
 var _plane: MeshInstance3D
 var _mesh: ArrayMesh
+var far: FarView ## dibujo de lejos (null en láminas chicas)
+var near_distance: float = 55.0 ## más cerca que esto (por bloque) se dibujan domos reales
+var fade_margin: float = 18.0 ## ancho del fundido entre cerca y lejos
+var _use_far: bool = false
+var last_process_us: int = 0 ## microsegundos que tardó el último _process (para el benchmark)
+var _camera: Camera3D
+var _far_only: PackedByteArray = PackedByteArray() ## por bloque: 1 si hoy solo se ve de lejos
 
 var _dirty: Dictionary = {} ## idx -> true
 var _anims: Dictionary = {} ## idx -> Vector2(segundos, aplastamiento al reventar)
@@ -75,6 +86,11 @@ func rebuild() -> void:
 	for n: MultiMeshInstance3D in _nodes:
 		n.queue_free()
 	_nodes.clear()
+	if far != null:
+		far.queue_free()
+		far = null
+	_use_far = sheet.cell_count() > FAR_MIN_CELLS
+	_far_only = PackedByteArray()
 	_multimeshes.clear()
 	_dirty.clear()
 	_anims.clear()
@@ -82,14 +98,23 @@ func rebuild() -> void:
 	_popped_shown.resize(sheet.cell_count())
 	_squash_shown = PackedFloat32Array()
 	_squash_shown.resize(sheet.cell_count())
-	_mesh = BubbleMesh.build(grid.bubble_radius * 0.94)
+	if sheet.cell_count() > LOW_POLY_CELLS:
+		_mesh = BubbleMesh.build(grid.bubble_radius * 0.94, 0.8, 3, 9)
+	else:
+		_mesh = BubbleMesh.build(grid.bubble_radius * 0.94)
 	_chunks_x = ceili(float(grid.width) / float(CHUNK))
 	_chunks_y = ceili(float(grid.height) / float(CHUNK))
 	for cy: int in _chunks_y:
 		for cx: int in _chunks_x:
 			_build_chunk(cx, cy)
+	if _use_far:
+		far = FarView.new()
+		far.name = "Far"
+		add_child(far)
+		far.build(grid, CHUNK, near_distance, fade_margin)
+		_far_only.resize(_nodes.size())
 	_build_plane()
-	material.set_shader_parameter("reveal_z", FAR_AWAY)
+	_set_reveal(FAR_AWAY)
 	_roll_t = -1.0
 
 
@@ -133,22 +158,62 @@ func clear_recycle_effect() -> void:
 func begin_roll_in() -> void:
 	_roll_t = 0.0
 	_roll_end_z = grid.row_step * float(grid.height) + 4.0
-	material.set_shader_parameter("reveal_z", -2.0)
+	_set_reveal(-2.0)
 
 
 func _process(delta: float) -> void:
 	if sheet == null:
 		return
+	var t0: int = Time.get_ticks_usec()
 	_advance_roll(delta)
 	_advance_anims(delta)
 	_flush_dirty()
+	if far != null:
+		var cam_pos: Vector3 = _camera_position()
+		_update_far_flags(cam_pos)
+		far.sync(cam_pos)
+	last_process_us = Time.get_ticks_usec() - t0
+
+
+func _set_reveal(z: float) -> void:
+	material.set_shader_parameter("reveal_z", z)
+	if far != null:
+		far.set_reveal_z(z)
+
+
+func _camera_position() -> Vector3:
+	if _camera == null or not is_instance_valid(_camera):
+		_camera = get_viewport().get_camera_3d()
+	if _camera == null:
+		return Vector3.ZERO
+	return _camera.global_position
+
+
+## Fundido por bloque según la distancia de la cámara: lejos = plano con textura de estado,
+## cerca = domos reales. En la zona de fundido se ven los dos (el de lejos aparece encima).
+## Los bloques que se ven solo de lejos no animan los reventones (no se verían).
+func _update_far_flags(cam_pos: Vector3) -> void:
+	var lo: float = near_distance - fade_margin
+	var span: float = fade_margin * 2.0
+	for ch: int in _nodes.size():
+		var d: float = cam_pos.distance_to(far.center_of(ch))
+		var f: float = clampf((d - lo) / span, 0.0, 1.0)
+		far.set_fade(ch, f)
+		_nodes[ch].visible = f < 1.0
+		_far_only[ch] = 1 if f >= 1.0 else 0
 
 
 func _on_cells_changed(indices: PackedInt32Array) -> void:
+	var w: int = grid.width
 	for idx: int in indices:
 		_dirty[idx] = true
 		if sheet.state[idx] == SheetModel.STATE_POPPED and _popped_shown[idx] == 0:
 			_popped_shown[idx] = 1
+			if not _far_only.is_empty():
+				@warning_ignore("integer_division")
+				var ch: int = (idx / w / CHUNK) * _chunks_x + (idx % w) / CHUNK
+				if _far_only[ch] == 1:
+					continue # de lejos no se ve la animación: queda directamente reventada
 			_anims[idx] = Vector2(0.0, _squash_shown[idx])
 
 
@@ -158,10 +223,10 @@ func _advance_roll(delta: float) -> void:
 	_roll_t += delta
 	var k: float = clampf(_roll_t / _roll_seconds, 0.0, 1.0)
 	var eased: float = k * k * (3.0 - 2.0 * k)
-	material.set_shader_parameter("reveal_z", lerpf(-2.0, _roll_end_z, eased))
+	_set_reveal(lerpf(-2.0, _roll_end_z, eased))
 	if k >= 1.0:
 		_roll_t = -1.0
-		material.set_shader_parameter("reveal_z", FAR_AWAY)
+		_set_reveal(FAR_AWAY)
 
 
 func _advance_anims(delta: float) -> void:
@@ -203,6 +268,11 @@ func _write_cell(idx: int) -> void:
 	var color: Color = Color(sheet.pressure[idx] - 1.0, squash, pop, float(sheet.type[idx]))
 	var loc: Vector2i = _locate(idx)
 	_multimeshes[loc.x].set_instance_custom_data(loc.y, color)
+	if far != null:
+		var c: Vector2i = grid.coords(idx)
+		var cx: int = floori(float(c.x) / float(CHUNK))
+		var cy: int = floori(float(c.y) / float(CHUNK))
+		far.set_cell(loc.x, c.x - cx * CHUNK, c.y - cy * CHUNK, sheet.pressure[idx], squash, pop, sheet.type[idx])
 
 
 ## (índice de bloque, índice de instancia dentro del bloque) de una celda.
@@ -252,6 +322,8 @@ func _build_chunk(cx: int, cy: int) -> void:
 	node.multimesh = mm
 	node.material_override = material
 	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	if _use_far:
+		pass # el fundido cerca/lejos lo maneja _update_far_flags()
 	add_child(node)
 	_nodes.append(node)
 	_multimeshes.append(mm)
