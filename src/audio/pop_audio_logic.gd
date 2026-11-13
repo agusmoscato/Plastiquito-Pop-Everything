@@ -38,16 +38,16 @@ func _init(p_max_voices: int = 24) -> void:
 
 
 func configure(cfg: Dictionary) -> void:
-	set_max_voices(int(cfg["voices"]))
-	pitch_variation = float(cfg["pitch_variation"])
-	streak_reset_seconds = float(cfg["streak_reset_seconds"])
-	streak_pitch_per_pop = float(cfg["streak_pitch_per_pop"])
-	streak_pitch_max = float(cfg["streak_pitch_max"])
-	crackle_threshold = int(cfg["crackle_threshold"])
-	crackle_rate_for_full_volume = float(cfg["crackle_rate_for_full_volume"])
-	crackle_smoothing_per_second = float(cfg["crackle_smoothing_per_second"])
-	large_chance = float(cfg["large_chance"])
-	tense_pressure = float(cfg["tense_pressure"])
+	set_max_voices(Cfg.integer(cfg, "voices"))
+	pitch_variation = Cfg.num(cfg, "pitch_variation")
+	streak_reset_seconds = Cfg.num(cfg, "streak_reset_seconds")
+	streak_pitch_per_pop = Cfg.num(cfg, "streak_pitch_per_pop")
+	streak_pitch_max = Cfg.num(cfg, "streak_pitch_max")
+	crackle_threshold = Cfg.integer(cfg, "crackle_threshold")
+	crackle_rate_for_full_volume = Cfg.num(cfg, "crackle_rate_for_full_volume")
+	crackle_smoothing_per_second = Cfg.num(cfg, "crackle_smoothing_per_second")
+	large_chance = Cfg.num(cfg, "large_chance")
+	tense_pressure = Cfg.num(cfg, "tense_pressure")
 
 
 func set_max_voices(n: int) -> void:
@@ -65,7 +65,10 @@ func set_samples(category: String, paths: Array[String]) -> void:
 
 
 func has_samples(category: String) -> bool:
-	return categories.has(category) and not (categories[category] as Array).is_empty()
+	if not categories.has(category):
+		return false
+	var list: Array = categories[category]
+	return not list.is_empty()
 
 
 ## Categoría de un pop según su presión. Tensa si p >= tense_pressure; si no,

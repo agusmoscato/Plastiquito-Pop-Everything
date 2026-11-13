@@ -180,11 +180,11 @@ func from_dict(data: Dictionary) -> bool:
 	for key: String in ["version", "width", "height", "pressure", "state", "type", "press"]:
 		if not data.has(key):
 			return _fail("falta el campo '%s'" % key)
-	var version: int = int(data["version"])
+	var version: int = Cfg.integer(data, "version")
 	if version != SAVE_VERSION:
 		return _fail("versión no soportada (%d)" % version)
-	var w: int = int(data["width"])
-	var h: int = int(data["height"])
+	var w: int = Cfg.integer(data, "width")
+	var h: int = Cfg.integer(data, "height")
 	var n: int = w * h
 	var p_text: String = str(data["pressure"])
 	var s_text: String = str(data["state"])

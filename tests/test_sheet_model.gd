@@ -75,7 +75,8 @@ func test_dict_roundtrip_identical() -> void:
 	sheet.set_type(9, 3)
 	sheet.press[12] = 0.37
 	var data: Dictionary = sheet.to_dict()
-	assert_eq(data["version"], SheetModel.SAVE_VERSION)
+	var version: int = data["version"]
+	assert_eq(version, SheetModel.SAVE_VERSION)
 	var other: SheetModel = SheetModel.new()
 	assert_true(other.from_dict(data))
 	assert_eq(other.width, sheet.width)

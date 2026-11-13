@@ -184,8 +184,8 @@ func _validate_bubbles() -> void:
 
 
 func _check_unlock(entry: Dictionary, file: String) -> void:
-	var phase_number: int = int(entry["unlock_phase"])
+	var phase_number: int = Cfg.integer(entry, "unlock_phase")
 	for p: Dictionary in phases:
-		if int(p["number"]) == phase_number:
+		if Cfg.integer(p, "number") == phase_number:
 			return
 	errors.append("%s[%s]: unlock_phase %d no existe en phases.json" % [file, str(entry["id"]), phase_number])

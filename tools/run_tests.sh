@@ -11,6 +11,14 @@ trap 'rm -f "$LOG"' EXIT
 # Importar primero para que se registren los class_name (cache de scripts globales).
 "$GODOT_BIN" --headless --import >/dev/null 2>&1
 
+# Lint: carga todos los scripts con las advertencias de tipos como errores.
+LINT_OUT="$("$GODOT_BIN" --headless -s tools/lint.gd 2>&1)"
+if echo "$LINT_OUT" | grep -qE "LINT FAIL|SCRIPT ERROR: Parse"; then
+  echo "$LINT_OUT" | grep -E -A1 "LINT FAIL|SCRIPT ERROR" >&2
+  echo "run_tests: el lint falló" >&2
+  exit 1
+fi
+
 "$GODOT_BIN" --headless -s addons/gut/gut_cmdln.gd \
   -gconfig=res://.gutconfig.json -gexit 2>&1 | tee "$LOG"
 CODE=${PIPESTATUS[0]}

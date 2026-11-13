@@ -33,10 +33,10 @@ func _init(p_sheet: SheetModel, p_grid: HexGrid) -> void:
 
 ## Carga los parámetros desde los diccionarios de data/ (tools.json "balance" y sheet.json).
 func configure(tool_balance: Dictionary, sheet_cfg: Dictionary) -> void:
-	force_per_second = float(tool_balance["force_per_second"])
-	drag_entry_fraction = float(tool_balance["drag_entry_fraction"])
-	resistance = float(sheet_cfg["resistance"])
-	recovery_per_second = float(sheet_cfg["recovery_per_second"])
+	force_per_second = Cfg.num(tool_balance, "force_per_second")
+	drag_entry_fraction = Cfg.num(tool_balance, "drag_entry_fraction")
+	resistance = Cfg.num(sheet_cfg, "resistance")
+	recovery_per_second = Cfg.num(sheet_cfg, "recovery_per_second")
 
 
 ## Celdas que toca el cursor al moverse de `from` a `to` (en el plano XZ).

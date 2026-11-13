@@ -36,7 +36,8 @@ func test_real_data_loads_without_errors() -> void:
 	assert_eq(db.tools.size(), 8)
 	assert_eq(db.bubbles.size(), 7)
 	assert_eq(str(db.get_tool("steamroller")["shape"]), "segment")
-	assert_eq(int(db.get_phase("orbit")["sheet_end"]["width"]), 1000)
+	var orbit_end: Dictionary = db.get_phase("orbit")["sheet_end"]
+	assert_eq(Cfg.integer(orbit_end, "width"), 1000)
 	assert_true(db.get_tool("nope").is_empty())
 
 
@@ -74,8 +75,8 @@ func test_unknown_unlock_phase_and_shape() -> void:
 func test_sheet_config_loaded_and_missing_field_detected() -> void:
 	var db: DataDB = DataDB.new()
 	assert_true(db.load_all(), str(db.errors))
-	assert_eq(float(db.sheet["reload_threshold"]), 0.9)
-	assert_eq(int(db.audio["voices"]), 24)
+	assert_eq(Cfg.num(db.sheet, "reload_threshold"), 0.9)
+	assert_eq(Cfg.integer(db.audio, "voices"), 24)
 	assert_true(db.juice.has("hitstop_ms"))
 	_copy_others(["sheet.json"])
 	_write("sheet.json", '{"version":1,"sheet":{"default_width":20}}')
