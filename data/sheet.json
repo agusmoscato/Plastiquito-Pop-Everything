@@ -9,6 +9,12 @@
     "resistance": 1.0,
     "recovery_per_second": 1.5,
     "reload_threshold": 0.9,
-    "reload_delay_seconds": 0.5
+    "reload_delay_seconds": 0.5,
+    "tense_threshold": 1.5,
+    "max_pressure": 2.0,
+    "min_pressure": 0.4,
+    "chain_k": 0.5,
+    "chain_k_max": 0.9,
+    "chain_budget_per_frame": 40
   }
 }

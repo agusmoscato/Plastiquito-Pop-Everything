@@ -21,44 +21,51 @@ func _on_reload() -> void:
 	_reloads += 1
 
 
+## step() de la herramienta + reventar lo que devuelve (como hace GameSim).
+func _step(touched: PackedInt32Array, delta: float) -> PackedInt32Array:
+	var out: PackedInt32Array = tool_model.step(touched, delta)
+	sheet.pop_many(out)
+	return out
+
+
 func _one(idx: int) -> PackedInt32Array:
 	return PackedInt32Array([idx])
 
 
 func test_press_accumulates_without_popping() -> void:
 	var c: int = grid.index(5, 5)
-	tool_model.step(_one(c), 0.1)
+	_step(_one(c), 0.1)
 	assert_almost_eq(sheet.get_press(c), 0.4, 0.0001)
-	tool_model.step(_one(c), 0.1)
+	_step(_one(c), 0.1)
 	assert_almost_eq(sheet.get_press(c), 0.8, 0.0001)
 	assert_eq(sheet.get_state(c), SheetModel.STATE_INTACT)
 
 
 func test_pops_exactly_at_threshold() -> void:
 	var c: int = grid.index(5, 5)
-	tool_model.step(_one(c), 0.1)
-	tool_model.step(_one(c), 0.1)
-	var popped: PackedInt32Array = tool_model.step(_one(c), 0.0499)
+	_step(_one(c), 0.1)
+	_step(_one(c), 0.1)
+	var popped: PackedInt32Array = _step(_one(c), 0.0499)
 	assert_eq(popped.size(), 0, "justo debajo del umbral no revienta")
-	popped = tool_model.step(_one(c), 0.0001 + 0.0002)
+	popped = _step(_one(c), 0.0001 + 0.0002)
 	assert_eq(popped, _one(c))
 	assert_eq(sheet.get_state(c), SheetModel.STATE_POPPED)
 
 
 func test_pops_when_force_equals_resistance_in_one_step() -> void:
 	var c: int = grid.index(1, 1)
-	var popped: PackedInt32Array = tool_model.step(_one(c), 0.25)
+	var popped: PackedInt32Array = _step(_one(c), 0.25)
 	assert_eq(popped, _one(c), "4.0 * 0.25 == 1.0 == resistencia")
 
 
 func test_recovers_when_released() -> void:
 	var c: int = grid.index(5, 5)
-	tool_model.step(_one(c), 0.2)
+	_step(_one(c), 0.2)
 	assert_almost_eq(sheet.get_press(c), 0.8, 0.0001)
-	tool_model.step(PackedInt32Array(), 0.1)
+	_step(PackedInt32Array(), 0.1)
 	assert_almost_eq(sheet.get_press(c), 0.6, 0.0001)
 	for k: int in 10:
-		tool_model.step(PackedInt32Array(), 0.1)
+		_step(PackedInt32Array(), 0.1)
 	assert_eq(sheet.get_press(c), 0.0)
 	assert_eq(tool_model.active_count(), 0)
 	assert_eq(sheet.get_state(c), SheetModel.STATE_INTACT)
@@ -67,10 +74,10 @@ func test_recovers_when_released() -> void:
 func test_drag_pops_every_cell_passed() -> void:
 	var a: Vector2 = grid.cell_to_world(grid.index(2, 4))
 	var b: Vector2 = grid.cell_to_world(grid.index(12, 4))
-	tool_model.step(tool_model.cells_along(a, a), 0.016) # empieza apretando
+	_step(tool_model.cells_along(a, a), 0.016) # empieza apretando
 	var path: PackedInt32Array = tool_model.cells_along(a, b)
 	assert_eq(path.size(), 11)
-	tool_model.step(path, 0.016)
+	_step(path, 0.016)
 	for q: int in range(3, 13):
 		assert_eq(sheet.get_state(grid.index(q, 4)), SheetModel.STATE_POPPED, "q=%d" % q)
 
@@ -87,7 +94,7 @@ func test_never_pops_same_bubble_twice() -> void:
 	var c: int = grid.index(3, 3)
 	var total: int = 0
 	for k: int in 10:
-		total += tool_model.step(_one(c), 0.5).size()
+		total += _step(_one(c), 0.5).size()
 	assert_eq(total, 1)
 	assert_eq(sheet.count_popped(), 1)
 	assert_eq(tool_model.pop_cells(_one(c)).size(), 0)
@@ -121,14 +128,14 @@ func test_changed_signal_reports_pressed_cells() -> void:
 	var got: Array[PackedInt32Array] = []
 	sheet.cells_changed.connect(func(idx: PackedInt32Array) -> void: got.append(idx))
 	var c: int = grid.index(4, 4)
-	tool_model.step(_one(c), 0.1)
+	_step(_one(c), 0.1)
 	assert_eq(got.size(), 1)
 	assert_eq(got[0], _one(c))
 
 
 func test_new_pressed_counts_squish_start() -> void:
 	var c: int = grid.index(4, 4)
-	tool_model.step(_one(c), 0.05)
+	_step(_one(c), 0.05)
 	assert_eq(tool_model.new_pressed, 1)
-	tool_model.step(_one(c), 0.05)
+	_step(_one(c), 0.05)
 	assert_eq(tool_model.new_pressed, 0)

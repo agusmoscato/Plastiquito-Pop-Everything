@@ -28,6 +28,8 @@ const SHEET_FIELDS: Dictionary = {
 	"default_width": TYPE_INT, "default_height": TYPE_INT, "bubble_radius": TYPE_FLOAT,
 	"resistance": TYPE_FLOAT, "recovery_per_second": TYPE_FLOAT,
 	"reload_threshold": TYPE_FLOAT, "reload_delay_seconds": TYPE_FLOAT,
+	"tense_threshold": TYPE_FLOAT, "max_pressure": TYPE_FLOAT, "min_pressure": TYPE_FLOAT,
+	"chain_k": TYPE_FLOAT, "chain_k_max": TYPE_FLOAT, "chain_budget_per_frame": TYPE_INT,
 }
 const JUICE_FIELDS: Dictionary = {
 	"hitstop_ms": TYPE_INT, "hitstop_every_streak": TYPE_INT, "mass_pop_radius": TYPE_FLOAT,
