@@ -233,7 +233,7 @@ func _after_step(_holding: bool, delta: float) -> void:
 	hud.on_sim_step(delta)
 	if n == 0:
 		return
-	Playtest.log.pops(sim.ev_tool_pops, PopAudio.streak())
+	Playtest.log.pops(n, PopAudio.streak())
 	Playtest.log.tool_pops(sim.state.selected_tool, sim.ev_tool_pops)
 	if sim.ev_tool_pops > 0:
 		tool_view.bounce(minf(float(sim.ev_tool_pops), 4.0) * 0.5)
