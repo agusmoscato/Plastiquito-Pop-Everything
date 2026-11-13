@@ -38,6 +38,7 @@ func _ready() -> void:
 	sim = GameSim.new(db, int(Time.get_ticks_usec() % 100000))
 	if not _has_demo_arg():
 		SaveSystem.sim = sim # las capturas de prueba no tocan el guardado
+		SaveSystem.interval = Cfg.num(db.economy, "autosave_seconds")
 		SaveSystem.load_into(sim)
 	world = ToyWorld.new()
 	world.name = "World"

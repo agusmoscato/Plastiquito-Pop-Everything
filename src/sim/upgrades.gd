@@ -43,6 +43,10 @@ func milestone(level: int) -> float:
 func next_cost(id: String, level: int) -> float:
 	var d: Dictionary = def(id)
 	var scale: float = 1.0 if str(d["scope"]) == PERM else cost_scale
+	# Primer pedido barato: la primera compra de fuerza o de valor sale pronto (en unos 30 s).
+	var kind: String = str(d["kind"])
+	if level == 0 and str(d["scope"]) != PERM and (kind == "force" or kind == "value") and cost_scale <= 1.0:
+		scale *= Cfg.num(eco, "first_level_cost_factor")
 	return ceilf(Economy.cost(Cfg.num(d, "base_cost"), Cfg.num(d, "growth"), level) * scale)
 
 
