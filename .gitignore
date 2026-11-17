@@ -35,3 +35,6 @@ Thumbs.db
 
 # Renders de CI copiados localmente para revisarlos
 /.render/
+
+# Manos posadas intermedias para los íconos (art/icons.py las regenera)
+/art/icons_src/

@@ -383,18 +383,42 @@ print("DIM", tuple(round(x, 4) for x in body.dimensions))
 if A["out"]:
     lib.export_glb(A["out"])
 
-if A["render"]:
-    name = "hand_ghost" if NO_ARM else "hand"
+POSES = {  # = HandRig.pose_data (grados, positivo cierra hacia la palma); falanges 1-3
+    "point": {"middle": (40, 72, 30), "ring": (42, 74, 30), "pinky": (44, 76, 30), "thumb": (8, 14, 10), "index": (2, 4, 2)},
+    "palm": {"middle": (0, 0, 0), "ring": (0, 0, 0), "pinky": (0, 0, 0), "thumb": (0, 0, 0), "index": (0, 0, 0)},
+    "grab": {"index": (36, 50, 30), "middle": (40, 54, 30), "ring": (42, 56, 30), "pinky": (44, 58, 30), "thumb": (22, 32, 26)},
+}
+
+
+def set_pose(pose_name):
     lib.select_only(arm_obj)
     bpy.ops.object.mode_set(mode="POSE")
-    pose = {"middle": (40, 72, 30), "ring": (42, 74, 30), "pinky": (44, 76, 30), "thumb": (8, 14, 10), "index": (2, 4, 2)}
-    for fname, angs in pose.items():
+    for fname, angs in POSES[pose_name].items():
         for k, deg in enumerate(angs):
             pb = arm_obj.pose.bones.get("%s_%d" % (fname, k + 1))
             if pb:
                 pb.rotation_mode = "XYZ"
-                spread = 38.0 if (fname == "thumb" and k == 0) else 0.0  # = HandRig.THUMB_TUCK
+                spread = 38.0 if (pose_name == "point" and fname == "thumb" and k == 0) else 0.0  # = HandRig.THUMB_TUCK
                 pb.rotation_euler = (math.radians(-deg), 0.0, math.radians(-spread))  # -X cierra hacia la palma
     bpy.ops.object.mode_set(mode="OBJECT")
+
+
+ICON_DIR = sys.argv[sys.argv.index("--icon-poses") + 1] if "--icon-poses" in sys.argv else None
+if ICON_DIR:
+    # Mallas posadas (sin esqueleto) para los íconos pre-renderizados (art/icons.py).
+    os.makedirs(ICON_DIR, exist_ok=True)
+    for pose_name in POSES:
+        set_pose(pose_name)
+        bpy.context.view_layer.update()
+        bpy.ops.object.select_all(action="DESELECT")
+        for o in (body, e_point, e_palm):
+            o.select_set(True)
+        bpy.ops.export_scene.gltf(filepath=os.path.join(ICON_DIR, "hand_%s.glb" % pose_name), export_format="GLB",
+                                  use_selection=True, export_apply=True, export_yup=True, export_skins=False,
+                                  export_animations=False)
+
+if A["render"]:
+    name = "hand_ghost" if NO_ARM else "hand"
+    set_pose("point")
     lib.render_set(A["render"], name, elev=0.7)
     lib.render_game_view(A["render"], name, yaw_deg=55.0, tilt_deg=-14.0)

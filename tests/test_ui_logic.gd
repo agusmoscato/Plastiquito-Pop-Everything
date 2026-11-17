@@ -90,6 +90,14 @@ func test_chain_stamp_is_small_and_never_over_a_panel() -> void:
 		assert_false(r.intersects(panel), "el sello no tapa el panel (origen %s)" % str(origin))
 
 
+func test_every_tool_and_upgrade_category_has_a_prerendered_icon() -> void:
+	for id: String in ["finger", "palm", "rolling_pin", "iron", "boot", "hands", "auto_roller", "bubble"]:
+		assert_true(ResourceLoader.exists(ToolIcon.DIR + ToolIcon.icon_name(id, "") + ".png"), id)
+	for v: String in ["size", "force", "speed", "count", "smart", "automation", "auto_reload"]:
+		assert_true(ResourceLoader.exists(ToolIcon.DIR + ToolIcon.icon_name("finger", v) + ".png"), v)
+	assert_eq(ToolIcon.icon_name("iron", "special"), "iron", "las demás mejoras usan el ícono de su herramienta")
+
+
 func test_flyers_cap_and_panels() -> void:
 	var f: FlyingNumbers = FlyingNumbers.new()
 	f.blocked = [Rect2(Vector2(0, 0), Vector2(200, 100))]

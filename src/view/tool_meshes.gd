@@ -1,7 +1,7 @@
 class_name ToolMeshes
 extends RefCounted
 ## Las herramientas 3D armadas con primitivas (sin modelos). Las usan el cursor del mundo
-## (ToolView) y los íconos en vivo de la tienda (ToolIcon). La punta/contacto queda en y = 0.
+## (ToolView); los íconos de la tienda son imágenes pre-renderizadas (art/icons.py). La punta/contacto queda en y = 0.
 
 const MODELS: String = "res://assets/models/"
 const HAND_SCALE: float = 26.0 ## el dedo del guante mide ~1,9 cm: en el mundo, ~0,5 burbuja de ancho (se calibra en B3)
