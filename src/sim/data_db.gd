@@ -35,7 +35,7 @@ const SHEET_FIELDS: Dictionary = {
 }
 const JUICE_FIELDS: Dictionary = {
 	"hitstop_ms": TYPE_INT, "hitstop_every_streak": TYPE_INT, "mass_pop_radius": TYPE_FLOAT,
-	"shake_per_pop": TYPE_FLOAT, "camera_min_bubble_px": TYPE_FLOAT, "camera_work_bubble_px": TYPE_ARRAY, "shake_max_trauma": TYPE_FLOAT, "shake_decay_per_second": TYPE_FLOAT,
+	"shake_per_pop": TYPE_FLOAT, "camera_min_bubble_px": TYPE_FLOAT, "camera_sheet_fill": TYPE_FLOAT, "camera_play_area": TYPE_FLOAT, "tool_screen_fraction": TYPE_DICTIONARY, "shake_max_trauma": TYPE_FLOAT, "shake_decay_per_second": TYPE_FLOAT,
 	"shake_max_offset": TYPE_FLOAT, "shake_max_angle_degrees": TYPE_FLOAT, "shake_noise_speed": TYPE_FLOAT,
 	"particle_pool_size": TYPE_INT, "shards_per_pop": TYPE_INT, "dust_per_pop": TYPE_INT,
 	"max_fx_per_frame": TYPE_INT, "pop_anim_inflate_ms": TYPE_INT, "pop_anim_collapse_ms": TYPE_INT,

@@ -173,11 +173,12 @@ La estética es de "juguete limpio": plástico brillante, formas simples y color
 - **Burbuja reventada:** queda aplastada, con arrugas hechas con ruido en las normales y un poco más opaca.
 - **Lámina:** un plano translúcido debajo de las burbujas que se ve desenrollarse cuando llega la lámina nueva.
 
-### Cámara de trabajo (decisión del 17/11/2026)
+### Cámara de trabajo (decisión del 17/11/2026, revisada)
 
-- Se juega con una **cámara de trabajo** de zoom fijo por fase: la burbuja mide 22 px en la Mesa, 12 en el Piso y 10 en el Galpón y el Estacionamiento (`camera_work_bubble_px`, nunca menos que `camera_min_bubble_px` = 10). La cámara sigue a la herramienta con un paneo suave cuando el cursor sale del 55 % central de la pantalla, sin salir de la lámina.
+- **Regla:** la lámina ENTERA llena entre el 60 % y el 75 % del ancho del área de juego (la zona a la izquierda de la hoja de pedidos; hoy 68 %, `camera_sheet_fill` y `camera_play_area` en `data/juice.json`) mientras sus burbujas midan 10 px o más (`camera_min_bubble_px`). Recién cuando la lámina ya no entra a 10 px, la cámara se acerca a 10 px y sigue a la herramienta con un paneo suave cuando el cursor sale del 55 % central. Reemplaza el zoom fijo por fase.
 - La escala se sigue viendo (pilar 3): la transición del reciclado se aleja hasta mostrar la lámina entera, la sostiene 1,2 s y vuelve al zoom de trabajo. Con la rueda el jugador puede alejarse hasta ver todo.
-- Con la cámara de trabajo, cada herramienta ocupa entre el 8 % y el 15 % del alto de la pantalla (`tools/tool_scale_report.gd`, informe en `docs/escala_herramientas.txt`).
+- **Herramientas:** ocupan una fracción fija del alto de la pantalla (`tool_screen_fraction`: la mano 16 %, dentro del 12-20 % pedido; el resto 12 %), aunque la cámara se aleje con la lámina que crece. La zona de golpe no cambia (el aura de la plancha la sigue marcando). Informe: `docs/escala_herramientas.txt`.
+- **Utilería:** a escala real, pero solo asoma por los bordes de la pantalla (en la Mesa, la taza cortada por el borde izquierdo y las puntas de los lápices abajo); nunca en el centro ni más grande que la lámina en pantalla. La lámpara de la Mesa ya no se ve (queda su luz cálida).
 
 ### Herramientas y escenarios
 

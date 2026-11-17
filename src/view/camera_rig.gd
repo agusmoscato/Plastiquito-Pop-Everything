@@ -28,14 +28,18 @@ var _smooth: float = SMOOTHING
 var _pull_left: float = 0.0
 ## Fracción del ancho visible que se desplaza el encuadre hacia la izquierda (la tienda tapa la derecha).
 var screen_shift: float = 0.0
-## Cámara de trabajo (DESIGN 5, decisión del 17/11/2026): el juego trabaja con un zoom fijo por fase
-## (burbuja de `work_bubble_px` en pantalla) que sigue a la herramienta; la lámina entera se ve en la
-## transición de reciclado y con la rueda. Los clips no la usan (work_mode en false).
+## Cámara de trabajo (DESIGN 5): la lámina ENTERA llena `sheet_fill` del ancho del área de juego (la zona
+## a la izquierda de la hoja de pedidos) mientras sus burbujas midan `min_bubble_px` o más. Cuando ya no
+## entra, la cámara se acerca a `min_bubble_px` y sigue a la herramienta. La transición de reciclado
+## muestra la lámina entera y con la rueda se ve todo. Los clips no la usan (work_mode en false).
 var work_mode: bool = false
-var work_bubble_px: float = 12.0
+var sheet_fill: float = 0.68
+var play_area: float = 0.71 ## fracción del ancho de pantalla que queda a la izquierda de la hoja de pedidos
+var min_bubble_px: float = 10.0
 var _work_zoom: float = 0.0
 var _return_in: float = -1.0 ## segundos hasta volver de la vista entera al zoom de trabajo
 var _following: bool = false
+var _follow_needed: bool = false
 const FOLLOW_INNER: float = 0.55 ## el cursor puede moverse libre en el 55 % central; afuera, la cámara lo sigue
 const FOLLOW_SPEED: float = 3.5
 const HOLD_WHOLE_S: float = 1.2 ## después de la transición, cuánto se sostiene la lámina entera
@@ -63,12 +67,15 @@ func fit_to(center: Vector2, extents: Vector2, animate_seconds: float = 0.0) -> 
 		aspect = vs.x / maxf(vs.y, 1.0) # horizontal, vertical (clips para shorts) o cualquier ventana
 	var fit: float = fit_distance(extents, aspect)
 	min_zoom = 3.5
-	_work_zoom = work_distance(work_bubble_px) if work_mode else fit
+	var plan: Vector2 = work_plan(extents, aspect, play_area, sheet_fill, min_bubble_px)
+	_work_zoom = plan.x if work_mode else fit
+	var follows: bool = plan.y > 0.5
 	max_zoom = maxf(maxf(fit, _work_zoom) * 1.6, 12.0) # con la rueda siempre se puede ver todo
 	var start_zoom: float = fit if animate_seconds > 0.0 else _work_zoom
 	_target_zoom = clampf(start_zoom, min_zoom, max_zoom)
 	_return_in = animate_seconds + HOLD_WHOLE_S if (work_mode and animate_seconds > 0.0) else -1.0
-	_following = work_mode and _return_in < 0.0
+	_follow_needed = work_mode and follows
+	_following = _follow_needed and _return_in < 0.0
 	var visible_w: float = 2.0 * _target_zoom * tan_half * aspect
 	_target_pos = Vector3(center.x + screen_shift * visible_w, 0.0, center.y)
 	if animate_seconds > 0.0:
@@ -88,6 +95,23 @@ static func fit_distance(extents: Vector2, aspect: float) -> float:
 	var d_x: float = extents.x / (2.0 * tan_half * aspect)
 	var d_y: float = extents.y * sin(deg_to_rad(PITCH_DEGREES)) / (2.0 * tan_half)
 	return maxf(d_x, d_y) * 1.3
+
+
+## Plan de la cámara de trabajo: (distancia, 1 si tiene que seguir a la herramienta). La lámina entera
+## llena `fill` del ancho del área de juego (y entra a lo alto); si así las burbujas quedan por debajo de
+## `min_px`, se acerca a `min_px` y sigue a la herramienta.
+static func work_plan(extents: Vector2, aspect: float, play: float, fill: float, min_px: float) -> Vector2:
+	var tan_half: float = tan(deg_to_rad(FOV) * 0.5)
+	var d_w: float = extents.x / (fill * play * 2.0 * tan_half * aspect)
+	var d_h: float = extents.y * sin(deg_to_rad(PITCH_DEGREES)) / (2.0 * tan_half) * 1.15
+	var d: float = maxf(d_w, d_h)
+	if bubble_px_at(d) >= min_px:
+		return Vector2(d, 0.0)
+	return Vector2(work_distance(min_px), 1.0)
+
+
+static func bubble_px_at(distance: float) -> float:
+	return 900.0 / (2.0 * distance * tan(deg_to_rad(FOV) * 0.5))
 
 
 ## Distancia a la que una burbuja (1 unidad) mide `px` en una pantalla de 900 px de alto.
@@ -171,7 +195,7 @@ func _process(delta: float) -> void:
 			_target_zoom = clampf(_work_zoom, min_zoom, max_zoom)
 			_smooth = 2.5
 			_pull_left = 1.2
-			_following = true
+			_following = _follow_needed
 	var k: float = 1.0 - exp(-_smooth * delta)
 	_zoom = lerpf(_zoom, _target_zoom, k)
 	position = position.lerp(_target_pos, k)

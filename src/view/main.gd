@@ -59,6 +59,7 @@ func _ready() -> void:
 	tool_view.name = "Tool"
 	add_child(tool_view)
 	tool_view.configure(db.juice)
+	tool_view.rig = world.camera_rig # la herramienta ocupa una fracción fija de la pantalla
 	hud = Hud.new()
 	hud.name = "Hud"
 	add_child(hud)

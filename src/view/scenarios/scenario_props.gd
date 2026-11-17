@@ -89,22 +89,21 @@ static func _cyl(top: float, bottom: float, height: float, segments: int = 24) -
 # --- Mesa: lámpara cálida, taza y lápices (todo fuera de la lámina) -------------------------------------
 
 static func _table(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
+	# Con la cámara de trabajo la lámina llena ~68 % del área de juego (camera_sheet_fill): la utilería,
+	# a escala real, solo ASOMA por los bordes (taza cortada a la izquierda, puntas de lápices abajo).
 	var h: Vector2 = e * 0.5
-	var lamp: Node3D = Node3D.new()
-	lamp.position = Vector3(c.x - h.x - 9.0, GROUND_Y, c.y - h.y - 4.0)
-	root.add_child(lamp)
-	_add(lamp, _cyl(2.6, 3.0, 0.8), _mat(Color("#2B2622"), 0.4, 0.5), Vector3(0.0, 0.4, 0.0))
-	_add(lamp, _cyl(0.25, 0.25, 9.0, 12), _mat(Color("#B8893A"), 0.3, 0.8), Vector3(0.0, 4.8, 0.0))
-	_add(lamp, _cyl(1.4, 4.2, 4.0), _emissive(Color("#FFB45A"), 1.6), Vector3(0.0, 10.0, 0.0))
-	var bulb: OmniLight3D = OmniLight3D.new()
-	bulb.light_color = Color("#FFA650")
-	bulb.light_energy = 2.2
-	bulb.omni_range = 90.0
-	bulb.position = Vector3(0.0, 8.0, 0.0)
-	lamp.add_child(bulb)
-	_glb(root, "prop_cup", Vector3(c.x + h.x + 12.0, GROUND_Y, c.y - h.y * 0.2), 200.0) # el asa apunta a la lámina: 12 cm la deja afuera
-	for i: int in 3:
-		_glb(root, "prop_pencil", Vector3(c.x - h.x - 3.0 - 1.4 * float(i), GROUND_Y, c.y + h.y * 0.3 + 2.0 * float(i)), 4.0 * float(i) - 4.0)
+	var play_half: float = e.x / 0.68 * 0.5 # medio ancho del área de juego, en el mundo
+	var bottom: float = c.y + maxf(h.y, e.x * 0.42) / 0.68 # borde de abajo de la pantalla, aproximado
+	var lamp_light: OmniLight3D = OmniLight3D.new() # la luz cálida de la lámpara queda; la lámpara no se ve
+	lamp_light.light_color = Color("#FFA650")
+	lamp_light.light_energy = 2.2
+	lamp_light.omni_range = 90.0
+	lamp_light.position = Vector3(c.x - h.x - 9.0, 12.0, c.y - h.y - 4.0)
+	root.add_child(lamp_light)
+	_glb(root, "prop_cup", Vector3(c.x - maxf(play_half + 2.0, h.x + 10.5), GROUND_Y, c.y - h.y * 0.35), 20.0) # cortada por el borde izquierdo, con el asa hacia afuera (test de props)
+	for i: int in 3: # lápices que entran desde abajo: se ven solo las puntas
+		var tip_z: float = bottom - 1.2 + 0.6 * float(i)
+		_glb(root, "prop_pencil", Vector3(c.x - h.x * 0.6 + 1.6 * float(i), GROUND_Y, tip_z + 21.6), 180.0 + 8.0 * float(i) - 8.0) # la punta mira a la lámina
 
 
 # --- Piso: zócalo, pata de silla y ventana con persiana --------------------------------------------------

@@ -1,48 +1,46 @@
 extends SceneTree
-## Informe headless de escala: con la cámara de TRABAJO de cada fase, qué fracción del
-## alto de pantalla ocupa cada herramienta y cuánto mide su zona de contacto contra su área de golpe.
+## Informe headless de la cámara de trabajo (DESIGN 5): para la lámina inicial y la más grande de cada
+## fase, a qué distancia queda la cámara, cuánto mide una burbuja, cuánto del área de juego llena la
+## lámina y si la cámara sigue a la herramienta. El tamaño de la herramienta en pantalla lo fija
+## ToolView con `tool_screen_fraction` (se informa el valor de datos).
 ## Uso: godot --headless --path . -s tools/tool_scale_report.gd
 
 const FOV: float = 40.0 ## = CameraRig.FOV (CameraRig usa autoloads: no se carga con -s)
 const PITCH: float = 55.0 ## = CameraRig.PITCH_DEGREES
-const PHASE_TOOLS: Dictionary = {1: ["finger", "palm"], 2: ["rolling_pin"], 3: ["iron"], 4: ["boot"]}
+const ASPECT: float = 16.0 / 9.0
 
 
 func _init() -> void:
 	var db: DataDB = DataDB.new()
 	db.load_all()
-	ToolMeshes.configure(db.juice)
-	for phase: int in PHASE_TOOLS:
-		var sim: GameSim = GameSim.new(db, 1)
-		sim.state.perm["perm_sheet"] = phase - 1
-		for id: String in ["unlock_palm", "unlock_pin", "unlock_iron", "unlock_boot"]:
-			sim.state.levels[id] = 1
-		sim.refresh_stats()
-		sim.new_sheet()
-		var ext: Vector2 = Vector2(sim.grid.spacing * float(sim.grid.width), sim.grid.row_step * float(sim.grid.height))
-		var work_px: Array = db.juice["camera_work_bubble_px"]
-		var px: float = work_px[phase - 1]
-		px = maxf(px, Cfg.num(db.juice, "camera_min_bubble_px"))
-		var d: float = 900.0 / px / (2.0 * tan(deg_to_rad(FOV) * 0.5)) # = CameraRig.work_distance(px)
-		var view_h: float = 2.0 * d * tan(deg_to_rad(FOV) * 0.5)
-		var tools: Array = PHASE_TOOLS[phase]
-		for id: String in tools:
-			sim.select_tool(id)
-			var tm: ToolModel = sim.selected_tool()
-			var root: Node3D = ToolMeshes.build(id, tm.radius, 0)
-			var box: AABB = ToolMeshes._bounds(root, Transform3D.IDENTITY)
-			var p: float = deg_to_rad(PITCH)
-			var screen_h: float = box.size.z * sin(p) + box.size.y * cos(p)
-			var hit: float = maxf(tm.radius * 2.0, sim.grid.spacing)
-			print("fase %d %-12s lámina %3dx%-3d cámara %6.1f  burbuja %4.1f px  herramienta %5.1f%% del alto  (caja %.1f x %.1f x %.1f, golpe %.1f)" % [
-				phase, id, sim.grid.width, sim.grid.height, d, 900.0 / view_h, 100.0 * screen_h / view_h, box.size.x, box.size.y, box.size.z, hit])
-			root.free()
+	var fill: float = Cfg.num(db.juice, "camera_sheet_fill")
+	var play: float = Cfg.num(db.juice, "camera_play_area")
+	var min_px: float = Cfg.num(db.juice, "camera_min_bubble_px")
+	var frac: Dictionary = db.juice["tool_screen_fraction"]
+	var sizes: Array = [[1, 8, 8], [1, 20, 20], [2, 40, 40], [3, 80, 80], [4, 150, 150]]
+	for row: Array in sizes:
+		var ph: int = row[0]
+		var w: float = row[1]
+		var hh: float = row[2]
+		var plan: Vector2 = work_plan(Vector2(w, hh * 0.866), play, fill, min_px)
+		var view_w: float = 2.0 * plan.x * tan(deg_to_rad(FOV) * 0.5) * ASPECT
+		var filled: float = minf(1.0, w / (view_w * play))
+		print("fase %d lámina %3dx%-3d cámara %6.1f  burbuja %5.1f px  llena %3.0f%% del área de juego  %s" % [
+			ph, int(w), int(hh), plan.x, bubble_px(plan.x), filled * 100.0, "sigue a la herramienta" if plan.y > 0.5 else "lámina entera"])
+	var hand_f: float = frac.get("finger", 0.0)
+	var other_f: float = frac.get("default", 0.0)
+	print("herramientas: mano (dedo y palma) %.0f %% del alto, el resto %.0f %% (ToolView, tool_screen_fraction)" % [hand_f * 100.0, other_f * 100.0])
 	quit()
 
 
-## Misma cuenta que CameraRig.fit_to con pantalla 16:9.
-static func fit_distance(extents: Vector2) -> float:
-	var tan_half: float = tan(deg_to_rad(FOV) * 0.5)
-	var d_x: float = extents.x / (2.0 * tan_half * 16.0 / 9.0)
-	var d_y: float = extents.y * sin(deg_to_rad(PITCH)) / (2.0 * tan_half)
-	return maxf(d_x, d_y) * 1.3
+## Misma cuenta que CameraRig.work_plan.
+static func work_plan(e: Vector2, play: float, fill: float, min_px: float) -> Vector2:
+	var t: float = tan(deg_to_rad(FOV) * 0.5)
+	var d: float = maxf(e.x / (fill * play * 2.0 * t * ASPECT), e.y * sin(deg_to_rad(PITCH)) / (2.0 * t) * 1.15)
+	if bubble_px(d) >= min_px:
+		return Vector2(d, 0.0)
+	return Vector2(900.0 / min_px / (2.0 * t), 1.0)
+
+
+static func bubble_px(d: float) -> float:
+	return 900.0 / (2.0 * d * tan(deg_to_rad(FOV) * 0.5))

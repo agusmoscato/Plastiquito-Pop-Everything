@@ -31,6 +31,12 @@ var _yaw_target: float = 0.0
 var _built_key: String = ""
 var _press_rate: float = 22.0
 var _depth_scale: float = 1.0
+## Tamaño en pantalla (DESIGN 5): con la cámara del juego (`rig`), la herramienta ocupa una fracción fija
+## del alto de la pantalla (`tool_screen_fraction` en juice.json), aunque la cámara se aleje con la lámina.
+var rig: CameraRig
+var screen_fraction: Dictionary = {}
+var _base_screen_h: float = 0.0
+var _screen_scale: float = 1.0
 
 
 func configure(juice: Dictionary) -> void:
@@ -39,6 +45,8 @@ func configure(juice: Dictionary) -> void:
 	stiffness = Cfg.num(juice, "finger_spring_stiffness")
 	damping = Cfg.num(juice, "finger_spring_damping")
 	bounce_impulse = Cfg.num(juice, "finger_bounce_impulse")
+	if juice.has("tool_screen_fraction"):
+		screen_fraction = juice["tool_screen_fraction"]
 	ToolMeshes.configure(juice)
 
 
@@ -64,6 +72,7 @@ func set_tool(id: String, p_radius: float, p_tier: int, speed01: float, force_ra
 	for n: Node in _holder.find_children("*", "Node3D", true, false):
 		if n is HandRig:
 			_rig = n as HandRig
+	_base_screen_h = screen_height_of(_body)
 	if id == "iron":
 		_holder.add_child(_make_heat_aura(p_radius))
 		_holder.add_child(_make_steam(p_radius))
@@ -131,6 +140,21 @@ func _make_steam(half: float) -> GPUParticles3D:
 	return p
 
 
+## Alto que ocupa en pantalla un modelo visto con la cámara inclinada del juego (en unidades del mundo).
+static func screen_height_of(node: Node3D) -> float:
+	var box: AABB = ToolMeshes._bounds(node, Transform3D.IDENTITY)
+	var p: float = deg_to_rad(CameraRig.PITCH_DEGREES)
+	return box.size.z * sin(p) + box.size.y * cos(p)
+
+
+## Escala para que la herramienta ocupe `fraction` del alto de la pantalla a la distancia `zoom`.
+static func screen_scale_for(base_h: float, zoom: float, fraction: float) -> float:
+	if base_h <= 0.0001:
+		return 1.0
+	var view_h: float = 2.0 * zoom * tan(deg_to_rad(CameraRig.FOV) * 0.5)
+	return fraction * view_h / base_h
+
+
 ## Mueve el dedo a la posición (x, z) del plano.
 func set_cursor(pos: Vector2) -> void:
 	_target = pos
@@ -172,8 +196,12 @@ func _process(delta: float) -> void:
 	var spring: Vector2 = SpringMath.step(Vector2(_offset, _velocity), stiffness, damping, delta)
 	_offset = spring.x
 	_velocity = spring.y
-	var hover: float = hover_height + (0.35 if tool_id != "finger" else 0.0)
-	position.y = maxf(hover - press_depth * _depth_scale * _press + _offset, 0.05)
+	if rig != null:
+		var frac: float = screen_fraction.get(tool_id, screen_fraction.get("default", 0.12))
+		var want: float = screen_scale_for(_base_screen_h, rig.zoom_distance(), frac)
+		_screen_scale = lerpf(_screen_scale, want, 1.0 - exp(-10.0 * delta))
+	var hover: float = (hover_height + (0.35 if tool_id != "finger" else 0.0)) * _screen_scale
+	position.y = maxf(hover - (press_depth * _depth_scale * _press - _offset) * _screen_scale, 0.02)
 	if _rig != null:
 		_rig.set_press(_press)
 	if _body == null:
@@ -181,7 +209,7 @@ func _process(delta: float) -> void:
 	var squash: float = _press * 0.22 + _squish_boost * 0.08
 	var stretch: float = clampf(_velocity * 0.03, -0.12, 0.18)
 	var s: Vector3 = Vector3(1.0 + squash - stretch * 0.5, 1.0 - squash + stretch, 1.0 + squash - stretch * 0.5)
-	_body.scale = s * _grow
+	_body.scale = s * _grow * _screen_scale
 	var heat: Node3D = _holder.get_node_or_null("Heat") as Node3D
 	if heat != null:
 		var pulse: float = 0.85 + 0.15 * sin(Time.get_ticks_msec() * 0.006)

@@ -31,7 +31,7 @@ func test_lighting_differs_between_scenarios() -> void:
 func test_work_camera_zoom_and_whole_sheet_on_transition() -> void:
 	var rig: CameraRig = CameraRig.new()
 	rig.work_mode = true
-	rig.work_bubble_px = 10.0
+	rig.min_bubble_px = 10.0
 	var work: float = CameraRig.work_distance(10.0)
 	var view_h: float = 2.0 * work * tan(deg_to_rad(CameraRig.FOV) * 0.5)
 	assert_almost_eq(900.0 / view_h, 10.0, 0.01, "en el zoom de trabajo la burbuja mide 10 px")
@@ -81,3 +81,24 @@ func _global_aabb(mi: MeshInstance3D) -> AABB:
 		xf = (p as Node3D).transform * xf
 		p = p.get_parent()
 	return xf * mi.get_aabb()
+
+
+
+func test_work_camera_small_sheet_fills_play_area() -> void:
+	var plan: Vector2 = CameraRig.work_plan(Vector2(8, 7), 16.0 / 9.0, 0.71, 0.68, 10.0)
+	assert_eq(plan.y, 0.0, "la lámina de la Mesa entra entera: no sigue a la herramienta")
+	var tan_half: float = tan(deg_to_rad(CameraRig.FOV) * 0.5)
+	var visible_w: float = 2.0 * plan.x * tan_half * 16.0 / 9.0
+	var fill: float = 8.0 / (visible_w * 0.71)
+	assert_almost_eq(fill, 0.68, 0.01, "llena el 68 % del ancho del área de juego")
+	assert_gte(CameraRig.bubble_px_at(plan.x), 10.0)
+	var big: Vector2 = CameraRig.work_plan(Vector2(150, 130), 16.0 / 9.0, 0.71, 0.68, 10.0)
+	assert_eq(big.y, 1.0, "la lámina grande no entra a 10 px: sigue a la herramienta")
+	assert_almost_eq(CameraRig.bubble_px_at(big.x), 10.0, 0.01)
+
+
+func test_tool_keeps_its_screen_fraction() -> void:
+	for zoom: float in [12.0, 40.0, 120.0]:
+		var k: float = ToolView.screen_scale_for(5.0, zoom, 0.16)
+		var view_h: float = 2.0 * zoom * tan(deg_to_rad(CameraRig.FOV) * 0.5)
+		assert_almost_eq(5.0 * k / view_h, 0.16, 0.0001, "la herramienta ocupa el 16 % del alto a cualquier distancia")
