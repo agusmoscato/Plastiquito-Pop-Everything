@@ -341,6 +341,8 @@ func _process(delta: float) -> void:
 	flyers.blocked = _panel_rects() # los paneles tiemblan y se mueven: se actualiza cada frame
 	var vp_size: Vector2 = get_viewport().get_visible_rect().size
 	chain_stamp.free_rect = Rect2(Vector2(10.0, 150.0), Vector2(vp_size.x - SHOP_W - 30.0, vp_size.y - 280.0))
+	chain_stamp.blocked = flyers.blocked
+	chain_stamp.max_width = (vp_size.x - SHOP_W) * ChainStamp.MAX_PLAY_FRACTION
 	_tic_cooldown = maxf(0.0, _tic_cooldown - delta)
 	if _arrow_t > 0.0:
 		_arrow_t -= delta

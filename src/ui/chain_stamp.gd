@@ -10,7 +10,11 @@ var growing: bool = false
 var total_text: String = ""
 var anchor: Vector2 = Vector2(-1.0, -1.0) ## origen de la cadena en pantalla (el sello va arriba)
 var free_rect: Rect2 = Rect2() ## zona libre de paneles donde puede ir el sello
+var blocked: Array[Rect2] = [] ## paneles del HUD: el sello nunca va encima
+var max_width: float = 0.0 ## ancho máximo del sello (35 % del área de juego); 0 = sin tope
 const ALPHA: float = 0.85 ## mientras dura: deja ver la ola por debajo
+const BASE_W: float = 300.0 ## ancho del sello a escala 1
+const MAX_PLAY_FRACTION: float = 0.35 ## el sello ocupa como mucho este ancho del área de juego
 const LIFT: float = 95.0 ## distancia mínima entre el origen de la cadena y el borde de abajo del sello
 
 var _slam: float = 0.0
@@ -55,10 +59,12 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	if _fade <= 0.01 or count < 2:
 		return
-	var scale_f: float = 1.0 + minf(float(count) / 60.0, 1.2) + _slam * 0.55
-	var w: float = 300.0 * scale_f
+	var scale_f: float = capped_scale(1.0 + minf(float(count) / 60.0, 1.2) + _slam * 0.55, max_width)
+	var w: float = BASE_W * scale_f
 	var h: float = 76.0 * scale_f
-	var center: Vector2 = stamp_center(anchor, Vector2(w, h), free_rect, Vector2(size.x * 0.5 - 150.0, 250.0)) + _shake
+	var block: Vector2 = Vector2(w, h + (44.0 * minf(scale_f, 1.8) if not growing else 0.0)) # sello + total abajo
+	var block_c: Vector2 = place(anchor, block, free_rect, blocked, Vector2(size.x * 0.5 - 150.0, 250.0))
+	var center: Vector2 = block_c - Vector2(0.0, (block.y - h) * 0.5) + _shake
 	var r: Rect2 = Rect2(center - Vector2(w, h) * 0.5, Vector2(w, h))
 	var label: String = "%s x%d" % [Tx.t("chain"), count]
 	UiKit.draw_stamp(self, r, label, UiKit.STAMP_RED, int(30.0 * scale_f), -0.09, _fade * ALPHA)
@@ -81,3 +87,40 @@ static func stamp_center(origin: Vector2, stamp_size: Vector2, free: Rect2, fall
 	c.x = clampf(c.x, free.position.x + half.x, maxf(free.position.x + half.x, free.end.x - half.x))
 	c.y = clampf(c.y, free.position.y + half.y, maxf(free.position.y + half.y, free.end.y - half.y))
 	return c
+
+
+## Escala del sello con tope: el ancho nunca pasa `max_w` (0 = sin tope).
+static func capped_scale(scale_f: float, max_w: float) -> float:
+	if max_w <= 0.0:
+		return scale_f
+	return minf(scale_f, max_w / BASE_W)
+
+
+## Como stamp_center, pero si el sello cae sobre un panel prueba otras posiciones dentro de la zona
+## libre (abajo del origen, después las esquinas y el centro) y se queda con la que menos tapa.
+static func place(origin: Vector2, stamp_size: Vector2, free: Rect2, panels: Array[Rect2], fallback: Vector2) -> Vector2:
+	var first: Vector2 = stamp_center(origin, stamp_size, free, fallback)
+	if free.size == Vector2.ZERO:
+		return first
+	var half: Vector2 = stamp_size * 0.5
+	var below: Vector2 = stamp_center(origin + Vector2(0.0, 2.0 * LIFT + stamp_size.y), stamp_size, free, fallback)
+	var lo: Vector2 = free.position + half
+	var hi: Vector2 = Vector2(maxf(lo.x, free.end.x - half.x), maxf(lo.y, free.end.y - half.y))
+	var options: Array[Vector2] = [first, below, Vector2(first.x, lo.y), Vector2(first.x, hi.y),
+			Vector2(lo.x, lo.y), Vector2(hi.x, lo.y), Vector2(lo.x, hi.y), Vector2(hi.x, hi.y), (lo + hi) * 0.5]
+	var best: Vector2 = first
+	var best_overlap: float = INF
+	for c: Vector2 in options:
+		var overlap: float = overlap_area(Rect2(c - half, stamp_size), panels)
+		if overlap < best_overlap - 0.5:
+			best = c
+			best_overlap = overlap
+	return best
+
+
+static func overlap_area(r: Rect2, panels: Array[Rect2]) -> float:
+	var total: float = 0.0
+	for p: Rect2 in panels:
+		var i: Rect2 = r.intersection(p)
+		total += i.get_area()
+	return total

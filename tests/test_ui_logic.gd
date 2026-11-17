@@ -74,6 +74,22 @@ func test_chain_stamp_goes_above_origin_inside_free_area() -> void:
 	assert_eq(ChainStamp.stamp_center(Vector2(-1, -1), Vector2(300, 76), free, Vector2(7, 7)), Vector2(7, 7))
 
 
+func test_chain_stamp_is_small_and_never_over_a_panel() -> void:
+	var play_w: float = 1920.0 - 452.0
+	var max_w: float = play_w * ChainStamp.MAX_PLAY_FRACTION
+	for raw: float in [1.0, 1.8, 2.75]:
+		var w: float = ChainStamp.BASE_W * ChainStamp.capped_scale(raw, max_w)
+		assert_lte(w, play_w * 0.35 + 0.01, "el sello no pasa el 35 % del área de juego")
+	var free: Rect2 = Rect2(Vector2(10, 150), Vector2(1430, 800))
+	var panel: Rect2 = Rect2(Vector2(20, 150), Vector2(420, 260)) # p. ej. la orden de trabajo arriba a la izquierda
+	var panels: Array[Rect2] = [panel]
+	var stamp: Vector2 = Vector2(max_w, 120.0)
+	for origin: Vector2 in [Vector2(200, 420), Vector2(150, 300), Vector2(700, 500), Vector2(-1, -1)]:
+		var c: Vector2 = ChainStamp.place(origin, stamp, free, panels, Vector2(200, 250))
+		var r: Rect2 = Rect2(c - stamp * 0.5, stamp)
+		assert_false(r.intersects(panel), "el sello no tapa el panel (origen %s)" % str(origin))
+
+
 func test_flyers_cap_and_panels() -> void:
 	var f: FlyingNumbers = FlyingNumbers.new()
 	f.blocked = [Rect2(Vector2(0, 0), Vector2(200, 100))]
