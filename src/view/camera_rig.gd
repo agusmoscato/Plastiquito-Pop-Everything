@@ -50,12 +50,10 @@ func fit_to(center: Vector2, extents: Vector2, animate_seconds: float = 0.0) -> 
 	if is_inside_tree():
 		var vs: Vector2 = get_viewport().get_visible_rect().size
 		aspect = vs.x / maxf(vs.y, 1.0) # horizontal, vertical (clips para shorts) o cualquier ventana
-	var d_x: float = extents.x / (2.0 * tan_half * aspect)
-	var d_y: float = extents.y * sin(deg_to_rad(PITCH_DEGREES)) / (2.0 * tan_half)
-	var fit: float = maxf(d_x, d_y) * 1.3
+	var fit: float = fit_distance(extents, aspect)
 	min_zoom = 3.5
 	max_zoom = maxf(fit * 1.6, 12.0)
-	_target_zoom = clampf(fit, min_zoom, max_zoom)
+	_target_zoom = clampf(minf(fit, legible_distance()), min_zoom, max_zoom)
 	var visible_w: float = 2.0 * _target_zoom * tan_half * aspect
 	_target_pos = Vector3(center.x + screen_shift * visible_w, 0.0, center.y)
 	if animate_seconds > 0.0:
@@ -67,6 +65,25 @@ func fit_to(center: Vector2, extents: Vector2, animate_seconds: float = 0.0) -> 
 	_zoom = _target_zoom
 	position = _target_pos
 	_apply_zoom()
+
+
+## Distancia que encuadra toda la lámina (con margen).
+static func fit_distance(extents: Vector2, aspect: float) -> float:
+	var tan_half: float = tan(deg_to_rad(FOV) * 0.5)
+	var d_x: float = extents.x / (2.0 * tan_half * aspect)
+	var d_y: float = extents.y * sin(deg_to_rad(PITCH_DEGREES)) / (2.0 * tan_half)
+	return maxf(d_x, d_y) * 1.3
+
+
+## Distancia máxima por defecto para que una burbuja (1 unidad) mida al menos `min_bubble_px`
+## en una pantalla de 900 px de alto: las láminas grandes no se encuadran enteras de entrada
+## (con la rueda se ven completas). Sin configurar, no limita.
+func legible_distance() -> float:
+	var px: float = Cfg.num(shake_cfg, "camera_min_bubble_px") if shake_cfg.has("camera_min_bubble_px") else 0.0
+	if px <= 0.0:
+		return INF
+	var view_h: float = 900.0 / px
+	return view_h / (2.0 * tan(deg_to_rad(FOV) * 0.5))
 
 
 ## Coloca la cámara de golpe (sin interpolar). Para el benchmark.

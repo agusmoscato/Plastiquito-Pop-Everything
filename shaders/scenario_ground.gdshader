@@ -94,10 +94,13 @@ vec3 asphalt(vec2 p, out float rough) {
 	float n = fbm(p * 0.35);
 	float speck = step(0.8, hash21(floor(p * 9.0))) * (1.0 - smoothstep(0.4, 1.2, fwidth(p.x) * 9.0));
 	vec3 col = vec3(0.15, 0.155, 0.165) * (0.8 + 0.5 * n) + speck * 0.05; // gris oscuro neutro
-	// Líneas de estacionamiento: rayas separadas y una línea larga de demarcación.
-	float col_x = abs(fract(p.x / 6.5) - 0.5) * 6.5;
-	float stall = smoothstep(0.26, 0.2, col_x) * step(0.0, sin(p.y * 0.04 + 1.0));
-	float band = smoothstep(0.22, 0.16, abs(mod(p.y, 38.0) - 19.0));
+	// Líneas de estacionamiento a escala real (1 u = 1 cm): lugares de 250 cm separados por líneas de
+	// 10 cm, de 500 cm de largo, y una línea de demarcación cada 1100 cm. Antialias por derivadas.
+	float aa = max(fwidth(p.x), fwidth(p.y)) * 1.5;
+	float col_x = abs(fract(p.x / 250.0) - 0.5) * 250.0;
+	float in_stall = step(mod(p.y, 1100.0), 500.0);
+	float stall = (1.0 - smoothstep(5.0 - aa, 5.0 + aa, col_x)) * in_stall;
+	float band = 1.0 - smoothstep(5.0 - aa, 5.0 + aa, abs(mod(p.y, 1100.0) - 800.0));
 	vec2 dd = abs(wpos.xz - sheet_rect.xy) - sheet_rect.zw;
 	float outside = smoothstep(3.0, 9.0, max(dd.x, dd.y)); // sin pintura debajo de la lámina
 	float paint = max(stall, band) * outside;

@@ -102,6 +102,13 @@ func fade_of(chunk_id: int) -> float:
 	return _fades[chunk_id]
 
 
+## Reciclado en láminas lejanas: el rollo se lleva lo que ya pasó y la lámina se arruga.
+func set_roll_up(z: float, crumple: float) -> void:
+	for m: ShaderMaterial in _materials:
+		m.set_shader_parameter("roll_up_z", z)
+		m.set_shader_parameter("crumple", crumple)
+
+
 func set_reveal_z(z: float) -> void:
 	for m: ShaderMaterial in _materials:
 		m.set_shader_parameter("reveal_z", z)

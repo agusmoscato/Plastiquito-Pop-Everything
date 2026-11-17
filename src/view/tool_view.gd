@@ -66,6 +66,7 @@ func set_tool(id: String, p_radius: float, p_tier: int, speed01: float, force_ra
 			_rig = n as HandRig
 	if id == "iron":
 		_holder.add_child(_make_heat_aura(p_radius))
+		_holder.add_child(_make_steam(p_radius))
 	if grew:
 		_grow = 0.55 # vuelve a 1 con rebote: se ve crecer
 
@@ -88,6 +89,46 @@ func _make_heat_aura(half: float) -> MeshInstance3D:
 	mi.position = Vector3(0.0, -0.6, 0.0)
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	return mi
+
+
+## Vapor que sale de la suela de la plancha: soplos blancos que suben y se abren.
+func _make_steam(half: float) -> GPUParticles3D:
+	var p: GPUParticles3D = GPUParticles3D.new()
+	p.name = "Steam"
+	p.amount = 36
+	p.lifetime = 1.1
+	p.local_coords = false
+	var proc: ParticleProcessMaterial = ParticleProcessMaterial.new()
+	proc.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+	proc.emission_box_extents = Vector3(half * 0.9, 0.05, half * 0.35)
+	proc.direction = Vector3.UP
+	proc.spread = 25.0
+	proc.initial_velocity_min = 0.6
+	proc.initial_velocity_max = 1.4
+	proc.gravity = Vector3(0.0, 0.4, 0.0)
+	proc.scale_min = 0.8
+	proc.scale_max = 2.0
+	var ramp: Gradient = Gradient.new()
+	ramp.set_color(0, Color(1.0, 1.0, 1.0, 0.0))
+	ramp.add_point(0.2, Color(1.0, 1.0, 1.0, 0.35))
+	ramp.set_color(ramp.get_point_count() - 1, Color(1.0, 1.0, 1.0, 0.0))
+	var gt: GradientTexture1D = GradientTexture1D.new()
+	gt.gradient = ramp
+	proc.color_ramp = gt
+	p.process_material = proc
+	var q: QuadMesh = QuadMesh.new()
+	q.size = Vector2(0.5, 0.5) * maxf(1.0, half * 0.35)
+	var m: StandardMaterial3D = StandardMaterial3D.new()
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	m.vertex_color_use_as_albedo = true
+	m.albedo_color = Color(0.95, 0.97, 1.0, 1.0)
+	q.material = m
+	p.draw_pass_1 = q
+	p.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	p.position = Vector3(0.0, -0.55, 0.0)
+	return p
 
 
 ## Mueve el dedo a la posición (x, z) del plano.

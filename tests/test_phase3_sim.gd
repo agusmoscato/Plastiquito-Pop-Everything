@@ -352,3 +352,13 @@ func test_no_night_shift_without_hands() -> void:
 	for i: int in 300:
 		sim.step(1.0 / 30.0, sim.center(), false)
 	assert_false(sim.night_shift())
+
+
+func test_echo_glow_pulses_only_before_revival() -> void:
+	assert_eq(EchoGlow.pulse(EchoGlow.WARN_SECONDS + 0.5, 0.0), 0.0, "lejos de reinflarse no brilla")
+	var early: float = 0.0
+	var late: float = 0.0
+	for i: int in 40: # máximo del latido en una ventana
+		early = maxf(early, EchoGlow.pulse(EchoGlow.WARN_SECONDS * 0.9, float(i) * 0.013))
+		late = maxf(late, EchoGlow.pulse(0.05, float(i) * 0.013))
+	assert_gt(late, early, "brilla más cuanto más cerca está de reinflarse")

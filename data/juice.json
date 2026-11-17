@@ -6,6 +6,7 @@
     "hitstop_every_streak": 25,
     "mass_pop_radius": 15.0,
     "shake_per_pop": 0.04,
+    "camera_min_bubble_px": 0.0,
     "shake_max_trauma": 0.8,
     "shake_decay_per_second": 1.6,
     "shake_max_offset": 0.25,

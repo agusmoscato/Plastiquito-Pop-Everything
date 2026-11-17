@@ -134,6 +134,8 @@ func refresh_all(roll_in: bool) -> void:
 func set_recycle_progress(crumple: float, roll_z: float) -> void:
 	material.set_shader_parameter("crumple", crumple)
 	material.set_shader_parameter("roll_up_z", roll_z)
+	if far != null:
+		far.set_roll_up(roll_z, crumple)
 	if _plane == null:
 		return
 	# La lámina base también se enrolla: queda solo lo que todavía no pasó el rollo.
@@ -153,6 +155,8 @@ func clear_recycle_effect() -> void:
 		_plane.position.z = center().y
 	material.set_shader_parameter("crumple", 0.0)
 	material.set_shader_parameter("roll_up_z", -1.0e9)
+	if far != null:
+		far.set_roll_up(-1.0e9, 0.0)
 
 
 func begin_roll_in() -> void:

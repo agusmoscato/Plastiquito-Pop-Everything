@@ -102,23 +102,24 @@ static func _table(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	bulb.omni_range = 90.0
 	bulb.position = Vector3(0.0, 8.0, 0.0)
 	lamp.add_child(bulb)
-	_glb(root, "prop_cup", Vector3(c.x + h.x + 8.0, GROUND_Y, c.y - h.y * 0.2), 200.0)
+	_glb(root, "prop_cup", Vector3(c.x + h.x + 12.0, GROUND_Y, c.y - h.y * 0.2), 200.0) # el asa apunta a la lámina: 12 cm la deja afuera
 	for i: int in 3:
 		_glb(root, "prop_pencil", Vector3(c.x - h.x - 3.0 - 1.4 * float(i), GROUND_Y, c.y + h.y * 0.3 + 2.0 * float(i)), 4.0 * float(i) - 4.0)
 
 
 # --- Piso: zócalo, pata de silla y ventana con persiana --------------------------------------------------
 
-static func _floor(root: Node3D, c: Vector2, e: Vector2, u: float) -> void:
-	var wall_z: float = c.y - e.y * 0.64
-	_add(root, _box(Vector3(e.x * 2.4, 22.0 * u, 0.5 * u)), _mat(Color("#CFC8B5"), 0.9), Vector3(c.x, 11.0 * u, wall_z - 0.5 * u))
-	_add(root, _box(Vector3(e.x * 2.4, 1.6 * u, 0.5 * u)), _mat(Color("#F1EEE6"), 0.5), Vector3(c.x, 0.8 * u, wall_z))
+static func _floor(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
+	# Todo en centímetros reales: pared de 120 cm, zócalo de 8 cm, ventana de 60 x 70 cm.
+	var wall_z: float = c.y - e.y * 0.5 - 18.0
+	_add(root, _box(Vector3(e.x * 2.4, 120.0, 2.0)), _mat(Color("#CFC8B5"), 0.9), Vector3(c.x, 60.0, wall_z - 1.0))
+	_add(root, _box(Vector3(e.x * 2.4, 8.0, 1.5)), _mat(Color("#F1EEE6"), 0.5), Vector3(c.x, 4.0, wall_z + 0.8))
 	# Ventana con persiana: un cuadro luminoso cruzado por tablillas oscuras.
-	var win: Vector3 = Vector3(c.x + e.x * 0.35, 11.0 * u, wall_z + 0.05 * u)
-	_add(root, _box(Vector3(11.0 * u, 12.0 * u, 0.3 * u)), _emissive(Color("#FFF3CF"), 1.5), win)
-	for i: int in 7:
-		_add(root, _box(Vector3(11.6 * u, 0.55 * u, 0.5 * u)), _mat(Color("#8D8777"), 0.6), win + Vector3(0.0, (float(i) - 3.0) * 1.55 * u, 0.3 * u))
-	_add(root, _box(Vector3(12.2 * u, 0.6 * u, 0.7 * u)), _mat(Color("#F1EEE6"), 0.5), win + Vector3(0.0, -6.3 * u, 0.2 * u))
+	var win: Vector3 = Vector3(c.x + e.x * 0.35, 70.0, wall_z + 0.2)
+	_add(root, _box(Vector3(60.0, 70.0, 0.6)), _emissive(Color("#FFF3CF"), 1.5), win)
+	for i: int in 9:
+		_add(root, _box(Vector3(62.0, 2.5, 1.2)), _mat(Color("#8D8777"), 0.6), win + Vector3(0.0, (float(i) - 4.0) * 7.5, 0.8))
+	_add(root, _box(Vector3(66.0, 3.0, 4.0)), _mat(Color("#F1EEE6"), 0.5), win + Vector3(0.0, -36.5, 1.5))
 	# Pata de silla (modelo real, 42 cm) junto al borde izquierdo, fuera de la lámina.
 	_glb(root, "prop_chair_leg", Vector3(c.x - e.x * 0.5 - 6.0, 0.0, c.y + e.y * 0.1))
 
@@ -131,8 +132,8 @@ static func _warehouse(root: Node3D, c: Vector2, e: Vector2, u: float) -> void:
 		_glb(root, "prop_shelf", Vector3(bx, 0.0, c.y - e.y * 0.5 - 20.0))
 	# Líneas amarillas de seguridad pintadas a los costados.
 	var yellow: StandardMaterial3D = _mat(Color("#E8C21C"), 0.7)
-	_add(root, _box(Vector3(0.5 * u, 0.06, e.y * 1.5)), yellow, Vector3(c.x - e.x * 0.68, GROUND_Y + 0.04, c.y))
-	_add(root, _box(Vector3(0.5 * u, 0.06, e.y * 1.5)), yellow, Vector3(c.x + e.x * 0.68, GROUND_Y + 0.04, c.y))
+	_add(root, _box(Vector3(10.0, 0.06, e.y * 1.5)), yellow, Vector3(c.x - e.x * 0.5 - 25.0, GROUND_Y + 0.04, c.y)) # 10 cm reales
+	_add(root, _box(Vector3(10.0, 0.06, e.y * 1.5)), yellow, Vector3(c.x + e.x * 0.5 + 25.0, GROUND_Y + 0.04, c.y))
 	root.add_child(_dust(c, e, u))
 
 
@@ -169,16 +170,18 @@ static func _dust(c: Vector2, e: Vector2, u: float) -> GPUParticles3D:
 
 # --- Estacionamiento: conos, cordón y farol ----------------------------------------------------------------
 
-static func _parking(root: Node3D, c: Vector2, e: Vector2, u: float) -> void:
+static func _parking(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	var h: Vector2 = e * 0.5
 	var spots: Array[Vector2] = [Vector2(-h.x - 14.0, -h.y * 0.6), Vector2(-h.x - 14.0, h.y * 0.5), Vector2(-h.x * 0.4, -h.y - 14.0), Vector2(h.x * 0.2, -h.y - 14.0)]
 	for spot: Vector2 in spots:
 		_glb(root, "prop_cone", Vector3(c.x + spot.x, 0.0, c.y + spot.y), spot.x * 7.0)
-	_add(root, _box(Vector3(e.x * 2.4, 1.2 * u, 1.8 * u)), _mat(Color("#8C8E92"), 0.9), Vector3(c.x, 0.6 * u, c.y - e.y * 0.66 - 14.0))
-	_add(root, _box(Vector3(e.x * 2.4, 0.12 * u, 1.9 * u)), _mat(Color("#E8C21C"), 0.7), Vector3(c.x, 1.25 * u, c.y - e.y * 0.66 - 14.0))
-	var post: Vector3 = Vector3(c.x - e.x * 0.74, 0.0, c.y - e.y * 0.58)
-	_add(root, _cyl(0.35 * u, 0.5 * u, 20.0 * u, 12), _mat(Color("#33353A"), 0.5, 0.6), post + Vector3(0.0, 10.0 * u, 0.0))
-	_add(root, _box(Vector3(4.0 * u, 0.7 * u, 1.4 * u)), _emissive(Color("#FFD59A"), 2.0), post + Vector3(1.6 * u, 20.2 * u, 0.0))
+	# Cordón de 15 x 15 cm con borde pintado y farol de 4 m, en cm reales, detrás de la lámina.
+	var curb_z: float = c.y - e.y * 0.5 - 40.0
+	_add(root, _box(Vector3(e.x * 2.4, 15.0, 15.0)), _mat(Color("#8C8E92"), 0.9), Vector3(c.x, 7.5, curb_z))
+	_add(root, _box(Vector3(e.x * 2.4, 1.0, 15.5)), _mat(Color("#E8C21C"), 0.7), Vector3(c.x, 15.2, curb_z))
+	var post: Vector3 = Vector3(c.x - e.x * 0.5 - 60.0, 0.0, curb_z - 20.0)
+	_add(root, _cyl(6.0, 9.0, 400.0, 12), _mat(Color("#33353A"), 0.5, 0.6), post + Vector3(0.0, 200.0, 0.0))
+	_add(root, _box(Vector3(60.0, 12.0, 25.0)), _emissive(Color("#FFD59A"), 2.0), post + Vector3(25.0, 402.0, 0.0))
 
 
 static func _cone(root: Node3D, pos: Vector3, u: float) -> void:

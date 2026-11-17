@@ -317,6 +317,11 @@ func _enqueue_overloaded(cells: PackedInt32Array) -> void:
 
 
 ## Eco: pasados `echo_delay_seconds` de reventar, vuelve a inflarse UNA vez (queda como normal).
+## Ecos pendientes: (índice de celda, segundos que faltan para volver a inflarse). Copia: la vista solo lee.
+func pending_echoes() -> Array[Vector2]:
+	return _echoes.duplicate()
+
+
 func _tick_echoes(dt: float) -> void:
 	var keep: Array[Vector2] = []
 	for e: Vector2 in _echoes:

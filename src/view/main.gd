@@ -16,6 +16,7 @@ var hud: Hud
 var overlay: DebugOverlay
 var pause_menu: PauseMenu
 var automation: AutomationView
+var echo_glow: EchoGlow
 var _offline: Dictionary = {}
 var _version_layer: CanvasLayer
 
@@ -70,6 +71,10 @@ func _ready() -> void:
 	automation.name = "Automation"
 	add_child(automation)
 	automation.bind(sim)
+	echo_glow = EchoGlow.new()
+	echo_glow.name = "EchoGlow"
+	add_child(echo_glow)
+	echo_glow.bind(sim)
 	hud.offline_ticket.collected.connect(_collect_offline)
 	if not _offline.is_empty() and Cfg.num(_offline, "pops") > 0.0:
 		hud.show_offline(_offline)
@@ -292,6 +297,8 @@ func _after_step(_holding: bool, delta: float) -> void:
 	_update_night(delta)
 	if sim.ev_squish:
 		PopAudio.play_squish()
+	if not sim.ev_revived.is_empty(): # un Eco se vuelve a inflar: entra aire
+		PopAudio.play_ui("air", randf_range(0.95, 1.08), -4.0)
 	hud.on_sim_step(delta)
 	if n == 0:
 		return
@@ -299,6 +306,8 @@ func _after_step(_holding: bool, delta: float) -> void:
 	Playtest.log.tool_pops(sim.state.selected_tool, sim.ev_tool_pops)
 	if sim.ev_tool_pops > 0:
 		tool_view.bounce(minf(float(sim.ev_tool_pops), 4.0) * 0.5)
+	if sim.state.selected_tool == "boot" and sim.ev_tool_pops > 0 and Juice.fx != null:
+		Juice.fx.stomp_at(Vector3(_cursor.x, 0.2, _cursor.y), sim.selected_tool().radius)
 	_pop_fx()
 	Juice.add_pop_trauma(n * 3 if sim.state.selected_tool == "boot" and sim.ev_tool_pops > 0 else n)
 	_check_hitstop()

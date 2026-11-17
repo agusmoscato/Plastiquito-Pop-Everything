@@ -19,6 +19,8 @@ uniform float base_alpha : hint_range(0.0, 1.0) = 0.2;
 uniform float rim_alpha : hint_range(0.0, 1.0) = 0.8;
 uniform float popped_alpha : hint_range(0.0, 1.0) = 0.38;
 uniform float reveal_z = 1.0e9;
+uniform float roll_up_z = -1.0e9; // reciclado: lo que ya pasó el rollo desaparece (z menor)
+uniform float crumple : hint_range(0.0, 1.0) = 0.0; // reciclado: la lámina se arruga y se opaca
 uniform float fade : hint_range(0.0, 1.0) = 1.0; // fundido cerca/lejos (lo maneja SheetView por bloque)
 
 varying vec3 v_world;
@@ -35,6 +37,9 @@ void vertex() {
 
 void fragment() {
 	vec2 wp = v_world.xz;
+	if (wp.y < roll_up_z) {
+		discard;
+	}
 	// Cuántos píxeles ocupa una celda: si son pocos, se dibuja un color plano promedio (mipmap de la
 	// textura de estado) en vez de domos, para que no haya moiré a lo lejos.
 	float wpp = max(length(dFdx(wp)), length(dFdy(wp)));
@@ -86,7 +91,12 @@ void fragment() {
 	float infl = popped ? 1.12 : 1.0 + 0.3 * (pressure - 1.0);
 	vec2 d = (wp - center) / (bubble_r * infl * (1.0 + 0.12 * squash));
 	float rr = dot(d, d);
-	if (rr > 1.0 && flat_k < 0.01) {
+	// Borde del domo con antialias por derivadas: el ancho del borde es lo que mide un píxel en
+	// unidades del domo, así el contorno queda suave a cualquier distancia y no hace moiré.
+	float dist = sqrt(rr);
+	float edge_w = max(fwidth(dist), 0.0001);
+	float coverage = 1.0 - smoothstep(1.0 - edge_w, 1.0 + edge_w, dist);
+	if (coverage <= 0.0 && flat_k < 0.01) {
 		discard;
 	}
 	float height = popped ? 0.15 : 0.8 * (1.0 - 0.55 * squash);
@@ -127,9 +137,7 @@ void fragment() {
 			a = 0.9;
 		}
 	}
-	if (rr > 1.0) {
-		a = 0.0;
-	}
+	a *= coverage;
 	if (flat_k > 0.0) {
 		vec3 flat_col = mix(vec3(0.46, 0.55, 0.66), vec3(0.55, 0.72, 0.9), avg.b);
 		float flat_a = 0.95;
@@ -139,6 +147,7 @@ void fragment() {
 		rough = mix(rough, 0.7, flat_k);
 		nw = normalize(mix(nw, vec3(0.0, 1.0, 0.0), flat_k));
 	}
+	col_rgb = mix(col_rgb, col_rgb * vec3(0.72, 0.78, 0.86), crumple * 0.6);
 	ALBEDO = col_rgb;
 	ROUGHNESS = rough;
 	SPECULAR = mix(1.0, 0.25, flat_k);

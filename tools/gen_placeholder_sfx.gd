@@ -16,6 +16,11 @@ var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 func _init() -> void:
 	_rng.seed = 20261113
+	if OS.get_cmdline_user_args().has("--only-air"): # agrega solo el aire del Eco sin regenerar el resto
+		_save(_air(), OUT_UI.path_join("ph_air.wav"))
+		print("gen_placeholder_sfx: ph_air listo")
+		quit(0)
+		return
 	for category: String in ["small", "large", "tense", "squish", "crinkle"]:
 		DirAccess.make_dir_recursive_absolute(OUT_POPS.path_join(category))
 		for i: int in VARIANTS:
@@ -29,6 +34,7 @@ func _init() -> void:
 	_save(_milestone(), OUT_UI.path_join("ph_milestone.wav"))
 	_save(_chain_hit(), OUT_UI.path_join("ph_chain_hit.wav"))
 	_save(_whoosh(), OUT_UI.path_join("ph_recycle.wav"))
+	_save(_air(), OUT_UI.path_join("ph_air.wav"))
 	DirAccess.make_dir_recursive_absolute(OUT_AMBIENT)
 	for phase: int in range(1, 5):
 		_save(_ambient(phase), OUT_AMBIENT.path_join("ph_ambient_%d.wav" % phase))
@@ -191,6 +197,21 @@ func _whoosh() -> PackedFloat32Array:
 		lp += a * 0.5 * (_rng.randf_range(-1.0, 1.0) - lp)
 		out[i] = lp * sin(PI * x)
 	return _normalize(out, 0.6)
+
+
+## Aire que entra en una burbuja (Eco que se vuelve a inflar): soplido corto que sube de tono.
+func _air() -> PackedFloat32Array:
+	var n: int = int(0.38 * RATE)
+	var out: PackedFloat32Array = _blank(0.38)
+	var lp: float = 0.0
+	for i: int in n:
+		var x: float = float(i) / float(n)
+		var cutoff: float = 900.0 + 3200.0 * x # se abre a medida que se infla
+		var a: float = clampf(2.0 * PI * cutoff / float(RATE), 0.0, 1.0)
+		lp += a * (_rng.randf_range(-1.0, 1.0) - lp)
+		var env: float = smoothstep(0.0, 0.25, x) * (1.0 - smoothstep(0.8, 1.0, x))
+		out[i] = lp * env
+	return _normalize(out, 0.45)
 
 
 ## Ruido de fondo que cierra sin costura (crossfade de la cola con el principio).

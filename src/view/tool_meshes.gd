@@ -152,7 +152,7 @@ static func build(tool_id: String, radius: float, tier: int = 0, icon: bool = fa
 			_add_model(body, "iron", s2, color, amount, metal)
 			_add_hand(body, "grab", tier, false, s2 * 1.1, Vector3(0.0, 0.158, -0.005) * s2, Vector3(0.0, 0.0, 0.0))
 		"boot":
-			_add_model(body, "boot", half * 1.8 / 0.33, color, amount, metal)
+			_add_model(body, "boot", half * 1.95 / 0.33, color, amount, metal) # la suela cubre el pisotón
 		"auto_roller":
 			_add_model(body, "roller", half * 2.0 / 0.26, color, amount, metal)
 		_:

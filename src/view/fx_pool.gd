@@ -12,6 +12,8 @@ var _frame: int = -1
 var _used_this_frame: int = 0
 var _special: Dictionary = {} ## tipo -> Array[GPUParticles3D] (partículas propias de cada especial)
 var _special_next: Dictionary = {}
+var _stomp_dust: GPUParticles3D ## pisotón de la bota: anillo de polvo que sale hacia afuera
+var _stomp_hop: GPUParticles3D ## pisotón: burbujas reventadas que saltan y caen
 
 
 func setup(cfg: Dictionary) -> void:
@@ -32,6 +34,54 @@ func setup(cfg: Dictionary) -> void:
 		_shards.append(shards)
 		_dust.append(dust)
 	_build_special_emitters()
+	_build_stomp_emitters()
+
+
+func _build_stomp_emitters() -> void:
+	var dust: ParticleProcessMaterial = ParticleProcessMaterial.new()
+	dust.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_RING
+	dust.emission_ring_axis = Vector3.UP
+	dust.emission_ring_radius = 1.0
+	dust.emission_ring_inner_radius = 0.6
+	dust.emission_ring_height = 0.1
+	dust.direction = Vector3(0.0, 0.25, 0.0)
+	dust.spread = 20.0
+	dust.radial_velocity_min = 5.0
+	dust.radial_velocity_max = 9.0
+	dust.damping_min = 6.0
+	dust.damping_max = 9.0
+	dust.gravity = Vector3(0.0, -0.6, 0.0)
+	dust.scale_min = 1.0
+	dust.scale_max = 2.2
+	dust.color_ramp = _fade_ramp()
+	_stomp_dust = _emitter(dust, _quad(0.7, Color(0.78, 0.7, 0.6, 0.45), 0.0), 70, 0.9)
+	add_child(_stomp_dust)
+	var hop: ParticleProcessMaterial = ParticleProcessMaterial.new()
+	hop.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+	hop.emission_sphere_radius = 1.0
+	hop.direction = Vector3.UP
+	hop.spread = 30.0
+	hop.initial_velocity_min = 4.0
+	hop.initial_velocity_max = 7.5
+	hop.gravity = Vector3(0.0, -22.0, 0.0)
+	hop.angular_velocity_min = -540.0
+	hop.angular_velocity_max = 540.0
+	hop.color_ramp = _fade_ramp()
+	_stomp_hop = _emitter(hop, _quad(0.32, Color(0.62, 0.86, 1.0, 0.8), 0.0), 28, 0.75)
+	add_child(_stomp_hop)
+
+
+## Pisotón de la bota en `pos` con radio `radius`: polvo radial y burbujas que saltan.
+func stomp_at(pos: Vector3, radius: float) -> void:
+	if _stomp_dust == null:
+		return
+	(_stomp_dust.process_material as ParticleProcessMaterial).emission_ring_radius = radius * 0.9
+	(_stomp_dust.process_material as ParticleProcessMaterial).emission_ring_inner_radius = radius * 0.5
+	(_stomp_hop.process_material as ParticleProcessMaterial).emission_sphere_radius = radius
+	_stomp_dust.global_position = pos
+	_stomp_hop.global_position = pos
+	_stomp_dust.restart()
+	_stomp_hop.restart()
 
 
 ## Partículas propias: Dorada = chispas amarillas hacia arriba, Bomba = brasas naranjas, Línea = rayas celestes.
