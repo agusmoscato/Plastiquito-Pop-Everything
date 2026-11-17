@@ -1,6 +1,8 @@
+class_name PlastiquitoMain
 extends Node3D
 ## Escena principal: junta el mundo 3D, GameSim (las reglas), el HUD y la entrada.
-## Argumentos de usuario (después de "--"):  --demo-shot=<carpeta>  genera capturas de prueba y sale.
+## Argumentos de usuario (después de "--"):  --demo-shot=<carpeta>  genera capturas de prueba y sale;
+## --smoke=<carpeta> [--minutes=N] [--shot-every=S]  prueba de humo con un bot que juega (solo CI).
 
 const RECYCLE_CRUMPLE_S: float = 0.9
 const RECYCLE_ROLL_S: float = 1.2
@@ -22,6 +24,7 @@ var _prev_cursor: Vector2 = Vector2.ZERO
 var _cursor_valid: bool = false
 var _hitstop_bucket: int = 0
 var _demo: bool = false
+var _shots_taken: int = 0
 var _debug: bool = false
 var _was_holding: bool = false
 var _press_cell: int = -1
@@ -88,13 +91,33 @@ func _ready() -> void:
 			_run_demo3(arg.trim_prefix("--demo3="))
 		elif arg.begins_with("--demo-tools="):
 			_run_demo_tools(arg.trim_prefix("--demo-tools="))
+		elif arg.begins_with("--smoke="):
+			_start_smoke(arg.trim_prefix("--smoke="))
 
 
 func _has_demo_arg() -> bool:
 	for arg: String in OS.get_cmdline_user_args():
-		if arg.begins_with("--demo-shot=") or arg.begins_with("--demo3=") or arg.begins_with("--demo-tools="):
+		if arg.begins_with("--demo-shot=") or arg.begins_with("--demo3=") or arg.begins_with("--demo-tools=") or arg.begins_with("--smoke="):
 			return true
 	return false
+
+
+func is_recycling() -> bool:
+	return _recycling
+
+
+func _start_smoke(dir: String) -> void:
+	var mins: float = 3.0
+	var every: float = 15.0
+	for arg: String in OS.get_cmdline_user_args():
+		if arg.begins_with("--minutes="):
+			mins = float(arg.trim_prefix("--minutes="))
+		elif arg.begins_with("--shot-every="):
+			every = float(arg.trim_prefix("--shot-every="))
+	var bot: SmokeBot = SmokeBot.new()
+	bot.name = "SmokeBot"
+	bot.setup(self, dir, mins, every)
+	add_child(bot)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -444,6 +467,17 @@ func _shot(dir: String, shot_name: String) -> void:
 	if img != null:
 		img.save_png("%s/%s.png" % [dir, shot_name])
 	print("demo: ", shot_name)
+	_shots_taken += 1
+	if _shots_taken >= _shot_limit():
+		get_tree().quit()
+
+
+## Tope de capturas por tanda (--shot-limit=N); sin el argumento no hay tope.
+func _shot_limit() -> int:
+	for arg: String in OS.get_cmdline_user_args():
+		if arg.begins_with("--shot-limit="):
+			return maxi(1, int(arg.trim_prefix("--shot-limit=")))
+	return 1 << 30
 
 
 ## Simula una pasada del cursor `seconds` segundos sobre la lámina.

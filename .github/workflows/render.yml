@@ -1,0 +1,140 @@
+# Render en la nube: capturas, prueba de humo y clips del juego real, sin tocar la PC del dueño.
+# Linux sin pantalla: Vulkan por software (lavapipe) dentro de xvfb. Resultado en la rama "renders",
+# carpeta <sha corto>/ (JPG, logs y RESUMEN.md). Los clips solo corren si el commit dice [clips].
+name: render
+
+on:
+  push:
+    branches: [fase-3b]
+  workflow_dispatch:
+    inputs:
+      clips:
+        description: "Grabar también los clips"
+        type: boolean
+        default: false
+
+concurrency:
+  group: render-${{ github.sha }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  GODOT_VERSION: 4.4.1-stable
+  VK_ICD_FILENAMES: /usr/share/vulkan/icd.d/lvp_icd.json
+
+jobs:
+  run:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: shots
+            args: --demo-shot=out/shots
+          - name: demo3
+            args: --demo3=out/demo3
+          - name: tools
+            args: --demo-tools=out/tools
+          - name: smoke
+            args: --smoke=out/smoke --minutes=5 --shot-every=25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-godot
+      - name: Correr ${{ matrix.name }}
+        run: |
+          mkdir -p out
+          set +e
+          timeout 3600 xvfb-run -a -s "-screen 0 1600x900x24" ./godot/godot --path . --audio-driver Dummy \
+            --resolution 1600x900 -- ${{ matrix.args }} > "out/log_${{ matrix.name }}.txt" 2>&1
+          echo "exit_code=$?" >> "out/log_${{ matrix.name }}.txt"
+          exit 0
+      - name: Revisar log
+        run: bash tools/ci/check_log.sh "out/log_${{ matrix.name }}.txt" "${{ matrix.name }}" > "out/check_${{ matrix.name }}.txt" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: out-${{ matrix.name }}
+          path: out/
+          retention-days: 3
+
+  clips:
+    if: contains(github.event.head_commit.message, '[clips]') || inputs.clips
+    name: clip ${{ matrix.clip }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        clip: [clip_1_zoom_out, clip_2_pin_wave, clip_3_iron_bomb, clip_4_transition, clip_5_boot_stomp]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-godot
+      - name: Grabar ${{ matrix.clip }}
+        run: |
+          mkdir -p out/clips
+          if [ ! -f "scenes/clips/${{ matrix.clip }}.tscn" ]; then echo "no existe el clip" > "out/clips/log_${{ matrix.clip }}.txt"; exit 0; fi
+          set +e
+          timeout 4800 xvfb-run -a -s "-screen 0 1600x900x24" ./godot/godot --path . --audio-driver Dummy \
+            --write-movie "out/clips/${{ matrix.clip }}.avi" --fixed-fps 60 --resolution 1080x1920 \
+            "scenes/clips/${{ matrix.clip }}.tscn" > "out/clips/log_${{ matrix.clip }}.txt" 2>&1
+          echo "exit_code=$?" >> "out/clips/log_${{ matrix.clip }}.txt"
+          exit 0
+      - name: MP4 y reporte de audio
+        run: bash tools/ci/encode_clip.sh "out/clips/${{ matrix.clip }}"
+      - name: Revisar log
+        run: bash tools/ci/check_log.sh "out/clips/log_${{ matrix.clip }}.txt" "${{ matrix.clip }}" > "out/clips/check_${{ matrix.clip }}.txt" || true
+      - run: rm -f out/clips/*.avi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: out-${{ matrix.clip }}
+          path: out/
+          retention-days: 3
+
+  publish:
+    needs: [run, clips]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: art_in
+          merge-multiple: true
+      - name: Convertir a JPG y armar el resumen
+        env:
+          MSG: ${{ github.event.head_commit.message }}
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq imagemagick > /dev/null
+          SHORT="${GITHUB_SHA::7}"
+          echo "SHORT=$SHORT" >> "$GITHUB_ENV"
+          bash tools/ci/publish_prepare.sh art_in "pub/$SHORT" "${MSG:-workflow_dispatch}"
+      - name: Subir a la rama renders
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git worktree add --detach rw
+          cd rw
+          if git ls-remote --exit-code --heads origin renders > /dev/null; then
+            git fetch --depth=1 origin renders && git checkout -B renders FETCH_HEAD
+          else
+            git checkout --orphan renders && git rm -rf -q . && echo "# Renders de CI (una carpeta por commit)" > README.md
+          fi
+          rm -rf "$SHORT" && cp -r "../pub/$SHORT" "$SHORT"
+          git add -A && git commit -q -m "renders: $SHORT"
+          for i in 1 2 3 4 5; do
+            git push origin renders && break
+            git fetch --depth=1 origin renders && git rebase -q FETCH_HEAD || { git rebase --abort; sleep 5; }
+            sleep $((i * 3))
+          done
+      - name: Fallar si hubo errores en algún log
+        run: |
+          if grep -rl "^FALLÓ" "pub/$SHORT" --include="check_*.txt"; then
+            grep -rh "" "pub/$SHORT" --include="check_*.txt"
+            exit 1
+          fi

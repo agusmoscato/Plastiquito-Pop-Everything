@@ -32,3 +32,6 @@ Thumbs.db
 
 # Salida del simulador de balance
 /tools/out/
+
+# Renders de CI copiados localmente para revisarlos
+/.render/
