@@ -1,5 +1,34 @@
 # Changelog
 
+## Fase 3b — Jornada de pulido (2026-11-17, sin mergear)
+
+Detalle, decisiones, conflictos y galería en [JORNADA.md](JORNADA.md). Rama `fase-3b` con commits
+locales (no se pudo pushear desde la sesión).
+
+### Hecho
+- CI de render (`render.yml`): capturas, prueba de humo con bot y clips en GitHub Actions, con
+  resultados en la rama `renders`. Prueba de humo headless para la PC (`tools/smoke_headless.sh`).
+- Bugs: resorte de la herramienta que llegaba a NaN con frames largos (`SpringMath`, test); salida
+  con recursos de audio vivos (`PopAudio.quit_clean`); signo invertido de las poses de la mano (test).
+- Modelos ronda 3: mano con dedos de tubo, pulgar a 45° y contactos en el modelo; bota con silueta
+  real; cable suave; palo sin costura; manitos en dos pasadas y sin cruzarse. Plancha y palo aprobados
+  por el revisor; mano, manitos y bota no.
+- HUD: "+N" con tope de 12, agrupados por cadena, con contorno y fuera de los paneles; odómetro sin
+  dígitos encimados; sello de cadena sobre el origen al 85 %; sello TURNO NOCHE.
+- TURNO NOCHE (DESIGN 3.5): Manitos x1,5 de ritmo y x8 en total tras 8 s sin tocar, con luz fría.
+- Simulador: idle/activo normalizado por fase, desglose por origen, `balance_full.sh` con 3 semillas.
+- Escenarios a escala real con test geométrico; asfalto con lugares de 250 cm; antialias por derivadas
+  en la lámina de lejos y FXAA; rollo de reciclado en láminas lejanas.
+- Eco con brillo previo y sonido de aire; vapor de la plancha; polvo y burbujas que saltan con la bota;
+  clip 3 con la plancha real; clip 5 de la bota.
+- `docs/screens` en JPG (< 500 KB) y sin `_tmp`. Versión 0.2.0.
+
+### Pendiente
+- Push y primera corrida de `render.yml` (capturas, humo con imagen, clips y audio).
+- Balance de casual y activo en las fases 3-4 (análisis en JORNADA.md).
+- Mano, manitos y bota hasta que el revisor los apruebe; íconos de la tienda.
+- Conflicto de escala de cámara contra el pilar 3 de DESIGN (decisión del dueño).
+
 ## Fase 3 — Escala (2026-11-13)
 
 El juego llega jugable hasta el final del Estacionamiento (DESIGN 4), la lámina de 1.000x1.000 se dibuja de lejos con una textura de estado, hay cuatro escenarios con identidad, plancha, bota, Eco, Manitos y rodillo automático, reciclado completo con tablero de corcho, ganancias sin conexión y herramienta de clips. **El balance de las fases 3 y 4 solo está calibrado para el perfil activo; el casual y el idle no cumplen todas las métricas (ver abajo).**

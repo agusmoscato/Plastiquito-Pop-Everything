@@ -1,0 +1,5 @@
+fase 1 finger       lámina   8x8   cámara   10.1  burbuja 122.0 px  herramienta  99.4% del alto  (caja 8.1 x 3.0 x 6.8, golpe 1.0)
+fase 1 palm         lámina   8x8   cámara   10.1  burbuja 122.0 px  herramienta 165.3% del alto  (caja 9.4 x 1.8 x 13.6, golpe 4.0)
+fase 2 rolling_pin  lámina  40x40  cámara   56.8  burbuja 21.8 px  herramienta  13.2% del alto  (caja 6.6 x 1.4 x 5.7, golpe 6.0)
+fase 3 iron         lámina  80x80  cámara  131.8  burbuja  9.4 px  herramienta  11.2% del alto  (caja 3.3 x 3.9 x 10.4, golpe 5.0)
+fase 4 boot         lámina 150x150 cámara  285.1  burbuja  4.3 px  herramienta   3.4% del alto  (caja 2.0 x 4.2 x 5.6, golpe 6.0)

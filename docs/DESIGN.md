@@ -105,6 +105,7 @@ Cada especial nueva entra al **Burbujario**, la colección, que cuenta para el 1
 - **Recarga automática** de lámina.
 - El juego activo siempre rinde más: el **combo** (reventones por segundo) llega hasta ×5. Así jugar activo vale la pena, pero dejarlo solo también avanza.
 - Para no lastimar la muñeca, mantener apretado cuenta como clic continuo. Nunca hace falta hacer clic sin parar.
+- **Turno noche** (aprobado en la jornada del 17/11/2026): si hay Manitos y nadie toca la lámina durante 8 segundos, empieza el TURNO NOCHE. Las Manitos tocan 1,5 veces más seguido y en total rinden 8 veces más (`idle_hand_mult`, `night_rate_mult` e `idle_hand_after_seconds` en `data/economy.json`). Se ve en el mundo: un sello de tinta "TURNO NOCHE" en el HUD, luz y ambiente más fríos y manitos que se mueven más rápido. Entra en unos 2 segundos y, al volver a tocar, se va en menos de 1 segundo. Las ganancias sin conexión usan el mismo bono, al 50% de eficiencia. Es la fuente principal del perfil idle, que tiene que rendir entre el 20% y el 45% del activo. El simulador lo mide en Pops normalizados por la base de cada fase: comparar Pops crudos entre perfiles que están en fases distintas no mide nada, porque la base se multiplica por 100 en cada fase.
 
 ### 3.6 Economía
 
