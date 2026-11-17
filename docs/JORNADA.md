@@ -2,17 +2,147 @@
 
 Trabajo autónomo en la PC del dueño en **modo invisible**: nada con ventana ni sonido. Godot solo
 `--headless`, Blender solo `-b`, procesos pesados con prioridad BelowNormal y de a uno. El render
-del juego (capturas, prueba de humo con imagen, clips) quedó preparado en GitHub Actions
-(`.github/workflows/render.yml`), con resultados en la rama `renders`, carpeta `<sha corto>/`.
+del juego (capturas, prueba de humo con imagen, clips) corre en GitHub Actions
+(`.github/workflows/render.yml`) y queda en la rama `renders`, carpeta `<sha corto>/`.
 
-## Estado en una línea
+## Estado en una línea (fin de la segunda sesión)
 
-**No se mergea a `main` y la rama no está pusheada.** Desde esta sesión no se puede hacer push a
-GitHub (ver "Bloqueo de push"), así que `render.yml` todavía no corrió nunca. Hay 7 commits locales
-en `fase-3b` con lint, tests (159) y prueba de humo headless en verde. El balance completo no cierra
-para los tres perfiles (tabla abajo).
+`fase-3b` pusheada. CI de render en verde. Lint y 165 tests en verde. **No se mergea a `main`**: el
+dueño revisa los modelos primero, y el balance de las fases 3-4 todavía no cierra para el activo y el
+casual.
 
-## Bloqueo de push (lo primero que hay que resolver)
+---
+
+# Sesión 2 (misma fecha, tarde)
+
+## Paso 0: push
+- Se habilitó UNA vez la ventana de inicio de sesión de Git Credential Manager (permitido por el dueño
+  para git) y el push funcionó. GCM tiene dos cuentas de GitHub; para pushear sin ventanas se fijó
+  `credential.https://github.com.username = agusmoscato` en la config **local** del repo. Desde ahí,
+  push sin ventanas después de cada tarea.
+- Primera corrida de `render.yml` (`a922c12`): los 4 trabajos renderizaron; falló solo el chequeo de
+  logs de `demo3` por "Invalid polygon data, triangulation failed" (el ticket sin conexión dibujaba una
+  hoja de pocos píxeles). Arreglado en `UiKit` con test. Las corridas siguientes (`5d269e9`, `bcc26a9`)
+  terminaron **en verde**: capturas, prueba de humo con imagen (26-27 capturas, 5 reciclados, 3 saltos
+  de fase) y logs sin ERROR ni NaN. El bug 2 (la mano invisible) quedó confirmado como resuelto.
+
+## Decisiones de diseño aplicadas (en DESIGN.md)
+1. **Cámara de trabajo**: zoom fijo por fase (burbuja de 22/12/10/10 px, mínimo 10) que sigue a la
+   herramienta con paneo suave; la transición de reciclado muestra la lámina entera 1,2 s y vuelve;
+   con la rueda se ve todo. Las herramientas miden 9-15 % del alto con esa cámara
+   ([informe](escala_herramientas.txt)). La Mesa usa 22 px: con 16 px la lámina de 8x8 quedaba como
+   un parche chico sobre la mesa en la captura de CI.
+2. **Plancha que quema**: quieta casi no aplasta (15 %), el calor solo se acumula si se desliza y,
+   quieta más de 0,6 s, derrite el plástico (sin valor ni aire) con humo y chirrido. Tests.
+
+## Modelos (prioridad principal)
+
+### Licencias
+| Modelo | Fuente | Licencia | Verificado en |
+| --- | --- | --- | --- |
+| Mano y manitos | MakeHuman / MPFB 2.0.18 (extensions.blender.org, sha256 verificado) | Assets **CC0** (código GPL, no se distribuye) | https://static.makehumancommunity.org/about/license.html (2026-11-17) |
+| Bota | Propia: no hay bota de trabajo CC0 en Poly Haven (solo "Rubber Boots", de lluvia), Kenney ni Quaternius | Propia | API de Poly Haven y búsqueda web (2026-11-17) |
+| Utilería | Sin cambios: lo CC0 de Poly Haven (cajas, cajones) es fotorrealista y con nuestros materiales planos perdía su detalle | Propia | — |
+
+Registro completo: [assets/models/LICENSES.md](../assets/models/LICENSES.md).
+
+### Método nuevo
+- **Mano** (`art/models/hand_mpfb.py`): MPFB se carga dentro de Blender -b sin instalarlo
+  (`art/mpfb_load.py`; `tools/get_mpfb.sh` lo baja y verifica). Humano adulto promedio, mano derecha +
+  10 cm de antebrazo con los pesos reales de MakeHuman; reposo = mano plana estándar (dedos con
+  abanico -5/-1/3/8°, pulgar a 40°), largo de mano 18,7 cm desde el pliegue (ANSUR II), dedos +10 %
+  (en MakeHuman la palma es algo larga), guante (subdivisión, 1,5 mm, arrugas en articulaciones, caña
+  floja, puño enrollado) y cortes redondeados. Esqueleto con los nombres de HandRig; `test_hand_rig`
+  (sentido de flexión y pulgar pegado) en verde. 16.600 triángulos (la mano del jugador es una sola).
+- **Manitos**: la misma mano sin antebrazo, cortada en el pliegue, sin subdivisión (3.200 triángulos).
+- **Bota** (`art/models/boot.py`): perfil lateral 2D extruido como loft con ancho variable (pie),
+  **Skin Modifier** para la caña (frente alto, quiebre en el tobillo), los dos volúmenes fundidos con
+  remallado por vóxeles y decimados, boca abierta, suela por offset del contorno, origen en la base de
+  la suela. 3.972 triángulos.
+- **HandRig**: aducción del pulgar en "señalar" (sin eso la mano se leía como "pistola de dos caños").
+
+### Verificación objetiva: IoU contra planos de proporciones reales
+`art/blueprints/blueprint.py` genera los planos por código (medidas antropométricas y de una bota de
+trabajo de 15 cm de caña); `art/check_iou.py` rasteriza la silueta del .glb en celdas de 1 mm, hace un
+registro rígido chico (giro ±10°, corrimiento ±3 cm, **sin escala**) y calcula el IoU.
+
+| Modelo | Vista superior | Vista lateral | Resultado | Superposición |
+| --- | --- | --- | --- | --- |
+| Mano | 0,851 | 0,852 | APROBADO (con poco margen) | [sup.](screens/modelos/iou_mano_superior.jpg) · [lat.](screens/modelos/iou_mano_lateral.jpg) |
+| Bota | 0,895 | 0,853 | APROBADO | [sup.](screens/modelos/iou_bota_superior.jpg) · [lat.](screens/modelos/iou_bota_lateral.jpg) |
+| Manitos (informativo) | 0,835 | 0,835 | no exigido | — |
+
+Errores que encontré en el propio método y corregí, para que el número sea honesto: las cápsulas de los
+dedos del plano agregaban su radio más allá del largo indicado; girar celdas ya rasterizadas dejaba
+agujeros; la icoesfera que crea el importador glTF como forma de los huesos se colaba en la silueta.
+El IoU de la mano se mide con la mano abierta (la pose de reposo): compara proporciones, no la pose.
+
+### Revisor externo y las 4 preguntas
+Cuatro rondas con subagentes que no vieron el trabajo (renders, superposiciones de IoU y capturas del
+juego de la rama `renders`). Entre rondas se corrigieron el pulgar (aducción), el puño flotante, los
+cortes en estrella, la costura dentada de la bota, la lengüeta que se leía como agujero y la bota
+parada derecha en el juego. **Ronda final:**
+
+| Modelo | (1) 64 px | (2) juguete limpio | (3) proporciones | (4) silueta | Revisor |
+| --- | --- | --- | --- | --- | --- |
+| Mano | no ("mancha azul") | a medias (grumos en el índice, cierre del antebrazo) | en planta bien; en 3/4 el antebrazo pesa mucho | puño como aro aparte | NO APROBADO |
+| Manitos | no | no (facetado, espalda plana) | palma enorme | no | NO APROBADO (la peor pieza) |
+| Bota | sí de perfil, no desde el juego | sí (una sola masa) | perfil bien, caña cilíndrica | cuello con dientes, cordones cortos, taco chico | NO APROBADO ("cerca") |
+| Plancha | sí | sí | sí | sí | APROBADO |
+| Palo | sí | sí | sí | sí | APROBADO |
+
+Lo que pide para aprobar, en orden: (1) manitos recortadas de la mano buena **con subdivisión** (hoy
+van sin ella para ahorrar triángulos: 12 manitos), (2) puño que salga del mismo volumen del guante y
+antebrazo más corto en la vista de juego, (3) cuello de la bota fundido con la caña, lengüeta visible y
+3-4 cruces de cordones, taco del ancho de la suela, (4) bota más de perfil con la cámara de 55°,
+(5) ícono "DEDO" con la mano entera, (6) base de la plancha con un borde oscuro.
+El IoU aprueba la mano y la bota; el revisor no. Son medidas distintas: el IoU dice que las
+proporciones son reales, el revisor juzga la lectura y el acabado. **Ningún modelo nuevo queda aprobado
+para mergear: necesitan la revisión del dueño.**
+
+Renders: [mano señalando, cámara del juego](screens/modelos/hand_juego.jpg) ·
+[mano 64 px](screens/modelos/hand_juego_64.jpg) · [mano de perfil](screens/modelos/hand_lado.jpg) ·
+[manitos](screens/modelos/hand_ghost_juego.jpg) · [bota de perfil](screens/modelos/boot_lado.jpg) ·
+[bota 3/4](screens/modelos/boot.jpg) · [bota 64 px](screens/modelos/boot_64.jpg) ·
+[plancha](screens/modelos/iron_juego.jpg) · [palo](screens/modelos/pin.jpg).
+Capturas del juego en la rama `renders` (carpetas por commit; las de los modelos finales:
+`2b67524` con la mano final y `c300a6a` con la bota de perfil, todas en verde).
+
+## Balance (3 perfiles x 3 semillas, 215 min)
+Cambios: costos de la fase 3 -32 %; plancha de radio 4 (antes 2,5); bota de radio 5 y 2 s de recarga
+(antes 3 y 4 s: con la plancha mejor, la bota recién comprada rendía 0,41x); el bot casual arrastra la
+plancha (sellar ya no rinde); `idle_hand_mult` 8.
+
+| Perfil | Semilla 1 | Semilla 2 | Semilla 3 |
+| --- | --- | --- | --- |
+| Activo | falla solo recuperación tras reciclar (66 %) | falla solo recuperación (63 %) | **todo APROBADO** |
+| Casual | % con compra 66 %, mediana 45-210 29 s, espera 253 s | % 67 %, espera 252 s, recuperación 89 % | % 66 %, espera 231 s |
+| Idle | 42 % ✔ | 33 % ✔ | 26 % ✔ |
+
+Llegadas: Piso 30/37 min, Galpón 92/94, Estacionamiento 138-143 (activo/casual), todo dentro de los
+objetivos. **No cierra todo en verde.** Lo que queda es de la economía de las fases 3-4: las mejoras
+salen en ráfagas (descuento de fase nueva) y después hay esperas de unos 4 minutos; la "recuperación"
+falla por los reciclados dentro del Estacionamiento, que vuelven a 0 sin mejoras permanentes que
+alcancen. Propuesta: más mejoras baratas por fase (no solo descuento en las 3 primeras compras) y
+mejoras permanentes que aceleren el arranque de cada reciclado.
+
+## Íconos (B2)
+Los íconos de herramienta (pestañas y barra) usan un primer plano por herramienta: la yema apretando una
+burbuja, la palma desde arriba, la bota de perfil, quietos con un vaivén. En la captura de CI se leen
+mejor que la "manchita", pero todavía no están revisados por el revisor externo.
+
+## Pendientes y próximos pasos
+1. Revisión humana de la mano y la bota (el dueño pidió no mergear antes).
+2. Balance de las fases 3-4 para el activo (recuperación) y el casual (disponibilidad de compras).
+3. Clips con `[clips]` y su reporte de audio (no se corrieron esta sesión).
+4. Benchmarks de rendimiento (necesitan ventana), sobre todo con la mano de 16.600 triángulos.
+5. Pendientes solo de Windows: JUGAR.bat, accesos directos, instalador e ícono con rcedit.
+
+---
+
+# Sesión 1
+
+## Bloqueo de push (resuelto en la sesión 2)
 
 - HTTPS: no hay credencial guardada y la sesión no puede abrir el inicio de sesión de Git Credential
   Manager (sería una ventana). `git push` falla con "terminal prompts disabled".

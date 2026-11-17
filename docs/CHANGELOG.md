@@ -1,5 +1,16 @@
 # Changelog
 
+## Fase 3b — Jornada de pulido, sesión 2 (2026-11-17, sin mergear)
+
+Detalle en [JORNADA.md](JORNADA.md).
+- Push funcionando y CI de render en verde (capturas, prueba de humo con imagen, logs limpios).
+- Cámara de trabajo por fase que sigue a la herramienta; la transición de reciclado muestra la lámina
+  entera. Herramientas a 9-15 % del alto. Plancha que quema si queda quieta.
+- Mano y manitos desde MakeHuman/MPFB (CC0) y bota con caña de Skin Modifier fundida en un volumen;
+  verificación por IoU contra planos de proporciones reales (mano 0,851/0,852, bota 0,895/0,853).
+- Íconos de herramienta en primer plano. Rebalance de las fases 3-4 (idle aprobado; activo y casual
+  todavía con métricas en rojo).
+
 ## Fase 3b — Jornada de pulido (2026-11-17, sin mergear)
 
 Detalle, decisiones, conflictos y galería en [JORNADA.md](JORNADA.md). Rama `fase-3b` con commits
