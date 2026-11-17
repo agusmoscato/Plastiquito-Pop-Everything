@@ -4,7 +4,9 @@ extends RefCounted
 ## (ToolView) y los íconos en vivo de la tienda (ToolIcon). La punta/contacto queda en y = 0.
 
 const MODELS: String = "res://assets/models/"
-const HAND_SCALE: float = 28.0 ## el dedo mide ~1,5 burbujas de ancho (el guante real mide 1,76 cm)
+const HAND_SCALE: float = 26.0 ## el dedo del guante mide ~1,9 cm: en el mundo, ~0,5 burbuja de ancho (se calibra en B3)
+const HAND_ROT: Vector3 = Vector3(-14.0, 55.0, 0.0) ## el brazo entra desde abajo a la derecha y el índice se ve de perfil
+const GHOST_SCALE: float = 0.8 ## las manitos miden el 80 % de la mano del jugador
 
 ## Estilo de la mano: "glove" (guante de nitrilo, por defecto) o "skin" (piel con subsurface).
 static var hand_style: String = "glove"
@@ -86,10 +88,16 @@ static func glove_material(tint: Color) -> Material:
 	return m
 
 
+## Manitos fantasma: una pasada que escribe solo profundidad y, encima, la pasada visible.
 static func ghost_material() -> ShaderMaterial:
-	var sm: ShaderMaterial = ShaderMaterial.new()
-	sm.shader = load("res://shaders/ghost_hand.gdshader") as Shader
-	return sm
+	var visible_pass: ShaderMaterial = ShaderMaterial.new()
+	visible_pass.shader = load("res://shaders/ghost_hand.gdshader") as Shader
+	visible_pass.render_priority = 1
+	var depth_pass: ShaderMaterial = ShaderMaterial.new()
+	depth_pass.shader = load("res://shaders/ghost_depth.gdshader") as Shader
+	depth_pass.render_priority = 0
+	depth_pass.next_pass = visible_pass
+	return depth_pass
 
 
 static func _instance(file: String) -> Node3D:
@@ -134,7 +142,7 @@ static func build(tool_id: String, radius: float, tier: int = 0, icon: bool = fa
 		"palm":
 			_add_hand(body, "palm", tier, false, half * 1.8 / 0.085, Vector3.ZERO, Vector3(0.0, 24.0, 0.0))
 		"hands":
-			_add_hand(body, "point", tier, true, HAND_SCALE * 0.2, Vector3.ZERO, Vector3(-12.0, 28.0, 0.0))
+			_add_hand(body, "point", tier, true, HAND_SCALE * GHOST_SCALE, Vector3.ZERO, HAND_ROT)
 		"rolling_pin":
 			var s: float = half * 2.0 / 0.619
 			_add_model(body, "pin", s, color, amount, metal)
@@ -148,7 +156,7 @@ static func build(tool_id: String, radius: float, tier: int = 0, icon: bool = fa
 		"auto_roller":
 			_add_model(body, "roller", half * 2.0 / 0.26, color, amount, metal)
 		_:
-			_add_hand(body, "point", tier, false, HAND_SCALE * (1.0 + 0.08 * radius), Vector3.ZERO, Vector3(-12.0, 28.0, 0.0))
+			_add_hand(body, "point", tier, false, HAND_SCALE * (1.0 + 0.08 * radius), Vector3.ZERO, HAND_ROT)
 	if icon:
 		_fit_icon(root)
 	return root

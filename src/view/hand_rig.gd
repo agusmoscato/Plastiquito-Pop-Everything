@@ -30,7 +30,7 @@ static func pose_data(name: String) -> Dictionary[String, PackedFloat32Array]:
 			d["middle"] = PackedFloat32Array([0.0, 50.0, 62.0, 28.0])
 			d["ring"] = PackedFloat32Array([0.0, 52.0, 64.0, 28.0])
 			d["pinky"] = PackedFloat32Array([0.0, 54.0, 66.0, 28.0])
-			d["thumb"] = PackedFloat32Array([28.0, 24.0, 14.0])
+			d["thumb"] = PackedFloat32Array([8.0, 16.0, 10.0]) # relajado, pegado al medio
 	return d
 
 
@@ -64,14 +64,15 @@ func _ready() -> void:
 	_place(_model)
 
 
-## Deja el contacto de la pose en el origen: la punta del índice, o el centro de la palma.
-## Las coordenadas salen de la malla importada (la punta del índice queda en z = 0,1538 y la
-## malla está corrida 0,0265 en x respecto de la muñeca).
+## Deja el contacto de la pose en el origen: la yema del índice ("point") o el centro de la palma.
+## Los puntos vienen en el modelo como nodos vacíos (contact_point y contact_palm, ver art/models/hand.py).
 func _place(model: Node3D) -> void:
-	var contact: Vector3 = Vector3(0.0, -0.0064, 0.1603)
-	if pose_name != "point":
-		contact = Vector3(0.0265, -0.0257, 0.279)
-	model.position = -contact
+	model.position = -contact_offset(model, pose_name)
+
+
+static func contact_offset(model: Node3D, pose: String) -> Vector3:
+	var node: Node3D = model.find_child("contact_point" if pose == "point" else "contact_palm", true, false) as Node3D
+	return node.position if node != null else Vector3.ZERO
 
 
 func set_pose(name: String, immediate: bool = false) -> void:
@@ -117,4 +118,6 @@ func _apply() -> void:
 		elif pose_name == "palm" and key.ends_with("_1"):
 			deg += 5.0 * _press
 		var rest: Quaternion = skeleton.get_bone_rest(_bones[key]).basis.get_rotation_quaternion()
-		skeleton.set_bone_pose_rotation(_bones[key], rest * Quaternion(Vector3.RIGHT, deg_to_rad(deg)))
+		# En los huesos exportados, +X local dobla hacia el dorso: se invierte para que los ángulos
+		# de pose_data (positivo = cierra hacia la palma) se cumplan (test_hand_rig lo verifica).
+		skeleton.set_bone_pose_rotation(_bones[key], rest * Quaternion(Vector3.RIGHT, -deg_to_rad(deg)))

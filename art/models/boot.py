@@ -1,5 +1,11 @@
-"""Bota de trabajo: puntera, suela con dibujo profundo, cordones y caña. Largo 0,30 m hacia +Y;
-el origen está en el centro de la suela, en el suelo."""
+"""Bota de trabajo (ronda 3). Largo ~0,30 m hacia +Y, origen en el centro de la suela, en el suelo.
+
+La caña y el pie salen de UNA silueta lateral (curvas de frente y talón en función de la altura)
+extruida como un loft de secciones horizontales con forma de planta de pie (talón angosto, antepié
+ancho, punta redonda) y subdividida. Encima: cuello acolchado abierto, lengüeta, contrafuerte,
+puntera reforzada, suela que sigue el contorno con taco y tacos de dibujo, y cordones cruzados.
+Presupuesto: hasta 4.000 triángulos.
+"""
 import math
 import os
 import sys
@@ -7,95 +13,197 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import bpy
 import bmesh
+from mathutils import Vector
 from art import lib
 
 A = lib.args()
 lib.reset()
-leather = lib.material("leather", lib.hex_color("#5A3519"), rough=0.6)
-rubber = lib.material("sole", lib.hex_color("#1E1B18"), rough=0.8)
-lace = lib.material("lace", lib.hex_color("#F4EFE6"), rough=0.7)
-steel = lib.material("steel_toe", lib.hex_color("#9AA3AA"), rough=0.35, metal=0.7)
+leather = lib.material("leather", lib.hex_color("#7A4A24"), rough=0.55, clearcoat=0.15)
+leather_dark = lib.material("leather_dark", lib.hex_color("#4A2C14"), rough=0.5, clearcoat=0.2)
+rubber = lib.material("sole", lib.hex_color("#2A2522"), rough=0.85)
+lace = lib.material("lace", lib.hex_color("#E9C46A"), rough=0.7)
+metal = lib.material("eyelet", lib.hex_color("#B8BEC4"), rough=0.3, metal=0.8)
 
-# Suela: contorno de pie (ancha en el antepié, angosta en el arco), extruida y con bisel.
-outline = []
-for i in range(28):
-    a = 2 * math.pi * i / 28
-    c, s = math.cos(a), math.sin(a)
-    w = 0.062 * (1.0 + 0.10 * s if s > 0 else 1.0 - 0.18 * math.exp(-((s + 0.2) ** 2) * 8))
-    outline.append((c * w, s * 0.150 - 0.0))
+SOLE_TOP = 0.022   # el cuero arranca sobre la entresuela
+COLLAR_BACK = 0.215
+COLLAR_FRONT = 0.185
+
+
+# --- Silueta lateral: borde de adelante y de atrás en función de la altura ---------------------
+def y_front(z):
+    if z <= 0.030:
+        return 0.150
+    if z <= 0.070:  # punta redonda
+        t = (z - 0.030) / 0.040
+        return 0.150 - 0.030 * (1.0 - math.sqrt(max(0.0, 1.0 - t * t)))
+    if z <= 0.125:  # empeine
+        t = (z - 0.070) / 0.055
+        return 0.120 - 0.115 * (t ** 0.85)
+    t = (z - 0.125) / (COLLAR_FRONT - 0.125)  # frente de la caña, apenas inclinada hacia adelante
+    return 0.005 - 0.020 * min(t, 1.0)
+
+
+def y_back(z):
+    if z <= 0.060:  # talón redondo con contrafuerte
+        t = (z - 0.030) / 0.040
+        return -0.138 - 0.010 * math.sqrt(max(0.0, 1.0 - t * t))
+    t = (z - 0.060) / (COLLAR_BACK - 0.060)  # tendón: entra y vuelve a salir en el cuello
+    return -0.140 + 0.020 * math.sin(min(t, 1.0) * math.pi * 0.85)
+
+
+def half_width(y, z):
+    """Ancho de la planta según el largo (talón angosto, antepié ancho) y la altura."""
+    u = (y + 0.150) / 0.300
+    plan = 0.036 + 0.018 * math.sin(min(max(u, 0.0), 1.0) * math.pi * 0.9) - 0.006 * max(0.0, u - 0.82) / 0.18
+    if z > 0.09:  # la caña es más redonda y un poco más angosta
+        k = min((z - 0.09) / 0.05, 1.0)
+        plan = plan * (1.0 - k) + 0.043 * k
+    return plan * (1.0 - 0.10 * max(0.0, z - 0.06) / 0.16)
+
+
+def ring(z, n, z_tilt=0.0, scale=1.0):
+    """Sección horizontal con forma de planta. z_tilt inclina la sección (el cuello sube atrás)."""
+    yb, yf = y_back(z), y_front(z)
+    yc, a = (yb + yf) * 0.5, (yf - yb) * 0.5
+    pts = []
+    for i in range(n):
+        th = 2.0 * math.pi * i / n
+        cu, su = math.cos(th), math.sin(th)
+        u = math.copysign(abs(cu) ** 0.8, cu)  # un poco más cuadrada que una elipse
+        y = yc + a * u * scale
+        x = half_width(y, z) * math.copysign(abs(su) ** 0.85, su) * scale
+        pts.append(Vector((x, y, z + z_tilt * (yc - y))))
+    return pts
+
+
+N = 20
+levels = [SOLE_TOP, 0.032, 0.046, 0.062, 0.078, 0.095, 0.112, 0.130, 0.150, 0.170, 0.190, 0.205]
 bm = bmesh.new()
-bot = [bm.verts.new((x, y, 0.0)) for x, y in outline]
-top = [bm.verts.new((x * 1.0, y * 1.0, 0.028)) for x, y in outline]
-n = len(outline)
-for i in range(n):
-    j = (i + 1) % n
-    bm.faces.new((bot[i], bot[j], top[j], top[i]))
-bm.faces.new(list(reversed(bot)))
-bm.faces.new(top)
-me = bpy.data.meshes.new("sole")
+rings = []
+for k, z in enumerate(levels):
+    tilt = 0.18 * max(0.0, (z - 0.15) / 0.055)  # las secciones de arriba suben hacia atrás
+    rings.append([bm.verts.new(p) for p in ring(z, N, tilt)])
+# Borde del cuello: se enrolla hacia adentro (abierto) y baja un poco (el pie entra por ahí).
+top = ring(levels[-1], N, 0.18)
+inner = [bm.verts.new(Vector((p.x * 0.80, p.y * 0.92 - 0.006, p.z - 0.004))) for p in top]
+deep = [bm.verts.new(Vector((p.x * 0.74, p.y * 0.88 - 0.008, p.z - 0.050))) for p in top]
+rings += [inner, deep]
+for k in range(len(rings) - 1):
+    for i in range(N):
+        j = (i + 1) % N
+        bm.faces.new((rings[k][i], rings[k][j], rings[k + 1][j], rings[k + 1][i]))
+bm.faces.new(list(reversed(rings[0])))
+bm.faces.new(rings[-1])
+# Puntera reforzada y contrafuerte: zonas de la misma malla, un poco infladas y más oscuras.
+bm.faces.ensure_lookup_table()
+for v in bm.verts:
+    toe = v.co.y > 0.088 and v.co.z < 0.074
+    heel = v.co.y < -0.098 and v.co.z < 0.094
+    if toe or heel:
+        c = Vector((0.0, v.co.y, v.co.z))
+        v.co = c + (v.co - c) * 1.035
+for f in bm.faces:
+    m = f.calc_center_median()
+    if (m.y > 0.088 and m.z < 0.074) or (m.y < -0.098 and m.z < 0.094):
+        f.material_index = 1
+me = bpy.data.meshes.new("upper")
 bm.to_mesh(me)
 bm.free()
-sole = bpy.data.objects.new("sole", me)
-bpy.context.scene.collection.objects.link(sole)
-lib.bevel(sole, 0.004, 2)
-sole.data.materials.append(rubber)
-parts = [sole]
-# Dibujo de la suela: chevrones biselados (dos tacos inclinados por fila) y bloque de talón marcado.
-heel = lib.box("heel", (0.098, 0.062, 0.016), (0.0, -0.108, -0.006))
-lib.bevel(heel, 0.005, 1)
-heel.data.materials.append(rubber)
-parts.append(heel)
-for row in range(7):
-    y = -0.040 + row * 0.027
-    wd = 0.056 - 0.0012 * abs(row - 2) ** 2 * (1 if y > 0.07 else 0.4)
+upper = bpy.data.objects.new("upper", me)
+bpy.context.scene.collection.objects.link(upper)
+upper.data.materials.append(leather)
+upper.data.materials.append(leather_dark)
+lib.subsurf(upper, 1)
+lib.apply_modifiers(upper)
+parts = [upper]
+
+
+def on_surface(x, z, out=0.0015):
+    """Punto de la superficie (ya subdividida) del frente de la bota a la altura z y lado x."""
+    ok, loc, nrm, _ = upper.ray_cast(Vector((x, 0.40, z)), Vector((0.0, -1.0, 0.0)))
+    if not ok:
+        return Vector((x, y_front(z), z)), Vector((0.0, 1.0, 0.0))
+    return loc + nrm * out, nrm
+
+# --- Cuello acolchado: un rollo alrededor de la boca ------------------------------------------
+collar_pts = [((p.x * 0.93), p.y * 0.97 - 0.002, p.z + 0.002) for p in top]
+collar_pts.append(collar_pts[0])
+collar = lib.tube_along("collar", collar_pts, [0.0085] * len(collar_pts), sides=8)
+collar.data.materials.append(leather_dark)
+parts.append(collar)
+
+# --- Lengüeta: sale de la boca, sigue el empeine y asoma arriba --------------------------------
+tongue_pts = []
+for z in (0.100, 0.130, 0.160, 0.190):
+    tongue_pts.append(tuple(on_surface(0.0, z, -0.002)[0]))
+tongue_pts.append((0.0, tongue_pts[-1][1] - 0.004, 0.216))
+tongue = lib.tube_along("tongue", tongue_pts, [0.017, 0.020, 0.021, 0.021, 0.019], sides=10, squash=0.32)
+tongue.data.materials.append(leather_dark)
+parts.append(tongue)
+
+# --- Suela: sigue el contorno, entresuela + taco + tacos de dibujo -----------------------------
+def sole_slab(name, z0, z1, scale, y_lo=-1.0, y_hi=1.0, n=24):
+    base = [p for p in ring(SOLE_TOP + 0.001, n, 0.0, scale)]
+    base = [Vector((p.x, min(max(p.y, y_lo), y_hi), 0.0)) for p in base]
+    bm3 = bmesh.new()
+    b = [bm3.verts.new((p.x, p.y, z0)) for p in base]
+    t = [bm3.verts.new((p.x, p.y, z1)) for p in base]
+    for i in range(n):
+        j = (i + 1) % n
+        bm3.faces.new((b[i], b[j], t[j], t[i]))
+    bm3.faces.new(list(reversed(b)))
+    bm3.faces.new(t)
+    me3 = bpy.data.meshes.new(name)
+    bm3.to_mesh(me3)
+    bm3.free()
+    o = bpy.data.objects.new(name, me3)
+    bpy.context.scene.collection.objects.link(o)
+    lib.bevel(o, 0.003, 1, 50.0)
+    o.data.materials.append(rubber)
+    return o
+
+
+parts.append(sole_slab("midsole", 0.008, SOLE_TOP + 0.002, 1.07))
+parts.append(sole_slab("heel_block", -0.010, 0.010, 1.05, -0.2, -0.070))   # taco
+parts.append(sole_slab("fore_sole", -0.004, 0.010, 1.05, -0.030, 0.2))     # planta delantera
+for row in range(6):  # tacos de dibujo en chevrón bajo la planta
+    y = -0.012 + row * 0.027
+    w = half_width(y, 0.0) * 0.78
     for sgn in (-1, 1):
-        x = sgn * 0.024 * (0.9 if y > 0.09 else 1.0)
-        if y > 0.11:
-            continue
-        lug = lib.box("lug", (0.030, 0.012, 0.012), (x, y, -0.003), (0.0, 0.0, math.radians(-24.0 * sgn)))
-        lib.bevel(lug, 0.0035, 1)
+        lug = lib.box("lug", (w * 0.95, 0.010, 0.007), (sgn * w * 0.48, y, -0.0065),
+                      (0.0, 0.0, math.radians(-22.0 * sgn)))
         lug.data.materials.append(rubber)
         parts.append(lug)
-for y in (0.125, 0.150):
-    lug = lib.box("lug", (0.060 if y < 0.14 else 0.040, 0.012, 0.012), (0.0, y, -0.003))
-    lib.bevel(lug, 0.0035, 1)
+for row in range(2):  # tacos transversales del taco
+    lug = lib.box("lug", (0.060, 0.012, 0.007), (0.0, -0.125 + row * 0.030, -0.0125))
     lug.data.materials.append(rubber)
     parts.append(lug)
-# Pie: tubo de sección achatada desde el talón hasta la puntera, con la punta redondeada.
-foot_pts = [(0, -0.150, 0.060), (0, -0.138, 0.070), (0, -0.07, 0.07), (0, 0.0, 0.062), (0, 0.075, 0.055), (0, 0.130, 0.045), (0, 0.160, 0.036), (0, 0.168, 0.033)]
-foot_r = [0.014, 0.046, 0.057, 0.059, 0.058, 0.050, 0.030, 0.012]
-foot = lib.tube_along("foot", foot_pts, foot_r, sides=14, squash=0.88)
-lib.subsurf(foot, 1)
-foot.data.materials.append(leather)
-parts.append(foot)
-# Puntera de acero (semiesfera achatada).
-toe_m = lib.material("toe_leather", lib.hex_color("#33200F"), rough=0.5)
-toe = lib.sphere("toecap", 0.054, (0.0, 0.116, 0.047), 16, 10, (1.0, 1.22, 0.74))
-toe.data.materials.append(toe_m)
-parts.append(toe)
-# Caña: tubo vertical que sube desde el tobillo, con un reborde acolchado arriba.
-shaft_pts = [(0, -0.080, 0.070), (0, -0.082, 0.120), (0, -0.084, 0.170), (0, -0.086, 0.205), (0, -0.087, 0.222), (0, -0.087, 0.228)]
-shaft_r = [0.040, 0.044, 0.039, 0.043, 0.049, 0.043]
-shaft = lib.tube_along("shaft", shaft_pts, shaft_r, sides=14, squash=0.95)
-lib.subsurf(shaft, 1)
-shaft.data.materials.append(leather)
-parts.append(shaft)
-tongue = lib.box("tongue", (0.050, 0.150, 0.008), (0.0, 0.0, 0.112), (math.radians(-6.0), 0.0, 0.0))
-lib.bevel(tongue, 0.003, 1)
-tongue.data.materials.append(leather)
-parts.append(tongue)
-# Lengüeta y cordones: cinco cruces sobre el empeine.
+
+# --- Ojales y cordones cruzados sobre el empeine y la caña -------------------------------------
+eyelets = []
 for k in range(5):
-    y = -0.045 + k * 0.032
-    z = 0.128 - k * 0.009
-    cross = lib.box("lace", (0.056, 0.007, 0.006), (0.0, y, z + 0.004), (math.radians(-6.0), 0.0, 0.0))
-    cross.data.materials.append(lace)
-    parts.append(cross)
-    for sx in (-0.030, 0.030):
-        eyelet = lib.sphere("eye", 0.0055, (sx, y, z), 8, 6)
-        eyelet.data.materials.append(steel)
-        parts.append(eyelet)
-mouth = lib.sphere("mouth", 0.040, (0.0, -0.087, 0.226), 14, 6, (1.0, 1.0, 0.18))
-mouth.data.materials.append(rubber)
-parts.append(mouth)
-lib.finish(parts, "boot", A)
+    z = 0.098 + k * 0.022
+    x = half_width(y_front(z), z) * 0.40
+    for sx in (-1, 1):
+        p, _n = on_surface(sx * x, z, 0.002)
+        eyelets.append(p)
+        e = lib.sphere("eyelet", 0.0050, tuple(p), 8, 4)
+        e.data.materials.append(metal)
+        parts.append(e)
+for k in range(4):  # cada tramo va del ojal izquierdo k al derecho k+1 y al revés: X
+    a_l, a_r = eyelets[2 * k], eyelets[2 * k + 1]
+    b_l, b_r = eyelets[2 * k + 2], eyelets[2 * k + 3]
+    for p0, p1 in ((a_l, b_r), (a_r, b_l)):
+        mid = (p0 + p1) * 0.5 + Vector((0.0, 0.006, 0.0))
+        seg = lib.tube_along("lace", [tuple(p0), tuple(mid), tuple(p1)], [0.0034, 0.0038, 0.0034], sides=6)
+        seg.data.materials.append(lace)
+        parts.append(seg)
+bow = lib.tube_along("bow", [tuple(eyelets[-2] + Vector((0, 0.004, 0.006))), (0.0, eyelets[-1].y + 0.012, eyelets[-1].z + 0.016),
+                             tuple(eyelets[-1] + Vector((0, 0.004, 0.006)))], [0.0034, 0.0042, 0.0034], sides=6)
+bow.data.materials.append(lace)
+parts.append(bow)
+
+lib.finish(parts, "boot", A, render_args={"elev": 0.35}, angle=48.0)
+if A["render"]:
+    # En el juego la bota se ve de 3/4 de costado (la punta hacia la derecha y hacia adelante).
+    lib.render_game_view(A["render"], "boot", yaw_deg=-65.0, tilt_deg=0.0, fill=0.55)

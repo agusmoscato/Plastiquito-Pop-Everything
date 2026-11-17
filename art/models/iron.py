@@ -84,12 +84,30 @@ for i, (x, y) in enumerate([(-0.026, 0.02), (0.026, 0.02), (-0.032, 0.06), (0.03
     h.data.materials.append(dark)
     holes.append(h)
 
-# Cable: tubo ondulado que sale por atrás.
-cable_pts = [(0.0, -0.14, 0.045), (0.0, -0.18, 0.035), (0.02, -0.23, 0.02), (-0.02, -0.28, 0.012), (0.0, -0.33, 0.01)]
-cable = lib.tube_along("cable", cable_pts, [0.007] * 5, sides=8)
-cable.data.materials.append(dark)
+# Cable: tubo sobre una curva suave (Catmull-Rom muestreada), con un protector donde sale del cuerpo.
+def catmull(points, per_seg=8):
+    pts = [Vector(p) for p in points]
+    pts = [pts[0] * 2 - pts[1]] + pts + [pts[-1] * 2 - pts[-2]]
+    out = []
+    for i in range(1, len(pts) - 2):
+        p0, p1, p2, p3 = pts[i - 1], pts[i], pts[i + 1], pts[i + 2]
+        for s in range(per_seg):
+            t = s / per_seg
+            t2, t3 = t * t, t * t * t
+            out.append(0.5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3))
+    out.append(pts[-2])
+    return [tuple(p) for p in out]
 
-parts = [sole, shell, band, handle, dial, cable] + holes
+
+ctrl = [(0.0, -0.135, 0.040), (0.004, -0.170, 0.030), (0.020, -0.215, 0.016), (0.034, -0.265, 0.009), (0.030, -0.320, 0.007)]
+cable_pts = catmull(ctrl, 7)
+cable = lib.tube_along("cable", cable_pts, [0.0058] * len(cable_pts), sides=10)
+cable.data.materials.append(dark)
+relief_pts = catmull(ctrl[:2], 4)
+relief = lib.tube_along("relief", relief_pts, [0.0105 - 0.0035 * i / (len(relief_pts) - 1) for i in range(len(relief_pts))], sides=12)
+relief.data.materials.append(dark)
+
+parts = [sole, shell, band, handle, dial, cable, relief] + holes
 for p in parts:
     lib.apply_modifiers(p)
 obj = lib.join(parts, "iron")
@@ -101,3 +119,4 @@ if A["out"]:
     lib.export_glb(A["out"])
 if A["render"]:
     lib.render_set(A["render"], "iron")
+    lib.render_game_view(A["render"], "iron", yaw_deg=-30.0, tilt_deg=0.0, fill=0.55)

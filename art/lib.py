@@ -284,6 +284,64 @@ def render_set(folder, name, target=(0, 0, 0.1), dist=0.6, size=1024, elev=0.45)
     shoot(40, 64, os.path.join(folder, "%s_64.jpg" % name))
 
 
+def bubble_field(radius=0.005, rows=16, cols=22, z=0.0):
+    """Grilla hexagonal de domos (plástico de burbujas) para dar escala en los renders de juego."""
+    mat = material("bubble", (0.62, 0.82, 0.95), rough=0.08, clearcoat=0.6)
+    objs = []
+    step = radius * 2.1
+    for r in range(rows):
+        for c in range(cols):
+            x = (c - cols / 2) * step + (step * 0.5 if r % 2 else 0.0)
+            y = (r - rows / 2) * step * 0.866
+            prof = [(radius * math.sin(math.pi * 0.5 * i / 6), z + radius * 0.75 * math.cos(math.pi * 0.5 * i / 6)) for i in range(7)]
+            prof = [(0.0, z + radius * 0.75)] + prof[1:]
+            o = revolve_profile("bub", prof, 14)
+            o.location = (x, y, 0)
+            o.data.materials.append(mat)
+            objs.append(o)
+    sheet = box("sheet", (cols * step + 0.02, rows * step + 0.02, 0.0006), (0, 0, z - 0.0003))
+    sheet.data.materials.append(material("sheet", (0.75, 0.86, 0.93), rough=0.3))
+    objs.append(sheet)
+    return objs
+
+
+def render_game_view(folder, name, yaw_deg=28.0, tilt_deg=-12.0, pitch_deg=55.0, size=1024, fill=0.9):
+    """Render como lo ve el juego: el modelo inclinado y girado como en ToolMeshes, la cámara a
+    `pitch_deg` desde arriba mirando hacia +Y (la -Z de Godot) y burbujas de 1 cm debajo.
+    Escribe <name>_juego.jpg y <name>_juego_64.jpg. Llamar después de render_set (reusa luces)."""
+    scene = bpy.context.scene
+    roots = [o for o in scene.objects if o.parent is None and o.type in ("MESH", "ARMATURE", "EMPTY")]
+    pivot = bpy.data.objects.new("game_pivot", None)
+    scene.collection.objects.link(pivot)
+    for o in roots:
+        o.parent = pivot
+    pivot.rotation_euler = (math.radians(tilt_deg), 0.0, math.radians(yaw_deg))
+    bpy.context.view_layer.update()
+    pts = []
+    for o in scene.objects:
+        if o.type == "MESH":
+            pts += [o.matrix_world @ Vector(c) for c in o.bound_box]
+    lo = Vector((min(p.x for p in pts), min(p.y for p in pts), min(p.z for p in pts)))
+    hi = Vector((max(p.x for p in pts), max(p.y for p in pts), max(p.z for p in pts)))
+    field = bubble_field(z=min(lo.z, 0.0) - 0.004)
+    tgt = (lo + hi) * 0.5
+    for o in field:
+        o.location.x += tgt.x
+        o.location.y += tgt.y
+    span = (hi - lo).length
+    cam = scene.camera
+    cam.data.lens = 50
+    dist = span / fill
+    p = math.radians(pitch_deg)
+    cam.location = tgt + Vector((0.0, -math.cos(p) * dist, math.sin(p) * dist))
+    cam.rotation_euler = (tgt - cam.location).to_track_quat("-Z", "Y").to_euler()
+    for px, suffix in ((size, "_juego"), (64, "_juego_64")):
+        scene.render.resolution_x = px
+        scene.render.resolution_y = px
+        scene.render.filepath = os.path.join(os.path.abspath(folder), name + suffix + ".jpg")
+        bpy.ops.render.render(write_still=True)
+
+
 def box(name, size, loc=(0, 0, 0), rot=(0, 0, 0)):
     """Caja con bisel (la usan los detalles duros)."""
     sx, sy, sz = size
