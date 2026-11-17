@@ -258,7 +258,7 @@ func test_memory_restores_part_of_previous_levels() -> void:
 	sim.state.levels["finger_force"] = 20
 	sim.state.pops_run = 5.0 * Cfg.num(db.economy, "pellet_divisor")
 	sim.recycle()
-	assert_eq(sim.state.level("finger_force"), 2, "10% de 20 niveles")
+	assert_eq(sim.state.level("finger_force"), 4, "20% de 20 niveles (10% por nivel)")
 	assert_eq(Cfg.integer(sim.state.last_levels, "finger_force"), 20)
 
 
