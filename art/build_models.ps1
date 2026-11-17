@@ -1,4 +1,4 @@
-# Regenera todos los .glb y renders de control. $env:BLENDER para otro ejecutable (hoy 4.5.10 LTS).
+﻿# Regenera todos los .glb y renders de control. $env:BLENDER para otro ejecutable (hoy 4.5.10 LTS).
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root
 $bl = if ($env:BLENDER) { $env:BLENDER } else { "C:\Program Files\Blender Foundation\Blender 4.5\blender.exe" }
@@ -10,7 +10,9 @@ function Run($script, $name, $extra) {
     & $bl -b --factory-startup -P "art/models/$script.py" -- --out "$out\$name.glb" --render $ren @extra |
         Select-String -Pattern "TRIS|Error|Traceback"
 }
-Run "hand" "hand_ghost" @("--no-arm")
-foreach ($m in "hand", "pin", "iron", "boot", "roller") { Run $m $m @() }
+# Mano y manitos: base MakeHuman/MPFB (CC0). Requiere tools/get_mpfb.sh una vez.
+Run "hand_mpfb" "hand_ghost" @("--no-arm")
+Run "hand_mpfb" "hand" @()
+foreach ($m in "pin", "iron", "boot", "roller") { Run $m $m @() }
 foreach ($w in "gem", "bomb", "line") { Run "specials" "special_$w" @("--which", $w) }
 foreach ($w in "cup", "pencil", "chair_leg", "shelf", "cone") { Run "props" "prop_$w" @("--which", $w) }
