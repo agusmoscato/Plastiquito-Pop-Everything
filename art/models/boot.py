@@ -136,9 +136,6 @@ def reinforce_shade(c):
     return 1.0 - 0.52 * max(t_toe, t_heel)
 
 
-lib.paint(upper, reinforce_shade)
-
-
 # --- Caña: Skin Modifier sobre una cadena de vértices (tobillo -> cuello), con quiebre en el tobillo ---
 SKIN_COMP = 1.05  # el Skin arma secciones cuadradas y la subdivisión las redondea y achica
 SHAFT = [  # (z, y de atrás, y de adelante, medio ancho): frente alto (como una bota de 15 cm de caña)
@@ -169,7 +166,12 @@ def shaft_skin():
         v.use_root = i == 0
     lib.subsurf(o, 2)
     lib.apply_modifiers(o)
-    # Boca abierta: se sacan las caras de la tapa de arriba (el pie entra por ahí).
+    o.data.materials.append(leather)
+    return o
+
+
+def open_mouth(o):
+    """Boca abierta: se sacan las caras de la tapa de arriba de la caña (el pie entra por ahí)."""
     bm3 = bmesh.new()
     bm3.from_mesh(o.data)
     top_z = max(v.co.z for v in bm3.verts)
@@ -177,12 +179,33 @@ def shaft_skin():
     bmesh.ops.delete(bm3, geom=cap, context="FACES")
     bm3.to_mesh(o.data)
     bm3.free()
-    o.data.materials.append(leather)
+
+
+def fuse(parts_in, name, voxel=0.003, target_tris=2100):
+    """Pie y caña en UN volumen: remallado por vóxeles (sin la costura dentada donde se cruzaban),
+    suavizado y decimado al presupuesto de triángulos."""
+    o = lib.join(parts_in, name)
+    rm = o.modifiers.new("Remesh", "REMESH")
+    rm.mode = "VOXEL"
+    rm.voxel_size = voxel
+    sm = o.modifiers.new("Smooth", "SMOOTH")
+    sm.factor = 0.6
+    sm.iterations = 6
+    lib.apply_modifiers(o)
+    tris = lib.triangles(o)
+    dec = o.modifiers.new("Decimate", "DECIMATE")
+    dec.ratio = min(1.0, target_tris / max(tris, 1))
+    lib.apply_modifiers(o)
     return o
 
 
 shaft = shaft_skin()
-lib.paint(shaft)
+upper = fuse([upper, shaft], "upper")
+open_mouth(upper)
+upper.data.materials.clear()
+upper.data.materials.append(leather)
+lib.paint(upper, reinforce_shade)
+shaft = upper  # los rayos (lengüeta, ojales, ribetes) van contra el volumen fundido
 
 
 def _ray(origin, d):
@@ -239,7 +262,7 @@ for nm, pts in (("welt_toe", welt_toe()), ("welt_heel", welt_heel())):
         w.data.materials.append(leather_dark)
         parts_welts = globals().setdefault("parts_welts", [])
         parts_welts.append(w)
-parts = [upper, shaft] + globals().get("parts_welts", [])
+parts = [upper] + globals().get("parts_welts", [])
 
 
 def on_surface(x, z, out=0.0015):
@@ -270,7 +293,7 @@ smooth_pts = [(pts_s[i - 1] + pts_s[i] * 2.0 + pts_s[(i + 1) % len(pts_s)]) / 4.
 arc = [p for (a, _), p in zip(samples, smooth_pts) if abs(a) > 0.55]  # abierto adelante (lengüeta)
 arc.sort(key=_ang)
 collar_pts = [(p.x, p.y, p.z + 0.002) for p in arc]
-rad = [0.0055 + 0.0050 * math.sin(math.pi * i / (len(collar_pts) - 1)) for i in range(len(collar_pts))]
+rad = [0.0075 + 0.0045 * math.sin(math.pi * i / (len(collar_pts) - 1)) for i in range(len(collar_pts))]  # cubre el borde recortado
 collar = lib.tube_along("collar", collar_pts, rad, sides=7, squash=0.7)
 collar.data.materials.append(leather_dark)
 parts.append(collar)
@@ -280,7 +303,7 @@ tongue_pts = []
 for z in (0.092, 0.115, 0.138, 0.161, 0.184, 0.200, 0.212):
     tongue_pts.append(tuple(on_surface(0.0, z, 0.0004)[0]))
 tongue = lib.tube_along("tongue", tongue_pts, [0.010, 0.013, 0.014, 0.0145, 0.0145, 0.014, 0.012], sides=12, squash=0.18)
-tongue.data.materials.append(leather_dark)
+tongue.data.materials.append(leather)  # cuero claro: oscura se leía como un agujero
 parts.append(tongue)
 
 # --- Suela: sigue el contorno, entresuela + taco + tacos de dibujo -----------------------------

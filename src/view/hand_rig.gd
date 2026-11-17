@@ -30,9 +30,14 @@ static func pose_data(name: String) -> Dictionary[String, PackedFloat32Array]:
 			d["middle"] = PackedFloat32Array([0.0, 40.0, 72.0, 30.0])
 			d["ring"] = PackedFloat32Array([0.0, 42.0, 74.0, 30.0])
 			d["pinky"] = PackedFloat32Array([0.0, 44.0, 76.0, 30.0])
-			d["thumb"] = PackedFloat32Array([14.0, 22.0, 16.0]) # semicerrado sobre el medio
+			d["thumb"] = PackedFloat32Array([8.0, 14.0, 10.0]) # apenas flexionado...
+			d["thumb_spread"] = PackedFloat32Array([THUMB_TUCK]) # ...y pegado al costado de los dedos cerrados
 	return d
 
+
+## Aducción del pulgar en "señalar" (grados): se pega al costado de los dedos cerrados en vez de
+## apuntar a la lámina (sin esto la mano se leía como una pistola de dos caños).
+const THUMB_TUCK: float = 38.0
 
 var pose_name: String = "point"
 var skeleton: Skeleton3D
@@ -85,6 +90,7 @@ func set_pose(name: String, immediate: bool = false) -> void:
 	var th: PackedFloat32Array = pose["thumb"]
 	for k: int in 3:
 		_target["thumb_%d" % (k + 1)] = th[k]
+	_target["thumb_spread"] = pose["thumb_spread"][0] if pose.has("thumb_spread") else 0.0
 	if immediate:
 		_angle = _target.duplicate()
 		_apply()
@@ -107,6 +113,8 @@ func _apply() -> void:
 	if skeleton == null:
 		return
 	for key: String in _angle:
+		if key == "thumb_spread":
+			continue
 		var deg: float = _angle[key]
 		if pose_name == "point":
 			if key == "index_3":
@@ -120,4 +128,8 @@ func _apply() -> void:
 		var rest: Quaternion = skeleton.get_bone_rest(_bones[key]).basis.get_rotation_quaternion()
 		# En los huesos exportados, +X local dobla hacia el dorso: se invierte para que los ángulos
 		# de pose_data (positivo = cierra hacia la palma) se cumplan (test_hand_rig lo verifica).
-		skeleton.set_bone_pose_rotation(_bones[key], rest * Quaternion(Vector3.RIGHT, -deg_to_rad(deg)))
+		var q: Quaternion = rest * Quaternion(Vector3.RIGHT, -deg_to_rad(deg))
+		if key == "thumb_1":
+			var spread: float = _angle.get("thumb_spread", 0.0)
+			q = q * Quaternion(Vector3.FORWARD, deg_to_rad(spread)) # sentido fijado por test_hand_rig
+		skeleton.set_bone_pose_rotation(_bones[key], q)

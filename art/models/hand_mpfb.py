@@ -20,7 +20,7 @@ from art import lib, mpfb_load
 
 A = lib.args()
 NO_ARM = "--no-arm" in sys.argv  # manitos: sin antebrazo ni puño
-ARM_LEN = 0.10  # antebrazo visible desde la muñeca
+ARM_LEN = 0.096  # antebrazo visible desde la muñeca (+4 mm del domo de la punta = 10 cm)
 CUFF_AT = 0.025  # el puño enrollado (el hueso wrist de MakeHuman empieza ~1 cm antes del pliegue)
 FINGER_STRETCH = 1.10
 
@@ -115,6 +115,13 @@ for v in bm.verts:
         dead.append(v)
 bmesh.ops.delete(bm, geom=dead, context="VERTS")
 bmesh.ops.holes_fill(bm, edges=bm.edges[:], sides=0)  # tapa el corte del antebrazo (o de la muñeca)
+# La tapa plana dejaba una estrella con picos: se redondea en domo (cara interior más chica y adelantada).
+for cap in [f for f in bm.faces if len(f.verts) > 8]:
+    res = bmesh.ops.inset_region(bm, faces=[cap], thickness=0.007, depth=0.0)
+    inner_c = cap.calc_center_median()
+    for v in cap.verts:
+        v.co = inner_c + (v.co - inner_c) * 0.55 + arm_axis * 0.004
+    bmesh.ops.poke(bm, faces=[cap])
 for v in bm.verts:
     v.co = to_local(v.co)
 bm.to_mesh(body.data)
@@ -286,7 +293,7 @@ if not NO_ARM:
         d = ref * math.cos(a) + ref2 * math.sin(a)
         best = max((((p - c) - axis_l * (p - c).dot(axis_l)).length for p in pts_sec
                     if ((p - c) - axis_l * (p - c).dot(axis_l)).normalized().dot(d) > 0.93), default=0.03)
-        loop.append(tuple(c + d * (best + 0.0045)))
+        loop.append(tuple(c + d * (best + 0.0025)))  # el puño abraza la muñeca (sin luz visible)
     cuff = closed_ring("cuff", [Vector(p) for p in loop], axis_l, 0.0068, 12)
     lib.subsurf(cuff, 1)
     lib.apply_modifiers(cuff)
@@ -354,13 +361,14 @@ if A["render"]:
     name = "hand_ghost" if NO_ARM else "hand"
     lib.select_only(arm_obj)
     bpy.ops.object.mode_set(mode="POSE")
-    pose = {"middle": (40, 72, 30), "ring": (42, 74, 30), "pinky": (44, 76, 30), "thumb": (14, 22, 16), "index": (2, 4, 2)}
+    pose = {"middle": (40, 72, 30), "ring": (42, 74, 30), "pinky": (44, 76, 30), "thumb": (8, 14, 10), "index": (2, 4, 2)}
     for fname, angs in pose.items():
         for k, deg in enumerate(angs):
             pb = arm_obj.pose.bones.get("%s_%d" % (fname, k + 1))
             if pb:
                 pb.rotation_mode = "XYZ"
-                pb.rotation_euler = (math.radians(-deg), 0.0, 0.0)  # -X cierra hacia la palma
+                spread = 38.0 if (fname == "thumb" and k == 0) else 0.0  # = HandRig.THUMB_TUCK
+                pb.rotation_euler = (math.radians(-deg), 0.0, math.radians(-spread))  # -X cierra hacia la palma
     bpy.ops.object.mode_set(mode="OBJECT")
     lib.render_set(A["render"], name, elev=0.7)
     lib.render_game_view(A["render"], name, yaw_deg=55.0, tilt_deg=-14.0)

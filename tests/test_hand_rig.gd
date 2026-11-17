@@ -50,3 +50,13 @@ func test_ghost_hands_never_overlap() -> void:
 		for j: int in range(i + 1, out.size()):
 			assert_gt(out[i].distance_to(out[j]), 2.39, "manitos %d y %d separadas" % [i, j])
 	assert_eq(out[3], Vector2(9, 9), "las que ya estaban lejos no se mueven")
+
+
+
+func test_point_pose_tucks_the_thumb_toward_the_fingers() -> void:
+	var open: HandRig = _rig("palm")
+	var point: HandRig = _rig("point")
+	var open_tip: Vector3 = _bone_pos(open, "thumb_3")
+	var tucked: Vector3 = _bone_pos(point, "thumb_3")
+	# El pulgar está del lado -X: al pegarse a los dedos, su punta va hacia +X.
+	assert_gt(tucked.x, open_tip.x + 0.005, "en señalar el pulgar se pega al costado de los dedos")
