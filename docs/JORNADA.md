@@ -5,13 +5,127 @@ Trabajo autónomo en la PC del dueño en **modo invisible**: nada con ventana ni
 del juego (capturas, prueba de humo con imagen, clips) corre en GitHub Actions
 (`.github/workflows/render.yml`) y queda en la rama `renders`, carpeta `<sha corto>/`.
 
-## Estado en una línea (fin de la segunda sesión)
+## Estado en una línea (fin de la tercera sesión)
+
+`fase-3b` pusheada, CI de render en verde (capturas, herramientas, prueba de humo y demo3), lint y
+170 tests en verde. **No se mergea a `main`**: el dueño revisa las capturas primero.
+
+---
+
+# Sesión 3 (misma fecha, noche): cámara, legibilidad, íconos
+
+Antes / después (todo en [screens/sesion3/](screens/sesion3/)):
+
+| | Antes | Después |
+| --- | --- | --- |
+| Mesa | [mesa_antes](screens/sesion3/mesa_antes.jpg) (c300a6a) | [mesa_despues](screens/sesion3/mesa_despues.jpg) (7b69b59) |
+| Mano en el juego | [mano_juego_antes](screens/sesion3/mano_juego_antes.jpg) | [mano_juego_despues](screens/sesion3/mano_juego_despues.jpg) · [primer plano apretando](screens/sesion3/mano_primer_plano.jpg) |
+| Mano (Blender) | [mano_antes](screens/sesion3/mano_antes.jpg) | [mano_despues](screens/sesion3/mano_despues.jpg) |
+| Bota (Blender) | [bota_antes](screens/sesion3/bota_antes.jpg) | [bota_despues](screens/sesion3/bota_despues.jpg) |
+| Íconos | [iconos_antes](screens/sesion3/iconos_antes.jpg) | [iconos_despues](screens/sesion3/iconos_despues.jpg) · [hoja de contactos con la prueba a 48 px](screens/iconos.jpg) |
+
+Una captura por fase con la cámara de trabajo: [Mesa](screens/sesion3/t050_fase1.jpg) ·
+[Piso](screens/sesion3/t100_fase2.jpg) · [Galpón](screens/sesion3/t200_fase3.jpg) ·
+[Estacionamiento](screens/sesion3/t275_fase4.jpg) · [sello de cadena](screens/sesion3/cadena.jpg).
+Todas las corridas están en la rama `renders` (carpetas `c495e56` a `7b69b59`).
+
+## 1. Encuadre (lo más grave)
+- **Regla nueva** (`CameraRig.work_plan`): la lámina entera llena el área de juego (la zona a la
+  izquierda de la hoja de pedidos) mientras sus burbujas midan 10 px o más; si no entra, la cámara
+  queda a 10 px y sigue a la herramienta. Informe por tamaño de lámina:
+  [escala_herramientas.txt](escala_herramientas.txt) (Mesa 8x8: 82 px por burbuja; Piso 40x40: 16 px;
+  Galpón y Estacionamiento: 10 px, y la cámara sigue).
+- La herramienta mide una **fracción fija del alto de la pantalla** (`tool_screen_fraction`: mano 16 %,
+  plancha 16 %, resto 12 %, manitos 8 %). En las capturas de CI encontré un error mío: medía el alto
+  con la caja alineada a los ejes, y la mano girada 55° salía 2,3 veces más chica. Ahora proyecta los
+  vértices reales (con test). El rebote del pisotón ya no crece con esa escala (en la fase 4 mandaba la
+  bota a la otra punta).
+- **Utilería**: se fue la lámpara (el disco oscuro con palo y la mancha amarilla); queda solo su luz
+  cálida. La taza y los lápices, a escala real, se ubican con el mismo `camera_sheet_fill` para que
+  asomen por los bordes sin tocar la lámina (test de geometría).
+- **Revisión externa de e37b696**: la lámina de la Mesa llenaba el 84 % (la perspectiva agranda el
+  borde cercano) y pasaba por debajo de las tarjetas, y la taza y los lápices quedaban fuera de cuadro.
+  Bajé `camera_sheet_fill` a 0,58 y la zona libre del seguimiento al 35 % central (en la fase 4 la mano
+  se iba a la esquina de la orden de trabajo).
+  En el render de 7b69b59 la lámina llena ~70 % y no pasa bajo ninguna tarjeta. **Todavía no se cumple**:
+  la taza y los lápices siguen fuera de cuadro (el film de la lámina tiene un margen grande y la
+  utilería se ubica contra él), y en la fase 4 la mano sigue quedando en el tercio de arriba, con
+  números flotantes que se pisan ([t275_fase4](screens/sesion3/t275_fase4.jpg)).
+
+## 2. Legibilidad
+- **Contorno** (`shaders/toon_outline.gdshader`): casco invertido en espacio de pantalla (1,6 px),
+  oscuro en la mano y las herramientas. En las manitos va dentro de su material, en la cola
+  transparente entre la pasada de profundidad y la visible: como overlay opaco las rellenaba enteras
+  (se vio en CI y se corrigió).
+- **Guante**: roughness 0,64, coat 0,15, luz de borde suave y color de vértice horneado en Blender, con
+  oclusión en los pliegues y la palma un 14 % más oscura.
+- **Mano**: antebrazo de 6 cm que se afina hacia la muñeca, borde enrollado fino (3,4 mm) pegado a la
+  muñeca, pulgar en reposo a 44°. **Manitos** con subdivisión (Godot genera los LOD al importar; 12.900
+  triángulos) y relleno al 6 %.
+- **Bota**: seis pares de ojales, cordones más gruesos, moño con puntas largas y taco más alto (sube
+  sobre el cuero en vez de levantar la bota).
+- **IoU** contra los planos (actualizados a 6 cm de antebrazo y borde enrollado de 3 mm): bota 0,896 /
+  0,850 (aprobada); mano 0,847 / 0,851. **La vista superior de la mano queda en 0,847, por debajo de
+  0,85**: el antebrazo corto saca la zona que mejor coincidía con el plano. Probé el pulgar a 36, 40, 44
+  y 48°, y 44 es el mejor. No toqué el plano para que pase.
+
+## 3. Íconos
+- `art/icons.py` (Blender -b) arma una escena por ícono a 256 px: fondo transparente, tres luces
+  relativas a la cámara, contorno Freestyle y cámara ortográfica de encuadre cerrado. Las manos salen
+  de `hand_mpfb.py --icon-poses` (señalar, palma y agarre, con los ángulos de `HandRig`).
+- Herramientas: yema apretando una burbuja, palma desde arriba, mano agarrando el palo y la plancha,
+  bota, manito, rodillo y burbuja. Mejoras, una por categoría: regla (tamaño), burbuja reventando
+  (fuerza), estela (velocidad) y manitos (automatización). Las demás usan el ícono de su herramienta.
+- `ToolIcon` pasa a ser un `TextureRect` con la misma API (ya no hay un SubViewport por ícono). Hay un
+  test de que cada ícono existe. Prueba a 48 px: [iconos.jpg](screens/iconos.jpg).
+
+## 4. Sello "CADENA ×N"
+Ancho máximo del 35 % del área de juego. Si cae sobre un panel del HUD, prueba otras posiciones y se
+queda con la que no tapa nada (con test). El revisor externo lo midió en 33-36 %, sin tapar paneles.
+
+## 5. Balance (congelado)
+Único cambio: **memoria del turno** rinde el doble (10 % de los niveles anteriores por nivel, hasta 8
+niveles). Corrí `balance_full` una vez (215 min, 3 perfiles x 3 semillas), sin perseguir métricas:
+
+| Perfil | Semilla 1 | Semilla 2 | Semilla 3 |
+| --- | --- | --- | --- |
+| Activo | falla solo recuperación (66 %) | falla solo recuperación (63 %) | falla solo recuperación (45 %; en la sesión 2 aprobaba) |
+| Casual | % con compra 66 %, mediana 29 s, espera 254 s | % 66 %, espera 345 s, recuperación 89 % | % 66 %, espera 231 s |
+| Idle | 41 % ✔ | 32 % ✔ | 24 % ✔ |
+
+Las llegadas no cambian (Piso 30/37 min, Galpón 92/94, Estacionamiento 138-143). La memoria más fuerte
+no movió la "recuperación": esa métrica la marcan los reciclados dentro del Estacionamiento.
+
+## Revisor externo (capturas de e37b696)
+- Aprobado: íconos a 48 px ("mucho mejor" que antes) y sello de cadena.
+- Parcial: mano entre 11 y 17 % del alto; contorno (se ve en la mano, poco en la bota); guante menos
+  globo; bota (los cordones se ven en el ícono, poco en el juego).
+- Fallado: encuadre de la Mesa y utilería (corregidos en 7b69b59; ver el punto 1).
+- No lo comparto: tomó por "la lámpara amarilla" a la burbuja dorada especial, que es una mecánica del
+  juego.
+
+## Pendientes
+1. **Revisión del dueño** de las capturas (no se mergea antes).
+2. **Utilería de la Mesa**: que la taza y las puntas de los lápices asomen de verdad (hoy no se ven).
+   **Fase 4**: centrar mejor la herramienta al seguirla y separar los números flotantes.
+3. **Rodillo automático**: a la escala de su franja real, el mango tapa media lámina en la Mesa. Hay
+   que acostarlo o achicar el mango en `roller.py`.
+4. **Puño en el juego**: el borde enrollado es tan fino que el contorno de 1,6 px lo pinta casi entero
+   y se lee como una banda negra. Opciones: contorno más fino en la mano, o puño algo más grueso.
+5. Mano: la vista superior del IoU en 0,847 (punto 2). Bota: los cordones casi no se leen a la escala
+   del juego.
+6. Burbujas: las vetas de la madera se ven como franjas a través de cada burbuja (refracción). En la
+   tienda, los números flotantes se pisan y los cuatro íconos de mejoras globales son iguales.
+7. Balance: la "recuperación" del activo y la disponibilidad de compras del casual (sin tocar, porque
+   el balance está congelado).
+
+---
+
+## Estado al cierre de la sesión 2
 
 `fase-3b` pusheada. CI de render en verde. Lint y 165 tests en verde. **No se mergea a `main`**: el
 dueño revisa los modelos primero, y el balance de las fases 3-4 todavía no cierra para el activo y el
 casual.
-
----
 
 # Sesión 2 (misma fecha, tarde)
 

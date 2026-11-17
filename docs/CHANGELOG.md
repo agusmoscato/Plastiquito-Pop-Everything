@@ -1,5 +1,20 @@
 # Changelog
 
+## Fase 3b — Jornada de pulido, sesión 3 (2026-11-17, sin mergear)
+
+Detalle, pares antes/después y pendientes en [JORNADA.md](JORNADA.md).
+- Cámara de trabajo: la lámina entera llena el área de juego mientras las burbujas midan 10 px o más;
+  si no, la cámara queda a 10 px y sigue a la herramienta. Cada herramienta mide una fracción fija del
+  alto de la pantalla (mano 16 %, manitos 8 %), medida con los vértices reales. Fuera la lámpara; la
+  taza y los lápices asoman por los bordes.
+- Contorno oscuro (casco invertido) en la mano y las herramientas, y celeste en las manitos. Guante
+  mate con oclusión horneada, antebrazo corto que se afina y borde enrollado fino. Bota con cordones
+  largos y taco alto. IoU: bota 0,896/0,850; mano 0,847/0,851 (la vista superior queda bajo 0,85).
+- Íconos pre-renderizados en Blender (256 px, contorno, luz de estudio), una por herramienta y una por
+  categoría de mejora; `ToolIcon` pasa a ser un `TextureRect`.
+- Sello de cadena con un ancho máximo del 35 % del área de juego y nunca sobre un panel.
+- Balance congelado; único cambio: la memoria del turno rinde el doble.
+
 ## Fase 3b — Jornada de pulido, sesión 2 (2026-11-17, sin mergear)
 
 Detalle en [JORNADA.md](JORNADA.md).
