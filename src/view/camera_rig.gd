@@ -33,14 +33,14 @@ var screen_shift: float = 0.0
 ## entra, la cámara se acerca a `min_bubble_px` y sigue a la herramienta. La transición de reciclado
 ## muestra la lámina entera y con la rueda se ve todo. Los clips no la usan (work_mode en false).
 var work_mode: bool = false
-var sheet_fill: float = 0.68
+var sheet_fill: float = 0.58
 var play_area: float = 0.71 ## fracción del ancho de pantalla que queda a la izquierda de la hoja de pedidos
 var min_bubble_px: float = 10.0
 var _work_zoom: float = 0.0
 var _return_in: float = -1.0 ## segundos hasta volver de la vista entera al zoom de trabajo
 var _following: bool = false
 var _follow_needed: bool = false
-const FOLLOW_INNER: float = 0.55 ## el cursor puede moverse libre en el 55 % central; afuera, la cámara lo sigue
+const FOLLOW_INNER: float = 0.35 ## el cursor puede moverse libre en el 35 % central; afuera, la cámara lo sigue
 const FOLLOW_SPEED: float = 3.5
 const HOLD_WHOLE_S: float = 1.2 ## después de la transición, cuánto se sostiene la lámina entera
 
@@ -120,7 +120,7 @@ static func work_distance(px: float) -> float:
 	return view_h / (2.0 * tan(deg_to_rad(FOV) * 0.5))
 
 
-## Sigue a la herramienta: si el cursor sale del 55 % central de lo visible, la cámara se corre
+## Sigue a la herramienta: si el cursor sale del 35 % central de lo visible, la cámara se corre
 ## suave para traerlo de vuelta (sin salir de la lámina). Solo con la cámara de trabajo.
 func follow(cursor: Vector2, valid: bool, delta: float) -> void:
 	if not _following or not valid or not cursor.is_finite():

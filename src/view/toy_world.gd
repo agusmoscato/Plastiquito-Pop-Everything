@@ -68,6 +68,7 @@ func rebind_game_sheet(roll_in: bool, animate_camera: float = 0.0, scenario_seco
 	specials_view.visible = true
 	camera_rig.min_bubble_px = Cfg.num(db.juice, "camera_min_bubble_px")
 	camera_rig.sheet_fill = Cfg.num(db.juice, "camera_sheet_fill")
+	ScenarioProps.sheet_fill = camera_rig.sheet_fill
 	camera_rig.play_area = Cfg.num(db.juice, "camera_play_area")
 	camera_rig.fit_to(sheet_view.center(), sheet_view.extents(), animate_camera)
 	if scenario_seconds > 0.0 and not scenario.matches(game.phase(), sheet_view.extents()):

@@ -5,6 +5,7 @@ extends RefCounted
 ## (centro `c`, tamaño `e`, en el plano XZ): enmarcan los bordes y nunca se cruzan con ella.
 
 const GROUND_Y: float = -0.05
+static var sheet_fill: float = 0.58 ## = camera_sheet_fill (ToyWorld lo actualiza): cuánto del área de juego llena la lámina
 
 
 ## Escala de unidad para los objetos: 1 u = 1/20 del lado de la lámina (mínimo 1).
@@ -89,11 +90,11 @@ static func _cyl(top: float, bottom: float, height: float, segments: int = 24) -
 # --- Mesa: lámpara cálida, taza y lápices (todo fuera de la lámina) -------------------------------------
 
 static func _table(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
-	# Con la cámara de trabajo la lámina llena ~68 % del área de juego (camera_sheet_fill): la utilería,
+	# Con la cámara de trabajo la lámina llena `sheet_fill` del área de juego (camera_sheet_fill): la utilería,
 	# a escala real, solo ASOMA por los bordes (taza cortada a la izquierda, puntas de lápices abajo).
 	var h: Vector2 = e * 0.5
-	var play_half: float = e.x / 0.68 * 0.5 # medio ancho del área de juego, en el mundo
-	var bottom: float = c.y + maxf(h.y, e.x * 0.42) / 0.68 # borde de abajo de la pantalla, aproximado
+	var play_half: float = e.x / sheet_fill * 0.5 # medio ancho del área de juego, en el mundo
+	var bottom: float = c.y + maxf(h.y, e.x * 0.42) / sheet_fill # borde de abajo de la pantalla, aproximado
 	var lamp_light: OmniLight3D = OmniLight3D.new() # la luz cálida de la lámpara queda; la lámpara no se ve
 	lamp_light.light_color = Color("#FFA650")
 	lamp_light.light_energy = 2.2

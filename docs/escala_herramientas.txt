@@ -1,6 +1,6 @@
-fase 1 lámina   8x8   cámara   12.8  burbuja  96.6 px  llena  68% del área de juego  lámina entera
-fase 1 lámina  20x20  cámara   32.0  burbuja  38.6 px  llena  68% del área de juego  lámina entera
-fase 2 lámina  40x40  cámara   64.0  burbuja  19.3 px  llena  68% del área de juego  lámina entera
+fase 1 lámina   8x8   cámara   15.0  burbuja  82.4 px  llena  58% del área de juego  lámina entera
+fase 1 lámina  20x20  cámara   37.5  burbuja  32.9 px  llena  58% del área de juego  lámina entera
+fase 2 lámina  40x40  cámara   75.1  burbuja  16.5 px  llena  58% del área de juego  lámina entera
 fase 3 lámina  80x80  cámara  123.6  burbuja  10.0 px  llena  70% del área de juego  sigue a la herramienta
 fase 4 lámina 150x150 cámara  123.6  burbuja  10.0 px  llena 100% del área de juego  sigue a la herramienta
 herramientas: mano (dedo y palma) 16 % del alto, el resto 12 % (ToolView, tool_screen_fraction)
