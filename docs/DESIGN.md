@@ -175,7 +175,7 @@ La estética es de "juguete limpio": plástico brillante, formas simples y color
 
 ### Cámara de trabajo (decisión del 17/11/2026)
 
-- Se juega con una **cámara de trabajo** de zoom fijo por fase: la burbuja mide 16 px en la Mesa, 12 en el Piso y 10 en el Galpón y el Estacionamiento (`camera_work_bubble_px`, nunca menos que `camera_min_bubble_px` = 10). La cámara sigue a la herramienta con un paneo suave cuando el cursor sale del 55 % central de la pantalla, sin salir de la lámina.
+- Se juega con una **cámara de trabajo** de zoom fijo por fase: la burbuja mide 22 px en la Mesa, 12 en el Piso y 10 en el Galpón y el Estacionamiento (`camera_work_bubble_px`, nunca menos que `camera_min_bubble_px` = 10). La cámara sigue a la herramienta con un paneo suave cuando el cursor sale del 55 % central de la pantalla, sin salir de la lámina.
 - La escala se sigue viendo (pilar 3): la transición del reciclado se aleja hasta mostrar la lámina entera, la sostiene 1,2 s y vuelve al zoom de trabajo. Con la rueda el jugador puede alejarse hasta ver todo.
 - Con la cámara de trabajo, cada herramienta ocupa entre el 8 % y el 15 % del alto de la pantalla (`tools/tool_scale_report.gd`, informe en `docs/escala_herramientas.txt`).
 

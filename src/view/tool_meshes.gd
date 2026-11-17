@@ -7,6 +7,7 @@ const MODELS: String = "res://assets/models/"
 const HAND_SCALE: float = 26.0 ## el dedo del guante mide ~1,9 cm: en el mundo, ~0,5 burbuja de ancho (se calibra en B3)
 const HAND_ROT: Vector3 = Vector3(-14.0, 55.0, 0.0) ## el brazo entra desde abajo a la derecha y el índice se ve de perfil
 const GHOST_SCALE: float = 0.8 ## las manitos miden el 80 % de la mano del jugador
+const MESA_SCALE: float = 0.73 ## dedo y palma: en la Mesa la cámara de trabajo está más cerca (burbuja de 22 px)
 
 ## Estilo de la mano: "glove" (guante de nitrilo, por defecto) o "skin" (piel con subsurface).
 static var hand_style: String = "glove"
@@ -140,7 +141,7 @@ static func build(tool_id: String, radius: float, tier: int = 0, icon: bool = fa
 	var metal: float = 0.85 if tier >= 2 else 0.0
 	match tool_id:
 		"palm":
-			_add_hand(body, "palm", tier, false, half * 1.8 / 0.085 * 0.64, Vector3.ZERO, Vector3(0.0, 24.0, 0.0)) # 8-15 % del alto con la cámara de trabajo
+			_add_hand(body, "palm", tier, false, half * 1.8 / 0.085 * 0.64 * MESA_SCALE, Vector3.ZERO, Vector3(0.0, 24.0, 0.0)) # 8-15 % del alto con la cámara de trabajo
 		"hands":
 			_add_hand(body, "point", tier, true, HAND_SCALE * GHOST_SCALE, Vector3.ZERO, HAND_ROT)
 		"rolling_pin":
@@ -156,7 +157,7 @@ static func build(tool_id: String, radius: float, tier: int = 0, icon: bool = fa
 		"auto_roller":
 			_add_model(body, "roller", half * 2.0 / 0.26, color, amount, metal)
 		_:
-			_add_hand(body, "point", tier, false, HAND_SCALE * (1.0 + 0.08 * radius), Vector3.ZERO, HAND_ROT)
+			_add_hand(body, "point", tier, false, HAND_SCALE * MESA_SCALE * (1.0 + 0.08 * radius), Vector3.ZERO, HAND_ROT)
 	if icon:
 		_fit_icon(root)
 	return root
