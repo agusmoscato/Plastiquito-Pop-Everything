@@ -153,7 +153,13 @@ static func build(tool_id: String, radius: float, tier: int = 0, icon: bool = fa
 			_add_model(body, "iron", s2, color, amount, metal)
 			_add_hand(body, "grab", tier, false, s2 * 1.1, Vector3(0.0, 0.158, -0.005) * s2, Vector3(0.0, 0.0, 0.0))
 		"boot":
-			_add_model(body, "boot", half * 1.95 / 0.33 * 1.1, color, amount, metal) # la suela cubre el pisotón; 8-15 % del alto
+			# De perfil para la cámara del juego (desde arriba, parada, era una mancha marrón): la punta
+			# apunta a la derecha y el costado se inclina hacia la cámara.
+			var tilt: Node3D = Node3D.new()
+			tilt.rotation_degrees = Vector3(-35.0, 0.0, 0.0)
+			body.add_child(tilt)
+			_add_model(tilt, "boot", half * 1.95 / 0.33 * 1.1, color, amount, metal) # la suela cubre el pisotón; 8-15 % del alto
+			(tilt.get_child(0) as Node3D).rotation_degrees = Vector3(0.0, -80.0, 0.0)
 		"auto_roller":
 			_add_model(body, "roller", half * 2.0 / 0.26, color, amount, metal)
 		_:
