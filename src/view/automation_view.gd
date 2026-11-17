@@ -7,12 +7,16 @@ const HAND_SEPARATION: float = 2.4 ## ~ancho de una manito en el mundo (palma de
 
 var sim: GameSim
 var night: float = 0.0 ## turno noche (0..1): las manitos se mueven más rápido
+var rig: CameraRig ## con cámara: las manitos miden `screen_fraction` del alto de la pantalla
+var screen_fraction: float = 0.10
 
 var _hands: Array[Node3D] = []
 var _dip: PackedFloat32Array = PackedFloat32Array()
 var _last_target: PackedInt32Array = PackedInt32Array()
 var _roller: Node3D
 var _roller_key: String = ""
+var _base_h: float = 0.0 ## alto en pantalla de una manito a escala 1 (ToolView.screen_height_of)
+var _scale: float = 1.0
 
 
 func bind(p_sim: GameSim) -> void:
@@ -23,6 +27,7 @@ func _process(delta: float) -> void:
 	if sim == null or sim.hands == null:
 		return
 	_sync_hands()
+	_update_scale(delta)
 	_move_hands(delta)
 	_sync_roller()
 
@@ -31,6 +36,8 @@ func _sync_hands() -> void:
 	var want: int = mini(sim.hands.count, 12)
 	while _hands.size() < want:
 		var h: Node3D = ToolMeshes.build("hands", 0.0, 0)
+		if _base_h <= 0.0:
+			_base_h = ToolView.screen_height_of(h.get_node("Body") as Node3D)
 		add_child(h)
 		_hands.append(h)
 		_dip.append(0.0)
@@ -60,13 +67,22 @@ func _move_hands(delta: float) -> void:
 		_dip[i] = maxf(0.0, _dip[i] - delta * (5.0 + 2.5 * night))
 		goals[i] = sim.grid.cell_to_world(t)
 		active[i] = 1
-	goals = separate(goals, active, HAND_SEPARATION)
+	goals = separate(goals, active, HAND_SEPARATION * _scale)
 	for i: int in _hands.size():
 		if active[i] == 0:
 			continue
 		var h: Node3D = _hands[i]
-		h.position = h.position.lerp(Vector3(goals[i].x, 1.1 - 0.8 * _dip[i], goals[i].y), 1.0 - exp(-14.0 * delta))
+		h.position = h.position.lerp(Vector3(goals[i].x, (1.1 - 0.8 * _dip[i]) * _scale, goals[i].y), 1.0 - exp(-14.0 * delta))
+		h.scale = Vector3.ONE * _scale
 		h.rotation.y = 0.0 # todas igual orientadas: nunca se cruzan
+
+
+## Misma regla que la herramienta del jugador: tamaño fijo en pantalla, más chicas que la mano.
+func _update_scale(delta: float) -> void:
+	if rig == null or _base_h <= 0.0:
+		return
+	var want: float = ToolView.screen_scale_for(_base_h, rig.zoom_distance(), screen_fraction)
+	_scale = lerpf(_scale, want, 1.0 - exp(-10.0 * delta))
 
 
 ## Separa en el plano las manitos que quedarían encimadas (solo lo visual; el toque ya ocurrió en la sim).

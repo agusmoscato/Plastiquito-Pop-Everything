@@ -142,9 +142,32 @@ func _make_steam(half: float) -> GPUParticles3D:
 
 ## Alto que ocupa en pantalla un modelo visto con la cámara inclinada del juego (en unidades del mundo).
 static func screen_height_of(node: Node3D) -> float:
-	var box: AABB = ToolMeshes._bounds(node, Transform3D.IDENTITY)
 	var p: float = deg_to_rad(CameraRig.PITCH_DEGREES)
-	return box.size.z * sin(p) + box.size.y * cos(p)
+	var up: Vector3 = Vector3(0.0, cos(p), -sin(p)) # el eje vertical de la pantalla, en el mundo
+	var span: Vector2 = Vector2(INF, -INF)
+	span = _project_span(node, Transform3D.IDENTITY, up, span)
+	return maxf(span.y - span.x, 0.0)
+
+
+## Mínimo y máximo de los vértices de las mallas proyectados sobre `axis` (vértices reales, no la
+## caja: con la mano girada 55° la caja inflaba la altura 2-3 veces y la mano quedaba chica).
+static func _project_span(node: Node, xf: Transform3D, axis: Vector3, span: Vector2) -> Vector2:
+	var out: Vector2 = span
+	if node is MeshInstance3D:
+		var mesh: Mesh = (node as MeshInstance3D).mesh
+		if mesh != null:
+			for si: int in mesh.get_surface_count():
+				var verts: PackedVector3Array = mesh.surface_get_arrays(si)[Mesh.ARRAY_VERTEX]
+				var step: int = maxi(1, verts.size() / 4000)
+				for vi: int in range(0, verts.size(), step):
+					var d: float = (xf * verts[vi]).dot(axis)
+					out = Vector2(minf(out.x, d), maxf(out.y, d))
+	for c: Node in node.get_children():
+		var ct: Transform3D = xf
+		if c is Node3D:
+			ct = xf * (c as Node3D).transform
+		out = _project_span(c, ct, axis, out)
+	return out
 
 
 ## Escala para que la herramienta ocupe `fraction` del alto de la pantalla a la distancia `zoom`.

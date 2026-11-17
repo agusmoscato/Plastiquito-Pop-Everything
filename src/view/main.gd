@@ -73,6 +73,9 @@ func _ready() -> void:
 	automation.name = "Automation"
 	add_child(automation)
 	automation.bind(sim)
+	automation.rig = world.camera_rig
+	var fractions: Dictionary = db.juice["tool_screen_fraction"]
+	automation.screen_fraction = Cfg.num(fractions, "hands")
 	echo_glow = EchoGlow.new()
 	echo_glow.name = "EchoGlow"
 	add_child(echo_glow)
@@ -654,6 +657,18 @@ func _run_demo3(dir: String) -> void:
 
 
 ## Capturas de las herramientas 3D: cada una sobre la lámina, suelta y apretando.
+## Primer plano de la mano apretando (revisión de materiales y contorno): la cámara se acerca y la
+## mano conserva su tamaño de mundo (sin la regla de fracción de pantalla mientras dura la foto).
+func _closeup_shot(dir: String) -> void:
+	var keep_rig: CameraRig = tool_view.rig
+	tool_view.rig = null
+	world.camera_rig.focus(_cursor + Vector2(1.2, 0.6), 4.5)
+	await _wait(0.4)
+	_shot(dir, "tool_finger_primer_plano")
+	tool_view.rig = keep_rig
+	world.camera_rig.fit_to(world.sheet_view.center(), world.sheet_view.extents())
+
+
 func _run_demo_tools(dir: String) -> void:
 	_demo = true
 	DirAccess.make_dir_recursive_absolute(dir)
@@ -677,5 +692,7 @@ func _run_demo_tools(dir: String) -> void:
 		tool_view.set_pressing(true)
 		await _wait(0.35)
 		_shot(dir, "tool_%s_apretando" % id)
+		if id == "finger":
+			await _closeup_shot(dir)
 		tool_view.set_pressing(false)
 	PopAudio.quit_clean()

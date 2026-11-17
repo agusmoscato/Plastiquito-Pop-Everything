@@ -97,6 +97,29 @@ func test_work_camera_small_sheet_fills_play_area() -> void:
 	assert_almost_eq(CameraRig.bubble_px_at(big.x), 10.0, 0.01)
 
 
+func test_screen_height_uses_vertices_not_the_box() -> void:
+	# Una "L" girada: la caja alineada a los ejes sería mucho más alta que lo que se ve en pantalla.
+	var root: Node3D = Node3D.new()
+	var body: Node3D = Node3D.new()
+	root.add_child(body)
+	var mi: MeshInstance3D = MeshInstance3D.new()
+	var rod: BoxMesh = BoxMesh.new()
+	rod.size = Vector3(4.0, 0.1, 0.1)
+	mi.mesh = rod
+	mi.rotation_degrees = Vector3(0.0, 45.0, 0.0)
+	body.add_child(mi)
+	var p: float = deg_to_rad(CameraRig.PITCH_DEGREES)
+	var expected: float = 4.0 * sin(deg_to_rad(45.0)) * sin(p) # el largo de la barra que cae en la vertical de la pantalla
+	assert_almost_eq(ToolView.screen_height_of(body), expected, 0.2)
+	var box: AABB = ToolMeshes._bounds(body, Transform3D.IDENTITY)
+	assert_lt(ToolView.screen_height_of(body), box.size.z * sin(p) + box.size.y * cos(p) + 0.001)
+	root.free()
+	var db: DataDB = DataDB.new()
+	db.load_all()
+	var frac: Dictionary = db.juice["tool_screen_fraction"]
+	assert_lt(Cfg.num(frac, "hands"), Cfg.num(frac, "finger"), "las manitos se ven más chicas que la mano del jugador")
+
+
 func test_tool_keeps_its_screen_fraction() -> void:
 	for zoom: float in [12.0, 40.0, 120.0]:
 		var k: float = ToolView.screen_scale_for(5.0, zoom, 0.16)

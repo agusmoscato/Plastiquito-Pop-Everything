@@ -9,7 +9,7 @@
     "camera_min_bubble_px": 10.0,
     "camera_sheet_fill": 0.68,
     "camera_play_area": 0.71,
-    "tool_screen_fraction": {"finger": 0.16, "palm": 0.16, "default": 0.12},
+    "tool_screen_fraction": {"finger": 0.16, "palm": 0.16, "hands": 0.10, "default": 0.12},
     "shake_max_trauma": 0.8,
     "shake_decay_per_second": 1.6,
     "shake_max_offset": 0.25,
