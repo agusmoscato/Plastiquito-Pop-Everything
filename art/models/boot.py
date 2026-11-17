@@ -83,17 +83,16 @@ def ring(z, n, z_tilt=0.0, scale=1.0):
 
 
 N = 18
-levels = [SOLE_TOP, 0.032, 0.046, 0.062, 0.078, 0.095, 0.112, 0.130, 0.150, 0.170, 0.190, 0.205]
+levels = [SOLE_TOP, 0.032, 0.046, 0.062, 0.078, 0.095, 0.112, 0.124]  # el pie; la caña es un Skin aparte
 bm = bmesh.new()
 rings = []
+TUCK = {0.112: 0.88, 0.124: 0.72}  # el borde de arriba del pie se mete adentro de la caña (sin escalón)
 for k, z in enumerate(levels):
     tilt = 0.18 * max(0.0, (z - 0.15) / 0.055)  # las secciones de arriba suben hacia atrás
-    rings.append([bm.verts.new(p) for p in ring(z, N, tilt)])
-# Borde del cuello: se enrolla hacia adentro (abierto) y baja un poco (el pie entra por ahí).
-top = ring(levels[-1], N, 0.18)
-inner = [bm.verts.new(Vector((p.x * 0.80, p.y * 0.92 - 0.006, p.z - 0.004))) for p in top]
-deep = [bm.verts.new(Vector((p.x * 0.74, p.y * 0.88 - 0.008, p.z - 0.050))) for p in top]
-rings += [inner, deep]
+    sc = TUCK.get(z, 1.0)
+    pts = ring(z, N, tilt)
+    cy = sum(q.y for q in pts) / len(pts)
+    rings.append([bm.verts.new(Vector((q.x * sc, cy + (q.y - cy) * sc, q.z))) for q in pts])
 for k in range(len(rings) - 1):
     for i in range(N):
         j = (i + 1) % N
@@ -140,9 +139,65 @@ def reinforce_shade(c):
 lib.paint(upper, reinforce_shade)
 
 
+# --- Caña: Skin Modifier sobre una cadena de vértices (tobillo -> cuello), con quiebre en el tobillo ---
+SKIN_COMP = 1.05  # el Skin arma secciones cuadradas y la subdivisión las redondea y achica
+SHAFT = [  # (z, y de atrás, y de adelante, medio ancho): frente alto (como una bota de 15 cm de caña)
+    (0.072, -0.132, 0.040, 0.041),
+    (0.100, -0.128, 0.022, 0.039),
+    (0.128, -0.122, 0.014, 0.0365),  # tobillo: lo más angosto, el tendón entra
+    (0.160, -0.126, 0.012, 0.0385),
+    (0.190, -0.130, 0.012, 0.0410),
+    (0.212, -0.133, 0.010, 0.0425),
+]
+
+
+def shaft_skin():
+    verts = []
+    radii = []
+    for (z, yb, yf, hw) in SHAFT:
+        back_lean = -0.05 * max(0.0, z - 0.10)  # la caña se inclina apenas hacia atrás
+        verts.append((0.0, (yb + yf) * 0.5 + back_lean, z))
+        radii.append((hw * SKIN_COMP, (yf - yb) * 0.5 * SKIN_COMP))
+    me2 = bpy.data.meshes.new("shaft")
+    me2.from_pydata(verts, [(i, i + 1) for i in range(len(verts) - 1)], [])
+    o = bpy.data.objects.new("shaft", me2)
+    bpy.context.scene.collection.objects.link(o)
+    lib.select_only(o)
+    o.modifiers.new("Skin", "SKIN")
+    for i, v in enumerate(me2.skin_vertices[0].data):
+        v.radius = radii[i]
+        v.use_root = i == 0
+    lib.subsurf(o, 2)
+    lib.apply_modifiers(o)
+    # Boca abierta: se sacan las caras de la tapa de arriba (el pie entra por ahí).
+    bm3 = bmesh.new()
+    bm3.from_mesh(o.data)
+    top_z = max(v.co.z for v in bm3.verts)
+    cap = [f for f in bm3.faces if f.calc_center_median().z > top_z - 0.012 and f.normal.z > 0.55]
+    bmesh.ops.delete(bm3, geom=cap, context="FACES")
+    bm3.to_mesh(o.data)
+    bm3.free()
+    o.data.materials.append(leather)
+    return o
+
+
+shaft = shaft_skin()
+lib.paint(shaft)
+
+
+def _ray(origin, d):
+    """Rayo contra el pie y la caña; devuelve el impacto más cercano al origen."""
+    best = None
+    for obj in (upper, shaft):
+        ok, loc, nrm, _ = obj.ray_cast(origin, d)
+        if ok and (best is None or (loc - origin).length < (best[0] - origin).length):
+            best = (loc, nrm)
+    return best
+
+
 def hit_from(center, d):
-    ok, loc, nrm, _ = upper.ray_cast(center + d * 0.25, -d)
-    return (loc + nrm * 0.0012) if ok else None
+    h = _ray(center + d * 0.25, -d)
+    return (h[0] + h[1] * 0.0012) if h else None
 
 
 def welt_toe():
@@ -184,21 +239,37 @@ for nm, pts in (("welt_toe", welt_toe()), ("welt_heel", welt_heel())):
         w.data.materials.append(leather_dark)
         parts_welts = globals().setdefault("parts_welts", [])
         parts_welts.append(w)
-parts = [upper] + globals().get("parts_welts", [])
+parts = [upper, shaft] + globals().get("parts_welts", [])
 
 
 def on_surface(x, z, out=0.0015):
     """Punto de la superficie (ya subdividida) del frente de la bota a la altura z y lado x."""
-    ok, loc, nrm, _ = upper.ray_cast(Vector((x, 0.40, z)), Vector((0.0, -1.0, 0.0)))
-    if not ok:
+    h = _ray(Vector((x, 0.40, z)), Vector((0.0, -1.0, 0.0)))
+    if h is None:
         return Vector((x, y_front(z), z)), Vector((0.0, 1.0, 0.0))
-    return loc + nrm * out, nrm
+    return h[0] + h[1] * out, h[1]
 
 # --- Cuello acolchado: un rollo alrededor de la boca ------------------------------------------
 # Acolchado del cuello: arco bajo que rodea talón y costados y queda abierto adelante (lengüeta).
-order = sorted(top, key=lambda p: math.atan2(p.x, -(p.y - (y_back(levels[-1]) + y_front(levels[-1])) * 0.5)))
-arc = [p for p in order if p.y < y_front(levels[-1]) - 0.030]
-collar_pts = [(p.x * 0.95, p.y * 0.98, p.z - 0.001) for p in arc]
+rim = [shaft.data.vertices[i].co.copy() for e in shaft.data.edges if len([f for f in shaft.data.polygons if e.key in f.edge_keys]) == 1 for i in e.vertices]
+rim_c = sum(rim, Vector()) / max(len(rim), 1)
+# El borde recortado tiene varias alturas: se toma el punto más alto en cada uno de 22 ángulos y se
+# suaviza, así el acolchado sigue una curva limpia (sin zigzag).
+def _ang(p):
+    return math.atan2(p.x, -(p.y - rim_c.y))
+
+
+samples = []
+for k in range(22):
+    a0 = -math.pi + 2.0 * math.pi * k / 22
+    near = [p for p in rim if abs(math.atan2(math.sin(_ang(p) - a0), math.cos(_ang(p) - a0))) < math.pi / 22]
+    if near:
+        samples.append((a0, max(near, key=lambda p: p.z)))
+pts_s = [p for (_, p) in samples]
+smooth_pts = [(pts_s[i - 1] + pts_s[i] * 2.0 + pts_s[(i + 1) % len(pts_s)]) / 4.0 for i in range(len(pts_s))]
+arc = [p for (a, _), p in zip(samples, smooth_pts) if abs(a) > 0.55]  # abierto adelante (lengüeta)
+arc.sort(key=_ang)
+collar_pts = [(p.x, p.y, p.z + 0.002) for p in arc]
 rad = [0.0055 + 0.0050 * math.sin(math.pi * i / (len(collar_pts) - 1)) for i in range(len(collar_pts))]
 collar = lib.tube_along("collar", collar_pts, rad, sides=7, squash=0.7)
 collar.data.materials.append(leather_dark)
@@ -206,9 +277,9 @@ parts.append(collar)
 
 # --- Lengüeta: sale de la boca, sigue el empeine y asoma arriba --------------------------------
 tongue_pts = []
-for z in (0.092, 0.115, 0.138, 0.161, 0.184, 0.200):
+for z in (0.092, 0.115, 0.138, 0.161, 0.184, 0.200, 0.212):
     tongue_pts.append(tuple(on_surface(0.0, z, 0.0004)[0]))
-tongue = lib.tube_along("tongue", tongue_pts, [0.010, 0.013, 0.014, 0.0145, 0.0145, 0.013], sides=12, squash=0.18)
+tongue = lib.tube_along("tongue", tongue_pts, [0.010, 0.013, 0.014, 0.0145, 0.0145, 0.014, 0.012], sides=12, squash=0.18)
 tongue.data.materials.append(leather_dark)
 parts.append(tongue)
 
@@ -276,6 +347,10 @@ parts.append(bow)
 
 for part in parts[1:]:
     lib.paint(part)  # el resto, blanco: Godot multiplica el albedo por el color de vértice
+bpy.context.view_layer.update()
+floor_z = min((o.matrix_world @ v.co).z for o in parts for v in o.data.vertices)
+for o in parts:  # origen en el suelo: la base de los tacos queda en z = 0
+    o.location.z -= floor_z
 lib.finish(parts, "boot", A, render_args={"elev": 0.35}, angle=48.0)
 if A["render"]:
     # En el juego la bota se ve de 3/4 de costado (la punta hacia la derecha y hacia adelante).
