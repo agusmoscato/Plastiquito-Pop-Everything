@@ -8,8 +8,8 @@ render_mode blend_mix, cull_back, unshaded, depth_draw_never, shadows_disabled;
 
 uniform vec3 core_color : source_color = vec3(0.56, 0.82, 0.95);
 uniform vec3 rim_color : source_color = vec3(0.90, 0.98, 1.0);
-uniform float base_alpha = 0.16;
-uniform float rim_alpha = 0.72;
+uniform float base_alpha = 0.06; // relleno muy tenue: el contorno celeste da la forma
+uniform float rim_alpha = 0.5;
 uniform float rim_power = 2.2;
 
 void fragment() {

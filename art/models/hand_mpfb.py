@@ -20,8 +20,8 @@ from art import lib, mpfb_load
 
 A = lib.args()
 NO_ARM = "--no-arm" in sys.argv  # manitos: sin antebrazo ni puño
-ARM_LEN = 0.096  # antebrazo visible desde la muñeca (+4 mm del domo de la punta = 10 cm)
-CUFF_AT = 0.025  # el puño enrollado (el hueso wrist de MakeHuman empieza ~1 cm antes del pliegue)
+ARM_LEN = 0.058  # antebrazo corto (revisión: pesaba tanto como la mano en la vista de juego)
+CUFF_AT = 0.018  # el puño enrollado, pegado a la muñeca
 FINGER_STRETCH = 1.10
 
 mpfb_load.load()
@@ -79,6 +79,32 @@ def closed_ring(name, loop, axis, r, sides):
     o = bpy.data.objects.new(name, me)
     bpy.context.scene.collection.objects.link(o)
     return o
+
+
+def bake_glove_tint(o):
+    """Color de vértice del guante (COLOR_0): oclusión en los pliegues (concavidad contra los vecinos)
+    y la palma algo más oscura. En Godot se multiplica por el color del guante."""
+    bm4 = bmesh.new()
+    bm4.from_mesh(o.data)
+    bm4.normal_update()
+    shade = {}
+    for v in bm4.verts:
+        nb = [e.other_vert(v).co for e in v.link_edges]
+        if not nb:
+            shade[v.index] = 1.0
+            continue
+        mean = sum(nb, Vector()) / len(nb)
+        edge = sum((q - v.co).length for q in nb) / len(nb)
+        concave = (mean - v.co).dot(v.normal) / max(edge, 1e-6)
+        ao = max(0.55, 1.0 - 1.6 * max(concave, 0.0))
+        palm = 0.86 if (v.normal.z < -0.45 and v.co.y > 0.0) else 1.0
+        shade[v.index] = ao * palm
+    bm4.free()
+    me = o.data
+    attr = me.color_attributes.get("tint") or me.color_attributes.new("tint", "BYTE_COLOR", "CORNER")
+    for loop in me.loops:
+        k = shade.get(loop.vertex_index, 1.0)
+        attr.data[loop.index].color = (k, k, k, 1.0)
 
 
 def to_local(p):
@@ -197,7 +223,7 @@ def flatten_rest():
     body.parent = None
     lib.select_only(arm_obj)
     bpy.ops.object.mode_set(mode="POSE")
-    FAN = {"index": -5.0, "middle": -1.0, "ring": 3.0, "pinky": 8.0, "thumb": -40.0}
+    FAN = {"index": -5.0, "middle": -1.0, "ring": 3.0, "pinky": 8.0, "thumb": -44.0}
     order = ["thumb_1"] + ["%s_%d" % (f, k) for f in ("index", "middle", "ring", "pinky") for k in (1, 2, 3)] + ["thumb_2", "thumb_3"]
     for name in order:
         pb = arm_obj.pose.bones[name]
@@ -251,13 +277,12 @@ if fore:
     cz = sum(v.co.z for v in fore) / len(fore)
     for v in fore:
         f = min(max((wrist_y - v.co.y - 0.005) / 0.035, 0.0), 1.0)
-        v.co.x = cx + (v.co.x - cx) * (1.0 + 0.28 * f)  # la caña cae más ancha que alta
-        v.co.z = cz + (v.co.z - cz) * (1.0 + 0.12 * f)
+        v.co.x = cx + (v.co.x - cx) * (1.0 + 0.18 * f)  # se afina hacia la muñeca
+        v.co.z = cz + (v.co.z - cz) * (1.0 + 0.08 * f)
 
 # --- Guante: subdivisión, engrosamiento, arrugas en las articulaciones --------------------------
-if not NO_ARM:
-    lib.subsurf(body, 1)
-    lib.apply_modifiers(body)
+lib.subsurf(body, 1)  # también las manitos (Godot les genera LOD al importar)
+lib.apply_modifiers(body)
 joints = bpy.data.objects["HandRig"].data.bones
 joint_pts = [b.head_local.copy() for b in joints if b.name.endswith(("_1", "_2", "_3"))]
 wr = body.vertex_groups.new(name="glove_wrinkles")
@@ -293,19 +318,20 @@ if not NO_ARM:
         d = ref * math.cos(a) + ref2 * math.sin(a)
         best = max((((p - c) - axis_l * (p - c).dot(axis_l)).length for p in pts_sec
                     if ((p - c) - axis_l * (p - c).dot(axis_l)).normalized().dot(d) > 0.93), default=0.03)
-        loop.append(tuple(c + d * (best + 0.0025)))  # el puño abraza la muñeca (sin luz visible)
-    cuff = closed_ring("cuff", [Vector(p) for p in loop], axis_l, 0.0068, 12)
+        loop.append(tuple(c + d * (best + 0.0006)))  # borde enrollado fino, pegado a la muñeca
+    cuff = closed_ring("cuff", [Vector(p) for p in loop], axis_l, 0.0034, 10)
     lib.subsurf(cuff, 1)
     lib.apply_modifiers(cuff)
     fg = cuff.vertex_groups.new(name="forearm")
     fg.add([v.index for v in cuff.data.vertices], 1.0, "REPLACE")
     parts.append(cuff)
 
-mat = lib.material("glove_nitrile", lib.hex_color("#3D6FD6"), rough=0.45, clearcoat=0.25)
+mat = lib.vertex_tint_material("glove_nitrile", lib.hex_color("#3D6FD6"), rough=0.64, clearcoat=0.15)
 for p in parts:
     p.data.materials.clear()
     p.data.materials.append(mat)
 body = lib.join(parts, "hand_glove") if len(parts) > 1 else body
+bake_glove_tint(body)
 lib.triangulate(body)
 lib.smooth(body, 70.0)
 lib.unwrap(body)

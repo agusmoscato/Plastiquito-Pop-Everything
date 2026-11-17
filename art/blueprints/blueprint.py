@@ -8,7 +8,8 @@ MANO (derecha, guante de nitrilo, mano relajada y plana; origen en el centro de 
   (muñeca a punta del medio), largo de palma 10,6, ancho de palma 8,4, ancho de muñeca 5,8 (perímetro
   de muñeca de 16,9 cm), ancho del antebrazo a 10 cm 6,4; dedos índice 7,2 / medio 8,1 / anular 7,6 / meñique 6,0 cm, ancho de dedo
   2,0-1,6 cm; pulgar 6,2 cm a ~40° de abducción; espesor de palma 3,0, muñeca 4,0, antebrazo 5,4 cm.
-  Guante: +0,15 cm por lado y puño enrollado de ~1,4 cm a 3,5 cm de la muñeca.
+  Guante: +0,15 cm por lado y borde enrollado fino (~0,7 cm) a 1,8 cm de la muñeca; se ven 6 cm
+  de antebrazo.
 
 BOTA de trabajo (talle 42; origen en el centro de la suela, en el suelo; y hacia la punta):
   vista superior (u = x, v = y) y lateral (u = y, v = z). Medidas típicas de una bota de trabajo de
@@ -56,11 +57,11 @@ THUMB = ((-3.4, 3.2), 6.2, 2.3, 1.95, 40.0)  # base, largo, anchos, abducción
 
 def hand_top(x, y, arm=True):
     g = GLOVE
-    if arm and -10.0 <= y <= 0.0:  # antebrazo: 6,9 cm a 10 cm, 6,2 en la muñeca
+    if arm and -6.0 <= y <= 0.0:  # antebrazo: 6,9 cm a 10 cm, 6,2 en la muñeca
         half = 2.9 + (3.2 - 2.9) * (-y / 10.0) + g
         if abs(x) <= half:
             return True
-        if -4.2 <= y <= -2.8 and abs(x) <= half + 1.15:  # puño enrollado
+        if -2.15 <= y <= -1.45 and abs(x) <= half + 0.3:  # borde enrollado fino (~3 mm, como un guante de nitrilo)
             return True
     # Palma: de la muñeca (6,2) a los nudillos (8,4), con la eminencia tenar del lado del pulgar.
     palm = [(-2.9 - g, 0.0), (2.9 + g, 0.0), (4.2 + g, 6.5), (4.0 + g, 9.6), (2.0, 10.6), (-2.0, 10.8),
@@ -83,11 +84,11 @@ def hand_top(x, y, arm=True):
 def hand_side(y, z, arm=True):
     """Perfil lateral (y hacia los dedos, z hacia el dorso)."""
     g = GLOVE
-    if arm and -10.0 <= y <= 0.0:
+    if arm and -6.0 <= y <= 0.0:
         half = 2.0 + (2.7 - 2.0) * (-y / 10.0) + g
         if abs(z) <= half:
             return True
-        if -4.2 <= y <= -2.8 and abs(z) <= half + 1.15:
+        if -2.15 <= y <= -1.45 and abs(z) <= half + 0.3:
             return True
     if 0.0 <= y <= 10.6:  # palma: 4,0 en la muñeca a 2,8 en los nudillos, un poco hacia la palma
         k = y / 10.6

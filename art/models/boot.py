@@ -329,7 +329,7 @@ def sole_slab(name, z0, z1, scale, y_lo=-1.0, y_hi=1.0, n=20):
 
 
 parts.append(sole_slab("midsole", 0.008, SOLE_TOP + 0.002, 1.07))
-parts.append(sole_slab("heel_block", -0.010, 0.010, 1.05, -0.2, -0.070))   # taco
+parts.append(sole_slab("heel_block", -0.010, 0.036, 1.06, -0.2, -0.070))   # taco alto: sube sobre el cuero y se lee de perfil
 parts.append(sole_slab("fore_sole", -0.004, 0.010, 1.05, -0.030, 0.2))     # planta delantera
 for row in range(6):  # tacos de dibujo en chevrón bajo la planta
     y = -0.012 + row * 0.027
@@ -346,8 +346,8 @@ for row in range(2):  # tacos transversales del taco
 
 # --- Ojales y cordones cruzados sobre el empeine y la caña -------------------------------------
 eyelets = []
-for k in range(5):
-    z = 0.098 + k * 0.022
+for k in range(6):
+    z = 0.092 + k * 0.0205
     x = half_width(y_front(z), z) * 0.40
     for sx in (-1, 1):
         p, _n = on_surface(sx * x, z, 0.002)
@@ -355,18 +355,27 @@ for k in range(5):
         e = lib.sphere("eyelet", 0.0050, tuple(p), 6, 3)
         e.data.materials.append(metal)
         parts.append(e)
-for k in range(4):  # cada tramo va del ojal izquierdo k al derecho k+1 y al revés: X
+for k in range(5):  # cada tramo va del ojal izquierdo k al derecho k+1 y al revés: X
     a_l, a_r = eyelets[2 * k], eyelets[2 * k + 1]
     b_l, b_r = eyelets[2 * k + 2], eyelets[2 * k + 3]
     for p0, p1 in ((a_l, b_r), (a_r, b_l)):
-        mid = (p0 + p1) * 0.5 + Vector((0.0, 0.006, 0.0))
-        seg = lib.tube_along("lace", [tuple(p0), tuple(mid), tuple(p1)], [0.0034, 0.0038, 0.0034], sides=6)
+        mid = (p0 + p1) * 0.5 + Vector((0.0, 0.003, 0.0))
+        seg = lib.tube_along("lace", [tuple(p0), tuple(mid), tuple(p1)], [0.0042, 0.0048, 0.0042], sides=6)
         seg.data.materials.append(lace)
         parts.append(seg)
-bow = lib.tube_along("bow", [tuple(eyelets[-2] + Vector((0, 0.004, 0.006))), (0.0, eyelets[-1].y + 0.012, eyelets[-1].z + 0.016),
-                             tuple(eyelets[-1] + Vector((0, 0.004, 0.006)))], [0.0034, 0.0042, 0.0034], sides=6)
-bow.data.materials.append(lace)
-parts.append(bow)
+top_l, top_r = eyelets[-2], eyelets[-1]
+knot = (top_l + top_r) * 0.5 + Vector((0.0, 0.008, -0.004))
+for sx in (-1, 1):  # moño: dos lazos y dos puntas largas que cuelgan por el costado
+    loop_pts = [tuple(knot), tuple(knot + Vector((sx * 0.018, 0.010, 0.003))), tuple(knot + Vector((sx * 0.034, 0.006, -0.006))),
+                tuple(knot + Vector((sx * 0.016, 0.006, -0.010))), tuple(knot)]
+    bow = lib.tube_along("bow", loop_pts, [0.0042, 0.0046, 0.0046, 0.0046, 0.0042], sides=6)
+    bow.data.materials.append(lace)
+    parts.append(bow)
+    end_pts = [tuple(knot), tuple(knot + Vector((sx * 0.012, 0.010, -0.012))), tuple(knot + Vector((sx * 0.020, 0.008, -0.034))),
+               tuple(knot + Vector((sx * 0.024, 0.004, -0.052)))]
+    end = lib.tube_along("lace_end", end_pts, [0.0042, 0.0042, 0.0040, 0.0036], sides=6)
+    end.data.materials.append(lace)
+    parts.append(end)
 
 for part in parts[1:]:
     lib.paint(part)  # el resto, blanco: Godot multiplica el albedo por el color de vértice

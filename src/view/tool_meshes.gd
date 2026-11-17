@@ -74,10 +74,16 @@ static func glove_material(tint: Color) -> Material:
 	m.normal_texture = nt
 	m.normal_scale = 0.35
 	m.uv1_scale = Vector3(6.0, 6.0, 1.0)
-	m.roughness = 0.45
+	# Nitrilo mate (que no parezca un globo): más rugoso, poco barniz, luz de borde suave, y el color de
+	# vértice del modelo (oclusión en los pliegues entre dedos y palma algo más oscura, art/models/hand_mpfb.py).
+	m.roughness = 0.64
 	m.clearcoat_enabled = true
-	m.clearcoat = 0.5
-	m.clearcoat_roughness = 0.35
+	m.clearcoat = 0.15
+	m.clearcoat_roughness = 0.6
+	m.rim_enabled = true
+	m.rim = 0.35
+	m.rim_tint = 0.6
+	m.vertex_color_use_as_albedo = true
 	if hand_style == "skin":
 		m.albedo_color = skin_color
 		m.roughness = 0.62
@@ -87,6 +93,27 @@ static func glove_material(tint: Color) -> Material:
 	else:
 		m.albedo_color = tint
 	return m
+
+
+const OUTLINE_DARK: Color = Color(0.12, 0.10, 0.09) ## contorno de juguete de la mano y las herramientas
+const OUTLINE_GHOST: Color = Color(0.56, 0.82, 0.95) ## contorno celeste de las manitos
+
+static var _outline_cache: Dictionary = {} ## color html -> ShaderMaterial (se comparte)
+
+
+## Contorno de juguete: un material_overlay en cada malla del modelo (ver toon_outline.gdshader).
+static func add_outline(node: Node, color: Color) -> void:
+	var key: String = color.to_html()
+	if not _outline_cache.has(key):
+		var m: ShaderMaterial = ShaderMaterial.new()
+		m.shader = load("res://shaders/toon_outline.gdshader") as Shader
+		m.set_shader_parameter("line_color", color)
+		_outline_cache[key] = m
+	var mat: ShaderMaterial = _outline_cache[key]
+	if node is MeshInstance3D:
+		(node as MeshInstance3D).material_overlay = mat
+	for c: Node in node.get_children():
+		add_outline(c, color)
 
 
 ## Manitos fantasma: una pasada que escribe solo profundidad y, encima, la pasada visible.
@@ -166,6 +193,7 @@ static func build(tool_id: String, radius: float, tier: int = 0, icon: bool = fa
 			_add_hand(body, "point", tier, false, HAND_SCALE * MESA_SCALE * (1.0 + 0.08 * radius), Vector3.ZERO, HAND_ROT)
 	if icon:
 		_fit_icon(root)
+	add_outline(root, OUTLINE_GHOST if tool_id == "hands" else OUTLINE_DARK)
 	return root
 
 
