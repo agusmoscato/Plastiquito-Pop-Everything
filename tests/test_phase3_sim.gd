@@ -283,14 +283,16 @@ func test_boot_in_game_sim_stomps_once_per_press() -> void:
 	sim.new_sheet()
 	sim.select_tool("boot")
 	var c: Vector2 = sim.center()
+	var cooldown: float = sim.selected_tool().cooldown
+	var frames: int = int(cooldown * 0.3 / 0.016) # todo pasa dentro de la recarga (dato de economy.json)
 	sim.step(0.016, c, true)
-	for i: int in 120:
+	for i: int in frames:
 		sim.step(0.016, c, false) # deja terminar la onda y la cadena
 	var first: int = sim.sheet.count_popped()
 	assert_gt(first, 5)
-	sim.step(0.016, c + Vector2(6.0, 0.0), true)
-	for i: int in 40:
-		sim.step(0.016, c + Vector2(6.0, 0.0), true)
+	sim.step(0.016, c + Vector2(12.0, 0.0), true)
+	for i: int in frames:
+		sim.step(0.016, c + Vector2(12.0, 0.0), true)
 	assert_eq(sim.sheet.count_popped(), first, "mantener apretado no vuelve a pisar mientras recarga")
 	assert_gt(sim.selected_tool().cooldown_left, 0.0)
 
@@ -362,3 +364,50 @@ func test_echo_glow_pulses_only_before_revival() -> void:
 		early = maxf(early, EchoGlow.pulse(EchoGlow.WARN_SECONDS * 0.9, float(i) * 0.013))
 		late = maxf(late, EchoGlow.pulse(0.05, float(i) * 0.013))
 	assert_gt(late, early, "brilla más cuanto más cerca está de reinflarse")
+
+
+func _iron_sim(seed_value: int) -> GameSim:
+	var sim: GameSim = GameSim.new(db, seed_value)
+	sim.state.perm["perm_sheet"] = 2
+	sim.state.levels["unlock_iron"] = 1
+	sim.refresh_stats()
+	sim.new_sheet()
+	assert_true(sim.select_tool("iron"))
+	return sim
+
+
+func test_still_iron_burns_plastic_without_value() -> void:
+	var sim: GameSim = _iron_sim(11)
+	var c: Vector2 = sim.center()
+	var burned: int = 0
+	for i: int in 45: # 1,5 s quieta y apretando
+		sim.step(1.0 / 30.0, c, true)
+		burned += sim.ev_burned.size()
+	assert_gt(burned, 0, "quieta más de iron_burn_after_seconds, derrite el plástico")
+	var pops_before: float = sim.state.pops
+	var more: int = 0
+	for i: int in 15:
+		sim.step(1.0 / 30.0, c + Vector2(0.2, 0.0), true) # sigue casi quieta
+		more += sim.ev_burned.size()
+	assert_eq(sim.state.pops, pops_before, "lo derretido no da Pops")
+
+
+func test_gliding_iron_never_burns_and_heats() -> void:
+	var sim: GameSim = _iron_sim(12)
+	var c: Vector2 = sim.center()
+	var burned: int = 0
+	for i: int in 90: # 3 s planchando a ~4 celdas por segundo
+		sim.step(1.0 / 30.0, c + Vector2(float(i) * 4.0 / 30.0 - 6.0, 0.0), true)
+		burned += sim.ev_burned.size()
+	assert_eq(burned, 0, "deslizándose nunca quema")
+	assert_gt(sim.state.pops, 0.0, "planchando revienta y da Pops")
+
+
+func test_iron_heat_only_while_moving() -> void:
+	var sim: GameSim = _iron_sim(13)
+	var tm: ToolModel = sim.selected_tool()
+	var c: Vector2 = sim.center()
+	var still: PackedInt32Array = tm.apply_heat(c, 0.1, Vector2.ZERO)
+	assert_eq(still.size(), 0, "quieta no calienta")
+	var moving: PackedInt32Array = tm.apply_heat(c, 0.1, Vector2(1.0, 0.0))
+	assert_gt(moving.size(), 0, "moviéndose calienta")

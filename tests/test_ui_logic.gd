@@ -82,3 +82,10 @@ func test_flyers_cap_and_panels() -> void:
 	assert_eq(f.pending(), FlyingNumbers.MAX_ITEMS, "nunca más de 12 en pantalla")
 	assert_false(Rect2(Vector2(0, 0), Vector2(200, 100)).has_point(f.outside_panels(Vector2(50, 50))), "no nace dentro de un panel")
 	f.free()
+
+
+func test_paper_polygon_never_self_intersects_on_tiny_sheets() -> void:
+	for h: float in [0.5, 1.0, 2.0, 3.0, 6.0]:
+		var poly: PackedVector2Array = UiKit.paper_polygon(Rect2(Vector2.ZERO, Vector2(300.0, h)), "ticket")
+		var tris: PackedInt32Array = Geometry2D.triangulate_polygon(poly)
+		assert_gt(tris.size(), 0, "alto %.1f: el polígono se puede triangular" % h)

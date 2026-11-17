@@ -14,6 +14,7 @@ var _special: Dictionary = {} ## tipo -> Array[GPUParticles3D] (partículas prop
 var _special_next: Dictionary = {}
 var _stomp_dust: GPUParticles3D ## pisotón de la bota: anillo de polvo que sale hacia afuera
 var _stomp_hop: GPUParticles3D ## pisotón: burbujas reventadas que saltan y caen
+var _smoke: GPUParticles3D ## plancha que quema: humo gris que sube
 
 
 func setup(cfg: Dictionary) -> void:
@@ -69,6 +70,27 @@ func _build_stomp_emitters() -> void:
 	hop.color_ramp = _fade_ramp()
 	_stomp_hop = _emitter(hop, _quad(0.32, Color(0.62, 0.86, 1.0, 0.8), 0.0), 28, 0.75)
 	add_child(_stomp_hop)
+	var smoke: ParticleProcessMaterial = ParticleProcessMaterial.new()
+	smoke.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+	smoke.emission_box_extents = Vector3(1.6, 0.1, 0.8)
+	smoke.direction = Vector3.UP
+	smoke.spread = 18.0
+	smoke.initial_velocity_min = 0.8
+	smoke.initial_velocity_max = 1.8
+	smoke.gravity = Vector3(0.0, 0.6, 0.0)
+	smoke.scale_min = 1.2
+	smoke.scale_max = 2.6
+	smoke.color_ramp = _fade_ramp()
+	_smoke = _emitter(smoke, _quad(0.9, Color(0.36, 0.34, 0.33, 0.5), 0.0), 26, 1.4)
+	add_child(_smoke)
+
+
+## Plancha que quema: humo gris donde se derritió el plástico.
+func smoke_at(pos: Vector3) -> void:
+	if _smoke == null:
+		return
+	_smoke.global_position = pos
+	_smoke.restart()
 
 
 ## Pisotón de la bota en `pos` con radio `radius`: polvo radial y burbujas que saltan.

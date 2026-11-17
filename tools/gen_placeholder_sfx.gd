@@ -21,6 +21,11 @@ func _init() -> void:
 		print("gen_placeholder_sfx: ph_air listo")
 		quit(0)
 		return
+	if OS.get_cmdline_user_args().has("--only-screech"): # solo el chirrido de la plancha que quema
+		_save(_screech(), OUT_UI.path_join("ph_screech.wav"))
+		print("gen_placeholder_sfx: ph_screech listo")
+		quit(0)
+		return
 	for category: String in ["small", "large", "tense", "squish", "crinkle"]:
 		DirAccess.make_dir_recursive_absolute(OUT_POPS.path_join(category))
 		for i: int in VARIANTS:
@@ -35,6 +40,8 @@ func _init() -> void:
 	_save(_chain_hit(), OUT_UI.path_join("ph_chain_hit.wav"))
 	_save(_whoosh(), OUT_UI.path_join("ph_recycle.wav"))
 	_save(_air(), OUT_UI.path_join("ph_air.wav"))
+	_save(_screech(), OUT_UI.path_join("ph_screech.wav"))
+	_save(_screech(), OUT_UI.path_join("ph_screech.wav"))
 	DirAccess.make_dir_recursive_absolute(OUT_AMBIENT)
 	for phase: int in range(1, 5):
 		_save(_ambient(phase), OUT_AMBIENT.path_join("ph_ambient_%d.wav" % phase))
@@ -197,6 +204,22 @@ func _whoosh() -> PackedFloat32Array:
 		lp += a * 0.5 * (_rng.randf_range(-1.0, 1.0) - lp)
 		out[i] = lp * sin(PI * x)
 	return _normalize(out, 0.6)
+
+
+## Plástico que se derrite bajo la plancha: chirrido agudo que tiembla, con un siseo encima.
+func _screech() -> PackedFloat32Array:
+	var n: int = int(0.42 * RATE)
+	var out: PackedFloat32Array = _blank(0.42)
+	var phase: float = 0.0
+	var lp: float = 0.0
+	for i: int in n:
+		var x: float = float(i) / float(n)
+		var f: float = 1900.0 + 450.0 * sin(x * 38.0) + 300.0 * x
+		phase += TAU * f / float(RATE)
+		lp += 0.35 * (_rng.randf_range(-1.0, 1.0) - lp)
+		var env: float = smoothstep(0.0, 0.08, x) * (1.0 - smoothstep(0.7, 1.0, x))
+		out[i] = (0.55 * sin(phase) + 0.25 * sin(phase * 2.01) + 0.35 * lp) * env
+	return _normalize(out, 0.4)
 
 
 ## Aire que entra en una burbuja (Eco que se vuelve a inflar): soplido corto que sube de tono.

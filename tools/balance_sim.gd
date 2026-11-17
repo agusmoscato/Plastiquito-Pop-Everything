@@ -203,6 +203,9 @@ func _still_pressing() -> bool:
 ## Casual: ~3 clics por segundo cerca del centro. Mira la lámina: casi siempre elige una
 ## burbuja entera cercana al punto al que apuntaba (a veces falla y clickea una reventada).
 func _move_casual() -> void:
+	if sim.state.selected_tool == "iron":
+		_sweep_with_pin(4.0) # quieta la plancha quema (DESIGN 3.3): el casual aprende a arrastrarla; arrastrar no depende del ritmo de clics
+		return
 	click_timer -= dt
 	press_timer -= dt
 	if click_timer <= 0.0:
@@ -570,6 +573,7 @@ func _late_checks(checks: Array[Array]) -> void:
 	for t: Vector3 in new_tool_results:
 		if t.z > 0.0:
 			min_leap = minf(min_leap, t.y / t.z)
+			print("   herramienta nueva %s: %.2fx (ritmo %.0f contra pico %.0f)" % [["palo", "plancha", "bota"][int(t.x)], t.y / t.z, t.y, t.z])
 	checks.append(["herramienta nueva vs. la anterior al máximo (x)", ">= 2", min_leap if min_leap < 99.0 else 0.0, min_leap >= 2.0 and min_leap < 99.0])
 
 

@@ -44,10 +44,10 @@
   "reload_delay_auto": 0.2,
   "chain_stamp_min": 10,
   "phase_cost_scales": [
-   1.0,
-   320.0,
-   40000.0,
-   8000000.0
+    1.0,
+    320.0,
+    27000.0,
+    8000000.0
   ],
   "first_level_cost_factor": 0.15,
   "chance_echo": 0.012,
@@ -59,9 +59,11 @@
   "roller_base_halfwidth": 2.0,
   "iron_heat_rate": 0.25,
   "iron_heat_cap": 1.4,
-  "iron_still_force": 1.0,
+  "iron_still_force": 0.15,
+  "iron_burn_after_seconds": 0.6,
+  "iron_glide_min_speed": 1.5,
   "iron_heat_reach": 1.6,
-  "boot_cooldown_seconds": 4.0,
+  "boot_cooldown_seconds": 2.0,
   "boot_wave_k": 0.5,
   "boot_wave_reach": 2.5,
   "idle_hand_mult": 8.0,

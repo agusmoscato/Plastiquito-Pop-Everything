@@ -86,6 +86,9 @@ static func paper_polygon(rect: Rect2, seed_text: String, jitter: float = 1.4) -
 	var pts: PackedVector2Array = PackedVector2Array()
 	var step: float = 22.0
 	var idx: int = 0
+	# En hojas chicas (un ticket que se está imprimiendo) el borde irregular se cruzaba consigo mismo y
+	# Godot no podía triangular el polígono: la irregularidad nunca pasa de 1/6 del lado menor.
+	jitter = minf(jitter, minf(rect.size.x, rect.size.y) / 6.0)
 	var corners: Array[Vector2] = [rect.position, Vector2(rect.end.x, rect.position.y), rect.end, Vector2(rect.position.x, rect.end.y)]
 	for c: int in 4:
 		var a: Vector2 = corners[c]
@@ -105,6 +108,8 @@ static func paper_polygon(rect: Rect2, seed_text: String, jitter: float = 1.4) -
 
 ## Hoja de papel (o cartón) con sombra proyectada abajo a la derecha.
 static func draw_sheet(ci: CanvasItem, rect: Rect2, color: Color, seed_text: String, lift: float = 0.0, jitter: float = 1.4) -> void:
+	if rect.size.x < 4.0 or rect.size.y < 4.0:
+		return # todavía no hay hoja que dibujar (por ejemplo, un ticket que recién empieza a salir)
 	var poly: PackedVector2Array = paper_polygon(rect, seed_text, jitter)
 	var shadow_off: Vector2 = Vector2(3.0 + lift, 4.0 + lift * 1.5)
 	var shadow: PackedVector2Array = PackedVector2Array()

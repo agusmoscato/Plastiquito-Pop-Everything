@@ -154,6 +154,7 @@ El juego tiene 7 fases, una por escenario. El final llega a las 6,5 horas y el 1
 - **Lámina más grande** abre una fase por nivel y cuesta 1, 18 y 110 Pellets (escalones a mano). Tiempos que logra el perfil activo del simulador: Piso a los 30 min, Galpón a los 90 y Estacionamiento a los 148.
 - **Cadenas:** `k` máximo 0,62 y umbral de tensión mínimo 1,4. Con los valores originales (0,9 y 1,3) las láminas de 6.400 y 22.500 burbujas se despejaban enteras de un golpe y rompían la economía.
 - **Plancha (3.3):** el calor sube la presión de las burbujas del aura hasta 1,4 antes de tocarlas; no crea aire por encima del tope (menor que el umbral de tensión). Su aura se ve como un rectángulo anaranjado que pulsa.
+- **Plancha que quema** (decisión del 17/11/2026): la plancha se usa arrastrándola. Quieta casi no aplasta (15 % de su fuerza, `iron_still_force`), el calor útil solo se acumula mientras se desliza (`iron_glide_min_speed`, en celdas por segundo) y, si queda quieta y apretando más de `iron_burn_after_seconds` (0,6 s), derrite el plástico de abajo: esas burbujas quedan reventadas sin valor y sin soltar aire, con humo gris y un chirrido. Antes, usarla como sello (golpes cortos sin moverla) rendía unas 4 veces más que planchar.
 - **Bota (3.3):** un pisotón por apretada, con recarga de 4 s (mejorable) visible en el HUD. La onda expansiva empuja hacia afuera una parte de la presión de lo pisado, limitada para que el aire total nunca aumente.
 - **Eco (3.4):** vuelve a inflarse una sola vez a los 2 s y queda como burbuja normal.
 - **Automatización (3.5):** las **Manitos** (Galpón) y el **rodillo automático** (Estacionamiento) revientan sin combo, así que jugar activo siempre rinde más; las manitos inteligentes existen pero requieren la Fase 6. Con el juego cerrado producen al 50% de eficiencia con tope de 2 horas.
@@ -171,6 +172,12 @@ La estética es de "juguete limpio": plástico brillante, formas simples y color
 - **Deformación por instancia:** la presión infla la burbuja y la fuerza la aplasta. Se hace en el vértice con los datos propios de cada instancia, sin física real.
 - **Burbuja reventada:** queda aplastada, con arrugas hechas con ruido en las normales y un poco más opaca.
 - **Lámina:** un plano translúcido debajo de las burbujas que se ve desenrollarse cuando llega la lámina nueva.
+
+### Cámara de trabajo (decisión del 17/11/2026)
+
+- Se juega con una **cámara de trabajo** de zoom fijo por fase: la burbuja mide 16 px en la Mesa, 12 en el Piso y 10 en el Galpón y el Estacionamiento (`camera_work_bubble_px`, nunca menos que `camera_min_bubble_px` = 10). La cámara sigue a la herramienta con un paneo suave cuando el cursor sale del 55 % central de la pantalla, sin salir de la lámina.
+- La escala se sigue viendo (pilar 3): la transición del reciclado se aleja hasta mostrar la lámina entera, la sostiene 1,2 s y vuelve al zoom de trabajo. Con la rueda el jugador puede alejarse hasta ver todo.
+- Con la cámara de trabajo, cada herramienta ocupa entre el 8 % y el 15 % del alto de la pantalla (`tools/tool_scale_report.gd`, informe en `docs/escala_herramientas.txt`).
 
 ### Herramientas y escenarios
 

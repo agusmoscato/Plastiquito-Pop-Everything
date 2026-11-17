@@ -28,6 +28,17 @@ var _smooth: float = SMOOTHING
 var _pull_left: float = 0.0
 ## Fracción del ancho visible que se desplaza el encuadre hacia la izquierda (la tienda tapa la derecha).
 var screen_shift: float = 0.0
+## Cámara de trabajo (DESIGN 5, decisión del 17/11/2026): el juego trabaja con un zoom fijo por fase
+## (burbuja de `work_bubble_px` en pantalla) que sigue a la herramienta; la lámina entera se ve en la
+## transición de reciclado y con la rueda. Los clips no la usan (work_mode en false).
+var work_mode: bool = false
+var work_bubble_px: float = 12.0
+var _work_zoom: float = 0.0
+var _return_in: float = -1.0 ## segundos hasta volver de la vista entera al zoom de trabajo
+var _following: bool = false
+const FOLLOW_INNER: float = 0.55 ## el cursor puede moverse libre en el 55 % central; afuera, la cámara lo sigue
+const FOLLOW_SPEED: float = 3.5
+const HOLD_WHOLE_S: float = 1.2 ## después de la transición, cuánto se sostiene la lámina entera
 
 
 func _init() -> void:
@@ -52,8 +63,12 @@ func fit_to(center: Vector2, extents: Vector2, animate_seconds: float = 0.0) -> 
 		aspect = vs.x / maxf(vs.y, 1.0) # horizontal, vertical (clips para shorts) o cualquier ventana
 	var fit: float = fit_distance(extents, aspect)
 	min_zoom = 3.5
-	max_zoom = maxf(fit * 1.6, 12.0)
-	_target_zoom = clampf(minf(fit, legible_distance()), min_zoom, max_zoom)
+	_work_zoom = work_distance(work_bubble_px) if work_mode else fit
+	max_zoom = maxf(maxf(fit, _work_zoom) * 1.6, 12.0) # con la rueda siempre se puede ver todo
+	var start_zoom: float = fit if animate_seconds > 0.0 else _work_zoom
+	_target_zoom = clampf(start_zoom, min_zoom, max_zoom)
+	_return_in = animate_seconds + HOLD_WHOLE_S if (work_mode and animate_seconds > 0.0) else -1.0
+	_following = work_mode and _return_in < 0.0
 	var visible_w: float = 2.0 * _target_zoom * tan_half * aspect
 	_target_pos = Vector3(center.x + screen_shift * visible_w, 0.0, center.y)
 	if animate_seconds > 0.0:
@@ -75,15 +90,26 @@ static func fit_distance(extents: Vector2, aspect: float) -> float:
 	return maxf(d_x, d_y) * 1.3
 
 
-## Distancia máxima por defecto para que una burbuja (1 unidad) mida al menos `min_bubble_px`
-## en una pantalla de 900 px de alto: las láminas grandes no se encuadran enteras de entrada
-## (con la rueda se ven completas). Sin configurar, no limita.
-func legible_distance() -> float:
-	var px: float = Cfg.num(shake_cfg, "camera_min_bubble_px") if shake_cfg.has("camera_min_bubble_px") else 0.0
-	if px <= 0.0:
-		return INF
-	var view_h: float = 900.0 / px
+## Distancia a la que una burbuja (1 unidad) mide `px` en una pantalla de 900 px de alto.
+static func work_distance(px: float) -> float:
+	var view_h: float = 900.0 / maxf(px, 1.0)
 	return view_h / (2.0 * tan(deg_to_rad(FOV) * 0.5))
+
+
+## Sigue a la herramienta: si el cursor sale del 55 % central de lo visible, la cámara se corre
+## suave para traerlo de vuelta (sin salir de la lámina). Solo con la cámara de trabajo.
+func follow(cursor: Vector2, valid: bool, delta: float) -> void:
+	if not _following or not valid or not cursor.is_finite():
+		return
+	var tan_half: float = tan(deg_to_rad(FOV) * 0.5)
+	var half_h: float = _zoom * tan_half / sin(deg_to_rad(PITCH_DEGREES)) # alto visible sobre el plano
+	var half_w: float = _zoom * tan_half * 16.0 / 9.0 * (1.0 - screen_shift * 2.0)
+	var center: Vector2 = Vector2(_target_pos.x - screen_shift * 2.0 * half_w, _target_pos.z)
+	var off: Vector2 = cursor - center
+	var lim: Vector2 = Vector2(half_w, half_h) * FOLLOW_INNER
+	var push: Vector2 = Vector2(signf(off.x) * maxf(absf(off.x) - lim.x, 0.0), signf(off.y) * maxf(absf(off.y) - lim.y, 0.0))
+	if push != Vector2.ZERO:
+		_pan(push * minf(1.0, FOLLOW_SPEED * delta))
 
 
 ## Coloca la cámara de golpe (sin interpolar). Para el benchmark.
@@ -139,6 +165,13 @@ func _process(delta: float) -> void:
 		_pull_left -= delta
 		if _pull_left <= 0.0:
 			_smooth = SMOOTHING
+	if _return_in > 0.0: # la transición mostró la lámina entera: vuelve al zoom de trabajo
+		_return_in -= delta
+		if _return_in <= 0.0:
+			_target_zoom = clampf(_work_zoom, min_zoom, max_zoom)
+			_smooth = 2.5
+			_pull_left = 1.2
+			_following = true
 	var k: float = 1.0 - exp(-_smooth * delta)
 	_zoom = lerpf(_zoom, _target_zoom, k)
 	position = position.lerp(_target_pos, k)

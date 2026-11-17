@@ -34,6 +34,10 @@ var center_falloff: float = 0.0
 var heat_rate: float = 0.0 ## presión por segundo
 var heat_cap: float = 1.4
 var still_force: float = 1.0 ## plancha: fracción de la fuerza cuando no se desliza (se plancha arrastrando)
+var burn_after: float = INF ## plancha: segundos quieta apretando hasta que derrite el plástico de abajo
+var glide_min_speed: float = 0.0 ## plancha: celdas por segundo a partir de las que "se desliza"
+var burned: PackedInt32Array = PackedInt32Array() ## celdas derretidas en el último step (sin valor ni aire)
+var _still_t: float = 0.0
 var heat_reach: float = 1.6 ## el aura es la plancha agrandada por este factor
 ## Bota: pisotón con tiempo de recarga y onda expansiva.
 var cooldown: float = 4.0
@@ -154,10 +158,12 @@ func _rect_cells(from: Vector2, to: Vector2) -> PackedInt32Array:
 
 ## Calor de la plancha: sube la presión de las burbujas del aura (sin reventar) hasta heat_cap.
 ## El aire no se crea de la nada: el calor solo infla hasta un tope menor que la presión máxima.
-func apply_heat(center: Vector2, dt: float) -> PackedInt32Array:
+func apply_heat(center: Vector2, dt: float, moved: Vector2 = Vector2.INF) -> PackedInt32Array:
 	var changed: PackedInt32Array = PackedInt32Array()
 	if heat_rate <= 0.0:
 		return changed
+	if moved.is_finite() and not is_gliding(moved, dt):
+		return changed # el calor útil solo se acumula si la plancha se mueve
 	var rot: float = _roller_dir.angle() + PI * 0.5
 	var size: Vector2 = Vector2(radius * 2.0, radius * 0.8) * heat_reach
 	for idx: int in grid.cells_in_rect(center, size, rot):
@@ -255,6 +261,7 @@ func step(touched: PackedInt32Array, delta: float, weights: PackedFloat32Array =
 		now_touched[idx] = true
 	var dragging: bool = _holding and not touched.is_empty()
 	var glide: float = glide_factor(dir, delta)
+	burned = _burn_if_still(touched, dir, delta)
 	for i: int in touched.size():
 		var idx: int = touched[i]
 		var w: float = weights[i] if i < weights.size() else 1.0
@@ -265,6 +272,33 @@ func step(touched: PackedInt32Array, delta: float, weights: PackedFloat32Array =
 	if not changed.is_empty():
 		sheet.notify_changed(changed)
 	return popped
+
+
+## Plancha que quema (DESIGN 3.3): quieta y apretando más de `burn_after` segundos, derrite el plástico
+## que tiene abajo: esas burbujas quedan reventadas SIN valor y sin soltar aire. Devuelve las derretidas.
+func _burn_if_still(touched: PackedInt32Array, dir: Vector2, delta: float) -> PackedInt32Array:
+	var out: PackedInt32Array = PackedInt32Array()
+	if shape != SHAPE_RECT or touched.is_empty() or delta <= 0.0:
+		_still_t = 0.0
+		return out
+	if is_gliding(dir, delta):
+		_still_t = 0.0
+		return out
+	_still_t += delta
+	if _still_t < burn_after:
+		return out
+	for idx: int in touched:
+		if sheet.state[idx] != SheetModel.STATE_POPPED:
+			sheet.press[idx] = 0.0
+			_active.erase(idx)
+			sheet.pressure[idx] = 0.0 # el aire se va con el plástico derretido: no alimenta cadenas
+			out.append(idx)
+	sheet.pop_many(out)
+	return out
+
+
+func is_gliding(dir: Vector2, delta: float) -> bool:
+	return delta > 0.0 and dir.length() / delta >= glide_min_speed * grid.spacing
 
 
 ## La plancha aplasta con toda su fuerza mientras se desliza (a partir de 2 celdas por segundo) y

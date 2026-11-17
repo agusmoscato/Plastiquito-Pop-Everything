@@ -31,6 +31,7 @@ var _was_holding: bool = false
 var _press_cell: int = -1
 var _fake_press: bool = false
 var _night: float = 0.0 ## turno noche suavizado (0 día .. 1 noche)
+var _burn_cooldown: float = 0.0 ## humo y chirrido de la plancha, como mucho cada 0,35 s
 
 var _recycling: bool = false
 var _recycle_t: float = 0.0
@@ -177,6 +178,7 @@ func _process(delta: float) -> void:
 		hud.on_sim_step(delta)
 		return
 	_update_cursor()
+	world.camera_rig.follow(_cursor, _cursor_valid and tool_view.visible, delta)
 	var holding: bool = _is_holding()
 	_track_press(holding)
 	var dir: Vector2 = _cursor - _prev_cursor
@@ -297,6 +299,13 @@ func _after_step(_holding: bool, delta: float) -> void:
 	_update_night(delta)
 	if sim.ev_squish:
 		PopAudio.play_squish()
+	_burn_cooldown = maxf(0.0, _burn_cooldown - delta)
+	if not sim.ev_burned.is_empty() and _burn_cooldown <= 0.0: # la plancha quieta derrite el plástico
+		_burn_cooldown = 0.35
+		var bp: Vector2 = sim.grid.cell_to_world(sim.ev_burned[sim.ev_burned.size() >> 1])
+		if Juice.fx != null:
+			Juice.fx.smoke_at(Vector3(bp.x, 0.3, bp.y))
+		PopAudio.play_ui("screech", randf_range(0.94, 1.06), -6.0)
 	if not sim.ev_revived.is_empty(): # un Eco se vuelve a inflar: entra aire
 		PopAudio.play_ui("air", randf_range(0.95, 1.08), -4.0)
 	hud.on_sim_step(delta)

@@ -35,7 +35,7 @@ const SHEET_FIELDS: Dictionary = {
 }
 const JUICE_FIELDS: Dictionary = {
 	"hitstop_ms": TYPE_INT, "hitstop_every_streak": TYPE_INT, "mass_pop_radius": TYPE_FLOAT,
-	"shake_per_pop": TYPE_FLOAT, "camera_min_bubble_px": TYPE_FLOAT, "shake_max_trauma": TYPE_FLOAT, "shake_decay_per_second": TYPE_FLOAT,
+	"shake_per_pop": TYPE_FLOAT, "camera_min_bubble_px": TYPE_FLOAT, "camera_work_bubble_px": TYPE_ARRAY, "shake_max_trauma": TYPE_FLOAT, "shake_decay_per_second": TYPE_FLOAT,
 	"shake_max_offset": TYPE_FLOAT, "shake_max_angle_degrees": TYPE_FLOAT, "shake_noise_speed": TYPE_FLOAT,
 	"particle_pool_size": TYPE_INT, "shards_per_pop": TYPE_INT, "dust_per_pop": TYPE_INT,
 	"max_fx_per_frame": TYPE_INT, "pop_anim_inflate_ms": TYPE_INT, "pop_anim_collapse_ms": TYPE_INT,
@@ -66,7 +66,7 @@ const ECONOMY_FIELDS: Dictionary = {
 	"first_level_cost_factor": TYPE_FLOAT,
 	"chance_echo": TYPE_FLOAT, "echo_delay_seconds": TYPE_FLOAT, "offline_efficiency": TYPE_FLOAT,
 	"offline_cap_hours": TYPE_FLOAT, "hand_base_rate": TYPE_FLOAT, "roller_base_speed": TYPE_FLOAT,
-	"roller_base_halfwidth": TYPE_FLOAT, "iron_heat_rate": TYPE_FLOAT, "iron_heat_cap": TYPE_FLOAT, "iron_still_force": TYPE_FLOAT,
+	"roller_base_halfwidth": TYPE_FLOAT, "iron_heat_rate": TYPE_FLOAT, "iron_heat_cap": TYPE_FLOAT, "iron_still_force": TYPE_FLOAT, "iron_burn_after_seconds": TYPE_FLOAT, "iron_glide_min_speed": TYPE_FLOAT,
 	"iron_heat_reach": TYPE_FLOAT, "boot_cooldown_seconds": TYPE_FLOAT, "boot_wave_k": TYPE_FLOAT,
 	"boot_wave_reach": TYPE_FLOAT, "reload_delay_manual": TYPE_FLOAT, "reload_delay_auto": TYPE_FLOAT, "chain_stamp_min": TYPE_INT,
 }

@@ -54,6 +54,7 @@ func _ready() -> void:
 func attach(sim: GameSim) -> void:
 	game = sim
 	camera_rig.screen_shift = 0.144
+	camera_rig.work_mode = true # el juego trabaja de cerca y sigue a la herramienta
 	rebind_game_sheet(false)
 
 
@@ -65,6 +66,9 @@ func rebind_game_sheet(roll_in: bool, animate_camera: float = 0.0, scenario_seco
 	sheet_view.bind(sheet, grid, db.juice, tool_model.resistance)
 	specials_view.bind(sheet, grid)
 	specials_view.visible = true
+	var work_px: Array = db.juice["camera_work_bubble_px"]
+	var phase_px: float = work_px[clampi(game.phase(), 1, work_px.size()) - 1]
+	camera_rig.work_bubble_px = maxf(phase_px, Cfg.num(db.juice, "camera_min_bubble_px"))
 	camera_rig.fit_to(sheet_view.center(), sheet_view.extents(), animate_camera)
 	if scenario_seconds > 0.0 and not scenario.matches(game.phase(), sheet_view.extents()):
 		transition_to_phase(game.phase(), scenario_seconds)

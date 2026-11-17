@@ -28,16 +28,30 @@ func test_lighting_differs_between_scenarios() -> void:
 	assert_eq(seen.size(), 4, "cada escenario tiene su propia luz")
 
 
-func test_default_camera_keeps_bubbles_legible() -> void:
+func test_work_camera_zoom_and_whole_sheet_on_transition() -> void:
 	var rig: CameraRig = CameraRig.new()
-	rig.shake_cfg = {"camera_min_bubble_px": 11.0}
-	var cap: float = rig.legible_distance()
-	var view_h: float = 2.0 * cap * tan(deg_to_rad(CameraRig.FOV) * 0.5)
-	assert_almost_eq(900.0 / view_h, 11.0, 0.01, "a la distancia tope la burbuja mide 11 px")
+	rig.work_mode = true
+	rig.work_bubble_px = 10.0
+	var work: float = CameraRig.work_distance(10.0)
+	var view_h: float = 2.0 * work * tan(deg_to_rad(CameraRig.FOV) * 0.5)
+	assert_almost_eq(900.0 / view_h, 10.0, 0.01, "en el zoom de trabajo la burbuja mide 10 px")
 	rig.fit_to(Vector2(75, 65), Vector2(150, 130))
-	assert_lte(rig.zoom_distance(), cap + 0.01, "la lámina de 150x150 no se encuadra entera de entrada")
-	rig.fit_to(Vector2(4, 4), Vector2(8, 8))
-	assert_almost_eq(rig.zoom_distance(), CameraRig.fit_distance(Vector2(8, 8), 16.0 / 9.0), 0.01, "la lámina chica se encuadra entera")
+	assert_almost_eq(rig.zoom_distance(), work, 0.01, "sin transición: zoom de trabajo")
+	var whole: float = CameraRig.fit_distance(Vector2(150, 130), 16.0 / 9.0)
+	assert_gte(rig.max_zoom, whole, "con la rueda se puede ver la lámina entera")
+	rig.fit_to(Vector2(75, 65), Vector2(150, 130), 3.5)
+	rig._zoom = whole
+	assert_almost_eq(rig._target_zoom, whole, 0.01, "la transición muestra la lámina entera")
+	for i: int in 400:
+		rig._process(1.0 / 60.0)
+	assert_almost_eq(rig._target_zoom, work, 0.01, "después vuelve al zoom de trabajo")
+	rig.free()
+
+
+func test_clip_camera_still_fits_whole_sheet() -> void:
+	var rig: CameraRig = CameraRig.new()
+	rig.fit_to(Vector2(75, 65), Vector2(150, 130))
+	assert_almost_eq(rig.zoom_distance(), CameraRig.fit_distance(Vector2(150, 130), 16.0 / 9.0), 0.01)
 	rig.free()
 
 

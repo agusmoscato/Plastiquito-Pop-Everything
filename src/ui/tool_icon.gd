@@ -10,6 +10,21 @@ var variant: String = "" ## "size", "force", "speed" o "special": distingue las 
 var _spin: Node3D
 var _vp: SubViewport
 var _px: int = 64
+var _cam: Camera3D
+var _sway_t: float = 0.0
+
+## Encuadre cerrado por herramienta (jornada B2): (zoom, dirección de la cámara, foco). foco "contact" =
+## el punto donde la herramienta toca la lámina; "center" = el centro del modelo. Las variantes de mejora
+## (regla, grilla, estela...) siguen con el encuadre general y el giro.
+const FRAMING: Dictionary = {
+	"finger": [2.7, Vector3(0.55, 0.75, 1.0), "contact"],  # la yema apretando una burbuja
+	"hands": [2.4, Vector3(0.55, 0.75, 1.0), "contact"],
+	"palm": [1.15, Vector3(0.0, 1.0, 0.18), "center"],      # la palma vista desde arriba
+	"rolling_pin": [1.25, Vector3(0.35, 0.8, 1.0), "center"],  # la mano agarrando el palo
+	"iron": [1.25, Vector3(0.7, 0.7, 1.0), "center"],
+	"boot": [1.2, Vector3(1.0, 0.35, 0.25), "center"],      # de perfil
+	"auto_roller": [1.2, Vector3(0.5, 0.7, 1.0), "center"],
+}
 
 
 func setup(p_kind: String, px: int, p_tier: int = 0) -> void:
@@ -44,15 +59,36 @@ func _build() -> void:
 	light.rotation_degrees = Vector3(-45.0, -30.0, 0.0)
 	light.light_energy = 1.2
 	_vp.add_child(light)
-	var cam: Camera3D = Camera3D.new()
-	cam.fov = 34.0
-	cam.position = Vector3(0.0, 2.4, 3.6)
-	cam.rotation_degrees = Vector3(-26.0, 0.0, 0.0)
-	_vp.add_child(cam)
+	_cam = Camera3D.new()
+	_cam.fov = 34.0
+	_cam.position = Vector3(0.0, 2.4, 3.6)
+	_cam.rotation_degrees = Vector3(-26.0, 0.0, 0.0)
+	_vp.add_child(_cam)
 	_spin = Node3D.new()
 	_vp.add_child(_spin)
 	_spin.add_child(_make_model())
 	_spin.position = Vector3(0.0, 0.1, 0.0)
+	_frame()
+
+
+func _closeup() -> bool:
+	return variant == "" and FRAMING.has(kind)
+
+
+## Encuadre cerrado: la cámara mira el foco desde la dirección de la herramienta, más cerca.
+func _frame() -> void:
+	if _cam == null or not _closeup():
+		return
+	var f: Array = FRAMING[kind]
+	var zoom: float = f[0]
+	var dir: Vector3 = f[1]
+	var focus: Vector3 = Vector3(0.0, 0.1, 0.0)
+	if str(f[2]) == "contact" and _spin.get_child_count() > 0:
+		var body: Node3D = (_spin.get_child(0) as Node3D).get_node_or_null("Body") as Node3D
+		if body != null:
+			focus = _spin.position + body.position # el contacto quedó acá al centrar el modelo
+	_cam.position = focus + dir.normalized() * (4.3 / zoom)
+	_cam.look_at(focus, Vector3.UP if absf(dir.normalized().y) < 0.95 else Vector3.FORWARD)
 
 
 func set_variant(p_variant: String) -> void:
@@ -60,8 +96,10 @@ func set_variant(p_variant: String) -> void:
 	if _spin == null:
 		return
 	for c: Node in _spin.get_children():
+		_spin.remove_child(c)
 		c.queue_free()
 	_spin.add_child(_make_model())
+	_frame()
 
 
 func set_tier(p_tier: int) -> void:
@@ -89,6 +127,8 @@ func _make_model() -> Node3D:
 		return root
 	var use_tier: int = tier
 	var model: Node3D = ToolMeshes.build(kind, 1.2, use_tier, true)
+	if _closeup() and (kind == "finger" or kind == "hands"):
+		_add_pressed_bubble(model)
 	match variant:
 		"size":
 			_add_ruler(model)
@@ -101,6 +141,24 @@ func _make_model() -> Node3D:
 		"count":
 			_add_copies(model)
 	return model
+
+
+## Primer plano del dedo: una burbuja aplastada justo debajo de la yema.
+func _add_pressed_bubble(model: Node3D) -> void:
+	var body: Node3D = model.get_node_or_null("Body") as Node3D
+	if body == null:
+		return
+	var d: MeshInstance3D = MeshInstance3D.new()
+	d.mesh = BubbleMesh.build(0.42, 0.8, 8, 16)
+	var mat: StandardMaterial3D = StandardMaterial3D.new()
+	mat.albedo_color = Color(0.55, 0.82, 1.0, 0.75)
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.rim_enabled = true
+	mat.rim = 0.8
+	d.material_override = mat
+	d.position = body.position + Vector3(0.0, -0.1, 0.0)
+	d.scale = Vector3(1.25, 0.45, 1.25) # aplastada por la yema
+	model.add_child(d)
 
 
 ## Tamaño: la herramienta al lado de una regla con marcas.
@@ -194,4 +252,8 @@ func _process(delta: float) -> void:
 	if _vp == null and is_visible_in_tree():
 		_build()
 	if _spin != null:
-		_spin.rotation.y += delta * (2.6 if variant == "speed" else 0.8)
+		if _closeup(): # primer plano quieto, con un vaivén leve (girando no se lee a 48 px)
+			_sway_t += delta
+			_spin.rotation.y = sin(_sway_t * 0.9) * 0.18
+		else:
+			_spin.rotation.y += delta * (2.6 if variant == "speed" else 0.8)

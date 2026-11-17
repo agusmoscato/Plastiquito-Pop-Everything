@@ -140,19 +140,19 @@ static func build(tool_id: String, radius: float, tier: int = 0, icon: bool = fa
 	var metal: float = 0.85 if tier >= 2 else 0.0
 	match tool_id:
 		"palm":
-			_add_hand(body, "palm", tier, false, half * 1.8 / 0.085, Vector3.ZERO, Vector3(0.0, 24.0, 0.0))
+			_add_hand(body, "palm", tier, false, half * 1.8 / 0.085 * 0.64, Vector3.ZERO, Vector3(0.0, 24.0, 0.0)) # 8-15 % del alto con la cámara de trabajo
 		"hands":
 			_add_hand(body, "point", tier, true, HAND_SCALE * GHOST_SCALE, Vector3.ZERO, HAND_ROT)
 		"rolling_pin":
-			var s: float = half * 2.0 / 0.619
+			var s: float = half * 2.0 / 0.619 * 1.25 # 8-15 % del alto con la cámara de trabajo
 			_add_model(body, "pin", s, color, amount, metal)
 			_add_hand(body, "grab", tier, false, s * 1.25, Vector3(0.222, 0.056, 0.0) * s, Vector3(0.0, 0.0, 0.0))
 		"iron":
-			var s2: float = half * 2.0 / 0.30
+			var s2: float = half * 2.0 / 0.30 * 0.75 # 8-15 % del alto con la cámara de trabajo; el aura marca la zona real
 			_add_model(body, "iron", s2, color, amount, metal)
 			_add_hand(body, "grab", tier, false, s2 * 1.1, Vector3(0.0, 0.158, -0.005) * s2, Vector3(0.0, 0.0, 0.0))
 		"boot":
-			_add_model(body, "boot", half * 1.95 / 0.33, color, amount, metal) # la suela cubre el pisotón
+			_add_model(body, "boot", half * 1.95 / 0.33 * 1.1, color, amount, metal) # la suela cubre el pisotón; 8-15 % del alto
 		"auto_roller":
 			_add_model(body, "roller", half * 2.0 / 0.26, color, amount, metal)
 		_:

@@ -36,6 +36,7 @@ var ev_chain_ended_value: float = 0.0
 var ev_new_specials: Array[int] = []
 var ev_reloaded: bool = false
 var ev_squish: bool = false
+var ev_burned: PackedInt32Array = PackedInt32Array() ## plancha quieta: celdas derretidas (humo y chirrido)
 var ev_revived: PackedInt32Array = PackedInt32Array() ## Ecos que se volvieron a inflar
 var ev_auto_from: int = 0 ## desde este índice de ev_* los reventones son de la automatización
 
@@ -151,6 +152,8 @@ func _configure_tool(id: String) -> void:
 	tm.heat_rate = Cfg.num(p, "heat_rate")
 	tm.heat_cap = Cfg.num(eco, "iron_heat_cap")
 	tm.still_force = Cfg.num(eco, "iron_still_force")
+	tm.burn_after = Cfg.num(eco, "iron_burn_after_seconds")
+	tm.glide_min_speed = Cfg.num(eco, "iron_glide_min_speed")
 	tm.heat_reach = Cfg.num(eco, "iron_heat_reach")
 	tm.cooldown = Cfg.num(p, "cooldown")
 	tm.wave_k = Cfg.num(eco, "boot_wave_k")
@@ -243,7 +246,8 @@ func step(dt: float, pointer: Vector2, pressing: bool) -> void:
 		popped = tm.step(touched, dt, tm.last_weights, dir)
 		if tm.shape == ToolModel.SHAPE_RECT and live:
 			tm.cells_for(_prev_pointer, pointer) # orienta la plancha hacia donde se mueve
-			tm.apply_heat(pointer, dt)
+			tm.apply_heat(pointer, dt, pointer - _prev_pointer)
+			ev_burned = tm.burned
 		ev_squish = tm.new_pressed > 0
 	_prev_pointer = pointer
 	_prev_pressing = pressing
@@ -344,6 +348,7 @@ func _do_reload() -> void:
 
 
 func _clear_events() -> void:
+	ev_burned = PackedInt32Array()
 	ev_idx = PackedInt32Array()
 	ev_value = PackedFloat64Array()
 	ev_pressure = PackedFloat32Array()
