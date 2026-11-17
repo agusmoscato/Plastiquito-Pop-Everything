@@ -150,6 +150,7 @@ func _configure_tool(id: String) -> void:
 	tm.center_falloff = Cfg.num(p, "center_falloff")
 	tm.heat_rate = Cfg.num(p, "heat_rate")
 	tm.heat_cap = Cfg.num(eco, "iron_heat_cap")
+	tm.still_force = Cfg.num(eco, "iron_still_force")
 	tm.heat_reach = Cfg.num(eco, "iron_heat_reach")
 	tm.cooldown = Cfg.num(p, "cooldown")
 	tm.wave_k = Cfg.num(eco, "boot_wave_k")
@@ -267,7 +268,7 @@ func step(dt: float, pointer: Vector2, pressing: bool) -> void:
 func _step_automation(dt: float) -> void:
 	if reload_timer >= 0.0:
 		return
-	var hand_cells: PackedInt32Array = hands.step(dt)
+	var hand_cells: PackedInt32Array = hands.step(dt * night_rate()) # de noche tocan más seguido
 	var roll_cells: PackedInt32Array = roller.step(dt)
 	if hand_cells.is_empty() and roll_cells.is_empty():
 		return
@@ -284,11 +285,20 @@ func _step_automation(dt: float) -> void:
 	_count_tool_pops("auto_roller", roll_cells.size())
 
 
-## Las Manitos rinden más cuando nadie toca (turno de noche): x`idle_hand_mult` tras
-## `idle_hand_after_seconds` sin apretar. Es la fuente principal del perfil idle.
+## TURNO NOCHE (DESIGN 3.5): tras `idle_hand_after_seconds` sin apretar, las Manitos rinden
+## x`idle_hand_mult` en total: tocan `night_rate_mult` veces más seguido y cada toque vale el resto.
+## Es la fuente principal del perfil idle. Requiere Manitos compradas.
+func night_shift() -> bool:
+	return hands != null and hands.count > 0 and idle_s >= Cfg.num(eco, "idle_hand_after_seconds")
+
+
+func night_rate() -> float:
+	return Cfg.num(eco, "night_rate_mult") if night_shift() else 1.0
+
+
 func hands_idle_mult() -> float:
-	if idle_s >= Cfg.num(eco, "idle_hand_after_seconds"):
-		return Cfg.num(eco, "idle_hand_mult")
+	if night_shift():
+		return Cfg.num(eco, "idle_hand_mult") / Cfg.num(eco, "night_rate_mult")
 	return 1.0
 
 

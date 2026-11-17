@@ -58,6 +58,7 @@ var _next_minute_log: float = 60.0
 var total_pop_events: int = 0
 var tool_pop_events: int = 0
 var chain_events: int = 0
+var source_value: Dictionary[String, float] = {"directo": 0.0, "cadena": 0.0, "automatico": 0.0} ## Pops del Galpón por origen
 
 
 func _initialize() -> void:
@@ -419,6 +420,10 @@ func _purchase(id: String) -> void:
 
 func _after_step(_was_phase: int) -> void:
 	total_pop_events += sim.ev_idx.size()
+	if sim.phase() == 3:
+		for i: int in sim.ev_value.size():
+			var key: String = "directo" if i < sim.ev_tool_pops else ("cadena" if i < sim.ev_auto_from else "automatico")
+			source_value[key] += sim.ev_value[i]
 	tool_pop_events += sim.ev_tool_pops
 	if sim.ev_chain_ended_count >= 10:
 		chain_events += 1
@@ -579,52 +584,55 @@ func _report_idle() -> bool:
 	var idle_rate: float = _own_rate(from_s, minutes * 60.0)
 	var ratio: float = idle_rate / maxf(active_rate, 1.0)
 	var ok: bool = ratio >= 0.2 and ratio <= 0.45
-	print("   idle (manitos a los %.1f min): %.0f Pops/min contra %.0f del activo = %.0f%%  objetivo 20-45%%  %s" % [
+	print("   idle (manitos a los %.1f min): %.1f contra %.1f Pops/min de fase 1 equivalentes (normalizado por fase) = %.0f%%  objetivo 20-45%%  %s" % [
 		hands_time / 60.0, idle_rate * 60.0, active_rate * 60.0, ratio * 100.0, "APROBADO" if ok else "FALLÓ"])
 	csv.append("0,metrica,idle contra activo (%%),%.1f,%s" % [ratio * 100.0, "APROBADO" if ok else "FALLO"])
 	return ok
 
 
 func _csv_rate(path: String, from_s: float, to_s: float) -> float:
-	var t0: float = -1.0
-	var p0: float = 0.0
-	var t1: float = -1.0
-	var p1: float = 0.0
-	for line: String in FileAccess.get_file_as_string(path).split("\n"):
-		var f: PackedStringArray = line.split(",")
-		if f.size() < 6 or f[1] != "minuto":
-			continue
-		var t: float = float(f[0])
-		if t >= from_s and t0 < 0.0:
-			t0 = t
-			p0 = float(f[5])
-		if t <= to_s:
-			t1 = t
-			p1 = float(f[5])
-	if t0 < 0.0 or t1 <= t0:
-		return 0.0
-	return (p1 - p0) / (t1 - t0)
+	return _phase_rate(FileAccess.get_file_as_string(path).split(char(10)), from_s, to_s)
 
 
 func _own_rate(from_s: float, to_s: float) -> float:
-	var t0: float = -1.0
-	var p0: float = 0.0
-	var t1: float = -1.0
-	var p1: float = 0.0
-	for line: String in csv:
+	return _phase_rate(csv, from_s, to_s)
+
+
+## Ritmo normalizado por fase: cada tramo de Pops se divide por la base de Pops de la fase en que se
+## ganó (1, 100, 10.000...). Comparar Pops crudos entre perfiles en fases distintas no mide nada: la
+## base se multiplica por 100 por fase y el cociente saltaba de 2 % a 83 % según quién cruzara antes.
+## Devuelve "Pops de fase 1 equivalentes" por segundo.
+func _phase_rate(lines: PackedStringArray, from_s: float, to_s: float) -> float:
+	var bases: Array = sim.eco["phase_base_values"]
+	var phase: int = 1
+	var prev_t: float = -1.0
+	var prev_p: float = 0.0
+	var acc: float = 0.0
+	var t_first: float = -1.0
+	var t_last: float = -1.0
+	for line: String in lines:
 		var f: PackedStringArray = line.split(",")
-		if f.size() < 6 or f[1] != "minuto":
+		if f.size() < 6:
+			continue
+		if f[1] == "hito" and f[2].begins_with("fase "):
+			phase = int(f[2].substr(5, 1))
+			continue
+		if f[1] != "minuto":
 			continue
 		var t: float = float(f[0])
-		if t >= from_s and t0 < 0.0:
-			t0 = t
-			p0 = float(f[5])
-		if t <= to_s:
-			t1 = t
-			p1 = float(f[5])
-	if t0 < 0.0 or t1 <= t0:
+		var ptot: float = float(f[5])
+		if t >= from_s and t <= to_s:
+			if prev_t >= from_s:
+				var base: float = bases[clampi(phase, 1, bases.size()) - 1]
+				acc += (ptot - prev_p) / base
+				t_last = t
+			elif t_first < 0.0:
+				t_first = t
+		prev_t = t
+		prev_p = ptot
+	if t_first < 0.0 or t_last <= t_first:
 		return 0.0
-	return (p1 - p0) / (t1 - t0)
+	return acc / (t_last - t_first)
 
 
 func _report(wall: float) -> bool:
@@ -636,6 +644,8 @@ func _report(wall: float) -> bool:
 		sim.state.pops_total, sim.state.pops, purchase_times.size(), sim.state.max_chain, sim.state.recycles])
 	print("   reventones=%d (herramienta %d, %.0f%% por cadena) cadenas>=10: %d" % [total_pop_events, tool_pop_events, 100.0 * float(total_pop_events - tool_pop_events) / maxf(float(total_pop_events), 1.0), chain_events])
 	var full: bool = minutes >= 200.0
+	var src_total: float = maxf(1.0, source_value["directo"] + source_value["cadena"] + source_value["automatico"])
+	print("   Galpón por origen: directo %.0f%%  cadena %.0f%%  automático %.0f%%" % [100.0 * source_value["directo"] / src_total, 100.0 * source_value["cadena"] / src_total, 100.0 * source_value["automatico"] / src_total])
 	if profile == "idle":
 		return _report_idle()
 	var checks: Array[Array] = []

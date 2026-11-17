@@ -21,6 +21,11 @@ var phase: int = 1
 var props: Node3D
 
 var _light: DirectionalLight3D
+var night: float = 0.0 ## 0 día .. 1 turno noche (luz más fría y tenue mientras las Manitos trabajan solas)
+var _current: Dictionary = {}
+
+const NIGHT_LIGHT: Color = Color(0.60, 0.72, 1.0)
+const NIGHT_AMB: Color = Color(0.42, 0.52, 0.86)
 var _env: Environment
 var _material: ShaderMaterial
 var _center: Vector2 = Vector2.ZERO
@@ -153,18 +158,28 @@ func _lerp_settings(a: Dictionary, b: Dictionary, k: float) -> Dictionary:
 	}
 
 
+## Turno noche: 0..1, ya suavizado por quien llama. Se aplica encima de la luz del escenario.
+func set_night(n: float) -> void:
+	if absf(n - night) < 0.002:
+		return
+	night = n
+	if not _current.is_empty() and not is_transitioning():
+		_push(_current)
+
+
 func _push(s: Dictionary) -> void:
+	_current = s
 	var rot: Vector3 = s["rot"]
 	var color: Color = s["color"]
 	var amb: Color = s["amb"]
 	var bg: Color = s["bg"]
 	_light.rotation_degrees = rot
-	_light.light_color = color
-	_light.light_energy = Cfg.num(s, "energy")
+	_light.light_color = color.lerp(NIGHT_LIGHT, 0.45 * night)
+	_light.light_energy = Cfg.num(s, "energy") * (1.0 - 0.22 * night)
 	_light.directional_shadow_max_distance = Cfg.num(s, "shadow")
-	_env.ambient_light_color = amb
+	_env.ambient_light_color = amb.lerp(NIGHT_AMB, 0.5 * night)
 	_env.ambient_light_energy = Cfg.num(s, "amb_e")
-	_env.background_color = bg
+	_env.background_color = bg.lerp(bg * Color(0.7, 0.78, 1.0), 0.6 * night)
 
 
 func _ambient() -> void:

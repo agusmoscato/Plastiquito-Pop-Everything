@@ -16,6 +16,7 @@ const T: Dictionary = {
 	"close": {"es": "CERRAR", "en": "CLOSE"},
 	"bubblepedia": {"es": "BURBUJARIO", "en": "BUBBLE LOG"},
 	"new": {"es": "NUEVA", "en": "NEW"},
+	"night_shift": {"es": "TURNO NOCHE", "en": "NIGHT SHIFT"},
 	"chain": {"es": "CADENA", "en": "CHAIN"},
 	"goal_palm": {"es": "Habilitar la palma", "en": "Unlock the palm"},
 	"goal_recycle": {"es": "Primer reciclado", "en": "First recycling"},

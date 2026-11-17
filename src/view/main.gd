@@ -29,6 +29,7 @@ var _debug: bool = false
 var _was_holding: bool = false
 var _press_cell: int = -1
 var _fake_press: bool = false
+var _night: float = 0.0 ## turno noche suavizado (0 día .. 1 noche)
 
 var _recycling: bool = false
 var _recycle_t: float = 0.0
@@ -288,6 +289,7 @@ func _after_step(_holding: bool, delta: float) -> void:
 	for p: float in sim.ev_pressure:
 		max_p = maxf(max_p, p)
 	PopAudio.report_frame(n, max_p, delta)
+	_update_night(delta)
 	if sim.ev_squish:
 		PopAudio.play_squish()
 	hud.on_sim_step(delta)
@@ -302,6 +304,14 @@ func _after_step(_holding: bool, delta: float) -> void:
 	_check_hitstop()
 	if sim.ev_chain_ended_count >= Cfg.integer(sim.eco, "chain_stamp_min"):
 		Playtest.log.chain(sim.ev_chain_ended_count)
+
+
+## TURNO NOCHE: entra en ~2 s y vuelve al día en ~0,7 s cuando se toca de nuevo.
+func _update_night(delta: float) -> void:
+	var on: bool = sim.night_shift()
+	_night = move_toward(_night, 1.0 if on else 0.0, delta * (0.5 if on else 1.4))
+	world.scenario.set_night(_night * _night * (3.0 - 2.0 * _night))
+	automation.night = _night
 
 
 func _pop_fx() -> void:

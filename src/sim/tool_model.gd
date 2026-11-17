@@ -33,6 +33,7 @@ var center_falloff: float = 0.0
 ## Plancha: el calor sube la presión de las burbujas cercanas (hasta heat_cap) antes de tocarlas.
 var heat_rate: float = 0.0 ## presión por segundo
 var heat_cap: float = 1.4
+var still_force: float = 1.0 ## plancha: fracción de la fuerza cuando no se desliza (se plancha arrastrando)
 var heat_reach: float = 1.6 ## el aura es la plancha agrandada por este factor
 ## Bota: pisotón con tiempo de recarga y onda expansiva.
 var cooldown: float = 4.0
@@ -253,16 +254,26 @@ func step(touched: PackedInt32Array, delta: float, weights: PackedFloat32Array =
 	for idx: int in touched:
 		now_touched[idx] = true
 	var dragging: bool = _holding and not touched.is_empty()
+	var glide: float = glide_factor(dir, delta)
 	for i: int in touched.size():
 		var idx: int = touched[i]
 		var w: float = weights[i] if i < weights.size() else 1.0
-		_press_cell(idx, delta * w, dragging and not _prev_touched.has(idx), changed, now_touched, dir)
+		_press_cell(idx, delta * w * glide, dragging and not _prev_touched.has(idx), changed, now_touched, dir)
 	_recover_untouched(now_touched, delta, changed)
 	_holding = not touched.is_empty()
 	_prev_touched = now_touched
 	if not changed.is_empty():
 		sheet.notify_changed(changed)
 	return popped
+
+
+## La plancha aplasta con toda su fuerza mientras se desliza (a partir de 2 celdas por segundo) y
+## con `still_force` quieta: usarla como sello rendía 4 veces más que planchar. Las demás, 1.
+func glide_factor(dir: Vector2, delta: float) -> float:
+	if shape != SHAPE_RECT or still_force >= 1.0 or delta <= 0.0:
+		return 1.0
+	var speed: float = dir.length() / delta
+	return clampf(speed / (grid.spacing * 2.0), still_force, 1.0)
 
 
 ## Revienta celdas de golpe (debug, "pop masivo"). Devuelve las que reventó.

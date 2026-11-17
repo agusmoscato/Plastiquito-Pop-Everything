@@ -27,10 +27,10 @@ static func pose_data(name: String) -> Dictionary[String, PackedFloat32Array]:
 			d["thumb"] = PackedFloat32Array([22.0, 32.0, 26.0])
 		_:
 			d["index"] = PackedFloat32Array([0.0, 2.0, 4.0, 2.0])
-			d["middle"] = PackedFloat32Array([0.0, 50.0, 62.0, 28.0])
-			d["ring"] = PackedFloat32Array([0.0, 52.0, 64.0, 28.0])
-			d["pinky"] = PackedFloat32Array([0.0, 54.0, 66.0, 28.0])
-			d["thumb"] = PackedFloat32Array([8.0, 16.0, 10.0]) # relajado, pegado al medio
+			d["middle"] = PackedFloat32Array([0.0, 40.0, 72.0, 30.0])
+			d["ring"] = PackedFloat32Array([0.0, 42.0, 74.0, 30.0])
+			d["pinky"] = PackedFloat32Array([0.0, 44.0, 76.0, 30.0])
+			d["thumb"] = PackedFloat32Array([14.0, 22.0, 16.0]) # semicerrado sobre el medio
 	return d
 
 

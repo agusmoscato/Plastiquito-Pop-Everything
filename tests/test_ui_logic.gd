@@ -61,3 +61,24 @@ func test_tx_has_both_languages_for_every_key() -> void:
 	for key: Variant in Tx.T:
 		var entry: Dictionary = Tx.T[key]
 		assert_true(entry.has("es") and entry.has("en"), str(key))
+
+
+func test_chain_stamp_goes_above_origin_inside_free_area() -> void:
+	var free: Rect2 = Rect2(Vector2(10, 150), Vector2(1100, 600))
+	var c: Vector2 = ChainStamp.stamp_center(Vector2(500, 600), Vector2(300, 76), free, Vector2.ZERO)
+	assert_lt(c.y + 38.0, 600.0 - ChainStamp.LIFT + 0.1, "el sello queda arriba de la ola")
+	var top: Vector2 = ChainStamp.stamp_center(Vector2(500, 160), Vector2(300, 76), free, Vector2.ZERO)
+	assert_gt(top.y - 38.0, 149.0, "no se sale de la zona libre")
+	var right: Vector2 = ChainStamp.stamp_center(Vector2(1200, 600), Vector2(300, 76), free, Vector2.ZERO)
+	assert_lt(right.x + 150.0, free.end.x + 0.1, "no se mete en la hoja de pedidos")
+	assert_eq(ChainStamp.stamp_center(Vector2(-1, -1), Vector2(300, 76), free, Vector2(7, 7)), Vector2(7, 7))
+
+
+func test_flyers_cap_and_panels() -> void:
+	var f: FlyingNumbers = FlyingNumbers.new()
+	f.blocked = [Rect2(Vector2(0, 0), Vector2(200, 100))]
+	for i: int in 30:
+		f.spawn(Vector2(400 + i * 10, 400), 1.0)
+	assert_eq(f.pending(), FlyingNumbers.MAX_ITEMS, "nunca más de 12 en pantalla")
+	assert_false(Rect2(Vector2(0, 0), Vector2(200, 100)).has_point(f.outside_panels(Vector2(50, 50))), "no nace dentro de un panel")
+	f.free()

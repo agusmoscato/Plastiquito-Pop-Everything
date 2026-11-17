@@ -327,3 +327,28 @@ func test_new_phase_discount_applies_to_first_buys_only() -> void:
 	assert_eq(sim.state.run_buys, 3)
 	assert_eq(sim.upgrades.discount, 1.0)
 	assert_gt(sim.upgrades.next_cost("finger_force", 3), 0.0)
+
+
+func test_night_shift_after_eight_idle_seconds() -> void:
+	var sim: GameSim = GameSim.new(db, 4)
+	sim.state.perm["perm_sheet"] = 2
+	sim.state.levels["unlock_hands"] = 1
+	sim.state.levels["hands_count"] = 3
+	sim.refresh_stats()
+	sim.new_sheet()
+	assert_false(sim.night_shift(), "recién empieza: turno de día")
+	for i: int in 270: # 9 s sin tocar
+		sim.step(1.0 / 30.0, sim.center(), false)
+	assert_true(sim.night_shift(), "a los 8 s sin tocar empieza el turno noche")
+	var total: float = sim.night_rate() * sim.hands_idle_mult()
+	assert_almost_eq(total, Cfg.num(sim.eco, "idle_hand_mult"), 0.0001, "ritmo x valor = bono total")
+	assert_gt(sim.night_rate(), 1.0, "de noche las manitos tocan más seguido")
+	sim.step(1.0 / 30.0, sim.center(), true)
+	assert_false(sim.night_shift(), "al volver a tocar termina")
+
+
+func test_no_night_shift_without_hands() -> void:
+	var sim: GameSim = GameSim.new(db, 5)
+	for i: int in 300:
+		sim.step(1.0 / 30.0, sim.center(), false)
+	assert_false(sim.night_shift())

@@ -20,6 +20,7 @@ var work_order: WorkOrder
 var next_bar: NextBar
 var combo: ComboMeter
 var chain_stamp: ChainStamp
+var night_stamp: NightStamp
 var flyers: FlyingNumbers
 var shop: ShopSheet
 var recycle_panel: RecyclePanel
@@ -29,6 +30,10 @@ var _tool_buttons: Dictionary = {} ## id -> StampButton
 var _recycle_button: StampButton
 var _log_button: StampButton
 var _in_flight: float = 0.0
+var _group_value: float = 0.0
+var _group_pos: Vector2 = Vector2.ZERO
+var _group_count: int = 0
+var _chain_origin: Vector2 = Vector2(-1.0, -1.0)
 var _rate_acc: float = 0.0
 var _rate_shown: float = 0.0
 var _rate_timer: float = 0.0
@@ -67,6 +72,9 @@ func setup(p_sim: GameSim, p_camera: Camera3D) -> void:
 	combo = ComboMeter.new()
 	combo.setup()
 	root.add_child(combo)
+	night_stamp = NightStamp.new()
+	night_stamp.setup()
+	root.add_child(night_stamp)
 	shop = ShopSheet.new()
 	shop.setup(sim)
 	shop.tag_bought.connect(_on_tag_bought)
@@ -165,6 +173,7 @@ func _layout() -> void:
 	next_bar.position = Vector2(free_w * 0.5 - next_bar.size.x * 0.5 + 60.0, 10.0)
 	shop.position = Vector2(vp.x - SHOP_W - 6.0, 8.0)
 	combo.position = Vector2(14.0, vp.y - 110.0)
+	night_stamp.position = Vector2(18.0, vp.y - 178.0)
 	var x: float = 230.0
 	for id: String in _tool_buttons:
 		var b: StampButton = _tool_buttons[id]
@@ -174,6 +183,7 @@ func _layout() -> void:
 	_log_button.position = Vector2(free_w - 170.0, 76.0)
 	bubble_log.position = Vector2(free_w - 380.0, 124.0)
 	flyers.target = pops_panel.odometer_center()
+	flyers.blocked = _panel_rects()
 
 
 # --- Eventos de la sim -------------------------------------------------------------------------
@@ -182,11 +192,17 @@ func _layout() -> void:
 func on_sim_step(delta: float) -> void:
 	_handle_pops()
 	var min_chain: int = Cfg.integer(sim.eco, "chain_stamp_min")
+	if sim.chain_count > 0 and _chain_origin.x < 0.0 and sim.ev_idx.size() > 0:
+		_chain_origin = _screen_of(sim.grid.cell_to_world(sim.ev_idx[0])) # donde arrancó la ola
 	if sim.chain_count >= min_chain:
+		chain_stamp.anchor = _chain_origin
 		chain_stamp.chain_progress(sim.chain_count)
 	if sim.ev_chain_ended_count >= min_chain:
+		chain_stamp.anchor = _chain_origin
 		chain_stamp.chain_ended(sim.ev_chain_ended_count, sim.ev_chain_ended_value)
 		PopAudio.play_ui("chain_hit", 1.0, 0.0)
+	if sim.chain_count == 0:
+		_chain_origin = Vector2(-1.0, -1.0)
 	_rate_acc += _sum_values()
 	_rate_timer += delta
 
@@ -198,35 +214,37 @@ func _sum_values() -> float:
 	return total
 
 
+## Los reventones directos de la herramienta vuelan sueltos; los de una cadena (y los de la
+## automatización) se juntan y salen como UN "+N" desde el centro de la cadena cuando termina.
 func _handle_pops() -> void:
 	var n: int = sim.ev_idx.size()
-	if n == 0:
-		return
-	_in_flight += _sum_values()
-	if n <= 10:
-		for i: int in n:
-			var p: Vector2 = sim.grid.cell_to_world(sim.ev_idx[i])
-			flyers.spawn(_screen_of(p), sim.ev_value[i])
-		return
-	# Muchos a la vez: se agrupan por zona de pantalla.
-	var buckets: Dictionary = {}
-	for i: int in n:
-		var sp: Vector2 = _screen_of(sim.grid.cell_to_world(sim.ev_idx[i]))
-		var key: int = int(sp.x / 170.0) * 1000 + int(sp.y / 170.0)
-		var b: Dictionary = buckets.get(key, {"pos": Vector2.ZERO, "count": 0, "value": 0.0})
-		var bpos: Vector2 = b["pos"]
-		var bcount: int = b["count"]
-		var bvalue: float = b["value"]
-		b["pos"] = bpos + sp
-		b["count"] = bcount + 1
-		b["value"] = bvalue + sim.ev_value[i]
-		buckets[key] = b
-	for key: Variant in buckets:
-		var b: Dictionary = buckets[key]
-		var bpos: Vector2 = b["pos"]
-		var bcount: int = b["count"]
-		var bvalue: float = b["value"]
-		flyers.spawn(bpos / float(bcount), bvalue)
+	if n > 0:
+		_in_flight += _sum_values()
+	var direct: int = mini(sim.ev_tool_pops, n)
+	for i: int in direct:
+		flyers.spawn(_screen_of(sim.grid.cell_to_world(sim.ev_idx[i])), sim.ev_value[i])
+	for i: int in range(direct, n):
+		_group_value += sim.ev_value[i]
+		_group_pos += _screen_of(sim.grid.cell_to_world(sim.ev_idx[i]))
+		_group_count += 1
+	if _group_count > 0 and sim.chain_count == 0:
+		flyers.spawn(_group_pos / float(_group_count), _group_value)
+		_group_value = 0.0
+		_group_pos = Vector2.ZERO
+		_group_count = 0
+
+
+## Rectángulos de los paneles del HUD (los "+N" no se dibujan encima).
+func _panel_rects() -> Array[Rect2]:
+	var out: Array[Rect2] = []
+	for c: Control in [pops_panel, work_order, next_bar, shop, combo, _recycle_button, _log_button]:
+		if c.visible:
+			out.append(c.get_global_rect())
+	for id: String in _tool_buttons:
+		var b: StampButton = _tool_buttons[id]
+		if b.visible:
+			out.append(b.get_global_rect())
+	return out
 
 
 func _screen_of(world_xz: Vector2) -> Vector2:
@@ -320,6 +338,9 @@ func _process(delta: float) -> void:
 		return
 	if get_viewport().get_visible_rect().size != _last_vp:
 		_layout()
+	flyers.blocked = _panel_rects() # los paneles tiemblan y se mueven: se actualiza cada frame
+	var vp_size: Vector2 = get_viewport().get_visible_rect().size
+	chain_stamp.free_rect = Rect2(Vector2(10.0, 150.0), Vector2(vp_size.x - SHOP_W - 30.0, vp_size.y - 280.0))
 	_tic_cooldown = maxf(0.0, _tic_cooldown - delta)
 	if _arrow_t > 0.0:
 		_arrow_t -= delta
@@ -340,6 +361,7 @@ func _process(delta: float) -> void:
 	var rates: Array = sim.eco["combo_rates"]
 	var top_rate: float = rates[rates.size() - 1]
 	combo.update_values(sim.combo_multiplier(), clampf(sim.combo_rate() / top_rate, 0.0, 1.0))
+	night_stamp.set_active(sim.night_shift())
 	_refresh_timer -= delta
 	if _refresh_timer <= 0.0:
 		_refresh_timer = 0.2

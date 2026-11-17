@@ -50,6 +50,33 @@ def material(name, color, rough=0.5, metal=0.0, clearcoat=0.0, emission=None, al
     return m
 
 
+def vertex_tint_material(name, color, rough=0.5, clearcoat=0.0):
+    """Material cuyo color base se multiplica por el atributo de color "tint" (se exporta como
+    COLOR_0 y Godot lo usa como albedo). Sirve para zonas más oscuras con borde suave."""
+    m = material(name, color, rough=rough, clearcoat=clearcoat)
+    nt = m.node_tree
+    bsdf = nt.nodes["Principled BSDF"]
+    attr = nt.nodes.new("ShaderNodeVertexColor")
+    attr.layer_name = "tint"
+    mix = nt.nodes.new("ShaderNodeMix")
+    mix.data_type = "RGBA"
+    mix.blend_type = "MULTIPLY"
+    mix.inputs["Factor"].default_value = 1.0
+    mix.inputs["A"].default_value = (color[0], color[1], color[2], 1.0)
+    nt.links.new(attr.outputs["Color"], mix.inputs["B"])
+    nt.links.new(mix.outputs["Result"], bsdf.inputs["Base Color"])
+    return m
+
+
+def paint(obj, fn=None):
+    """Llena el atributo de color "tint" de cada esquina: blanco, o fn(posición) -> 0..1 (gris)."""
+    me = obj.data
+    attr = me.color_attributes.get("tint") or me.color_attributes.new("tint", "BYTE_COLOR", "CORNER")
+    for loop in me.loops:
+        v = 1.0 if fn is None else fn(me.vertices[loop.vertex_index].co)
+        attr.data[loop.index].color = (v, v, v, 1.0)
+
+
 def hex_color(h):
     h = h.lstrip("#")
     def lin(c):

@@ -6,6 +6,7 @@ extends Node3D
 const HAND_SEPARATION: float = 2.4 ## ~ancho de una manito en el mundo (palma de 8,5 cm x escala)
 
 var sim: GameSim
+var night: float = 0.0 ## turno noche (0..1): las manitos se mueven más rápido
 
 var _hands: Array[Node3D] = []
 var _dip: PackedFloat32Array = PackedFloat32Array()
@@ -56,7 +57,7 @@ func _move_hands(delta: float) -> void:
 		if t != _last_target[i]:
 			_last_target[i] = t
 			_dip[i] = 1.0 # toca: baja y vuelve
-		_dip[i] = maxf(0.0, _dip[i] - delta * 5.0)
+		_dip[i] = maxf(0.0, _dip[i] - delta * (5.0 + 2.5 * night))
 		goals[i] = sim.grid.cell_to_world(t)
 		active[i] = 1
 	goals = separate(goals, active, HAND_SEPARATION)

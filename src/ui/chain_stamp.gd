@@ -8,6 +8,10 @@ signal slammed(count: int)
 var count: int = 0
 var growing: bool = false
 var total_text: String = ""
+var anchor: Vector2 = Vector2(-1.0, -1.0) ## origen de la cadena en pantalla (el sello va arriba)
+var free_rect: Rect2 = Rect2() ## zona libre de paneles donde puede ir el sello
+const ALPHA: float = 0.85 ## mientras dura: deja ver la ola por debajo
+const LIFT: float = 95.0 ## distancia mínima entre el origen de la cadena y el borde de abajo del sello
 
 var _slam: float = 0.0
 var _hold: float = 0.0
@@ -51,13 +55,13 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	if _fade <= 0.01 or count < 2:
 		return
-	var center: Vector2 = Vector2(size.x * 0.5 - 150.0, 250.0) + _shake
 	var scale_f: float = 1.0 + minf(float(count) / 60.0, 1.2) + _slam * 0.55
 	var w: float = 300.0 * scale_f
 	var h: float = 76.0 * scale_f
+	var center: Vector2 = stamp_center(anchor, Vector2(w, h), free_rect, Vector2(size.x * 0.5 - 150.0, 250.0)) + _shake
 	var r: Rect2 = Rect2(center - Vector2(w, h) * 0.5, Vector2(w, h))
 	var label: String = "%s x%d" % [Tx.t("chain"), count]
-	UiKit.draw_stamp(self, r, label, UiKit.STAMP_RED, int(30.0 * scale_f), -0.09, _fade)
+	UiKit.draw_stamp(self, r, label, UiKit.STAMP_RED, int(30.0 * scale_f), -0.09, _fade * ALPHA)
 	if not growing and total_text != "":
 		var font: Font = UiKit.font_mono_bold()
 		var fs: int = int(26.0 * minf(scale_f, 1.8))
@@ -65,3 +69,15 @@ func _draw() -> void:
 		var pos: Vector2 = Vector2(center.x - ts.x * 0.5, r.end.y + 34.0)
 		draw_string(font, pos + Vector2(2.0, 2.0), total_text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, fs, Color(UiKit.PAPER.r, UiKit.PAPER.g, UiKit.PAPER.b, _fade))
 		draw_string(font, pos, total_text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, fs, Color(UiKit.INK.r, UiKit.INK.g, UiKit.INK.b, _fade))
+
+
+## Centro del sello: arriba del origen de la cadena (para no tapar la ola), dentro de la zona libre.
+## Sin origen conocido usa `fallback`.
+static func stamp_center(origin: Vector2, stamp_size: Vector2, free: Rect2, fallback: Vector2) -> Vector2:
+	if origin.x < 0.0 or free.size == Vector2.ZERO:
+		return fallback
+	var c: Vector2 = origin - Vector2(0.0, LIFT + stamp_size.y * 0.5)
+	var half: Vector2 = stamp_size * 0.5
+	c.x = clampf(c.x, free.position.x + half.x, maxf(free.position.x + half.x, free.end.x - half.x))
+	c.y = clampf(c.y, free.position.y + half.y, maxf(free.position.y + half.y, free.end.y - half.y))
+	return c

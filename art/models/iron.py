@@ -66,7 +66,7 @@ for i in range(11):
     y = -0.07 + 0.15 * t
     z = 0.07 + 0.075 * math.sin(math.pi * t) ** 0.8
     arch_pts.append((0.0, y, z))
-arch_r = [0.012, 0.0125, 0.0145, 0.0155, 0.0160, 0.0160, 0.0155, 0.0145, 0.0130, 0.0125, 0.012]
+arch_r = [r * 1.35 for r in (0.012, 0.0125, 0.0145, 0.0155, 0.0160, 0.0160, 0.0155, 0.0145, 0.0130, 0.0125, 0.012)]  # asa gruesa, de juguete
 handle = lib.tube_along("handle", arch_pts, arch_r, sides=14, squash=0.8)
 lib.subsurf(handle, 1)
 handle.data.materials.append(red)

@@ -15,7 +15,7 @@ lib.reset()
 # un cuello fino y una perilla con curvatura; el cuerpo es levemente abarrilado.
 half = [(0.0, 0.310), (0.011, 0.309), (0.019, 0.300), (0.0235, 0.284), (0.0245, 0.266), (0.0215, 0.248),
         (0.0165, 0.232), (0.0135, 0.215), (0.0130, 0.198), (0.0150, 0.184), (0.0245, 0.176),
-        (0.0385, 0.168), (0.0408, 0.140), (0.0420, 0.080), (0.0425, 0.0), ]
+        (0.0335, 0.1735), (0.0375, 0.1700), (0.0388, 0.1660), (0.0408, 0.140), (0.0420, 0.080), (0.0425, 0.0), ]
 # El anillo del centro (z = 0) va una sola vez: antes se repetía al espejar y el anillo duplicado,
 # de largo cero, se veía como una costura en el medio del palo.
 full = [(r, -z) for (r, z) in half[:-1]] + half
@@ -25,7 +25,7 @@ profile[0] = (0.0, profile[0][1])
 profile[-1] = (0.0, profile[-1][1])
 obj = lib.revolve_profile("rolling_pin", profile, segments=28)
 lib.bevel(obj, 0.0015, 2)
-wood = lib.material("wood_turned", lib.hex_color("#B98552"), rough=0.55)
+wood = lib.material("wood_turned", lib.hex_color("#B98552"), rough=0.32, clearcoat=0.45)  # barnizada, brillo de juguete
 obj.data.materials.append(wood)
 lib.apply_modifiers(obj)
 lib.triangulate(obj)

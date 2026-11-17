@@ -30,7 +30,7 @@ NO_ARM = "--no-arm" in sys.argv  # manitos fantasma: sin antebrazo, puño mínim
 lib.reset()
 
 PALM_W = 0.085
-FINGER_R = PALM_W / 8.0  # radio: diámetro = 1/4 del ancho de la palma
+FINGER_R = PALM_W / 7.2  # radio: el diámetro visible (sección achatada) queda en ~1/4 de la palma
 MIDDLE_LEN = 0.090
 SIDES = 14
 # x e y de la base (MCP), largo relativo, abanico (grados, + hacia +X), fracción de cada falange, grosor.
@@ -54,21 +54,20 @@ def finger_tube(name, joints, radius, base_back=0.012):
     # Muestras (punto, radio, s): s = distancia desde el MCP (negativa dentro de la palma).
     samples = [(start, radius * 1.02, -base_back)]
     s_acc = 0.0
-    prof = [(0.0, 1.10), (0.5, 0.90), (1.0, 1.00)]  # nudillo, centro fino, articulación
     for k in range(3):
         a, b = j[k], j[k + 1]
         taper = (1.0, 0.94, 0.88)[k]
         last = k == 2
-        steps = (0.0, 0.25, 0.5, 0.75) if not last else (0.0, 0.3, 0.55, 0.72)
+        steps = (0.0, 0.12, 0.3, 0.5, 0.7, 0.88) if not last else (0.0, 0.15, 0.35, 0.55, 0.72)
         for t in steps:
             if k > 0 and t == 0.0:
-                f = 1.06  # articulación abultada
+                f = 1.04  # articulación apenas abultada
             elif t == 0.0:
-                f = 1.10
+                f = 1.06
             elif last:
-                f = 0.90 + 0.10 * math.sin(t * math.pi)  # la yema se ensancha antes de la punta
+                f = 0.96 + 0.06 * math.sin(t * math.pi)  # la yema se ensancha antes de la punta
             else:
-                f = 0.88 + 0.06 * abs(t - 0.5) * 2.0
+                f = 0.97
             samples.append((a.lerp(b, t), radius * taper * f, s_acc + seg_len[k] * t))
         s_acc += seg_len[k]
     # Punta redonda: casquete de 4 anillos más el vértice final.
@@ -127,7 +126,7 @@ def chain_weights(prefix, ring_s, seg_len, sides, base_bone):
     con una mezcla de ±4 mm alrededor de cada articulación."""
     j1 = seg_len[0]
     j2 = j1 + seg_len[1]
-    blend = 0.004
+    blend = 0.008  # mezcla ancha: la articulación se dobla redondeada, sin canto vivo
 
     def mix(s, edge, lo_bone, hi_bone):
         t = max(0.0, min(1.0, (s - (edge - blend)) / (2 * blend)))
@@ -162,15 +161,15 @@ for name, f in FINGERS.items():
     bone_joints[name] = pts
 
 # --- Pulgar: metacarpo y 2 falanges, a ~45° del costado -------------------------------------------
-t_dir = Vector((-math.sin(math.radians(45.0)), math.cos(math.radians(45.0)), -0.20)).normalized()
-th_pts = [Vector((-0.028, 0.012, -0.006))]
-for k, L in enumerate((0.028, 0.024, 0.021)):
+t_dir = Vector((-math.sin(math.radians(45.0)), math.cos(math.radians(45.0)), -0.04)).normalized()
+th_pts = [Vector((-0.030, 0.014, -0.001))]
+for k, L in enumerate((0.021, 0.017, 0.015)):  # ~60 % del índice fuera de la eminencia tenar
     # Cada falange gira ~24° hacia adentro (hacia la base del índice) y baja un poco.
     ang = math.radians(-24.0 * k)
     d = Vector((t_dir.x * math.cos(ang) - t_dir.y * math.sin(ang),
-                t_dir.x * math.sin(ang) + t_dir.y * math.cos(ang), t_dir.z - 0.10 * k)).normalized()
+                t_dir.x * math.sin(ang) + t_dir.y * math.cos(ang), t_dir.z - 0.04 * k)).normalized()
     th_pts.append(th_pts[-1] + d * L)
-th_obj, th_s, th_len = finger_tube("thumb", th_pts, FINGER_R * 1.12, base_back=0.006)
+th_obj, th_s, th_len = finger_tube("thumb", th_pts, FINGER_R * (0.95 if NO_ARM else 1.05), base_back=0.006)
 pieces.append((th_obj, chain_weights("thumb", th_s, th_len, SIDES, "wrist")))
 bone_joints["thumb"] = th_pts
 
@@ -181,36 +180,36 @@ def const(bone_name):
 
 # --- Palma: placa acolchada con espesor; eminencia tenar del lado del pulgar --------------------
 cage_v = []
-rows = ((-0.020, 0.0340, 0.0150, -0.0125), (0.030, 0.0425, 0.0170, -0.0140), (0.080, 0.0420, 0.0135, -0.0110))
+rows = ((-0.012, 0.0330, 0.0125, -0.0110), (0.030, 0.0425, 0.0140, -0.0120), (0.080, 0.0420, 0.0120, -0.0100))
 for (y, hw, zt, zb) in rows:
     cage_v += [(-hw, y, zb), (hw, y, zb), (hw, y, zt), (-hw, y, zt)]
 cage_f = [(0, 1, 2, 3), (11, 10, 9, 8), (0, 4, 5, 1), (1, 5, 6, 2), (2, 6, 7, 3), (3, 7, 4, 0),
           (4, 8, 9, 5), (5, 9, 10, 6), (6, 10, 11, 7), (7, 11, 8, 4)]
+if NO_ARM:  # manitos: palma un 20 % más chica y más plana
+    cage_v = [(x * 0.82, y if y > 0.05 else y * 0.8 + 0.010, z * 0.8) for (x, y, z) in cage_v]
 palm_obj = lib.new_object("palm", cage_v, cage_f)
 lib.subsurf(palm_obj, 2)
 lib.apply_modifiers(palm_obj)
 pieces.append((palm_obj, const("wrist")))
-thenar = lib.sphere("thenar", 0.020, (-0.024, 0.016, -0.008), 14, 8, (0.95, 1.35, 0.72))
+thenar = lib.sphere("thenar", 0.018, (-0.024, 0.018, -0.006), 14, 8, (0.95, 1.30, 0.62))
 thenar.rotation_euler = (0.0, 0.0, math.radians(-28.0))
 pieces.append((thenar, const("wrist")))
 
-# --- Puño del guante (reborde enrollado) y antebrazo corto ----------------------------------------
+# --- Muñeca, puño enrollado y antebrazo: UN tubo continuo (sin cortes de bloque) -------------------
+# Muñeca angosta (80 % de la palma), el rollo del puño apenas más ancho y 8 cm de antebrazo que se afina.
 if NO_ARM:
-    cuff_pts = [(0.0, -0.036, 0.0), (0.0, -0.030, 0.0), (0.0, -0.022, 0.0), (0.0, -0.010, 0.0)]
-    cuff_r = [0.0290, 0.0335, 0.0325, 0.0305]
+    # Manitos: la muñeca se cierra con un casquete redondeado (no con un disco).
+    pass  # la placa de la palma ya cierra la muñeca (sin casquete agregado)
 else:
-    cuff_pts = [(0.0, -0.062, 0.0), (0.0, -0.054, 0.0), (0.0, -0.046, 0.0), (0.0, -0.040, 0.0),
-                (0.0, -0.030, 0.0), (0.0, -0.018, 0.0), (0.0, -0.008, 0.0)]
-    cuff_r = [0.0300, 0.0340, 0.0345, 0.0330, 0.0318, 0.0310, 0.0300]  # puño ~6,9 cm: apenas más que la muñeca
-    arm_pts = [(0.0, -0.148, -0.002), (0.0, -0.120, -0.001), (0.0, -0.090, 0.0), (0.0, -0.060, 0.0)]
-    arm = lib.tube_along("forearm", arm_pts, [0.0275, 0.0275, 0.0278, 0.0282], sides=20, squash=0.72)
-    lib.subsurf(arm, 1)
-    lib.apply_modifiers(arm)
-    pieces.append((arm, const("forearm")))
-cuff = lib.tube_along("cuff", cuff_pts, cuff_r, sides=24, squash=0.64)
-lib.subsurf(cuff, 1)
-lib.apply_modifiers(cuff)
-pieces.append((cuff, const("forearm")))
+    cuff_pts = [(0.0, -0.126, -0.002), (0.0, -0.120, -0.002), (0.0, -0.104, -0.001), (0.0, -0.082, 0.0),
+                (0.0, -0.062, 0.0), (0.0, -0.052, 0.0), (0.0, -0.044, 0.0), (0.0, -0.036, 0.0),
+                (0.0, -0.022, 0.0), (0.0, -0.006, 0.0)]
+    cuff_r = [0.012, 0.0250, 0.0262, 0.0275, 0.0285, 0.0322, 0.0330, 0.0300, 0.0285, 0.0290]
+if not NO_ARM:
+    cuff = lib.tube_along("cuff", cuff_pts, cuff_r, sides=22, squash=0.66)
+    lib.subsurf(cuff, 1)
+    lib.apply_modifiers(cuff)
+    pieces.append((cuff, const("forearm")))
 
 # --- Armature: un hueso por falange, más palma (metacarpos), muñeca y antebrazo ------------------
 bpy.ops.object.armature_add(enter_editmode=True)
@@ -233,7 +232,7 @@ def bone(name, head, tail, parent=None):
     return eb
 
 
-bone("forearm", (0, -0.148, 0), (0, -0.030, 0))
+bone("forearm", (0, -0.126, 0), (0, -0.030, 0))
 bone("wrist", (0, -0.030, 0), (0, 0.040, 0), "forearm")
 for name, pts in bone_joints.items():
     if name != "thumb":
@@ -295,7 +294,7 @@ if A["render"]:
     # Pose "señalar" como en el juego (HandRig.pose_data) para los renders de control.
     lib.select_only(arm_obj)
     bpy.ops.object.mode_set(mode="POSE")
-    pose = {"middle": (50, 62, 28), "ring": (52, 64, 28), "pinky": (54, 66, 28), "thumb": (8, 16, 10), "index": (2, 4, 2)}
+    pose = {"middle": (40, 72, 30), "ring": (42, 74, 30), "pinky": (44, 76, 30), "thumb": (14, 22, 16), "index": (2, 4, 2)}
     for fname, angs in pose.items():
         for k, deg in enumerate(angs):
             pb = arm_obj.pose.bones.get("%s_%d" % (fname, k + 1))
