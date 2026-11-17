@@ -224,7 +224,10 @@ func _process(delta: float) -> void:
 		var want: float = screen_scale_for(_base_screen_h, rig.zoom_distance(), frac)
 		_screen_scale = lerpf(_screen_scale, want, 1.0 - exp(-10.0 * delta))
 	var hover: float = (hover_height + (0.35 if tool_id != "finger" else 0.0)) * _screen_scale
-	position.y = maxf(hover - (press_depth * _depth_scale * _press - _offset) * _screen_scale, 0.02)
+	# El rebote no crece con la escala de pantalla: en las fases 3-4 la escala llega a ~7 y el pisotón
+	# mandaba la bota a la otra punta de la pantalla.
+	var bounce_scale: float = minf(_screen_scale, 1.0)
+	position.y = maxf(hover - press_depth * _depth_scale * _press * _screen_scale + _offset * bounce_scale, 0.02)
 	if _rig != null:
 		_rig.set_press(_press)
 	if _body == null:

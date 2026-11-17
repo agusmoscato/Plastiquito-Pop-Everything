@@ -662,10 +662,14 @@ func _run_demo3(dir: String) -> void:
 func _closeup_shot(dir: String) -> void:
 	var keep_rig: CameraRig = tool_view.rig
 	tool_view.rig = null
-	world.camera_rig.focus(_cursor + Vector2(1.2, 0.6), 4.5)
+	automation.visible = false
+	hud.visible = false
+	world.camera_rig.focus(_cursor + Vector2(1.0, 0.2), 6.0)
 	await _wait(0.4)
 	_shot(dir, "tool_finger_primer_plano")
 	tool_view.rig = keep_rig
+	automation.visible = true
+	hud.visible = true
 	world.camera_rig.fit_to(world.sheet_view.center(), world.sheet_view.extents())
 
 
