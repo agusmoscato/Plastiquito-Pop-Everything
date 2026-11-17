@@ -128,9 +128,9 @@ func _process(delta: float) -> void:
 	_press = lerpf(_press, _press_target, 1.0 - exp(-_press_rate * delta))
 	_squish_boost = maxf(0.0, _squish_boost - delta * 6.0)
 	_grow = lerpf(_grow, 1.0, 1.0 - exp(-9.0 * delta))
-	var accel: float = -stiffness * _offset - damping * _velocity
-	_velocity += accel * delta
-	_offset += _velocity * delta
+	var spring: Vector2 = SpringMath.step(Vector2(_offset, _velocity), stiffness, damping, delta)
+	_offset = spring.x
+	_velocity = spring.y
 	var hover: float = hover_height + (0.35 if tool_id != "finger" else 0.0)
 	position.y = maxf(hover - press_depth * _depth_scale * _press + _offset, 0.05)
 	if _rig != null:
