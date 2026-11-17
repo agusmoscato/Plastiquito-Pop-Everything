@@ -120,11 +120,16 @@ static func add_outline(node: Node, color: Color) -> void:
 static func ghost_material() -> ShaderMaterial:
 	var visible_pass: ShaderMaterial = ShaderMaterial.new()
 	visible_pass.shader = load("res://shaders/ghost_hand.gdshader") as Shader
-	visible_pass.render_priority = 1
+	visible_pass.render_priority = 2
+	var outline: ShaderMaterial = ShaderMaterial.new()
+	outline.shader = load("res://shaders/toon_outline_ghost.gdshader") as Shader
+	outline.set_shader_parameter("line_color", OUTLINE_GHOST)
+	outline.render_priority = 1
+	outline.next_pass = visible_pass
 	var depth_pass: ShaderMaterial = ShaderMaterial.new()
 	depth_pass.shader = load("res://shaders/ghost_depth.gdshader") as Shader
 	depth_pass.render_priority = 0
-	depth_pass.next_pass = visible_pass
+	depth_pass.next_pass = outline
 	return depth_pass
 
 
@@ -193,7 +198,8 @@ static func build(tool_id: String, radius: float, tier: int = 0, icon: bool = fa
 			_add_hand(body, "point", tier, false, HAND_SCALE * MESA_SCALE * (1.0 + 0.08 * radius), Vector3.ZERO, HAND_ROT)
 	if icon:
 		_fit_icon(root)
-	add_outline(root, OUTLINE_GHOST if tool_id == "hands" else OUTLINE_DARK)
+	if tool_id != "hands": # las manitos llevan su contorno dentro de ghost_material()
+		add_outline(root, OUTLINE_DARK)
 	return root
 
 
