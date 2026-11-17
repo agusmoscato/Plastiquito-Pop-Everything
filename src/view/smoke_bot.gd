@@ -17,6 +17,7 @@ var _t: float = 0.0
 var _shot_t: float = 0.0
 var _shots: int = 0
 var _down: bool = false
+var _mouse: Vector2 = Vector2.ZERO
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var _counts: Dictionary[String, int] = {"taps": 0, "drags": 0, "buys": 0, "tool_switches": 0, "recycles": 0, "phase_jumps": 0}
 var _finished: bool = false
@@ -122,13 +123,13 @@ func _buy_something() -> void:
 	var shop: ShopSheet = main.hud.shop
 	var tab: StampButton = shop._tabs.get(shop.tab_of(best))
 	if tab != null and tab.is_visible_in_tree():
-		await _click_screen(tab.get_global_rect().get_center())
+		await _click_control(tab)
 	var tag: UpgradeTag = shop.tag_for(best)
 	shop._scroll.ensure_control_visible(tag)
 	await _frames(3)
 	var before: int = main.sim.state.level(best)
 	if tag.is_visible_in_tree():
-		await _click_screen(tag.get_global_rect().get_center())
+		await _click_control(tag)
 	if main.sim.state.level(best) > before:
 		_counts["buys"] += 1
 
@@ -156,7 +157,7 @@ func _recycle_via_panel() -> void:
 	_shoot("t%03d_reciclado_panel" % int(_t))
 	var btn: StampButton = main.hud.recycle_panel._recycle_button
 	if btn != null and btn.is_visible_in_tree():
-		await _click_screen(btn.get_global_rect().get_center())
+		await _click_control(btn)
 	await _frames(10)
 	if not main.is_recycling(): # el botón no respondió: cierra el panel y sigue
 		main.hud.close_recycle_panel()
@@ -176,7 +177,7 @@ func _dev_phase_jump() -> void:
 	sim.buy("perm_sheet", 1)
 	sim.state.pops_run = maxf(sim.state.pops_run, 4.0 * Cfg.num(sim.eco, "pellet_divisor"))
 	_counts["phase_jumps"] += 1
-	print("smoke: salto de fase DEV a la fase %d" % (sim.phase() + 1))
+	print("smoke: salto de fase DEV (lámina más grande nivel %d)" % sim.state.perm_level("perm_sheet"))
 	await _recycle_via_panel()
 	sim.state.pops += 50.0 * sim.upgrades.next_cost("finger_force", 0) # para que haya qué comprar
 	await _frames(30)
@@ -202,37 +203,66 @@ func _mouse_to_screen(sp: Vector2) -> void:
 	ev.position = sp
 	ev.global_position = sp
 	ev.button_mask = MOUSE_BUTTON_MASK_LEFT if _down else 0
-	Input.parse_input_event(ev)
+	_mouse = sp
+	_send(ev)
 
 
 func _button(pressed: bool) -> void:
 	_down = pressed
-	var sp: Vector2 = main.get_viewport().get_mouse_position()
+	var sp: Vector2 = _mouse
 	var ev: InputEventMouseButton = InputEventMouseButton.new()
 	ev.button_index = MOUSE_BUTTON_LEFT
 	ev.pressed = pressed
 	ev.position = sp
 	ev.global_position = sp
 	ev.button_mask = MOUSE_BUTTON_MASK_LEFT if pressed else 0
-	Input.parse_input_event(ev)
+	_send(ev)
 
 
-func _click_screen(sp: Vector2) -> void:
-	_mouse_to_screen(sp)
-	await _frames(2)
-	_button(true)
-	await _frames(2)
-	_button(false)
-	await _frames(2)
+## Clic real en el centro del control. Sin pantalla, el evento se le entrega directo al control
+## (con --headless Godot no reparte la entrada y el estiramiento de pantalla no tiene tamaño real).
+func _click_control(ctrl: Control) -> void:
+	if not _headless():
+		_mouse_to_screen(ctrl.get_global_rect().get_center())
+		await _frames(2)
+		_button(true)
+		await _frames(2)
+		_button(false)
+		await _frames(2)
+		return
+	for pressed: bool in [true, false]:
+		var ev: InputEventMouseButton = InputEventMouseButton.new()
+		ev.button_index = MOUSE_BUTTON_LEFT
+		ev.pressed = pressed
+		ev.position = ctrl.size * 0.5
+		ctrl._gui_input(ev)
+		await _frames(2)
 
 
 func _key(code: int) -> void:
+	if _headless(): # sin pantalla, la tecla va directo al manejador del juego
+		main._on_key(code)
+		return
 	for pressed: bool in [true, false]:
 		var ev: InputEventKey = InputEventKey.new()
 		ev.keycode = code as Key
 		ev.physical_keycode = code as Key
 		ev.pressed = pressed
-		Input.parse_input_event(ev)
+		_send(ev)
+
+
+## Con ventana (CI) el sistema reparte el evento. Sin pantalla (--headless) Input lo acumula y nadie
+## lo procesa: se vacía la cola (actualiza el estado del mouse) y se lo entrega al viewport a mano.
+func _send(ev: InputEvent) -> void:
+	Input.parse_input_event(ev)
+	if not _headless():
+		return
+	Input.flush_buffered_events()
+	get_viewport().push_input(ev, true)
+
+
+func _headless() -> bool:
+	return DisplayServer.get_name() == "headless"
 
 
 func _frames(n: int) -> void:
@@ -243,6 +273,8 @@ func _frames(n: int) -> void:
 # --- Capturas y cierre ---------------------------------------------------------------------------
 
 func _shoot(shot_name: String) -> void:
+	if _headless(): # sin render (PC del dueño): solo la lógica
+		return
 	var img: Image = get_viewport().get_texture().get_image()
 	if img != null:
 		img.save_png("%s/%s.png" % [dir, shot_name])
@@ -256,5 +288,5 @@ func _finish() -> void:
 	_finished = true
 	_shoot("t%03d_final" % int(_t))
 	var s: GameState = main.sim.state
-	print("SMOKE OK | %.0f s | fase %d | pops %.3g | capturas %d | %s" % [_t, main.sim.phase(), s.pops, _shots, JSON.stringify(_counts)])
-	get_tree().quit()
+	print("SMOKE OK | %.0f s | fase %d | pops %.0f | capturas %d | %s" % [_t, main.sim.phase(), s.pops, _shots, JSON.stringify(_counts)])
+	PopAudio.quit_clean()

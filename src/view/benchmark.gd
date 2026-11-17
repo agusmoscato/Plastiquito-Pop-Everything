@@ -57,7 +57,7 @@ func _ready() -> void:
 	print(text)
 	print("CSV: ", ProjectSettings.globalize_path("user://benchmark.csv"))
 	if auto_quit:
-		get_tree().quit()
+		PopAudio.quit_clean()
 
 
 func _run(variant: String, res_text: String) -> String:

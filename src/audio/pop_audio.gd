@@ -22,6 +22,7 @@ var _ambient_streams: Dictionary = {} ## fase -> AudioStream (assets/audio/ambie
 var _ambient_players: Array[AudioStreamPlayer] = []
 var _ambient_active: int = 0
 var _ambient_phase: int = -1
+var _quitting: bool = false
 
 
 func _ready() -> void:
@@ -119,6 +120,28 @@ func set_ambient(phase: int) -> void:
 	tw.tween_property(nxt, "volume_db", -22.0, 2.0)
 	tw.tween_property(old, "volume_db", -80.0, 2.0)
 	tw.chain().tween_callback(old.stop)
+
+
+## Al salir suelta los ambientes: si un reproductor quedaba con su reproducción viva, Godot
+## avisaba "resources still in use at exit" con el WAV del ambiente de la fase 1.
+## Sale del juego sin dejar reproducciones vivas. El hilo de mezcla retira las reproducciones
+## paradas en su próximo ciclo y el servidor de audio las suelta recién en su update() del hilo
+## principal; si se sale en el mismo frame, Godot avisa "resources still in use at exit" con el
+## ambiente que estaba sonando. Por eso: parar todo, dejar pasar unos frames reales y salir.
+func quit_clean(exit_code: int = 0) -> void:
+	if _quitting:
+		return
+	_quitting = true
+	for n: Node in find_children("*", "AudioStreamPlayer", true, false):
+		var p: AudioStreamPlayer = n as AudioStreamPlayer
+		p.stop()
+		p.stream = null
+	_ambient_streams.clear()
+	_ambient_phase = -1
+	for i: int in 3:
+		OS.delay_msec(40)
+		await get_tree().process_frame
+	get_tree().quit(exit_code)
 
 
 func _load_ambient(phase: int) -> AudioStream:

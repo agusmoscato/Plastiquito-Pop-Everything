@@ -88,4 +88,4 @@ func _on_volume_changed(_bus: String, value: float) -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
 		write_now()
-		get_tree().quit()
+		PopAudio.quit_clean()

@@ -121,7 +121,7 @@ func _open_data_folder() -> void:
 func _quit() -> void:
 	SaveSystem.save_now()
 	Playtest.write_now()
-	get_tree().quit()
+	PopAudio.quit_clean()
 
 
 func _draw_menu() -> void:

@@ -469,7 +469,7 @@ func _shot(dir: String, shot_name: String) -> void:
 	print("demo: ", shot_name)
 	_shots_taken += 1
 	if _shots_taken >= _shot_limit():
-		get_tree().quit()
+		PopAudio.quit_clean()
 
 
 ## Tope de capturas por tanda (--shot-limit=N); sin el argumento no hay tope.
@@ -535,7 +535,7 @@ func _run_demo(dir: String) -> void:
 	await _wait(0.4)
 	_shot(dir, "10_pausa")
 	get_tree().paused = false
-	get_tree().quit()
+	PopAudio.quit_clean()
 
 
 func _demo_chain() -> void:
@@ -621,7 +621,7 @@ func _run_demo3(dir: String) -> void:
 		_refresh_tool_view()
 		await _wait(1.2)
 		_shot(dir, "36_escenario_%d" % ph)
-	get_tree().quit()
+	PopAudio.quit_clean()
 
 
 ## Capturas de las herramientas 3D: cada una sobre la lámina, suelta y apretando.
@@ -649,4 +649,4 @@ func _run_demo_tools(dir: String) -> void:
 		await _wait(0.35)
 		_shot(dir, "tool_%s_apretando" % id)
 		tool_view.set_pressing(false)
-	get_tree().quit()
+	PopAudio.quit_clean()

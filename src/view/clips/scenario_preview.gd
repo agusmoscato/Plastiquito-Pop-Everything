@@ -52,4 +52,4 @@ func script_step(_time: float, delta: float) -> void:
 		_step = 7
 	elif _step == 7 and _timer > 4.5:
 		_shot("6_transicion_fin")
-		get_tree().quit()
+		PopAudio.quit_clean()

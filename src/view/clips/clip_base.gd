@@ -143,7 +143,7 @@ func _process(delta: float) -> void:
 		_effects(delta)
 	_maybe_shot()
 	if t >= duration:
-		get_tree().quit()
+		PopAudio.quit_clean()
 
 
 ## Con --clip-shots=<carpeta> guarda 4 cuadros repartidos en el clip (para revisarlo sin grabar).
