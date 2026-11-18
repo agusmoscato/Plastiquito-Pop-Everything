@@ -49,6 +49,9 @@ var phase2_time: float = -1.0
 var first_recycle: float = -1.0
 var max_dry_gap: float = 0.0
 var max_dry_at: float = 0.0
+var max_dry_late_at: float = 0.0
+var dump_at: float = -1.0
+var max_dry_late_phase: int = 0
 var near_buy_time: float = 0.0
 var counted_time: float = 0.0
 var _dry_since: float = -1.0
@@ -89,6 +92,8 @@ func _parse_args() -> void:
 			seed_value = int(arg.trim_prefix("--seed="))
 		elif arg.begins_with("--dt="):
 			dt = 1.0 / float(arg.trim_prefix("--dt="))
+		elif arg.begins_with("--dump-at="): # minuto en que se imprime lo que queda por comprar
+			dump_at = float(arg.trim_prefix("--dump-at=")) * 60.0
 
 
 func _run() -> void:
@@ -448,6 +453,8 @@ func _after_step(_was_phase: int) -> void:
 	if sim.now >= _next_minute_log:
 		_next_minute_log += 60.0
 		_log("minuto", "")
+		if dump_at > 0.0 and absf(sim.now - dump_at) < 30.0:
+			_dump_shop()
 
 
 ## Una vez por segundo: ritmo de los últimos 60 s, pico de la partida, recuperación y herramientas nuevas.
@@ -523,6 +530,8 @@ func _track_availability() -> void:
 				max_dry_at = sim.now
 		elif gap > max_dry_gap_late:
 			max_dry_gap_late = gap
+			max_dry_late_at = sim.now
+			max_dry_late_phase = sim.phase()
 
 
 func _log(kind: String, detail: String) -> void:
@@ -658,6 +667,7 @@ func _report(wall: float) -> bool:
 	checks.append(["mediana entre compras 0-10 min", "15-40 s", early, early >= 15.0 and early <= 40.0])
 	checks.append(["mediana entre compras 10-45 min", "30-90 s", late, late >= 30.0 and late <= 90.0])
 	print("   (la mayor espera sin compra terminó en el minuto %.1f)" % (max_dry_at / 60.0))
+	print("   (la mayor espera de 45-210 min terminó en el minuto %.1f, fase %d)" % [max_dry_late_at / 60.0, max_dry_late_phase])
 	checks.append(["máx. tiempo sin poder comprar", "<= 120 s", max_dry_gap, max_dry_gap <= 120.0])
 	var pct: float = 100.0 * near_buy_time / maxf(counted_time, 1.0)
 	checks.append(["% tiempo con compra pagable o a < 30 s", ">= 70 %", pct, pct >= 70.0])
@@ -677,3 +687,19 @@ func _report(wall: float) -> bool:
 		csv.append("0,metrica,%s %s,%.2f,%s" % [str(c[0]).replace(",", ";"), c[1], value, "APROBADO" if passed else "FALLO"])
 	print("   RESULTADO: %s" % ("APROBADO" if all_ok else "FALLÓ"))
 	return all_ok
+
+
+## Diagnóstico: mejoras de la partida disponibles, nivel y cuántos segundos de ingreso cuesta la próxima.
+func _dump_shop() -> void:
+	var income: float = maxf(_income_per_s(), 1.0)
+	print("   tienda en el minuto %.1f (ingreso %.3g/s, pops %.3g, fase %d):" % [sim.now / 60.0, income, sim.state.pops, sim.phase()])
+	for id: String in sim.upgrades.order:
+		if sim.upgrades.is_perm(id) or not sim.upgrades.is_available(sim.state, id):
+			continue
+		var level: int = sim.state.level(id)
+		var mx: int = sim.upgrades.max_level(id)
+		if level >= mx:
+			print("     %-16s %2d/%-2d MAX" % [id, level, mx])
+			continue
+		var cost: float = sim.upgrades.next_cost(id, level)
+		print("     %-16s %2d/%-2d %8.0f s de ingreso" % [id, level, mx, cost / income])

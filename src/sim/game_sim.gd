@@ -90,6 +90,8 @@ func refresh_stats() -> void:
 	upgrades.cost_scale = scales[mini(phase(), scales.size()) - 1]
 	var discounted: bool = phase() >= 2 and state.run_buys < Cfg.integer(eco, "new_phase_discount_levels")
 	upgrades.discount = Cfg.num(eco, "new_phase_discount") if discounted else 1.0
+	upgrades.relearn = state.last_levels
+	upgrades.relearn_factor = Cfg.num(eco, "relearn_cost_factor")
 	if sheet != null:
 		_apply_to_sheet()
 

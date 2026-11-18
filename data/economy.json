@@ -46,7 +46,7 @@
   "phase_cost_scales": [
     1.0,
     320.0,
-    27000.0,
+    36000.0,
     8000000.0
   ],
   "first_level_cost_factor": 0.15,
@@ -59,7 +59,7 @@
   "roller_base_halfwidth": 2.0,
   "iron_heat_rate": 0.25,
   "iron_heat_cap": 1.4,
-  "iron_still_force": 0.15,
+  "iron_still_force": 0.1,
   "iron_burn_after_seconds": 0.6,
   "iron_glide_min_speed": 1.5,
   "iron_heat_reach": 1.6,
@@ -73,6 +73,7 @@
   "chain_dr_alpha": 0.6,
   "special_cap_k": 1.6,
   "new_phase_discount_levels": 3,
-  "new_phase_discount": 0.4
+  "new_phase_discount": 0.4,
+  "relearn_cost_factor": 0.35
  }
 }

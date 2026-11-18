@@ -158,6 +158,9 @@ func _build_environment() -> void:
 	env.glow_enabled = true
 	env.glow_intensity = 0.5
 	env.glow_hdr_threshold = 1.6 # solo brilla lo que lo pida más adelante (doradas, arcoíris)
+	env.adjustment_enabled = true # un poco más de color y contraste: juguete, no foto
+	env.adjustment_saturation = 1.12
+	env.adjustment_contrast = 1.05
 	environment = WorldEnvironment.new()
 	environment.environment = env
 	add_child(environment)
@@ -169,6 +172,7 @@ func _build_light() -> void:
 	light.light_energy = 0.85
 	light.shadow_enabled = true
 	light.shadow_blur = 2.5
+	light.light_angular_distance = 1.2 # sombras de borde suave (fuente de luz con tamaño)
 	light.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
 	light.directional_shadow_max_distance = 80.0
 	add_child(light)

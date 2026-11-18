@@ -262,6 +262,22 @@ func test_memory_restores_part_of_previous_levels() -> void:
 	assert_eq(Cfg.integer(sim.state.last_levels, "finger_force"), 20)
 
 
+func test_relearn_makes_known_levels_cheaper_after_recycle() -> void:
+	var sim: GameSim = GameSim.new(db, 4)
+	sim.state.levels["finger_force"] = 6
+	sim.state.pops_run = 5.0 * Cfg.num(db.economy, "pellet_divisor")
+	sim.recycle()
+	sim.state.run_buys = 99 # sin el descuento de las primeras compras, para medir solo este
+	sim.refresh_stats()
+	var known: float = sim.upgrades.next_cost("finger_force", 3)
+	var fresh: float = sim.upgrades.next_cost("finger_force", 6)
+	sim.upgrades.relearn = {}
+	var normal_known: float = sim.upgrades.next_cost("finger_force", 3)
+	assert_almost_eq(known, ceilf(normal_known * Cfg.num(db.economy, "relearn_cost_factor")), 1.0, "nivel ya tenido: más barato")
+	sim.upgrades.relearn = sim.state.last_levels
+	assert_gt(fresh, known, "los niveles nuevos cuestan lo normal")
+
+
 func test_phase_progression_to_four() -> void:
 	var sim: GameSim = GameSim.new(db, 5)
 	sim.state.perm["perm_sheet"] = 3

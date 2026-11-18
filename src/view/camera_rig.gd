@@ -49,6 +49,12 @@ func _init() -> void:
 	rotation.x = -deg_to_rad(PITCH_DEGREES)
 	camera = Camera3D.new()
 	camera.fov = FOV
+	# Efecto maqueta: lo que queda más lejos que la lámina se desenfoca suave (la distancia se
+	# ajusta con el zoom en _apply_zoom).
+	var attrs: CameraAttributesPractical = CameraAttributesPractical.new()
+	attrs.dof_blur_far_enabled = true
+	attrs.dof_blur_amount = 0.06
+	camera.attributes = attrs
 	camera.near = 0.2
 	camera.far = 4000.0
 	add_child(camera)
@@ -210,6 +216,10 @@ func _pan(offset: Vector2) -> void:
 
 func _apply_zoom() -> void:
 	camera.position = Vector3(0.0, 0.0, _zoom)
+	var attrs: CameraAttributesPractical = camera.attributes as CameraAttributesPractical
+	if attrs != null:
+		attrs.dof_blur_far_distance = _zoom * 1.35
+		attrs.dof_blur_far_transition = _zoom * 0.9
 
 
 func _apply_shake(delta: float) -> void:

@@ -8,6 +8,8 @@ const PERM: String = "perm"
 var db: DataDB
 var eco: Dictionary
 var discount: float = 1.0 ## factor de costo de las primeras compras de una fase nueva
+var relearn: Dictionary = {} ## id -> nivel que se tuvo en la partida anterior ("ya sabés hacerlo")
+var relearn_factor: float = 1.0 ## factor de costo de esos niveles al volver a comprarlos
 var order: Array[String] = [] ## ids en el orden del catálogo
 ## Las mejoras en Pops cuestan más en cada fase (x base de la fase, DESIGN 4); lo fija GameSim.
 var cost_scale: float = 1.0
@@ -59,6 +61,10 @@ func next_cost(id: String, level: int) -> float:
 	# Fases nuevas: las primeras compras tras reciclar salen con descuento (lo fija GameSim).
 	if str(d["scope"]) != PERM:
 		scale *= discount
+		# Ya sabés hacerlo: los niveles que tuviste antes de reciclar se recompran más baratos.
+		var known: int = relearn.get(id, 0)
+		if level < known:
+			scale *= relearn_factor
 	return ceilf(Economy.cost(Cfg.num(d, "base_cost"), Cfg.num(d, "growth"), level) * scale)
 
 

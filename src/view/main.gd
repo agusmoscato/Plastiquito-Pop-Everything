@@ -91,6 +91,7 @@ func _ready() -> void:
 		overlay.mass_pop_requested.connect(_mass_pop)
 		overlay.cheat_pops_requested.connect(func() -> void: sim.state.pops += 1.0e6; sim.state.pops_run += 1.0e6)
 		add_child(overlay)
+	_add_vignette()
 	pause_menu = PauseMenu.new()
 	add_child(pause_menu)
 	if not _has_demo_arg(): # al abrir el juego, primero el menú de inicio (las capturas lo saltean)
@@ -476,6 +477,20 @@ func _finish_recycle() -> void:
 	Playtest.log.recycled(sim.state.first_recycle_s / 60.0)
 	print("reciclado: +%d pellets" % gained)
 	SaveSystem.save_now()
+
+
+## Viñeta sutil sobre el mundo y debajo del HUD.
+func _add_vignette() -> void:
+	var layer: CanvasLayer = CanvasLayer.new()
+	layer.layer = 0
+	var rect: ColorRect = ColorRect.new()
+	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var m: ShaderMaterial = ShaderMaterial.new()
+	m.shader = load("res://shaders/vignette.gdshader") as Shader
+	rect.material = m
+	layer.add_child(rect)
+	add_child(layer)
 
 
 func _add_version_label() -> void:
