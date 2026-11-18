@@ -123,3 +123,9 @@ func test_paper_polygon_never_self_intersects_on_tiny_sheets() -> void:
 		var poly: PackedVector2Array = UiKit.paper_polygon(Rect2(Vector2.ZERO, Vector2(300.0, h)), "ticket")
 		var tris: PackedInt32Array = Geometry2D.triangulate_polygon(poly)
 		assert_gt(tris.size(), 0, "alto %.1f: el polígono se puede triangular" % h)
+
+
+func test_first_hint_only_at_the_start() -> void:
+	assert_true(FirstHint.wanted(0.0))
+	assert_false(FirstHint.wanted(50.0), "después de los primeros reventones ya no aparece")
+	assert_true(Tx.T.has("hint_1") and Tx.T.has("hint_2"))

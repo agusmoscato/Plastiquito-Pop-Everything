@@ -10,6 +10,8 @@ const T: Dictionary = {
 	"work_order": {"es": "ORDEN DE TRABAJO", "en": "WORK ORDER"},
 	"next_order": {"es": "SIGUIENTE PEDIDO", "en": "NEXT ORDER"},
 	"ready": {"es": "LISTO PARA SELLAR", "en": "READY TO STAMP"},
+	"hint_1": {"es": "APRETÁ UNA BURBUJA", "en": "PRESS A BUBBLE"},
+	"hint_2": {"es": "mantené apretado y arrastrá para reventar varias", "en": "hold and drag to pop many"},
 	"sheet_done": {"es": "¡LÁMINA LISTA!", "en": "SHEET DONE!"},
 	"next_all_ready": {"es": "Todo listo: elegí en la hoja", "en": "All set: pick on the sheet"},
 	"next_all_done": {"es": "Hoja completa", "en": "Sheet complete"},
