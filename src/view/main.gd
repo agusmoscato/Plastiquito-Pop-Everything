@@ -15,6 +15,7 @@ var tool_view: ToolView
 var hud: Hud
 var overlay: DebugOverlay
 var pause_menu: PauseMenu
+var title: TitleScreen
 var automation: AutomationView
 var echo_glow: EchoGlow
 var _offline: Dictionary = {}
@@ -92,6 +93,11 @@ func _ready() -> void:
 		add_child(overlay)
 	pause_menu = PauseMenu.new()
 	add_child(pause_menu)
+	if not _has_demo_arg(): # al abrir el juego, primero el menú de inicio (las capturas lo saltean)
+		title = TitleScreen.new()
+		title.has_save = SaveSystem.has_save()
+		title.options_menu = pause_menu
+		add_child(title)
 	_add_version_label()
 	_refresh_tool_view()
 	_announce_new_specials()
@@ -528,6 +534,16 @@ func _demo_swipe(from: Vector2, to: Vector2, seconds: float) -> void:
 func _run_demo(dir: String) -> void:
 	_demo = true
 	DirAccess.make_dir_recursive_absolute(dir)
+	var menu: TitleScreen = TitleScreen.new() # el menú de inicio, para revisarlo en las capturas
+	menu.options_menu = pause_menu
+	add_child(menu)
+	await _wait(1.0)
+	menu.pop_bubble(2)
+	menu.pop_bubble(5)
+	await _wait(0.08)
+	_shot(dir, "00_menu")
+	menu._start()
+	menu.queue_free()
 	await _wait(1.2)
 	_shot(dir, "01_inicio")
 	sim.state.pops = 4000.0

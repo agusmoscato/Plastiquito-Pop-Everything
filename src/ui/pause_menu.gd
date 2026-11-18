@@ -12,6 +12,10 @@ var _lang_button: StampButton
 var _slider: InkSlider
 var _rows: Array = []
 var _bottom: Array = []
+var _back: StampButton
+var _quit_button: StampButton
+var suppressed: bool = false ## el menú de inicio está abierto: Esc no abre la pausa
+var _options_only: bool = false ## abierto desde el menú de inicio: solo opciones, "VOLVER"
 
 
 func _ready() -> void:
@@ -30,10 +34,10 @@ func _ready() -> void:
 	_lang_button = _button("", Vector2(W - 60.0, 44.0), UiKit.CARDBOARD_DARK, _toggle_language)
 	var folder: StampButton = _button("ABRIR CARPETA DE DATOS", Vector2(W - 60.0, 44.0), UiKit.CARDBOARD_DARK, _open_data_folder)
 	folder.font_size = 14
-	var back: StampButton = _button("VOLVER AL JUEGO", Vector2(180.0, 50.0), UiKit.STAMP_RED, close)
-	var quit_button: StampButton = _button("SALIR", Vector2(150.0, 50.0), UiKit.CARDBOARD_DARK, _quit)
+	_back = _button("VOLVER AL JUEGO", Vector2(180.0, 50.0), UiKit.STAMP_RED, close)
+	_quit_button = _button("SALIR", Vector2(150.0, 50.0), UiKit.CARDBOARD_DARK, _quit)
 	_rows = [_slider, _shake_button, _lang_button, folder]
-	_bottom = [back, quit_button]
+	_bottom = [_back, _quit_button]
 	_place(_rows, _bottom)
 	_refresh_labels()
 	_root.visible = false
@@ -43,7 +47,20 @@ func is_open() -> bool:
 	return _root.visible
 
 
+## Desde el menú de inicio: las mismas opciones, sin pausar ni salir del juego.
+func open_options() -> void:
+	_options_only = true
+	_root.visible = true
+	_quit_button.visible = false
+	_back.text = "VOLVER" if Settings.language == "es" else "BACK"
+	_place(_rows, _bottom)
+	_refresh_labels()
+
+
 func toggle() -> void:
+	if _options_only:
+		close()
+		return
 	if is_open():
 		close()
 	else:
@@ -55,6 +72,11 @@ func toggle() -> void:
 
 func close() -> void:
 	_root.visible = false
+	if _options_only: # vuelve al menú de inicio, que sigue pausado
+		_options_only = false
+		_quit_button.visible = true
+		_back.text = "VOLVER AL JUEGO"
+		return
 	get_tree().paused = false
 
 
@@ -62,6 +84,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey:
 		var key: InputEventKey = event
 		if key.pressed and not key.echo and key.keycode == KEY_ESCAPE:
+			if suppressed and not _options_only:
+				return
 			toggle()
 			get_viewport().set_input_as_handled()
 
@@ -131,7 +155,8 @@ func _draw_menu() -> void:
 	UiKit.draw_sheet(_root, rect, UiKit.PAPER, "pause_sheet", 3.0, 1.8)
 	UiKit.draw_tape(_root, rect.position + Vector2(30.0, 4.0), -0.5, 56.0, 18.0)
 	UiKit.draw_tape(_root, Vector2(rect.end.x - 30.0, rect.position.y + 4.0), 0.5, 56.0, 18.0)
-	UiKit.draw_text(_root, rect.position + Vector2(30.0, 64.0), "PAUSA" if Settings.language == "es" else "PAUSED", UiKit.font_title(), 30, UiKit.INK)
+	var head: String = ("OPCIONES" if Settings.language == "es" else "OPTIONS") if _options_only else ("PAUSA" if Settings.language == "es" else "PAUSED")
+	UiKit.draw_text(_root, rect.position + Vector2(30.0, 64.0), head, UiKit.font_title(), 30, UiKit.INK)
 	UiKit.draw_text(_root, rect.position + Vector2(30.0, 104.0), "VOLUMEN GENERAL" if Settings.language == "es" else "MASTER VOLUME", UiKit.font_mono_bold(), 12, UiKit.INK_SOFT)
 	var pct: String = "%d%%" % int(Settings.get_volume("Master") * 100.0)
 	UiKit.draw_text(_root, rect.position + Vector2(W - 100.0, 104.0), pct, UiKit.font_mono_bold(), 14, UiKit.INK, HORIZONTAL_ALIGNMENT_RIGHT, 70.0)

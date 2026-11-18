@@ -25,6 +25,17 @@ func save_now() -> bool:
 	return write_file(PATH, sim.save_dict(Time.get_unix_time_from_system()))
 
 
+## Nueva partida: borra el guardado y deja de guardar esta sesión (la escena se recarga después).
+func wipe() -> void:
+	sim = null
+	if FileAccess.file_exists(PATH):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(PATH))
+
+
+func has_save() -> bool:
+	return FileAccess.file_exists(PATH)
+
+
 ## Carga el save en `target`. false si no hay archivo o es inválido (la partida queda como estaba).
 func load_into(target: GameSim) -> bool:
 	var data: Dictionary = read_file(PATH)
