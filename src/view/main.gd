@@ -299,6 +299,7 @@ func _on_purchased(id: String, count: int, _milestone: bool) -> void:
 
 func _after_step(_holding: bool, delta: float) -> void:
 	if sim.ev_reloaded:
+		_celebrate_sheet()
 		world.rebind_game_sheet(true)
 		PopAudio.play_crinkle()
 		Playtest.log.sheet_reloaded()
@@ -337,6 +338,18 @@ func _after_step(_holding: bool, delta: float) -> void:
 
 
 ## TURNO NOCHE: entra en ~2 s y vuelve al día en ~0,7 s cuando se toca de nuevo.
+## Lámina terminada: sello, sonido de hito y destellos dorados sobre la lámina (el cierre de cada ciclo).
+func _celebrate_sheet() -> void:
+	hud.chain_stamp.announce(Tx.t("sheet_done"))
+	PopAudio.play_ui("milestone", 1.0, -3.0)
+	Juice.add_pop_trauma(12)
+	var c: Vector2 = sim.center()
+	var e: Vector2 = world.sheet_view.extents() * 0.35
+	for k: int in 5:
+		var a: float = TAU * float(k) / 5.0
+		Juice.special_at(Vector3(c.x + cos(a) * e.x, 0.5, c.y + sin(a) * e.y), 1)
+
+
 func _update_night(delta: float) -> void:
 	var on: bool = sim.night_shift()
 	_night = move_toward(_night, 1.0 if on else 0.0, delta * (0.5 if on else 1.4))

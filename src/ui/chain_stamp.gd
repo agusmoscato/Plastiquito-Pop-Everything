@@ -8,6 +8,7 @@ signal slammed(count: int)
 var count: int = 0
 var growing: bool = false
 var total_text: String = ""
+var banner: String = "" ## anuncio (por ejemplo "¡LÁMINA LISTA!") en lugar de "CADENA xN"
 var anchor: Vector2 = Vector2(-1.0, -1.0) ## origen de la cadena en pantalla (el sello va arriba)
 var free_rect: Rect2 = Rect2() ## zona libre de paneles donde puede ir el sello
 var blocked: Array[Rect2] = [] ## paneles del HUD: el sello nunca va encima
@@ -30,13 +31,26 @@ func setup() -> void:
 
 
 func chain_progress(n: int) -> void:
+	banner = ""
 	count = n
 	growing = true
 	_hold = 0.0
 	_fade = 1.0
 
 
+## Sello de anuncio con el mismo golpe que el de la cadena (lámina terminada).
+func announce(text: String) -> void:
+	banner = text
+	count = 2
+	growing = false
+	total_text = ""
+	_slam = 1.0
+	_hold = 1.1
+	_fade = 1.0
+
+
 func chain_ended(n: int, total: float) -> void:
+	banner = ""
 	count = n
 	growing = false
 	total_text = "+" + NumberFormat.pops(total, Settings.language)
@@ -66,7 +80,7 @@ func _draw() -> void:
 	var block_c: Vector2 = place(anchor, block, free_rect, blocked, Vector2(size.x * 0.5 - 150.0, 250.0))
 	var center: Vector2 = block_c - Vector2(0.0, (block.y - h) * 0.5) + _shake
 	var r: Rect2 = Rect2(center - Vector2(w, h) * 0.5, Vector2(w, h))
-	var label: String = "%s x%d" % [Tx.t("chain"), count]
+	var label: String = banner if banner != "" else "%s x%d" % [Tx.t("chain"), count]
 	UiKit.draw_stamp(self, r, label, UiKit.STAMP_RED, int(30.0 * scale_f), -0.09, _fade * ALPHA)
 	if not growing and total_text != "":
 		var font: Font = UiKit.font_mono_bold()
