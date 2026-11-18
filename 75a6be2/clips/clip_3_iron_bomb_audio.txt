@@ -1,0 +1,25 @@
+archivo: clip_3_iron_bomb.mp4  10091 KB
+duration=15.050000
+--- volumedetect
+[Parsed_volumedetect_0 @ 0x55a1a86626c0] mean_volume: -35.8 dB
+[Parsed_volumedetect_0 @ 0x55a1a86626c0] max_volume: -2.9 dB
+[Parsed_volumedetect_0 @ 0x55a1a86626c0] histogram_2db: 4
+[Parsed_volumedetect_0 @ 0x55a1a86626c0] histogram_3db: 8
+[Parsed_volumedetect_0 @ 0x55a1a86626c0] histogram_4db: 32
+[Parsed_volumedetect_0 @ 0x55a1a86626c0] histogram_5db: 36
+[Parsed_volumedetect_0 @ 0x55a1a86626c0] histogram_6db: 68
+[Parsed_volumedetect_0 @ 0x55a1a86626c0] histogram_7db: 96
+[Parsed_volumedetect_0 @ 0x55a1a86626c0] histogram_8db: 150
+[Parsed_volumedetect_0 @ 0x55a1a86626c0] histogram_9db: 194
+[Parsed_volumedetect_0 @ 0x55a1a86626c0] histogram_10db: 254
+[Parsed_volumedetect_0 @ 0x55a1a86626c0] histogram_11db: 338
+[Parsed_volumedetect_0 @ 0x55a1a86626c0] histogram_12db: 420
+--- astats (general)
+Overall
+Peak level dB: -2.938206
+RMS level dB: -35.750362
+RMS peak dB: -16.136305
+Flat factor: 0.000000
+Peak count: 2.000000
+--- RMS por segundo (dB), para ver picos del crepitar
+-84.522949 -57.729258 -53.890908 -inf -inf -inf -inf -inf -inf -23.614553 -57.376372 -inf -inf -inf -inf -inf -inf 
