@@ -244,6 +244,8 @@ func _update_cursor() -> void:
 	tool_view.visible = over_sheet and not over_ui
 	if _cursor_valid:
 		tool_view.set_cursor(_cursor)
+	var reach: float = maxf(tool_view.radius, world.grid.spacing * 0.55) # el dedo alcanza una burbuja
+	world.sheet_view.set_hover(_cursor, reach if tool_view.visible else 0.0)
 
 
 func _track_press(holding: bool) -> void:

@@ -131,6 +131,14 @@ func refresh_all(roll_in: bool) -> void:
 
 
 ## Reciclado: arruga la lámina (0..1) y la va enrollando hacia z (filas con z menor desaparecen).
+## Resalta las burbujas al alcance de la herramienta (radio 0 = nada).
+func set_hover(pos: Vector2, hover_radius: float) -> void:
+	if material == null:
+		return
+	material.set_shader_parameter("hover_pos", pos)
+	material.set_shader_parameter("hover_radius", hover_radius)
+
+
 func set_recycle_progress(crumple: float, roll_z: float) -> void:
 	material.set_shader_parameter("crumple", crumple)
 	material.set_shader_parameter("roll_up_z", roll_z)

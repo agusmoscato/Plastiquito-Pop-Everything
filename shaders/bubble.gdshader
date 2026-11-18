@@ -25,6 +25,8 @@ uniform float reveal_width = 2.0; // ancho de la "curva" del rollo
 uniform float roll_lift = 0.7;
 uniform float roll_up_z = -1.0e9; // reciclado: las filas con z menor ya se enrollaron
 uniform float crumple : hint_range(0.0, 1.0) = 0.0; // reciclado: la lámina se arruga
+uniform vec2 hover_pos = vec2(1.0e9); // (x, z) de la herramienta: las burbujas que alcanza se iluminan apenas
+uniform float hover_radius = 0.0;
 
 varying float v_pressure;
 varying float v_squash;
@@ -122,7 +124,12 @@ void fragment() {
 	EMISSION = col * (fres * 0.5 * (1.0 - 0.8 * popped) + tense * 0.12);
 	NORMAL = n;
 
+	// Lo que va a reventar: brillo suave bajo la herramienta (solo burbujas enteras).
+	float hv = (1.0 - smoothstep(hover_radius * 0.75, hover_radius, distance(v_origin.xz, hover_pos))) * (1.0 - popped);
+	EMISSION += vec3(0.16, 0.2, 0.22) * hv;
+
 	float a = mix(base_alpha, rim_alpha, fres);
+	a += 0.12 * hv;
 	a = mix(a, popped_alpha, popped);
 	a += tense * 0.12;
 	ALPHA = clamp(a, 0.0, 1.0);
