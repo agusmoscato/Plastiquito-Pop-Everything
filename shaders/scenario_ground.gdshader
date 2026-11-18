@@ -2,7 +2,7 @@ shader_type spatial;
 // Piso de los escenarios, todo procedural: 1 madera, 2 baldosas en damero con luz de persiana,
 // 3 hormigón con manchas, 4 asfalto con líneas pintadas. Se mezclan dos tipos (kind_a -> kind_b)
 // para que la transición entre escenarios no tenga cortes.
-render_mode cull_back;
+render_mode cull_back, diffuse_toon, specular_toon; // estilo juguete (ToyStyle)
 
 uniform int kind_a = 1;
 uniform int kind_b = 1;

@@ -1,11 +1,11 @@
-"""Mano derecha con guante a partir de MakeHuman/MPFB (assets CC0, ver assets/models/LICENSES.md).
+"""Mano derecha de persona (piel, con la manga de la camisa) a partir de MakeHuman/MPFB (assets CC0, ver assets/models/LICENSES.md).
 1 unidad = 1 m. Dedos hacia +Y, palma hacia -Z, pulgar del lado -X; origen en la yema del índice.
 
 Pasos: humano adulto promedio de MPFB con el esqueleto "default" -> se aíslan la mano derecha y
 10 cm de antebrazo con los pesos reales -> se orienta a la convención del juego -> esqueleto propio
 con los nombres que usa HandRig (forearm, wrist, <dedo>_meta, <dedo>_1..3, thumb_1..3) conservando
-los pesos de MakeHuman -> guante: subdivisión, engrosamiento de 1,5 mm, arrugas en las articulaciones
-y puño enrollado en la muñeca. Empties contact_point (yema del índice) y contact_palm.
+los pesos de MakeHuman -> subdivisión, color de piel con oclusión horneada y la manga de una camisa
+que tapa el corte del antebrazo. Empties contact_point (yema del índice) y contact_palm.
 Uso: blender -b --factory-startup -P art/models/hand_mpfb.py -- --out assets/models/hand.glb --render art/renders [--no-arm]
 """
 import math
@@ -19,9 +19,12 @@ from mathutils import Matrix, Vector
 from art import lib, mpfb_load
 
 A = lib.args()
-NO_ARM = "--no-arm" in sys.argv  # manitos: sin antebrazo ni puño
+NO_ARM = "--no-arm" in sys.argv  # manitos: sin antebrazo ni manga
 ARM_LEN = 0.058  # antebrazo corto (revisión: pesaba tanto como la mano en la vista de juego)
-CUFF_AT = 0.018  # el puño enrollado, pegado a la muñeca
+SLEEVE_AT = 0.030  # la manga arranca a 3 cm de la muñeca (se ve la muñeca)
+SKIN = "#D9A27E"  # piel (tono medio)
+SKIN_PALM = "#E8B99A"  # la palma es más clara que el dorso
+SLEEVE = "#3E5C8A"  # camisa de trabajo
 FINGER_STRETCH = 1.10
 
 mpfb_load.load()
@@ -52,59 +55,40 @@ R = Matrix((across, forward, up))                                  # mundo -> lo
 arm_axis = (elbow - wrist_h).normalized()
 
 
-def closed_ring(name, loop, axis, r, sides):
-    """Toro cerrado (sin tapas ni costura) que sigue el lazo `loop` alrededor de `axis`: el puño enrollado."""
-    bm2 = bmesh.new()
-    n = len(loop)
-    c = sum(loop, Vector()) / n
-    rings = []
-    for i in range(n):
-        p = loop[i]
-        tdir = (loop[(i + 1) % n] - loop[i - 1]).normalized()
-        out = (p - c)
-        out = (out - axis * out.dot(axis)).normalized()
-        ring = []
-        for k in range(sides):
-            a = 2.0 * math.pi * k / sides
-            ring.append(bm2.verts.new(p + out * (math.cos(a) * r) + axis * (math.sin(a) * r * 1.15)))
-        rings.append(ring)
-    for i in range(n):
-        ra, rb = rings[i], rings[(i + 1) % n]
-        for k in range(sides):
-            k2 = (k + 1) % sides
-            bm2.faces.new((ra[k], ra[k2], rb[k2], rb[k]))
-    me = bpy.data.meshes.new(name)
-    bm2.to_mesh(me)
-    bm2.free()
-    o = bpy.data.objects.new(name, me)
-    bpy.context.scene.collection.objects.link(o)
-    return o
-
-
-def bake_glove_tint(o):
-    """Color de vértice del guante (COLOR_0): oclusión en los pliegues (concavidad contra los vecinos)
-    y la palma algo más oscura. En Godot se multiplica por el color del guante."""
+def bake_skin_tint(o):
+    """Color de vértice (COLOR_0; Godot lo usa como albedo): piel con oclusión en los pliegues
+    (concavidad contra los vecinos), la palma más clara y la manga de la camisa."""
+    skin, palm_c, cloth = (lib.hex_color(h) for h in (SKIN, SKIN_PALM, SLEEVE))
+    sg = o.vertex_groups.get("sleeve")
+    in_sleeve = set()
+    if sg:
+        in_sleeve = {v.index for v in o.data.vertices if any(g.group == sg.index and g.weight > 0.5 for g in v.groups)}
     bm4 = bmesh.new()
     bm4.from_mesh(o.data)
     bm4.normal_update()
-    shade = {}
+    col = {}
     for v in bm4.verts:
         nb = [e.other_vert(v).co for e in v.link_edges]
-        if not nb:
-            shade[v.index] = 1.0
-            continue
-        mean = sum(nb, Vector()) / len(nb)
-        edge = sum((q - v.co).length for q in nb) / len(nb)
-        concave = (mean - v.co).dot(v.normal) / max(edge, 1e-6)
-        ao = max(0.55, 1.0 - 1.6 * max(concave, 0.0))
-        palm = 0.86 if (v.normal.z < -0.45 and v.co.y > 0.0) else 1.0
-        shade[v.index] = ao * palm
+        ao = 1.0
+        if nb:
+            mean = sum(nb, Vector()) / len(nb)
+            edge = sum((q - v.co).length for q in nb) / len(nb)
+            concave = (mean - v.co).dot(v.normal) / max(edge, 1e-6)
+            ao = max(0.6, 1.0 - 1.4 * max(concave, 0.0))
+        if v.index in in_sleeve:
+            base = cloth
+        else:
+            t = min(max((-v.normal.z - 0.2) / 0.5, 0.0), 1.0) if v.co.y > -0.01 else 0.0
+            base = [skin[k] * (1.0 - t) + palm_c[k] * t for k in range(3)]
+        col[v.index] = [c * ao for c in base]
     bm4.free()
     me = o.data
     attr = me.color_attributes.get("tint") or me.color_attributes.new("tint", "BYTE_COLOR", "CORNER")
     for loop in me.loops:
-        k = shade.get(loop.vertex_index, 1.0)
-        attr.data[loop.index].color = (k, k, k, 1.0)
+        c = col.get(loop.vertex_index, (1.0, 1.0, 1.0))
+        attr.data[loop.index].color = (c[0], c[1], c[2], 1.0)
+    if sg:
+        o.vertex_groups.remove(sg)
 
 
 def to_local(p):
@@ -241,9 +225,7 @@ def flatten_rest():
     # es algo larga y los dedos algo cortos contra los promedios antropométricos del plano.
     bpy.context.view_layer.update()
     for f in ("index", "middle", "ring", "pinky"):
-        # El dedo del guante es un poco más ancho que el dedo desnudo (+8 %); las falanges lo heredan.
-        arm_obj.pose.bones[f + "_1"].scale = (1.08, FINGER_STRETCH, 1.08)
-    arm_obj.pose.bones["thumb_2"].scale = (1.08, 1.08, 1.08)
+        arm_obj.pose.bones[f + "_1"].scale = (1.0, FINGER_STRETCH, 1.0)
     bpy.context.view_layer.update()
     bpy.ops.object.mode_set(mode="OBJECT")
     lib.select_only(body)
@@ -269,69 +251,70 @@ for o in (body, arm_obj):
     lib.select_only(o)
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 
-# --- Caña del guante: el nitrilo queda flojo sobre el antebrazo (hasta +28 % hacia el puño) ---------
-wrist_y = arm_obj.data.bones["wrist"].head_local.y
-fore = [v for v in body.data.vertices if v.co.y < wrist_y - 0.005]
-if fore:
-    cx = sum(v.co.x for v in fore) / len(fore)
-    cz = sum(v.co.z for v in fore) / len(fore)
-    for v in fore:
-        f = min(max((wrist_y - v.co.y - 0.005) / 0.035, 0.0), 1.0)
-        v.co.x = cx + (v.co.x - cx) * (1.0 + 0.18 * f)  # se afina hacia la muñeca
-        v.co.z = cz + (v.co.z - cz) * (1.0 + 0.08 * f)
-
-# --- Guante: subdivisión, engrosamiento, arrugas en las articulaciones --------------------------
-lib.subsurf(body, 1)  # también las manitos (Godot les genera LOD al importar)
+# --- Piel: una subdivisión (también las manitos; Godot les genera LOD al importar) -------------
+lib.subsurf(body, 1)
 lib.apply_modifiers(body)
-joints = bpy.data.objects["HandRig"].data.bones
-joint_pts = [b.head_local.copy() for b in joints if b.name.endswith(("_1", "_2", "_3"))]
-wr = body.vertex_groups.new(name="glove_wrinkles")
-for v in body.data.vertices:
-    d = min((v.co - p).length for p in joint_pts)
-    w = math.exp(-(d / 0.008) ** 2)
-    if w > 0.02:
-        wr.add([v.index], w, "REPLACE")
-thick = body.modifiers.new("Glove", "DISPLACE")
-thick.strength = 0.0015
-thick.mid_level = 0.0
-noise = bpy.data.textures.new("glove_noise", "STUCCI")
-noise.noise_scale = 0.004
-wrinkle = body.modifiers.new("Wrinkles", "DISPLACE")
-wrinkle.texture = noise
-wrinkle.strength = 0.0012
-wrinkle.vertex_group = "glove_wrinkles"
-lib.apply_modifiers(body)
-body.vertex_groups.remove(body.vertex_groups["glove_wrinkles"])
 
 parts = [body]
 if not NO_ARM:
-    # Puño enrollado: aro de tubo que sigue la sección del antebrazo a 3,5 cm de la muñeca.
+    # Manga de camisa: anillos que copian la sección del antebrazo (+3 mm), con un dobladillo más
+    # grueso donde termina y una tapa del lado del codo (el corte del antebrazo no se ve nunca).
     axis_l = (R @ arm_axis).normalized()
-    pts_sec = [v.co.copy() for v in body.data.vertices if abs(v.co.dot(axis_l) - CUFF_AT) < 0.005]
-    c = sum(pts_sec, Vector()) / max(len(pts_sec), 1)
     ref = Vector((1.0, 0.0, 0.0))
     ref = (ref - axis_l * ref.dot(axis_l)).normalized()
     ref2 = axis_l.cross(ref).normalized()
-    loop = []
-    for i in range(28):
-        a = 2.0 * math.pi * i / 28
-        d = ref * math.cos(a) + ref2 * math.sin(a)
-        best = max((((p - c) - axis_l * (p - c).dot(axis_l)).length for p in pts_sec
-                    if ((p - c) - axis_l * (p - c).dot(axis_l)).normalized().dot(d) > 0.93), default=0.03)
-        loop.append(tuple(c + d * (best + 0.0006)))  # borde enrollado fino, pegado a la muñeca
-    cuff = closed_ring("cuff", [Vector(p) for p in loop], axis_l, 0.0034, 10)
-    lib.subsurf(cuff, 1)
-    lib.apply_modifiers(cuff)
-    fg = cuff.vertex_groups.new(name="forearm")
-    fg.add([v.index for v in cuff.data.vertices], 1.0, "REPLACE")
-    parts.append(cuff)
+    N_RING = 28
 
-mat = lib.vertex_tint_material("glove_nitrile", lib.hex_color("#3D6FD6"), rough=0.64, clearcoat=0.15)
+    def section(at, extra):
+        pts_sec = [v.co.copy() for v in body.data.vertices if abs(v.co.dot(axis_l) - at) < 0.004]
+        c = sum(pts_sec, Vector()) / max(len(pts_sec), 1)
+        loop = []
+        for i in range(N_RING):
+            a = 2.0 * math.pi * i / N_RING
+            d = ref * math.cos(a) + ref2 * math.sin(a)
+            best = max((((p - c) - axis_l * (p - c).dot(axis_l)).length for p in pts_sec
+                        if ((p - c) - axis_l * (p - c).dot(axis_l)).normalized().dot(d) > 0.93), default=0.03)
+            loop.append(c + d * (best + extra))
+        return loop
+
+    far = max(v.co.dot(axis_l) for v in body.data.vertices)
+    rings = [
+        [p + axis_l * 0.004 for p in section(SLEEVE_AT, -0.0005)],  # adentro del dobladillo
+        section(SLEEVE_AT, 0.0045),                                 # borde del dobladillo
+        [p + axis_l * 0.006 for p in section(SLEEVE_AT, 0.0045)],
+        section(SLEEVE_AT + 0.010, 0.0032),
+        section(min(SLEEVE_AT + 0.022, far - 0.008), 0.0032),
+    ]
+    rings.append([p + axis_l * (far + 0.006 - p.dot(axis_l)) for p in rings[-1]])
+    bm5 = bmesh.new()
+    vr = [[bm5.verts.new(p) for p in ring] for ring in rings]
+    for r0, r1 in zip(vr, vr[1:]):
+        for i in range(N_RING):
+            j = (i + 1) % N_RING
+            bm5.faces.new((r0[i], r0[j], r1[j], r1[i]))
+    tip = bm5.verts.new(sum(rings[-1], Vector()) / N_RING + axis_l * 0.004)
+    for i in range(N_RING):
+        bm5.faces.new((vr[-1][i], vr[-1][(i + 1) % N_RING], tip))
+    bmesh.ops.recalc_face_normals(bm5, faces=bm5.faces[:])
+    me5 = bpy.data.meshes.new("sleeve")
+    bm5.to_mesh(me5)
+    bm5.free()
+    sleeve = bpy.data.objects.new("sleeve", me5)
+    bpy.context.scene.collection.objects.link(sleeve)
+    lib.subsurf(sleeve, 1)
+    lib.apply_modifiers(sleeve)
+    fg = sleeve.vertex_groups.new(name="forearm")
+    fg.add([v.index for v in sleeve.data.vertices], 1.0, "REPLACE")
+    sg = sleeve.vertex_groups.new(name="sleeve")
+    sg.add([v.index for v in sleeve.data.vertices], 1.0, "REPLACE")
+    parts.append(sleeve)
+
+mat = lib.vertex_tint_material("skin", (1.0, 1.0, 1.0), rough=0.6)  # el color va en los vértices
 for p in parts:
     p.data.materials.clear()
     p.data.materials.append(mat)
-body = lib.join(parts, "hand_glove") if len(parts) > 1 else body
-bake_glove_tint(body)
+body = lib.join(parts, "hand_glove") if len(parts) > 1 else body  # nombre que busca HandRig
+bake_skin_tint(body)
 lib.triangulate(body)
 lib.smooth(body, 70.0)
 lib.unwrap(body)

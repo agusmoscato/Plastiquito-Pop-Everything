@@ -1,14 +1,14 @@
 """Planos de proporciones de referencia, generados por código a partir de medidas reales (no del modelo).
 Cada plano es una función f(u, v) -> bool en centímetros, en el mismo sistema que los modelos:
 
-MANO (derecha, guante de nitrilo, mano relajada y plana; origen en el centro de la muñeca):
+MANO (derecha, sin guante, mano relajada y plana; origen en el centro de la muñeca):
   vista superior (u = x, v = y): x hacia el meñique, y hacia los dedos.
   vista lateral  (u = y, v = z): z hacia el dorso.
   Medidas: promedios de adultos (ANSUR II, mezcla de sexos, redondeadas): largo de mano 18,7 cm
   (muñeca a punta del medio), largo de palma 10,6, ancho de palma 8,4, ancho de muñeca 5,8 (perímetro
   de muñeca de 16,9 cm), ancho del antebrazo a 10 cm 6,4; dedos índice 7,2 / medio 8,1 / anular 7,6 / meñique 6,0 cm, ancho de dedo
   2,0-1,6 cm; pulgar 6,2 cm a ~40° de abducción; espesor de palma 3,0, muñeca 4,0, antebrazo 5,4 cm.
-  Guante: +0,15 cm por lado y borde enrollado fino (~0,7 cm) a 1,8 cm de la muñeca; se ven 6 cm
+  Manga de camisa desde 3 cm de la muñeca: +0,3 cm por lado y dobladillo de +0,45 cm; se ven 6 cm
   de antebrazo.
 
 BOTA de trabajo (talle 42; origen en el centro de la suela, en el suelo; y hacia la punta):
@@ -18,7 +18,7 @@ BOTA de trabajo (talle 42; origen en el centro de la suela, en el suelo; y hacia
 """
 import math
 
-GLOVE = 0.15
+GLOVE = 0.0  # mano desnuda (antes, guante de nitrilo de 1,5 mm)
 
 
 def _seg_dist(px, py, ax, ay, bx, by):
@@ -61,7 +61,7 @@ def hand_top(x, y, arm=True):
         half = 2.9 + (3.2 - 2.9) * (-y / 10.0) + g
         if abs(x) <= half:
             return True
-        if -2.15 <= y <= -1.45 and abs(x) <= half + 0.3:  # borde enrollado fino (~3 mm, como un guante de nitrilo)
+        if y <= -3.0 and abs(x) <= half + (0.45 if y >= -3.6 else 0.32):  # manga con dobladillo
             return True
     # Palma: de la muñeca (6,2) a los nudillos (8,4), con la eminencia tenar del lado del pulgar.
     palm = [(-2.9 - g, 0.0), (2.9 + g, 0.0), (4.2 + g, 6.5), (4.0 + g, 9.6), (2.0, 10.6), (-2.0, 10.8),
@@ -88,7 +88,7 @@ def hand_side(y, z, arm=True):
         half = 2.0 + (2.7 - 2.0) * (-y / 10.0) + g
         if abs(z) <= half:
             return True
-        if -2.15 <= y <= -1.45 and abs(z) <= half + 0.3:
+        if y <= -3.0 and abs(z) <= half + (0.45 if y >= -3.6 else 0.32):
             return True
     if 0.0 <= y <= 10.6:  # palma: 4,0 en la muñeca a 2,8 en los nudillos, un poco hacia la palma
         k = y / 10.6

@@ -25,6 +25,7 @@ static func build(phase: int, c: Vector2, e: Vector2) -> Node3D:
 		_parking(root, c, e, u)
 	else:
 		_table(root, c, e, u)
+	ToyStyle.apply(root) # mismo estilo juguete y contorno que la mano y las herramientas
 	return root
 
 

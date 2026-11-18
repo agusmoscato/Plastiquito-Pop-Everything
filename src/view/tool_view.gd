@@ -47,7 +47,6 @@ func configure(juice: Dictionary) -> void:
 	bounce_impulse = Cfg.num(juice, "finger_bounce_impulse")
 	if juice.has("tool_screen_fraction"):
 		screen_fraction = juice["tool_screen_fraction"]
-	ToolMeshes.configure(juice)
 
 
 ## Define qué herramienta se muestra, su tamaño en el mundo, el hito (color) y la velocidad (0..1).

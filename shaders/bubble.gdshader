@@ -5,7 +5,7 @@ shader_type spatial;
 //                  a = tipo (0 = normal).
 // Transparencia: alpha blend + cull_back + depth prepass por el propio domo. Las burbujas
 // no se superponen entre sí, así que el orden por instancia no importa (ver CHANGELOG).
-render_mode blend_mix, depth_draw_opaque, cull_back, specular_schlick_ggx;
+render_mode blend_mix, depth_draw_opaque, cull_back, specular_toon; // brillo de caricatura, como el resto (ToyStyle)
 
 uniform vec4 tint : source_color = vec4(0.45, 0.75, 1.0, 1.0);
 uniform float rim_power : hint_range(0.5, 8.0) = 2.6;

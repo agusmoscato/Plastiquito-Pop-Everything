@@ -10,8 +10,6 @@ const GHOST_SCALE: float = 0.8 ## las manitos miden el 80 % de la mano del jugad
 const MESA_SCALE: float = 0.73 ## dedo y palma: en la Mesa la cámara de trabajo está más cerca (burbuja de 22 px)
 
 ## Estilo de la mano: "glove" (guante de nitrilo, por defecto) o "skin" (piel con subsurface).
-static var hand_style: String = "glove"
-static var skin_color: Color = Color("#E8B896")
 
 const TIER_COLORS: Dictionary = {
 	"finger": [Color("#3D6FD6"), Color("#2F9E6B"), Color("#D5D8DB"), Color("#F2C94C")],
@@ -34,11 +32,8 @@ static func tier_color(tool_id: String, tier: int) -> Color:
 static func material(color: Color, metallic: float = 0.0) -> StandardMaterial3D:
 	var m: StandardMaterial3D = StandardMaterial3D.new()
 	m.albedo_color = color
-	m.roughness = 0.3 if metallic < 0.1 else 0.22
 	m.metallic = metallic
-	m.rim_enabled = true
-	m.rim = 0.3
-	m.rim_tint = 0.5
+	ToyStyle.toonify(m) # mismo estilo juguete que el resto (sin brillo metálico)
 	return m
 
 
@@ -53,45 +48,14 @@ static func _part(parent: Node3D, mesh: Mesh, mat: Material, pos: Vector3, rot_d
 	return mi
 
 
-## Aplica el estilo de la mano desde data/juice.json.
-static func configure(juice: Dictionary) -> void:
-	hand_style = str(juice.get("hand_style", "glove"))
-	skin_color = Color(str(juice.get("hand_skin_color", "#E8B896")))
-
-
-static func glove_material(tint: Color) -> Material:
+## La mano es de persona: el color de la piel y de la manga viene horneado en los vértices del modelo
+## (art/models/hand_mpfb.py, con oclusión en los pliegues). El material solo pone el estilo juguete.
+static func hand_material() -> Material:
 	var m: StandardMaterial3D = StandardMaterial3D.new()
-	var noise: FastNoiseLite = FastNoiseLite.new()
-	noise.frequency = 0.9
-	var nt: NoiseTexture2D = NoiseTexture2D.new()
-	nt.noise = noise
-	nt.as_normal_map = true
-	nt.bump_strength = 1.2
-	nt.seamless = true
-	nt.width = 256
-	nt.height = 256
-	m.normal_enabled = true
-	m.normal_texture = nt
-	m.normal_scale = 0.35
-	m.uv1_scale = Vector3(6.0, 6.0, 1.0)
-	# Nitrilo mate (que no parezca un globo): más rugoso, poco barniz, luz de borde suave, y el color de
-	# vértice del modelo (oclusión en los pliegues entre dedos y palma algo más oscura, art/models/hand_mpfb.py).
-	m.roughness = 0.64
-	m.clearcoat_enabled = true
-	m.clearcoat = 0.15
-	m.clearcoat_roughness = 0.6
-	m.rim_enabled = true
-	m.rim = 0.35
-	m.rim_tint = 0.6
+	m.albedo_color = Color.WHITE
 	m.vertex_color_use_as_albedo = true
-	if hand_style == "skin":
-		m.albedo_color = skin_color
-		m.roughness = 0.62
-		m.clearcoat_enabled = false
-		m.subsurf_scatter_enabled = true
-		m.subsurf_scatter_strength = 0.6
-	else:
-		m.albedo_color = tint
+	m.roughness = 0.6
+	ToyStyle.toonify(m)
 	return m
 
 
@@ -149,14 +113,15 @@ static func _tint(node: Node, color: Color, amount: float, metallic: float) -> v
 			var m: StandardMaterial3D = src.duplicate() as StandardMaterial3D
 			m.albedo_color = src.albedo_color.lerp(color, amount)
 			m.metallic = maxf(m.metallic, metallic)
+			ToyStyle.toonify(m)
 			mi.set_surface_override_material(i, m)
 	for c: Node in node.get_children():
 		_tint(c, color, amount, metallic)
 
 
-static func _hand(pose: String, tint: Color, ghost: bool) -> HandRig:
+static func _hand(pose: String, ghost: bool) -> HandRig:
 	var rig: HandRig = HandRig.new()
-	rig.setup(pose, ghost_material() if ghost else glove_material(tint))
+	rig.setup(pose, ghost_material() if ghost else hand_material())
 	return rig
 
 
@@ -199,7 +164,7 @@ static func build(tool_id: String, radius: float, tier: int = 0, icon: bool = fa
 	if icon:
 		_fit_icon(root)
 	if tool_id != "hands": # las manitos llevan su contorno dentro de ghost_material()
-		add_outline(root, OUTLINE_DARK)
+		ToyStyle.apply(root) # estilo juguete y contorno oscuro, como el resto del mundo
 	return root
 
 
@@ -211,14 +176,14 @@ static func _add_model(body: Node3D, file: String, scale_factor: float, color: C
 	body.add_child(m)
 
 
-static func _add_hand(body: Node3D, pose: String, tier: int, ghost: bool, scale_factor: float, pos: Vector3, rot_deg: Vector3) -> void:
+static func _add_hand(body: Node3D, pose: String, _tier: int, ghost: bool, scale_factor: float, pos: Vector3, rot_deg: Vector3) -> void:
 	var pivot: Node3D = Node3D.new()
 	pivot.name = "HandPivot"
 	pivot.position = pos
 	pivot.rotation_degrees = rot_deg
 	pivot.scale = Vector3.ONE * scale_factor
 	body.add_child(pivot)
-	var rig: HandRig = _hand(pose, tier_color("finger", tier), ghost)
+	var rig: HandRig = _hand(pose, ghost) # la piel no cambia con el nivel
 	pivot.add_child(rig)
 
 

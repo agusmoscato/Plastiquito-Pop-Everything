@@ -128,7 +128,102 @@ def frame(points, toward_camera, fill=0.86, roll_up=(0.0, 0.0, 1.0)):
     sun(-d + up * 0.7, 2.6, (1.0, 0.97, 0.9))
 
 
+def base_of(src):
+    """(color base, usa color de vértice) de un material importado de glTF: el factor de color va
+    solo, o multiplicado por el color de vértice (Mix), o directo desde el nodo Color Attribute."""
+    if not src.use_nodes:
+        return (0.8, 0.8, 0.8, 1.0), False, 1.0
+    bsdf = next((n for n in src.node_tree.nodes if n.type == "BSDF_PRINCIPLED"), None)
+    if bsdf is None:
+        return (0.8, 0.8, 0.8, 1.0), False, 1.0
+    alpha = bsdf.inputs["Alpha"].default_value
+    sock = bsdf.inputs["Base Color"]
+    if not sock.is_linked:
+        return tuple(sock.default_value), False, alpha
+    node = sock.links[0].from_node
+    if node.type == "VERTEX_COLOR":
+        return (1.0, 1.0, 1.0, 1.0), True, alpha
+    if node.type == "MIX":
+        colors = [i for i in node.inputs if i.type == "RGBA" and not i.is_linked]
+        factor = tuple(colors[0].default_value) if colors else (1.0, 1.0, 1.0, 1.0)
+        return factor, True, alpha
+    return (0.8, 0.8, 0.8, 1.0), False, alpha
+
+
+def toon_material(src, vcol_layer=None):
+    """Copia del material con el sombreado del juego (ToyStyle): difuso en tres bandas planas que
+    multiplican el color base (o el color de vértice, en la mano). Sin brillos PBR."""
+    m = bpy.data.materials.new(src.name + "_toon")
+    m.use_nodes = True
+    nt = m.node_tree
+    for n in list(nt.nodes):
+        nt.nodes.remove(n)
+    out = nt.nodes.new("ShaderNodeOutputMaterial")
+    diffuse = nt.nodes.new("ShaderNodeBsdfDiffuse")
+    to_rgb = nt.nodes.new("ShaderNodeShaderToRGB")
+    ramp = nt.nodes.new("ShaderNodeValToRGB")
+    ramp.color_ramp.interpolation = "CONSTANT"
+    ramp.color_ramp.elements[0].position = 0.0
+    ramp.color_ramp.elements[0].color = (0.58, 0.58, 0.62, 1.0)
+    ramp.color_ramp.elements[1].position = 0.22
+    ramp.color_ramp.elements[1].color = (0.84, 0.84, 0.86, 1.0)
+    top = ramp.color_ramp.elements.new(0.5)
+    top.color = (1.0, 1.0, 1.0, 1.0)
+    mix = nt.nodes.new("ShaderNodeMix")
+    mix.data_type = "RGBA"
+    mix.blend_type = "MULTIPLY"
+    mix.inputs["Factor"].default_value = 1.0
+    emit = nt.nodes.new("ShaderNodeEmission")
+    nt.links.new(diffuse.outputs[0], to_rgb.inputs[0])
+    nt.links.new(to_rgb.outputs["Color"], ramp.inputs["Fac"])
+    nt.links.new(ramp.outputs["Color"], mix.inputs["A"])
+    base, _uses, alpha = base_of(src)
+    if vcol_layer:
+        vc = nt.nodes.new("ShaderNodeVertexColor")
+        vc.layer_name = vcol_layer
+        tint = nt.nodes.new("ShaderNodeMix")
+        tint.data_type = "RGBA"
+        tint.blend_type = "MULTIPLY"
+        tint.inputs["Factor"].default_value = 1.0
+        nt.links.new(vc.outputs["Color"], tint.inputs["A"])
+        tint.inputs["B"].default_value = base
+        nt.links.new(tint.outputs["Result"], mix.inputs["B"])
+    else:
+        mix.inputs["B"].default_value = base
+    nt.links.new(mix.outputs["Result"], emit.inputs["Color"])
+    nt.links.new(emit.outputs[0], out.inputs["Surface"])
+    if alpha < 0.99:
+        transp = nt.nodes.new("ShaderNodeBsdfTransparent")
+        mixs = nt.nodes.new("ShaderNodeMixShader")
+        mixs.inputs["Fac"].default_value = alpha
+        nt.links.new(transp.outputs[0], mixs.inputs[1])
+        nt.links.new(emit.outputs[0], mixs.inputs[2])
+        nt.links.new(mixs.outputs[0], out.inputs["Surface"])
+        if hasattr(m, "surface_render_method"):
+            m.surface_render_method = "BLENDED"
+    return m
+
+
+def toonify_scene():
+    cache = {}
+    for o in bpy.context.scene.objects:
+        if o.type != "MESH":
+            continue
+        layer = o.data.color_attributes[0].name if len(o.data.color_attributes) else None
+        for slot in o.material_slots:
+            src = slot.material
+            if src is None or src.name.endswith("_toon"):
+                continue
+            _base, uses_v, _a = base_of(src)
+            use_v = layer if (layer and uses_v) else None  # la mano: el color está en los vértices
+            key = (src.name, use_v)
+            if key not in cache:
+                cache[key] = toon_material(src, use_v)
+            slot.material = cache[key]
+
+
 def shoot(name):
+    toonify_scene()
     os.makedirs(OUT, exist_ok=True)
     bpy.context.scene.render.filepath = os.path.join(OUT, name + ".png")
     bpy.ops.render.render(write_still=True)

@@ -3,7 +3,7 @@ shader_type spatial;
 // de estado (1 píxel por burbuja, ver StatePacker). Los domos son falsos: la celda se calcula con
 // matemática hexagonal en el fragmento y la normal y el brillo salen de la posición dentro del domo.
 // R = presión/2, G = aplastamiento, B = progreso de reventón, A = tipo*32.
-render_mode blend_mix, depth_draw_opaque, cull_disabled, specular_schlick_ggx;
+render_mode blend_mix, depth_draw_opaque, cull_disabled, specular_toon;
 
 uniform sampler2D state_tex : filter_linear_mipmap, repeat_disable;
 uniform float chunk_q0 = 0.0;
