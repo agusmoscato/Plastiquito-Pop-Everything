@@ -59,6 +59,7 @@ static func hand_material() -> Material:
 	return m
 
 
+const ROLLER_THIN: float = 0.5 ## diámetro y mango del rodillo respecto de su ancho
 const ROLLER_AXLE_Y: float = -0.155 ## alto del eje del cilindro en roller.glb (metros, del centro del modelo)
 const OUTLINE_DARK: Color = Color(0.12, 0.10, 0.09) ## contorno de juguete de la mano y las herramientas
 const OUTLINE_GHOST: Color = Color(0.56, 0.82, 0.95) ## contorno celeste de las manitos
@@ -164,10 +165,15 @@ static func build(tool_id: String, radius: float, tier: int = 0, icon: bool = fa
 			var rs: float = half * 2.0 / 0.26
 			var tilt_r: Node3D = Node3D.new()
 			tilt_r.name = "Tilt"
-			tilt_r.position = Vector3(0.0, -ROLLER_AXLE_Y * rs, 0.0)
+			# El ancho del cilindro es la franja que limpia; el diámetro y el mango van a la mitad (a
+			# escala uniforme el rodillo era más grueso que media lámina).
+			var thin: float = rs * ROLLER_THIN
+			tilt_r.position = Vector3(0.0, -ROLLER_AXLE_Y * thin, 0.0)
 			body.add_child(tilt_r)
 			_add_model(tilt_r, "roller", rs, color, amount, metal)
-			(tilt_r.get_child(0) as Node3D).position = Vector3(0.0, ROLLER_AXLE_Y * rs, 0.0)
+			var roller_m: Node3D = tilt_r.get_child(0) as Node3D
+			roller_m.scale = Vector3(rs, thin, thin)
+			roller_m.position = Vector3(0.0, ROLLER_AXLE_Y * thin, 0.0)
 		_:
 			_add_hand(body, "point", tier, false, HAND_SCALE * MESA_SCALE * (1.0 + 0.08 * radius), Vector3.ZERO, HAND_ROT)
 	if icon:

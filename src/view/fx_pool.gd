@@ -6,6 +6,7 @@ extends Node3D
 var _entries: Array[Node3D] = []
 var _shards: Array[GPUParticles3D] = []
 var _dust: Array[GPUParticles3D] = []
+var _rings: Array[GPUParticles3D] = [] ## anillo de aire a ras de la lámina en cada reventón
 var _next: int = 0
 var _max_per_frame: int = 6
 var _frame: int = -1
@@ -23,17 +24,22 @@ func setup(cfg: Dictionary) -> void:
 	var dust_mat: ParticleProcessMaterial = _dust_process()
 	var shard_mesh: QuadMesh = _quad(0.09, Color(0.75, 0.92, 1.0, 0.55), 0.0)
 	var dust_mesh: QuadMesh = _quad(0.32, Color(1.0, 1.0, 1.0, 0.18), 0.0)
+	var ring_mat: ParticleProcessMaterial = _ring_process()
+	var ring_mesh: QuadMesh = _ring_quad(RING_SIZE)
 	for i: int in Cfg.integer(cfg, "particle_pool_size"):
 		var holder: Node3D = Node3D.new()
 		holder.name = "Fx%02d" % i
 		add_child(holder)
 		var shards: GPUParticles3D = _emitter(shard_mat, shard_mesh, Cfg.integer(cfg, "shards_per_pop"), 0.7)
 		var dust: GPUParticles3D = _emitter(dust_mat, dust_mesh, Cfg.integer(cfg, "dust_per_pop"), 0.55)
+		var ring: GPUParticles3D = _emitter(ring_mat, ring_mesh, 1, RING_LIFE)
 		holder.add_child(shards)
 		holder.add_child(dust)
+		holder.add_child(ring)
 		_entries.append(holder)
 		_shards.append(shards)
 		_dust.append(dust)
+		_rings.append(ring)
 	_build_special_emitters()
 	_build_stomp_emitters()
 
@@ -175,6 +181,7 @@ func _fire(pos: Vector3) -> void:
 	_entries[_next].global_position = pos
 	_shards[_next].restart()
 	_dust[_next].restart()
+	_rings[_next].restart()
 	_next = (_next + 1) % _entries.size()
 
 
@@ -236,6 +243,54 @@ func _dust_process() -> ParticleProcessMaterial:
 	m.scale_max = 1.6
 	m.color_ramp = _fade_ramp()
 	return m
+
+
+const RING_SIZE: float = 1.7 ## diámetro final del anillo (una burbuja y media)
+const RING_LIFE: float = 0.22
+
+
+## Anillo: no se mueve, crece rápido (de 35 % a 100 %, con frenado) y se desvanece.
+func _ring_process() -> ParticleProcessMaterial:
+	var m: ParticleProcessMaterial = ParticleProcessMaterial.new()
+	m.direction = Vector3(0.0, 1.0, 0.0)
+	m.spread = 0.0
+	m.initial_velocity_min = 0.0
+	m.initial_velocity_max = 0.0
+	m.gravity = Vector3.ZERO
+	var curve: Curve = Curve.new()
+	curve.add_point(Vector2(0.0, 0.35), 0.0, 3.0)
+	curve.add_point(Vector2(1.0, 1.0), 0.0, 0.0)
+	var ct: CurveTexture = CurveTexture.new()
+	ct.curve = curve
+	m.scale_curve = ct
+	m.color_ramp = _fade_ramp()
+	return m
+
+
+## Cuadrado acostado (mira hacia arriba) con textura de aro: centro y borde transparentes.
+func _ring_quad(size: float) -> QuadMesh:
+	var q: QuadMesh = QuadMesh.new()
+	q.size = Vector2(size, size)
+	q.orientation = PlaneMesh.FACE_Y
+	var g: Gradient = Gradient.new()
+	g.offsets = PackedFloat32Array([0.0, 0.62, 0.8, 1.0])
+	g.colors = PackedColorArray([Color(1, 1, 1, 0), Color(1, 1, 1, 0), Color(1, 1, 1, 0.75), Color(1, 1, 1, 0)])
+	var t: GradientTexture2D = GradientTexture2D.new()
+	t.gradient = g
+	t.fill = GradientTexture2D.FILL_RADIAL
+	t.fill_from = Vector2(0.5, 0.5)
+	t.fill_to = Vector2(1.0, 0.5)
+	t.width = 64
+	t.height = 64
+	var m: StandardMaterial3D = StandardMaterial3D.new()
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.vertex_color_use_as_albedo = true
+	m.albedo_color = Color(0.92, 0.97, 1.0, 1.0)
+	m.albedo_texture = t
+	m.no_depth_test = false
+	q.material = m
+	return q
 
 
 ## Punto redondo suave (centro opaco, borde transparente) para que las partículas no sean cuadrados.
