@@ -209,7 +209,7 @@ func _quad(size: float, color: Color, glow: float) -> QuadMesh:
 	m.billboard_keep_scale = true
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.vertex_color_use_as_albedo = true
-	m.albedo_texture = _soft_dot()
+	m.albedo_texture = soft_dot()
 	m.emission_enabled = glow > 0.0
 	q.material = m
 	return q
@@ -294,7 +294,7 @@ func _ring_quad(size: float) -> QuadMesh:
 
 
 ## Punto redondo suave (centro opaco, borde transparente) para que las partículas no sean cuadrados.
-func _soft_dot() -> GradientTexture2D:
+static func soft_dot() -> GradientTexture2D:
 	var g: Gradient = Gradient.new()
 	g.set_color(0, Color(1, 1, 1, 1))
 	g.set_color(1, Color(1, 1, 1, 0))

@@ -132,6 +132,7 @@ func _make_steam(half: float) -> GPUParticles3D:
 	m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
 	m.vertex_color_use_as_albedo = true
 	m.albedo_color = Color(0.95, 0.97, 1.0, 1.0)
+	m.albedo_texture = FxPool.soft_dot() # nubecitas redondas (sin textura eran cuadrados blancos)
 	q.material = m
 	p.draw_pass_1 = q
 	p.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
