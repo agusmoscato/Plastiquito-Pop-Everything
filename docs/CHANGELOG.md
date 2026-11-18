@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.0 — Menú de inicio, progresión y aspecto (2026-11-18, sin mergear)
+
+- **Menú de inicio**: el juego ya no arranca de una. Jugar/Continuar, Nueva partida (con
+  confirmación), Opciones y Salir, con una tira de burbujas que se pueden reventar. Indicación de la
+  primera vez ("Apretá una burbuja / mantené y arrastrá").
+- **Progresión** (balance descongelado a pedido del dueño): "ya sabés hacerlo", los niveles que tuviste
+  antes de reciclar se recompran al 35 %; fase 3 un tercio más cara; plancha más fuerte que el palo.
+  Antes, reciclar en la fase 4 dejaba esperas de 4-5 minutos sin poder comprar. Semillas 1 y 2: Piso
+  30/37, Galpón 76-80, Estacionamiento 118-126 min; compras más seguidas que el objetivo de la métrica
+  (ráfagas de recompra tras reciclar) y la "herramienta nueva" del casual inestable entre semillas.
+- **Aspecto**: efecto maqueta (desenfoque de fondo), sombras suaves, más color, viñeta; objetos
+  altos sin sombra; especiales con contorno y al menos 18 px en pantalla.
+- **Sensación**: lámina terminada con festejo; las burbujas al alcance de la herramienta se iluminan.
+
 ## 0.3.1 — Pulido de sensación (2026-11-18, sin mergear)
 
 - Sonido de reventón propio con un modelo de plástico de burbujas (`tools/gen_pop_sfx.gd`): chasquido
