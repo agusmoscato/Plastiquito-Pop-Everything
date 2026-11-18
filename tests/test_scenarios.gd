@@ -125,3 +125,12 @@ func test_tool_keeps_its_screen_fraction() -> void:
 		var k: float = ToolView.screen_scale_for(5.0, zoom, 0.16)
 		var view_h: float = 2.0 * zoom * tan(deg_to_rad(CameraRig.FOV) * 0.5)
 		assert_almost_eq(5.0 * k / view_h, 0.16, 0.0001, "la herramienta ocupa el 16 % del alto a cualquier distancia")
+
+
+func test_specials_grow_when_bubbles_are_small() -> void:
+	var near: float = CameraRig.work_distance(80.0)
+	var far: float = CameraRig.work_distance(10.0)
+	assert_eq(SpecialsView.boost_for(near), 1.0, "de cerca, tamaño normal")
+	var k: float = SpecialsView.boost_for(far)
+	assert_gt(k, 1.5, "de lejos crecen")
+	assert_gte(CameraRig.bubble_px_at(far) * k, SpecialsView.MIN_SPECIAL_PX - 0.5, "miden al menos el mínimo en pantalla")

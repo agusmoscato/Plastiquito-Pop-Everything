@@ -19,6 +19,9 @@ var _mats: Dictionary = {}
 var _dying: Array[Dictionary] = []
 var _t: float = 0.0
 var _new_label_cell: Dictionary = {} ## tipo -> idx con etiqueta NUEVA
+var rig: CameraRig ## con cámara: las especiales crecen si las burbujas se ven chicas
+const MIN_SPECIAL_PX: float = 18.0 ## tamaño mínimo en pantalla de una especial (antes parecían migas)
+var _boost: float = 1.0
 
 
 func _init() -> void:
@@ -67,14 +70,22 @@ func mark_new(type_id: int, text: String) -> void:
 		return
 
 
+## Factor de tamaño para que una especial mida al menos MIN_SPECIAL_PX con la cámara a `distance`.
+static func boost_for(distance: float) -> float:
+	return clampf(MIN_SPECIAL_PX / maxf(CameraRig.bubble_px_at(distance), 1.0), 1.0, 2.4)
+
+
 func _process(delta: float) -> void:
 	_t += delta
+	if rig != null:
+		_boost = lerpf(_boost, boost_for(rig.zoom_distance()), 1.0 - exp(-6.0 * delta))
 	for key: Variant in _nodes:
 		var node: Node3D = _nodes[key]
 		var idx: int = key
 		var type_id: int = sheet.type[idx]
 		var bob: float = sin(_t * 2.2 + float(idx)) * 0.04
 		node.position.y = 0.32 + bob
+		node.scale = Vector3.ONE * _boost
 		if type_id == TYPE_GOLDEN:
 			node.rotation.y += delta * 1.1
 		elif type_id == TYPE_BOMB:
@@ -120,6 +131,8 @@ func _spawn(idx: int, type_id: int) -> void:
 		_add(node, "echo_ring", "echo_ring", Vector3(0.0, 0.0, 0.0), Vector3(90.0, 0.0, 0.0))
 	elif type_id == TYPE_LINE:
 		_add_model(node, "special_line", 1.15, Vector3(0.0, -0.24, 0.0))
+	ToyStyle.apply(node) # mismo estilo juguete y contorno que el resto
+	node.scale = Vector3.ONE * _boost
 	_nodes[idx] = node
 
 

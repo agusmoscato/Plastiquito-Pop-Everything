@@ -44,6 +44,7 @@ func _ready() -> void:
 	sheet_view.name = "SheetView"
 	add_child(sheet_view)
 	specials_view = SpecialsView.new()
+	specials_view.rig = camera_rig
 	specials_view.name = "Specials"
 	add_child(specials_view)
 	if not deferred_sheet:
