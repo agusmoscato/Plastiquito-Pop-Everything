@@ -5,6 +5,7 @@ extends RefCounted
 ## (centro `c`, tamaño `e`, en el plano XZ): enmarcan los bordes y nunca se cruzan con ella.
 
 const GROUND_Y: float = -0.05
+const TALL_PROP: float = 6.0 ## cm: más alto que esto, sin sombra
 static var sheet_fill: float = 0.58 ## = camera_sheet_fill (ToyWorld lo actualiza): cuánto del área de juego llena la lámina
 
 
@@ -26,7 +27,23 @@ static func build(phase: int, c: Vector2, e: Vector2) -> Node3D:
 	else:
 		_table(root, c, e, u)
 	ToyStyle.apply(root) # mismo estilo juguete y contorno que la mano y las herramientas
+	_no_tall_shadows(root, Transform3D.IDENTITY)
 	return root
+
+
+## Los objetos altos (pata de silla, estantes, conos) no proyectan sombra: a escala real su sombra
+## cruzaba toda la lámina. Los bajos la conservan para quedar apoyados.
+static func _no_tall_shadows(node: Node, xf: Transform3D) -> void:
+	if node is MeshInstance3D:
+		var mi: MeshInstance3D = node as MeshInstance3D
+		var box: AABB = xf * mi.get_aabb()
+		if box.size.y > TALL_PROP:
+			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	for c: Node in node.get_children():
+		var ct: Transform3D = xf
+		if c is Node3D:
+			ct = xf * (c as Node3D).transform
+		_no_tall_shadows(c, ct)
 
 
 # --- Utilidades --------------------------------------------------------------------------------
