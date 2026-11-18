@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0 — Estilo unificado y mano de persona (2026-11-18, sin mergear)
+
+- Un solo estilo 3D (`ToyStyle`): sombreado toon en bandas, sin metal ni relieves, luz de borde suave
+  y contorno oscuro en la mano, las herramientas, la utilería y los especiales; piso y burbujas con
+  brillo toon. Los íconos se renderizan con el mismo criterio.
+- La mano es de persona: piel con oclusión horneada, palma más clara y manga de camisa con dobladillo
+  (antes, guante azul). IoU contra el plano sin guante: superior 0,809, lateral 0,851.
+- Build 0.3.0 (Windows .exe, instalador y Linux) en la rama `builds`; tag `v0.3.0`.
+
 ## Fase 3b — Jornada de pulido, sesión 3 (2026-11-17, sin mergear)
 
 Detalle, pares antes/después y pendientes en [JORNADA.md](JORNADA.md).
