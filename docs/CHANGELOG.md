@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.1 — Pulido de sensación (2026-11-18, sin mergear)
+
+- Sonido de reventón propio con un modelo de plástico de burbujas (`tools/gen_pop_sfx.gd`): chasquido
+  de < 1 ms, resonancias del aire y la lámina, soplido y micro-crujidos (antes, provisorios blandos).
+- Anillo de aire en cada reventón; números "+N" que no se apilan y aparecen con un golpe de tamaño.
+- Burbujas reventadas apagadas y enteras con más brillo: se ve de un vistazo qué falta reventar.
+- Mesa: solo asoman las puntas de dos lápices (sin taza ni objetos más grandes que la lámina).
+  Rodillo automático acostado y más fino. Film de la lámina mate (sin franjas claras).
+- Íconos propios para las mejoras globales; vapor y polvo redondos; calor de la plancha suave;
+  la hoja de pedidos sigue a la herramienta elegida; "Siguiente pedido" sin guiones sueltos.
+
 ## 0.3.0 — Estilo unificado y mano de persona (2026-11-18, sin mergear)
 
 - Un solo estilo 3D (`ToyStyle`): sombreado toon en bandas, sin metal ni relieves, luz de borde suave
