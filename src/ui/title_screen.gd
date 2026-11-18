@@ -7,8 +7,10 @@ extends CanvasLayer
 
 signal started
 
+var hide_while_open: Array[CanvasLayer] = [] ## el HUD: se oculta mientras está el menú
+
 const W: float = 560.0
-const H: float = 600.0
+const TOP: float = 300.0 ## alto de la parte de arriba (título y burbujas); los botones van debajo
 const BUBBLES: int = 7
 const BUBBLE_R: float = 26.0
 
@@ -47,6 +49,8 @@ func _ready() -> void:
 	_place()
 	if options_menu != null:
 		options_menu.suppressed = true
+	for c: CanvasLayer in hide_while_open:
+		c.visible = false
 	get_tree().paused = true
 
 
@@ -67,14 +71,19 @@ func _button(text: String, size: Vector2, color: Color, action: Callable) -> Sta
 	return b
 
 
+## La hoja mide lo justo para el título y los botones visibles.
 func _card() -> Rect2:
 	var vp: Vector2 = get_viewport().get_visible_rect().size
-	return Rect2(Vector2((vp.x - W) * 0.5, (vp.y - H) * 0.5), Vector2(W, H))
+	var h: float = TOP + 34.0
+	for b: StampButton in [_play, _new, _options, _quit]:
+		if b != null and b.visible:
+			h += b.size.y + 14.0
+	return Rect2(Vector2((vp.x - W) * 0.5, (vp.y - h) * 0.5), Vector2(W, h))
 
 
 func _place() -> void:
 	var r: Rect2 = _card()
-	var y: float = r.position.y + 300.0
+	var y: float = r.position.y + TOP
 	for b: StampButton in [_play, _new, _options, _quit]:
 		if not b.visible:
 			continue
@@ -135,6 +144,8 @@ func _start() -> void:
 	_root.visible = false
 	if options_menu != null:
 		options_menu.suppressed = false
+	for c: CanvasLayer in hide_while_open:
+		c.visible = true
 	get_tree().paused = false
 	started.emit()
 

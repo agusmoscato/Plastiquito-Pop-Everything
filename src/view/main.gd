@@ -98,6 +98,7 @@ func _ready() -> void:
 		title = TitleScreen.new()
 		title.has_save = SaveSystem.has_save()
 		title.options_menu = pause_menu
+		title.hide_while_open = [hud]
 		add_child(title)
 	_add_version_label()
 	_refresh_tool_view()
