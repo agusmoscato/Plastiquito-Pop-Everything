@@ -1,0 +1,95 @@
+# Render 712f969
+
+Commit: feat(juice): las burbujas al alcance de la herramienta se iluminan apenas (se ve qué va a reventar)
+
+## Logs
+
+```
+APROBADO demo3
+```
+
+```
+APROBADO shots
+```
+
+```
+APROBADO smoke
+SMOKE OK | 301 s | fase 4 | pops 718060230 | capturas 27 | {"buys":9,"drags":17,"phase_jumps":3,"recycles":5,"taps":84,"tool_switches":0}
+```
+
+```
+APROBADO tools
+```
+
+## Audio
+
+## Archivos
+- RESUMEN.md
+- check_demo3.txt
+- check_shots.txt
+- check_smoke.txt
+- check_tools.txt
+- demo3/30_galpon_plancha_manitos.jpg
+- demo3/31_tienda_iconos.jpg
+- demo3/32_estacionamiento_bota.jpg
+- demo3/33_estacionamiento_rodillo.jpg
+- demo3/34_tablero_corcho.jpg
+- demo3/35_bienvenida.jpg
+- demo3/36_escenario_1.jpg
+- demo3/36_escenario_2.jpg
+- demo3/36_escenario_3.jpg
+- demo3/36_escenario_4.jpg
+- log_demo3.txt
+- log_import.txt
+- log_shots.txt
+- log_smoke.txt
+- log_tools.txt
+- shots/00_menu.jpg
+- shots/01_inicio.jpg
+- shots/02_hud_tienda.jpg
+- shots/03_palma.jpg
+- shots/04_cadena.jpg
+- shots/05_cadena_fin.jpg
+- shots/06_reciclado_panel.jpg
+- shots/07_reciclado_arruga.jpg
+- shots/08_reciclado_rollo.jpg
+- shots/09_reciclado_nueva.jpg
+- shots/10_pausa.jpg
+- smoke/t000_inicio.jpg
+- smoke/t025_fase1.jpg
+- smoke/t050_fase1.jpg
+- smoke/t075_fase2.jpg
+- smoke/t077_reciclado_panel.jpg
+- smoke/t085_reciclando.jpg
+- smoke/t089_fase2_llegada.jpg
+- smoke/t100_fase2.jpg
+- smoke/t125_fase2.jpg
+- smoke/t150_fase2.jpg
+- smoke/t153_reciclado_panel.jpg
+- smoke/t160_reciclando.jpg
+- smoke/t164_fase3_llegada.jpg
+- smoke/t175_fase3.jpg
+- smoke/t200_fase3.jpg
+- smoke/t208_reciclado_panel.jpg
+- smoke/t216_reciclando.jpg
+- smoke/t225_fase3.jpg
+- smoke/t234_reciclado_panel.jpg
+- smoke/t241_reciclando.jpg
+- smoke/t245_fase4_llegada.jpg
+- smoke/t250_fase4.jpg
+- smoke/t259_reciclado_panel.jpg
+- smoke/t267_reciclando.jpg
+- smoke/t275_fase4.jpg
+- smoke/t300_fase4.jpg
+- smoke/t300_final.jpg
+- tools/tool_boot_apretando.jpg
+- tools/tool_boot_suelto.jpg
+- tools/tool_finger_apretando.jpg
+- tools/tool_finger_primer_plano.jpg
+- tools/tool_finger_suelto.jpg
+- tools/tool_iron_apretando.jpg
+- tools/tool_iron_suelto.jpg
+- tools/tool_palm_apretando.jpg
+- tools/tool_palm_suelto.jpg
+- tools/tool_rolling_pin_apretando.jpg
+- tools/tool_rolling_pin_suelto.jpg
