@@ -1,0 +1,1486 @@
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+
+first_scan_filesystem: begin: Project initialization steps: 5
+	first_scan_filesystem: step 0: Scanning file structure...
+	first_scan_filesystem: step 1: Loading global class names...
+	first_scan_filesystem: step 2: Verifying GDExtensions...
+	first_scan_filesystem: step 3: Creating autoload scripts...
+	first_scan_filesystem: step 4: Initializing plugins...
+	first_scan_filesystem: step 5: Starting file scan...
+first_scan_filesystem: end
+update_scripts_classes: begin: Registering global classes... steps: 170
+	update_scripts_classes: step 0: 
+	update_scripts_classes: step 1: 
+	update_scripts_classes: step 2: 
+	update_scripts_classes: step 3: 
+	update_scripts_classes: step 4: 
+	update_scripts_classes: step 5: 
+	update_scripts_classes: step 6: 
+	update_scripts_classes: step 7: 
+	update_scripts_classes: step 8: 
+	update_scripts_classes: step 9: 
+	update_scripts_classes: step 10: 
+	update_scripts_classes: step 11: 
+	update_scripts_classes: step 12: 
+	update_scripts_classes: step 13: 
+	update_scripts_classes: step 14: 
+	update_scripts_classes: step 15: 
+	update_scripts_classes: step 16: 
+	update_scripts_classes: step 17: 
+	update_scripts_classes: step 18: 
+	update_scripts_classes: step 19: 
+	update_scripts_classes: step 20: 
+	update_scripts_classes: step 21: 
+	update_scripts_classes: step 22: 
+	update_scripts_classes: step 23: 
+	update_scripts_classes: step 24: 
+	update_scripts_classes: step 25: 
+	update_scripts_classes: step 26: 
+	update_scripts_classes: step 27: 
+	update_scripts_classes: step 28: 
+	update_scripts_classes: step 29: 
+	update_scripts_classes: step 30: 
+	update_scripts_classes: step 31: GutMain
+	update_scripts_classes: step 32: 
+	update_scripts_classes: step 33: 
+	update_scripts_classes: step 34: 
+	update_scripts_classes: step 35: 
+	update_scripts_classes: step 36: 
+	update_scripts_classes: step 37: 
+	update_scripts_classes: step 38: 
+	update_scripts_classes: step 39: GutHookScript
+	update_scripts_classes: step 40: 
+	update_scripts_classes: step 41: GutInputFactory
+	update_scripts_classes: step 42: GutInputSender
+	update_scripts_classes: step 43: 
+	update_scripts_classes: step 44: 
+	update_scripts_classes: step 45: 
+	update_scripts_classes: step 46: 
+	update_scripts_classes: step 47: 
+	update_scripts_classes: step 48: 
+	update_scripts_classes: step 49: 
+	update_scripts_classes: step 50: 
+	update_scripts_classes: step 51: 
+	update_scripts_classes: step 52: 
+	update_scripts_classes: step 53: 
+	update_scripts_classes: step 54: 
+	update_scripts_classes: step 55: 
+	update_scripts_classes: step 56: GutStringUtils
+	update_scripts_classes: step 57: 
+	update_scripts_classes: step 58: 
+	update_scripts_classes: step 59: 
+	update_scripts_classes: step 60: GutTest
+	update_scripts_classes: step 61: 
+	update_scripts_classes: step 62: 
+	update_scripts_classes: step 63: 
+	update_scripts_classes: step 64: GutUtils
+	update_scripts_classes: step 65: 
+	update_scripts_classes: step 66: 
+	update_scripts_classes: step 67: 
+	update_scripts_classes: step 68: 
+	update_scripts_classes: step 69: PopAudioLogic
+	update_scripts_classes: step 70: 
+	update_scripts_classes: step 71: 
+	update_scripts_classes: step 72: 
+	update_scripts_classes: step 73: 
+	update_scripts_classes: step 74: AirModel
+	update_scripts_classes: step 75: AppInfo
+	update_scripts_classes: step 76: AutoRoller
+	update_scripts_classes: step 77: Cfg
+	update_scripts_classes: step 78: ChainSolver
+	update_scripts_classes: step 79: ComboTracker
+	update_scripts_classes: step 80: DataDB
+	update_scripts_classes: step 81: Economy
+	update_scripts_classes: step 82: GameSim
+	update_scripts_classes: step 83: GameState
+	update_scripts_classes: step 84: HandsModel
+	update_scripts_classes: step 85: HexGrid
+	update_scripts_classes: step 86: NumberFormat
+	update_scripts_classes: step 87: OfflineEarnings
+	update_scripts_classes: step 88: PlaytestMode
+	update_scripts_classes: step 89: Prestige
+	update_scripts_classes: step 90: SessionLog
+	update_scripts_classes: step 91: SheetModel
+	update_scripts_classes: step 92: ToolModel
+	update_scripts_classes: step 93: Upgrades
+	update_scripts_classes: step 94: BubbleLog
+	update_scripts_classes: step 95: ChainStamp
+	update_scripts_classes: step 96: ComboMeter
+	update_scripts_classes: step 97: DigitWheel
+	update_scripts_classes: step 98: FlyingNumbers
+	update_scripts_classes: step 99: Hud
+	update_scripts_classes: step 100: InkSlider
+	update_scripts_classes: step 101: NextBar
+	update_scripts_classes: step 102: NightStamp
+	update_scripts_classes: step 103: Odometer
+	update_scripts_classes: step 104: OfflineTicket
+	update_scripts_classes: step 105: PauseMenu
+	update_scripts_classes: step 106: PermCard
+	update_scripts_classes: step 107: PopsPanel
+	update_scripts_classes: step 108: RecyclePanel
+	update_scripts_classes: step 109: ShopSheet
+	update_scripts_classes: step 110: StampButton
+	update_scripts_classes: step 111: ToolIcon
+	update_scripts_classes: step 112: Tx
+	update_scripts_classes: step 113: UiKit
+	update_scripts_classes: step 114: UpgradeTag
+	update_scripts_classes: step 115: WorkOrder
+	update_scripts_classes: step 116: 
+	update_scripts_classes: step 117: 
+	update_scripts_classes: step 118: 
+	update_scripts_classes: step 119: 
+	update_scripts_classes: step 120: 
+	update_scripts_classes: step 121: ClipBase
+	update_scripts_classes: step 122: 
+	update_scripts_classes: step 123: ScenarioDirector
+	update_scripts_classes: step 124: ScenarioProps
+	update_scripts_classes: step 125: AutomationView
+	update_scripts_classes: step 126: 
+	update_scripts_classes: step 127: BubbleMesh
+	update_scripts_classes: step 128: CameraRig
+	update_scripts_classes: step 129: DebugOverlay
+	update_scripts_classes: step 130: EchoGlow
+	update_scripts_classes: step 131: FarView
+	update_scripts_classes: step 132: FxPool
+	update_scripts_classes: step 133: HandRig
+	update_scripts_classes: step 134: PlastiquitoMain
+	update_scripts_classes: step 135: SheetView
+	update_scripts_classes: step 136: SmokeBot
+	update_scripts_classes: step 137: SpecialsView
+	update_scripts_classes: step 138: SpringMath
+	update_scripts_classes: step 139: StatePacker
+	update_scripts_classes: step 140: ToolMeshes
+	update_scripts_classes: step 141: ToolView
+	update_scripts_classes: step 142: ToyStyle
+	update_scripts_classes: step 143: ToyWorld
+	update_scripts_classes: step 144: 
+	update_scripts_classes: step 145: 
+	update_scripts_classes: step 146: 
+	update_scripts_classes: step 147: 
+	update_scripts_classes: step 148: 
+	update_scripts_classes: step 149: 
+	update_scripts_classes: step 150: 
+	update_scripts_classes: step 151: 
+	update_scripts_classes: step 152: 
+	update_scripts_classes: step 153: 
+	update_scripts_classes: step 154: 
+	update_scripts_classes: step 155: 
+	update_scripts_classes: step 156: 
+	update_scripts_classes: step 157: 
+	update_scripts_classes: step 158: 
+	update_scripts_classes: step 159: 
+	update_scripts_classes: step 160: 
+	update_scripts_classes: step 161: 
+	update_scripts_classes: step 162: 
+	update_scripts_classes: step 163: 
+	update_scripts_classes: step 164: 
+	update_scripts_classes: step 165: 
+	update_scripts_classes: step 166: 
+	update_scripts_classes: step 167: 
+	update_scripts_classes: step 168: 
+	update_scripts_classes: step 169: 
+update_scripts_classes: end
+_update_scan_actions: begin: Scanning actions... steps: 328
+	_update_scan_actions: step 0: AnonymousPro-Bold.ttf
+	_update_scan_actions: step 1: AnonymousPro-BoldItalic.ttf
+	_update_scan_actions: step 2: AnonymousPro-Italic.ttf
+	_update_scan_actions: step 3: AnonymousPro-Regular.ttf
+	_update_scan_actions: step 4: CourierPrime-Bold.ttf
+	_update_scan_actions: step 5: CourierPrime-BoldItalic.ttf
+	_update_scan_actions: step 6: CourierPrime-Italic.ttf
+	_update_scan_actions: step 7: CourierPrime-Regular.ttf
+	_update_scan_actions: step 8: LobsterTwo-Bold.ttf
+	_update_scan_actions: step 9: LobsterTwo-BoldItalic.ttf
+	_update_scan_actions: step 10: LobsterTwo-Italic.ttf
+	_update_scan_actions: step 11: LobsterTwo-Regular.ttf
+	_update_scan_actions: step 12: arrow.png
+	_update_scan_actions: step 13: play.png
+	_update_scan_actions: step 14: Folder.svg
+	_update_scan_actions: step 15: green.png
+	_update_scan_actions: step 16: red.png
+	_update_scan_actions: step 17: Script.svg
+	_update_scan_actions: step 18: yellow.png
+	_update_scan_actions: step 19: icon.png
+	_update_scan_actions: step 20: source_code_pro.fnt
+	_update_scan_actions: step 21: boot_lateral.png
+	_update_scan_actions: step 22: boot_superior.png
+	_update_scan_actions: step 23: hand_ghost_lateral.png
+	_update_scan_actions: step 24: hand_ghost_superior.png
+	_update_scan_actions: step 25: hand_lateral.png
+	_update_scan_actions: step 26: hand_superior.png
+	_update_scan_actions: step 27: boot.jpg
+	_update_scan_actions: step 28: boot_64.jpg
+	_update_scan_actions: step 29: boot_atras.jpg
+	_update_scan_actions: step 30: boot_frente.jpg
+	_update_scan_actions: step 31: boot_juego.jpg
+	_update_scan_actions: step 32: boot_juego_64.jpg
+	_update_scan_actions: step 33: boot_lado.jpg
+	_update_scan_actions: step 34: boot_tres_cuartos.jpg
+	_update_scan_actions: step 35: hand.jpg
+	_update_scan_actions: step 36: hand_64.jpg
+	_update_scan_actions: step 37: hand_atras.jpg
+	_update_scan_actions: step 38: hand_frente.jpg
+	_update_scan_actions: step 39: hand_ghost.jpg
+	_update_scan_actions: step 40: hand_ghost_64.jpg
+	_update_scan_actions: step 41: hand_ghost_atras.jpg
+	_update_scan_actions: step 42: hand_ghost_frente.jpg
+	_update_scan_actions: step 43: hand_ghost_juego.jpg
+	_update_scan_actions: step 44: hand_ghost_juego_64.jpg
+	_update_scan_actions: step 45: hand_ghost_lado.jpg
+	_update_scan_actions: step 46: hand_ghost_tres_cuartos.jpg
+	_update_scan_actions: step 47: hand_juego.jpg
+	_update_scan_actions: step 48: hand_juego_64.jpg
+	_update_scan_actions: step 49: hand_lado.jpg
+	_update_scan_actions: step 50: hand_tres_cuartos.jpg
+	_update_scan_actions: step 51: iron.jpg
+	_update_scan_actions: step 52: iron_64.jpg
+	_update_scan_actions: step 53: iron_atras.jpg
+	_update_scan_actions: step 54: iron_frente.jpg
+	_update_scan_actions: step 55: iron_juego.jpg
+	_update_scan_actions: step 56: iron_juego_64.jpg
+	_update_scan_actions: step 57: iron_lado.jpg
+	_update_scan_actions: step 58: iron_tres_cuartos.jpg
+	_update_scan_actions: step 59: pin.jpg
+	_update_scan_actions: step 60: pin_64.jpg
+	_update_scan_actions: step 61: pin_atras.jpg
+	_update_scan_actions: step 62: pin_frente.jpg
+	_update_scan_actions: step 63: pin_juego.jpg
+	_update_scan_actions: step 64: pin_juego_64.jpg
+	_update_scan_actions: step 65: pin_lado.jpg
+	_update_scan_actions: step 66: pin_tres_cuartos.jpg
+	_update_scan_actions: step 67: prop_chair_leg.jpg
+	_update_scan_actions: step 68: prop_chair_leg_64.jpg
+	_update_scan_actions: step 69: prop_chair_leg_atras.jpg
+	_update_scan_actions: step 70: prop_chair_leg_frente.jpg
+	_update_scan_actions: step 71: prop_chair_leg_lado.jpg
+	_update_scan_actions: step 72: prop_chair_leg_tres_cuartos.jpg
+	_update_scan_actions: step 73: prop_cone.jpg
+	_update_scan_actions: step 74: prop_cone_64.jpg
+	_update_scan_actions: step 75: prop_cone_atras.jpg
+	_update_scan_actions: step 76: prop_cone_frente.jpg
+	_update_scan_actions: step 77: prop_cone_lado.jpg
+	_update_scan_actions: step 78: prop_cone_tres_cuartos.jpg
+	_update_scan_actions: step 79: prop_cup.jpg
+	_update_scan_actions: step 80: prop_cup_64.jpg
+	_update_scan_actions: step 81: prop_cup_atras.jpg
+	_update_scan_actions: step 82: prop_cup_frente.jpg
+	_update_scan_actions: step 83: prop_cup_lado.jpg
+	_update_scan_actions: step 84: prop_cup_tres_cuartos.jpg
+	_update_scan_actions: step 85: prop_pencil.jpg
+	_update_scan_actions: step 86: prop_pencil_64.jpg
+	_update_scan_actions: step 87: prop_pencil_atras.jpg
+	_update_scan_actions: step 88: prop_pencil_frente.jpg
+	_update_scan_actions: step 89: prop_pencil_lado.jpg
+	_update_scan_actions: step 90: prop_pencil_tres_cuartos.jpg
+	_update_scan_actions: step 91: prop_shelf.jpg
+	_update_scan_actions: step 92: prop_shelf_64.jpg
+	_update_scan_actions: step 93: prop_shelf_atras.jpg
+	_update_scan_actions: step 94: prop_shelf_frente.jpg
+	_update_scan_actions: step 95: prop_shelf_lado.jpg
+	_update_scan_actions: step 96: prop_shelf_tres_cuartos.jpg
+	_update_scan_actions: step 97: roller.jpg
+	_update_scan_actions: step 98: roller_64.jpg
+	_update_scan_actions: step 99: roller_atras.jpg
+	_update_scan_actions: step 100: roller_frente.jpg
+	_update_scan_actions: step 101: roller_lado.jpg
+	_update_scan_actions: step 102: roller_tres_cuartos.jpg
+	_update_scan_actions: step 103: special_bomb.jpg
+	_update_scan_actions: step 104: special_bomb_64.jpg
+	_update_scan_actions: step 105: special_bomb_atras.jpg
+	_update_scan_actions: step 106: special_bomb_frente.jpg
+	_update_scan_actions: step 107: special_bomb_lado.jpg
+	_update_scan_actions: step 108: special_bomb_tres_cuartos.jpg
+	_update_scan_actions: step 109: special_gem.jpg
+	_update_scan_actions: step 110: special_gem_64.jpg
+	_update_scan_actions: step 111: special_gem_atras.jpg
+	_update_scan_actions: step 112: special_gem_frente.jpg
+	_update_scan_actions: step 113: special_gem_lado.jpg
+	_update_scan_actions: step 114: special_gem_tres_cuartos.jpg
+	_update_scan_actions: step 115: special_line.jpg
+	_update_scan_actions: step 116: special_line_64.jpg
+	_update_scan_actions: step 117: special_line_atras.jpg
+	_update_scan_actions: step 118: special_line_frente.jpg
+	_update_scan_actions: step 119: special_line_lado.jpg
+	_update_scan_actions: step 120: special_line_tres_cuartos.jpg
+	_update_scan_actions: step 121: ph_ambient_1.wav
+	_update_scan_actions: step 122: ph_ambient_2.wav
+	_update_scan_actions: step 123: ph_ambient_3.wav
+	_update_scan_actions: step 124: ph_ambient_4.wav
+	_update_scan_actions: step 125: ph_crackle_loop.wav
+	_update_scan_actions: step 126: ph_crinkle_00.wav
+	_update_scan_actions: step 127: ph_crinkle_01.wav
+	_update_scan_actions: step 128: ph_crinkle_02.wav
+	_update_scan_actions: step 129: ph_crinkle_03.wav
+	_update_scan_actions: step 130: ph_crinkle_04.wav
+	_update_scan_actions: step 131: ph_crinkle_05.wav
+	_update_scan_actions: step 132: ph_crinkle_06.wav
+	_update_scan_actions: step 133: ph_crinkle_07.wav
+	_update_scan_actions: step 134: ph_crinkle_08.wav
+	_update_scan_actions: step 135: ph_crinkle_09.wav
+	_update_scan_actions: step 136: pop_large_00.wav
+	_update_scan_actions: step 137: pop_large_01.wav
+	_update_scan_actions: step 138: pop_large_02.wav
+	_update_scan_actions: step 139: pop_large_03.wav
+	_update_scan_actions: step 140: pop_large_04.wav
+	_update_scan_actions: step 141: pop_large_05.wav
+	_update_scan_actions: step 142: pop_large_06.wav
+	_update_scan_actions: step 143: pop_large_07.wav
+	_update_scan_actions: step 144: pop_large_08.wav
+	_update_scan_actions: step 145: pop_large_09.wav
+	_update_scan_actions: step 146: pop_large_10.wav
+	_update_scan_actions: step 147: pop_large_11.wav
+	_update_scan_actions: step 148: pop_small_00.wav
+	_update_scan_actions: step 149: pop_small_01.wav
+	_update_scan_actions: step 150: pop_small_02.wav
+	_update_scan_actions: step 151: pop_small_03.wav
+	_update_scan_actions: step 152: pop_small_04.wav
+	_update_scan_actions: step 153: pop_small_05.wav
+	_update_scan_actions: step 154: pop_small_06.wav
+	_update_scan_actions: step 155: pop_small_07.wav
+	_update_scan_actions: step 156: pop_small_08.wav
+	_update_scan_actions: step 157: pop_small_09.wav
+	_update_scan_actions: step 158: pop_small_10.wav
+	_update_scan_actions: step 159: pop_small_11.wav
+	_update_scan_actions: step 160: ph_squish_00.wav
+	_update_scan_actions: step 161: ph_squish_01.wav
+	_update_scan_actions: step 162: ph_squish_02.wav
+	_update_scan_actions: step 163: ph_squish_03.wav
+	_update_scan_actions: step 164: ph_squish_04.wav
+	_update_scan_actions: step 165: ph_squish_05.wav
+	_update_scan_actions: step 166: ph_squish_06.wav
+	_update_scan_actions: step 167: ph_squish_07.wav
+	_update_scan_actions: step 168: ph_squish_08.wav
+	_update_scan_actions: step 169: ph_squish_09.wav
+	_update_scan_actions: step 170: pop_tense_00.wav
+	_update_scan_actions: step 171: pop_tense_01.wav
+	_update_scan_actions: step 172: pop_tense_02.wav
+	_update_scan_actions: step 173: pop_tense_03.wav
+	_update_scan_actions: step 174: pop_tense_04.wav
+	_update_scan_actions: step 175: pop_tense_05.wav
+	_update_scan_actions: step 176: pop_tense_06.wav
+	_update_scan_actions: step 177: pop_tense_07.wav
+	_update_scan_actions: step 178: pop_tense_08.wav
+	_update_scan_actions: step 179: pop_tense_09.wav
+	_update_scan_actions: step 180: pop_tense_10.wav
+	_update_scan_actions: step 181: pop_tense_11.wav
+	_update_scan_actions: step 182: ph_air.wav
+	_update_scan_actions: step 183: ph_chain_hit.wav
+	_update_scan_actions: step 184: ph_milestone.wav
+	_update_scan_actions: step 185: ph_recycle.wav
+	_update_scan_actions: step 186: ph_screech.wav
+	_update_scan_actions: step 187: ph_stamp.wav
+	_update_scan_actions: step 188: ph_tic.wav
+	_update_scan_actions: step 189: Archivo.ttf
+	_update_scan_actions: step 190: BowlbyOne-Regular.ttf
+	_update_scan_actions: step 191: SpaceMono-Bold.ttf
+	_update_scan_actions: step 192: SpaceMono-Regular.ttf
+	_update_scan_actions: step 193: auto_roller.png
+	_update_scan_actions: step 194: boot.png
+	_update_scan_actions: step 195: bubble.png
+	_update_scan_actions: step 196: finger.png
+	_update_scan_actions: step 197: hands.png
+	_update_scan_actions: step 198: iron.png
+	_update_scan_actions: step 199: palm.png
+	_update_scan_actions: step 200: rolling_pin.png
+	_update_scan_actions: step 201: up_auto.png
+	_update_scan_actions: step 202: up_chain.png
+	_update_scan_actions: step 203: up_force.png
+	_update_scan_actions: step 204: up_memory.png
+	_update_scan_actions: step 205: up_size.png
+	_update_scan_actions: step 206: up_special.png
+	_update_scan_actions: step 207: up_speed.png
+	_update_scan_actions: step 208: up_tense.png
+	_update_scan_actions: step 209: up_value.png
+	_update_scan_actions: step 210: boot.glb
+	_update_scan_actions: step 211: hand.glb
+	_update_scan_actions: step 212: hand_ghost.glb
+	_update_scan_actions: step 213: iron.glb
+	_update_scan_actions: step 214: pin.glb
+	_update_scan_actions: step 215: prop_chair_leg.glb
+	_update_scan_actions: step 216: prop_cone.glb
+	_update_scan_actions: step 217: prop_cup.glb
+	_update_scan_actions: step 218: prop_pencil.glb
+	_update_scan_actions: step 219: prop_shelf.glb
+	_update_scan_actions: step 220: roller.glb
+	_update_scan_actions: step 221: special_bomb.glb
+	_update_scan_actions: step 222: special_gem.glb
+	_update_scan_actions: step 223: special_line.glb
+	_update_scan_actions: step 224: 01_inicio.jpg
+	_update_scan_actions: step 225: 02_hud_tienda.jpg
+	_update_scan_actions: step 226: 03_palma.jpg
+	_update_scan_actions: step 227: 04_cadena.jpg
+	_update_scan_actions: step 228: 06_reciclado_panel.jpg
+	_update_scan_actions: step 229: 07_reciclado_arruga.jpg
+	_update_scan_actions: step 230: 08_reciclado_rollo.jpg
+	_update_scan_actions: step 231: 10_pausa.jpg
+	_update_scan_actions: step 232: Clip_0.jpg
+	_update_scan_actions: step 233: Clip_1.jpg
+	_update_scan_actions: step 234: clip_1_zoom_out_0.jpg
+	_update_scan_actions: step 235: clip_1_zoom_out_1.jpg
+	_update_scan_actions: step 236: clip_1_zoom_out_2.jpg
+	_update_scan_actions: step 237: clip_1_zoom_out_3.jpg
+	_update_scan_actions: step 238: Clip_2.jpg
+	_update_scan_actions: step 239: clip_2_pin_wave_0.jpg
+	_update_scan_actions: step 240: clip_2_pin_wave_1.jpg
+	_update_scan_actions: step 241: clip_2_pin_wave_2.jpg
+	_update_scan_actions: step 242: clip_2_pin_wave_3.jpg
+	_update_scan_actions: step 243: Clip_3.jpg
+	_update_scan_actions: step 244: clip_3_iron_bomb_0.jpg
+	_update_scan_actions: step 245: clip_3_iron_bomb_1.jpg
+	_update_scan_actions: step 246: clip_3_iron_bomb_2.jpg
+	_update_scan_actions: step 247: clip_3_iron_bomb_3.jpg
+	_update_scan_actions: step 248: clip_4_transition_0.jpg
+	_update_scan_actions: step 249: clip_4_transition_1.jpg
+	_update_scan_actions: step 250: clip_4_transition_2.jpg
+	_update_scan_actions: step 251: clip_4_transition_3.jpg
+	_update_scan_actions: step 252: 1_mesa.jpg
+	_update_scan_actions: step 253: 2_piso.jpg
+	_update_scan_actions: step 254: 3_galpon.jpg
+	_update_scan_actions: step 255: 4_estacionamiento.jpg
+	_update_scan_actions: step 256: 5_transicion_mitad.jpg
+	_update_scan_actions: step 257: 6_transicion_fin.jpg
+	_update_scan_actions: step 258: 30_galpon_plancha_manitos.jpg
+	_update_scan_actions: step 259: 31_tienda_iconos.jpg
+	_update_scan_actions: step 260: 32_estacionamiento_bota.jpg
+	_update_scan_actions: step 261: 33_estacionamiento_rodillo.jpg
+	_update_scan_actions: step 262: 34_tablero_corcho.jpg
+	_update_scan_actions: step 263: 35_bienvenida.jpg
+	_update_scan_actions: step 264: 36_escenario_1.jpg
+	_update_scan_actions: step 265: 36_escenario_2.jpg
+	_update_scan_actions: step 266: 36_escenario_3.jpg
+	_update_scan_actions: step 267: 36_escenario_4.jpg
+	_update_scan_actions: step 268: antes_boot.jpg
+	_update_scan_actions: step 269: antes_boot_lado.jpg
+	_update_scan_actions: step 270: antes_hand.jpg
+	_update_scan_actions: step 271: antes_hand_lado.jpg
+	_update_scan_actions: step 272: antes_iron.jpg
+	_update_scan_actions: step 273: antes_pin.jpg
+	_update_scan_actions: step 274: despues_boot.jpg
+	_update_scan_actions: step 275: despues_boot_64.jpg
+	_update_scan_actions: step 276: despues_boot_juego.jpg
+	_update_scan_actions: step 277: despues_boot_juego_64.jpg
+	_update_scan_actions: step 278: despues_boot_lado.jpg
+	_update_scan_actions: step 279: despues_hand.jpg
+	_update_scan_actions: step 280: despues_hand_ghost_juego.jpg
+	_update_scan_actions: step 281: despues_hand_ghost_juego_64.jpg
+	_update_scan_actions: step 282: despues_hand_juego.jpg
+	_update_scan_actions: step 283: despues_hand_juego_64.jpg
+	_update_scan_actions: step 284: despues_hand_lado.jpg
+	_update_scan_actions: step 285: despues_iron.jpg
+	_update_scan_actions: step 286: despues_iron_juego.jpg
+	_update_scan_actions: step 287: despues_pin.jpg
+	_update_scan_actions: step 288: despues_pin_64.jpg
+	_update_scan_actions: step 289: boot.jpg
+	_update_scan_actions: step 290: boot_64.jpg
+	_update_scan_actions: step 291: boot_juego.jpg
+	_update_scan_actions: step 292: boot_juego_64.jpg
+	_update_scan_actions: step 293: boot_lado.jpg
+	_update_scan_actions: step 294: boot_tres_cuartos.jpg
+	_update_scan_actions: step 295: hand_ghost_juego.jpg
+	_update_scan_actions: step 296: hand_ghost_juego_64.jpg
+	_update_scan_actions: step 297: hand_juego.jpg
+	_update_scan_actions: step 298: hand_juego_64.jpg
+	_update_scan_actions: step 299: hand_lado.jpg
+	_update_scan_actions: step 300: hand_tres_cuartos.jpg
+	_update_scan_actions: step 301: iou_bota_lateral.jpg
+	_update_scan_actions: step 302: iou_bota_superior.jpg
+	_update_scan_actions: step 303: iou_mano_lateral.jpg
+	_update_scan_actions: step 304: iou_mano_superior.jpg
+	_update_scan_actions: step 305: iron.jpg
+	_update_scan_actions: step 306: iron_64.jpg
+	_update_scan_actions: step 307: iron_juego.jpg
+	_update_scan_actions: step 308: pin.jpg
+	_update_scan_actions: step 309: pin_64.jpg
+	_update_scan_actions: step 310: bota_antes.jpg
+	_update_scan_actions: step 311: bota_despues.jpg
+	_update_scan_actions: step 312: cadena.jpg
+	_update_scan_actions: step 313: iconos_antes.jpg
+	_update_scan_actions: step 314: iconos_despues.jpg
+	_update_scan_actions: step 315: mano_antes.jpg
+	_update_scan_actions: step 316: mano_despues.jpg
+	_update_scan_actions: step 317: mano_juego_antes.jpg
+	_update_scan_actions: step 318: mano_juego_despues.jpg
+	_update_scan_actions: step 319: mano_primer_plano.jpg
+	_update_scan_actions: step 320: mesa_antes.jpg
+	_update_scan_actions: step 321: mesa_despues.jpg
+	_update_scan_actions: step 322: t050_fase1.jpg
+	_update_scan_actions: step 323: t100_fase2.jpg
+	_update_scan_actions: step 324: t200_fase3.jpg
+	_update_scan_actions: step 325: t275_fase4.jpg
+	_update_scan_actions: step 326: iconos.jpg
+	_update_scan_actions: step 327: icon.png
+_update_scan_actions: end
+reimport: begin: (Re)Importing Assets steps: 328
+	reimport: step 0: Preparing files to reimport...
+	reimport: step 1: Preparing files to reimport...
+	reimport: step 2: Preparing files to reimport...
+	reimport: step 3: Preparing files to reimport...
+	reimport: step 4: Preparing files to reimport...
+	reimport: step 5: Preparing files to reimport...
+	reimport: step 6: Preparing files to reimport...
+	reimport: step 7: Preparing files to reimport...
+	reimport: step 8: Preparing files to reimport...
+	reimport: step 9: Preparing files to reimport...
+	reimport: step 10: Preparing files to reimport...
+	reimport: step 11: Preparing files to reimport...
+	reimport: step 12: Preparing files to reimport...
+	reimport: step 13: Preparing files to reimport...
+	reimport: step 14: Preparing files to reimport...
+	reimport: step 15: Preparing files to reimport...
+	reimport: step 16: Preparing files to reimport...
+	reimport: step 17: Preparing files to reimport...
+	reimport: step 18: Preparing files to reimport...
+	reimport: step 19: Preparing files to reimport...
+	reimport: step 20: Preparing files to reimport...
+	reimport: step 21: Preparing files to reimport...
+	reimport: step 22: Preparing files to reimport...
+	reimport: step 23: Preparing files to reimport...
+	reimport: step 24: Preparing files to reimport...
+	reimport: step 25: Preparing files to reimport...
+	reimport: step 26: Preparing files to reimport...
+	reimport: step 27: Preparing files to reimport...
+	reimport: step 28: Preparing files to reimport...
+	reimport: step 29: Preparing files to reimport...
+	reimport: step 30: Preparing files to reimport...
+	reimport: step 31: Preparing files to reimport...
+	reimport: step 32: Preparing files to reimport...
+	reimport: step 33: Preparing files to reimport...
+	reimport: step 34: Preparing files to reimport...
+	reimport: step 35: Preparing files to reimport...
+	reimport: step 36: Preparing files to reimport...
+	reimport: step 37: Preparing files to reimport...
+	reimport: step 38: Preparing files to reimport...
+	reimport: step 39: Preparing files to reimport...
+	reimport: step 40: Preparing files to reimport...
+	reimport: step 41: Preparing files to reimport...
+	reimport: step 42: Preparing files to reimport...
+	reimport: step 43: Preparing files to reimport...
+	reimport: step 44: Preparing files to reimport...
+	reimport: step 45: Preparing files to reimport...
+	reimport: step 46: Preparing files to reimport...
+	reimport: step 47: Preparing files to reimport...
+	reimport: step 48: Preparing files to reimport...
+	reimport: step 49: Preparing files to reimport...
+	reimport: step 50: Preparing files to reimport...
+	reimport: step 51: Preparing files to reimport...
+	reimport: step 52: Preparing files to reimport...
+	reimport: step 53: Preparing files to reimport...
+	reimport: step 54: Preparing files to reimport...
+	reimport: step 55: Preparing files to reimport...
+	reimport: step 56: Preparing files to reimport...
+	reimport: step 57: Preparing files to reimport...
+	reimport: step 58: Preparing files to reimport...
+	reimport: step 59: Preparing files to reimport...
+	reimport: step 60: Preparing files to reimport...
+	reimport: step 61: Preparing files to reimport...
+	reimport: step 62: Preparing files to reimport...
+	reimport: step 63: Preparing files to reimport...
+	reimport: step 64: Preparing files to reimport...
+	reimport: step 65: Preparing files to reimport...
+	reimport: step 66: Preparing files to reimport...
+	reimport: step 67: Preparing files to reimport...
+	reimport: step 68: Preparing files to reimport...
+	reimport: step 69: Preparing files to reimport...
+	reimport: step 70: Preparing files to reimport...
+	reimport: step 71: Preparing files to reimport...
+	reimport: step 72: Preparing files to reimport...
+	reimport: step 73: Preparing files to reimport...
+	reimport: step 74: Preparing files to reimport...
+	reimport: step 75: Preparing files to reimport...
+	reimport: step 76: Preparing files to reimport...
+	reimport: step 77: Preparing files to reimport...
+	reimport: step 78: Preparing files to reimport...
+	reimport: step 79: Preparing files to reimport...
+	reimport: step 80: Preparing files to reimport...
+	reimport: step 81: Preparing files to reimport...
+	reimport: step 82: Preparing files to reimport...
+	reimport: step 83: Preparing files to reimport...
+	reimport: step 84: Preparing files to reimport...
+	reimport: step 85: Preparing files to reimport...
+	reimport: step 86: Preparing files to reimport...
+	reimport: step 87: Preparing files to reimport...
+	reimport: step 88: Preparing files to reimport...
+	reimport: step 89: Preparing files to reimport...
+	reimport: step 90: Preparing files to reimport...
+	reimport: step 91: Preparing files to reimport...
+	reimport: step 92: Preparing files to reimport...
+	reimport: step 93: Preparing files to reimport...
+	reimport: step 94: Preparing files to reimport...
+	reimport: step 95: Preparing files to reimport...
+	reimport: step 96: Preparing files to reimport...
+	reimport: step 97: Preparing files to reimport...
+	reimport: step 98: Preparing files to reimport...
+	reimport: step 99: Preparing files to reimport...
+	reimport: step 100: Preparing files to reimport...
+	reimport: step 101: Preparing files to reimport...
+	reimport: step 102: Preparing files to reimport...
+	reimport: step 103: Preparing files to reimport...
+	reimport: step 104: Preparing files to reimport...
+	reimport: step 105: Preparing files to reimport...
+	reimport: step 106: Preparing files to reimport...
+	reimport: step 107: Preparing files to reimport...
+	reimport: step 108: Preparing files to reimport...
+	reimport: step 109: Preparing files to reimport...
+	reimport: step 110: Preparing files to reimport...
+	reimport: step 111: Preparing files to reimport...
+	reimport: step 112: Preparing files to reimport...
+	reimport: step 113: Preparing files to reimport...
+	reimport: step 114: Preparing files to reimport...
+	reimport: step 115: Preparing files to reimport...
+	reimport: step 116: Preparing files to reimport...
+	reimport: step 117: Preparing files to reimport...
+	reimport: step 118: Preparing files to reimport...
+	reimport: step 119: Preparing files to reimport...
+	reimport: step 120: Preparing files to reimport...
+	reimport: step 121: Preparing files to reimport...
+	reimport: step 122: Preparing files to reimport...
+	reimport: step 123: Preparing files to reimport...
+	reimport: step 124: Preparing files to reimport...
+	reimport: step 125: Preparing files to reimport...
+	reimport: step 126: Preparing files to reimport...
+	reimport: step 127: Preparing files to reimport...
+	reimport: step 128: Preparing files to reimport...
+	reimport: step 129: Preparing files to reimport...
+	reimport: step 130: Preparing files to reimport...
+	reimport: step 131: Preparing files to reimport...
+	reimport: step 132: Preparing files to reimport...
+	reimport: step 133: Preparing files to reimport...
+	reimport: step 134: Preparing files to reimport...
+	reimport: step 135: Preparing files to reimport...
+	reimport: step 136: Preparing files to reimport...
+	reimport: step 137: Preparing files to reimport...
+	reimport: step 138: Preparing files to reimport...
+	reimport: step 139: Preparing files to reimport...
+	reimport: step 140: Preparing files to reimport...
+	reimport: step 141: Preparing files to reimport...
+	reimport: step 142: Preparing files to reimport...
+	reimport: step 143: Preparing files to reimport...
+	reimport: step 144: Preparing files to reimport...
+	reimport: step 145: Preparing files to reimport...
+	reimport: step 146: Preparing files to reimport...
+	reimport: step 147: Preparing files to reimport...
+	reimport: step 148: Preparing files to reimport...
+	reimport: step 149: Preparing files to reimport...
+	reimport: step 150: Preparing files to reimport...
+	reimport: step 151: Preparing files to reimport...
+	reimport: step 152: Preparing files to reimport...
+	reimport: step 153: Preparing files to reimport...
+	reimport: step 154: Preparing files to reimport...
+	reimport: step 155: Preparing files to reimport...
+	reimport: step 156: Preparing files to reimport...
+	reimport: step 157: Preparing files to reimport...
+	reimport: step 158: Preparing files to reimport...
+	reimport: step 159: Preparing files to reimport...
+	reimport: step 160: Preparing files to reimport...
+	reimport: step 161: Preparing files to reimport...
+	reimport: step 162: Preparing files to reimport...
+	reimport: step 163: Preparing files to reimport...
+	reimport: step 164: Preparing files to reimport...
+	reimport: step 165: Preparing files to reimport...
+	reimport: step 166: Preparing files to reimport...
+	reimport: step 167: Preparing files to reimport...
+	reimport: step 168: Preparing files to reimport...
+	reimport: step 169: Preparing files to reimport...
+	reimport: step 170: Preparing files to reimport...
+	reimport: step 171: Preparing files to reimport...
+	reimport: step 172: Preparing files to reimport...
+	reimport: step 173: Preparing files to reimport...
+	reimport: step 174: Preparing files to reimport...
+	reimport: step 175: Preparing files to reimport...
+	reimport: step 176: Preparing files to reimport...
+	reimport: step 177: Preparing files to reimport...
+	reimport: step 178: Preparing files to reimport...
+	reimport: step 179: Preparing files to reimport...
+	reimport: step 180: Preparing files to reimport...
+	reimport: step 181: Preparing files to reimport...
+	reimport: step 182: Preparing files to reimport...
+	reimport: step 183: Preparing files to reimport...
+	reimport: step 184: Preparing files to reimport...
+	reimport: step 185: Preparing files to reimport...
+	reimport: step 186: Preparing files to reimport...
+	reimport: step 187: Preparing files to reimport...
+	reimport: step 188: Preparing files to reimport...
+	reimport: step 189: Preparing files to reimport...
+	reimport: step 190: Preparing files to reimport...
+	reimport: step 191: Preparing files to reimport...
+	reimport: step 192: Preparing files to reimport...
+	reimport: step 193: Preparing files to reimport...
+	reimport: step 194: Preparing files to reimport...
+	reimport: step 195: Preparing files to reimport...
+	reimport: step 196: Preparing files to reimport...
+	reimport: step 197: Preparing files to reimport...
+	reimport: step 198: Preparing files to reimport...
+	reimport: step 199: Preparing files to reimport...
+	reimport: step 200: Preparing files to reimport...
+	reimport: step 201: Preparing files to reimport...
+	reimport: step 202: Preparing files to reimport...
+	reimport: step 203: Preparing files to reimport...
+	reimport: step 204: Preparing files to reimport...
+	reimport: step 205: Preparing files to reimport...
+	reimport: step 206: Preparing files to reimport...
+	reimport: step 207: Preparing files to reimport...
+	reimport: step 208: Preparing files to reimport...
+	reimport: step 209: Preparing files to reimport...
+	reimport: step 210: Preparing files to reimport...
+	reimport: step 211: Preparing files to reimport...
+	reimport: step 212: Preparing files to reimport...
+	reimport: step 213: Preparing files to reimport...
+	reimport: step 214: Preparing files to reimport...
+	reimport: step 215: Preparing files to reimport...
+	reimport: step 216: Preparing files to reimport...
+	reimport: step 217: Preparing files to reimport...
+	reimport: step 218: Preparing files to reimport...
+	reimport: step 219: Preparing files to reimport...
+	reimport: step 220: Preparing files to reimport...
+	reimport: step 221: Preparing files to reimport...
+	reimport: step 222: Preparing files to reimport...
+	reimport: step 223: Preparing files to reimport...
+	reimport: step 224: Preparing files to reimport...
+	reimport: step 225: Preparing files to reimport...
+	reimport: step 226: Preparing files to reimport...
+	reimport: step 227: Preparing files to reimport...
+	reimport: step 228: Preparing files to reimport...
+	reimport: step 229: Preparing files to reimport...
+	reimport: step 230: Preparing files to reimport...
+	reimport: step 231: Preparing files to reimport...
+	reimport: step 232: Preparing files to reimport...
+	reimport: step 233: Preparing files to reimport...
+	reimport: step 234: Preparing files to reimport...
+	reimport: step 235: Preparing files to reimport...
+	reimport: step 236: Preparing files to reimport...
+	reimport: step 237: Preparing files to reimport...
+	reimport: step 238: Preparing files to reimport...
+	reimport: step 239: Preparing files to reimport...
+	reimport: step 240: Preparing files to reimport...
+	reimport: step 241: Preparing files to reimport...
+	reimport: step 242: Preparing files to reimport...
+	reimport: step 243: Preparing files to reimport...
+	reimport: step 244: Preparing files to reimport...
+	reimport: step 245: Preparing files to reimport...
+	reimport: step 246: Preparing files to reimport...
+	reimport: step 247: Preparing files to reimport...
+	reimport: step 248: Preparing files to reimport...
+	reimport: step 249: Preparing files to reimport...
+	reimport: step 250: Preparing files to reimport...
+	reimport: step 251: Preparing files to reimport...
+	reimport: step 252: Preparing files to reimport...
+	reimport: step 253: Preparing files to reimport...
+	reimport: step 254: Preparing files to reimport...
+	reimport: step 255: Preparing files to reimport...
+	reimport: step 256: Preparing files to reimport...
+	reimport: step 257: Preparing files to reimport...
+	reimport: step 258: Preparing files to reimport...
+	reimport: step 259: Preparing files to reimport...
+	reimport: step 260: Preparing files to reimport...
+	reimport: step 261: Preparing files to reimport...
+	reimport: step 262: Preparing files to reimport...
+	reimport: step 263: Preparing files to reimport...
+	reimport: step 264: Preparing files to reimport...
+	reimport: step 265: Preparing files to reimport...
+	reimport: step 266: Preparing files to reimport...
+	reimport: step 267: Preparing files to reimport...
+	reimport: step 268: Preparing files to reimport...
+	reimport: step 269: Preparing files to reimport...
+	reimport: step 270: Preparing files to reimport...
+	reimport: step 271: Preparing files to reimport...
+	reimport: step 272: Preparing files to reimport...
+	reimport: step 273: Preparing files to reimport...
+	reimport: step 274: Preparing files to reimport...
+	reimport: step 275: Preparing files to reimport...
+	reimport: step 276: Preparing files to reimport...
+	reimport: step 277: Preparing files to reimport...
+	reimport: step 278: Preparing files to reimport...
+	reimport: step 279: Preparing files to reimport...
+	reimport: step 280: Preparing files to reimport...
+	reimport: step 281: Preparing files to reimport...
+	reimport: step 282: Preparing files to reimport...
+	reimport: step 283: Preparing files to reimport...
+	reimport: step 284: Preparing files to reimport...
+	reimport: step 285: Preparing files to reimport...
+	reimport: step 286: Preparing files to reimport...
+	reimport: step 287: Preparing files to reimport...
+	reimport: step 288: Preparing files to reimport...
+	reimport: step 289: Preparing files to reimport...
+	reimport: step 290: Preparing files to reimport...
+	reimport: step 291: Preparing files to reimport...
+	reimport: step 292: Preparing files to reimport...
+	reimport: step 293: Preparing files to reimport...
+	reimport: step 294: Preparing files to reimport...
+	reimport: step 295: Preparing files to reimport...
+	reimport: step 296: Preparing files to reimport...
+	reimport: step 297: Preparing files to reimport...
+	reimport: step 298: Preparing files to reimport...
+	reimport: step 299: Preparing files to reimport...
+	reimport: step 300: Preparing files to reimport...
+	reimport: step 301: Preparing files to reimport...
+	reimport: step 302: Preparing files to reimport...
+	reimport: step 303: Preparing files to reimport...
+	reimport: step 304: Preparing files to reimport...
+	reimport: step 305: Preparing files to reimport...
+	reimport: step 306: Preparing files to reimport...
+	reimport: step 307: Preparing files to reimport...
+	reimport: step 308: Preparing files to reimport...
+	reimport: step 309: Preparing files to reimport...
+	reimport: step 310: Preparing files to reimport...
+	reimport: step 311: Preparing files to reimport...
+	reimport: step 312: Preparing files to reimport...
+	reimport: step 313: Preparing files to reimport...
+	reimport: step 314: Preparing files to reimport...
+	reimport: step 315: Preparing files to reimport...
+	reimport: step 316: Preparing files to reimport...
+	reimport: step 317: Preparing files to reimport...
+	reimport: step 318: Preparing files to reimport...
+	reimport: step 319: Preparing files to reimport...
+	reimport: step 320: Preparing files to reimport...
+	reimport: step 321: Preparing files to reimport...
+	reimport: step 322: Preparing files to reimport...
+	reimport: step 323: Preparing files to reimport...
+	reimport: step 324: Preparing files to reimport...
+	reimport: step 325: Preparing files to reimport...
+	reimport: step 326: Preparing files to reimport...
+	reimport: step 327: Preparing files to reimport...
+	reimport: step 0: Executing pre-reimport operations...
+preload_reimporting_scene: begin: Preparing scenes for reload steps: 1
+	preload_reimporting_scene: step 0: Analyzing scene [empty]
+	preload_reimporting_scene: step 1: Preparation done.
+preload_reimporting_scene: end
+	reimport: step 0: source_code_pro.fnt
+	reimport: step 1: source_code_pro.fnt
+	reimport: step 3: BowlbyOne-Regular.ttf
+	reimport: step 4: SpaceMono-Bold.ttf
+	reimport: step 5: SpaceMono-Regular.ttf
+	reimport: step 6: LobsterTwo-Regular.ttf
+	reimport: step 7: LobsterTwo-Italic.ttf
+	reimport: step 8: LobsterTwo-BoldItalic.ttf
+	reimport: step 9: AnonymousPro-Bold.ttf
+	reimport: step 10: AnonymousPro-BoldItalic.ttf
+	reimport: step 11: AnonymousPro-Italic.ttf
+	reimport: step 12: AnonymousPro-Regular.ttf
+	reimport: step 13: CourierPrime-Bold.ttf
+	reimport: step 14: LobsterTwo-Bold.ttf
+	reimport: step 15: CourierPrime-Regular.ttf
+	reimport: step 16: CourierPrime-Italic.ttf
+	reimport: step 17: source_code_pro.fnt
+	reimport: step 18: Archivo.ttf
+	reimport: step 19: BowlbyOne-Regular.ttf
+	reimport: step 20: SpaceMono-Bold.ttf
+	reimport: step 21: SpaceMono-Regular.ttf
+	reimport: step 22: LobsterTwo-Regular.ttf
+	reimport: step 23: LobsterTwo-Italic.ttf
+	reimport: step 24: LobsterTwo-BoldItalic.ttf
+	reimport: step 25: AnonymousPro-Bold.ttf
+	reimport: step 26: AnonymousPro-BoldItalic.ttf
+	reimport: step 27: AnonymousPro-Italic.ttf
+	reimport: step 28: AnonymousPro-Regular.ttf
+	reimport: step 29: CourierPrime-Bold.ttf
+	reimport: step 30: LobsterTwo-Bold.ttf
+	reimport: step 31: CourierPrime-Regular.ttf
+	reimport: step 32: CourierPrime-Italic.ttf
+	reimport: step 33: CourierPrime-BoldItalic.ttf
+	reimport: step 34: clip_4_transition_1.jpg
+	reimport: step 35: clip_4_transition_0.jpg
+	reimport: step 36: clip_3_iron_bomb_3.jpg
+	reimport: step 37: clip_3_iron_bomb_2.jpg
+	reimport: step 38: clip_3_iron_bomb_1.jpg
+	reimport: step 39: clip_3_iron_bomb_0.jpg
+	reimport: step 40: Clip_3.jpg
+	reimport: step 41: clip_2_pin_wave_3.jpg
+	reimport: step 42: clip_2_pin_wave_2.jpg
+	reimport: step 43: clip_2_pin_wave_1.jpg
+	reimport: step 44: clip_2_pin_wave_0.jpg
+	reimport: step 45: Clip_2.jpg
+	reimport: step 46: clip_1_zoom_out_3.jpg
+	reimport: step 47: clip_1_zoom_out_2.jpg
+	reimport: step 48: clip_4_transition_2.jpg
+	reimport: step 49: clip_4_transition_3.jpg
+	reimport: step 50: 1_mesa.jpg
+	reimport: step 51: 2_piso.jpg
+	reimport: step 52: 3_galpon.jpg
+	reimport: step 53: 4_estacionamiento.jpg
+	reimport: step 54: 5_transicion_mitad.jpg
+	reimport: step 55: 6_transicion_fin.jpg
+	reimport: step 56: 30_galpon_plancha_manitos.jpg
+	reimport: step 57: 31_tienda_iconos.jpg
+	reimport: step 58: 32_estacionamiento_bota.jpg
+	reimport: step 59: 33_estacionamiento_rodillo.jpg
+	reimport: step 60: 34_tablero_corcho.jpg
+	reimport: step 61: 35_bienvenida.jpg
+	reimport: step 62: 36_escenario_1.jpg
+	reimport: step 63: auto_roller.png
+	reimport: step 64: boot.png
+	reimport: step 65: bubble.png
+	reimport: step 66: finger.png
+	reimport: step 67: hands.png
+	reimport: step 68: iron.png
+	reimport: step 69: palm.png
+	reimport: step 70: rolling_pin.png
+	reimport: step 71: up_auto.png
+	reimport: step 72: up_chain.png
+	reimport: step 73: up_force.png
+	reimport: step 74: up_memory.png
+	reimport: step 75: up_size.png
+	reimport: step 76: up_special.png
+	reimport: step 77: up_speed.png
+	reimport: step 78: up_tense.png
+	reimport: step 79: up_value.png
+	reimport: step 80: 01_inicio.jpg
+	reimport: step 81: 02_hud_tienda.jpg
+	reimport: step 82: 03_palma.jpg
+	reimport: step 83: 04_cadena.jpg
+	reimport: step 84: 06_reciclado_panel.jpg
+	reimport: step 85: 07_reciclado_arruga.jpg
+	reimport: step 86: 08_reciclado_rollo.jpg
+	reimport: step 87: 10_pausa.jpg
+	reimport: step 88: Clip_0.jpg
+	reimport: step 89: Clip_1.jpg
+	reimport: step 90: clip_1_zoom_out_0.jpg
+	reimport: step 91: clip_1_zoom_out_1.jpg
+	reimport: step 92: hand_juego.jpg
+	reimport: step 93: hand_juego_64.jpg
+	reimport: step 94: hand_lado.jpg
+	reimport: step 95: hand_tres_cuartos.jpg
+	reimport: step 96: iou_bota_lateral.jpg
+	reimport: step 97: iou_bota_superior.jpg
+	reimport: step 98: iou_mano_lateral.jpg
+	reimport: step 99: iou_mano_superior.jpg
+	reimport: step 100: iron.jpg
+	reimport: step 101: iron_64.jpg
+	reimport: step 102: iron_juego.jpg
+	reimport: step 103: pin.jpg
+	reimport: step 104: pin_64.jpg
+	reimport: step 105: bota_antes.jpg
+	reimport: step 106: bota_despues.jpg
+	reimport: step 107: cadena.jpg
+	reimport: step 108: iconos_antes.jpg
+	reimport: step 109: iconos_despues.jpg
+	reimport: step 110: mano_antes.jpg
+	reimport: step 111: mano_despues.jpg
+	reimport: step 112: mano_juego_antes.jpg
+	reimport: step 113: mano_juego_despues.jpg
+	reimport: step 114: mano_primer_plano.jpg
+	reimport: step 115: icon.png
+	reimport: step 116: mesa_antes.jpg
+	reimport: step 117: mesa_despues.jpg
+	reimport: step 118: t050_fase1.jpg
+	reimport: step 119: t100_fase2.jpg
+	reimport: step 120: t200_fase3.jpg
+	reimport: step 121: t275_fase4.jpg
+	reimport: step 122: iconos.jpg
+	reimport: step 123: 36_escenario_2.jpg
+	reimport: step 124: 36_escenario_3.jpg
+	reimport: step 125: 36_escenario_4.jpg
+	reimport: step 126: antes_boot.jpg
+	reimport: step 127: antes_boot_lado.jpg
+	reimport: step 128: antes_hand.jpg
+	reimport: step 129: antes_hand_lado.jpg
+	reimport: step 130: antes_iron.jpg
+	reimport: step 131: antes_pin.jpg
+	reimport: step 132: despues_boot.jpg
+	reimport: step 133: despues_boot_64.jpg
+	reimport: step 134: despues_boot_juego.jpg
+	reimport: step 135: despues_boot_juego_64.jpg
+	reimport: step 136: despues_boot_lado.jpg
+	reimport: step 137: despues_hand.jpg
+	reimport: step 138: despues_hand_ghost_juego.jpg
+	reimport: step 139: despues_hand_ghost_juego_64.jpg
+	reimport: step 140: despues_hand_juego.jpg
+	reimport: step 141: despues_hand_juego_64.jpg
+	reimport: step 142: despues_hand_lado.jpg
+	reimport: step 143: despues_iron.jpg
+	reimport: step 144: despues_iron_juego.jpg
+	reimport: step 145: despues_pin.jpg
+	reimport: step 146: despues_pin_64.jpg
+	reimport: step 147: boot.jpg
+	reimport: step 148: boot_64.jpg
+	reimport: step 149: boot_juego.jpg
+	reimport: step 150: boot_juego_64.jpg
+	reimport: step 151: boot_lado.jpg
+	reimport: step 154: hand_ghost_juego_64.jpg
+	reimport: step 155: prop_cup_lado.jpg
+	reimport: step 156: prop_cup_frente.jpg
+	reimport: step 157: prop_cup_atras.jpg
+	reimport: step 158: prop_cup_64.jpg
+	reimport: step 159: prop_cup.jpg
+	reimport: step 160: prop_cone_tres_cuartos.jpg
+	reimport: step 161: prop_cone_lado.jpg
+	reimport: step 162: prop_cone_frente.jpg
+	reimport: step 163: prop_cone_atras.jpg
+	reimport: step 164: prop_cone_64.jpg
+	reimport: step 165: prop_cone.jpg
+	reimport: step 166: prop_chair_leg_tres_cuartos.jpg
+	reimport: step 167: prop_chair_leg_lado.jpg
+	reimport: step 168: prop_chair_leg_frente.jpg
+	reimport: step 169: prop_chair_leg_atras.jpg
+	reimport: step 170: prop_chair_leg_64.jpg
+	reimport: step 171: prop_chair_leg.jpg
+	reimport: step 172: pin_tres_cuartos.jpg
+	reimport: step 173: pin_lado.jpg
+	reimport: step 174: pin_juego_64.jpg
+	reimport: step 175: pin_juego.jpg
+	reimport: step 176: pin_frente.jpg
+	reimport: step 177: pin_atras.jpg
+	reimport: step 178: special_bomb_lado.jpg
+	reimport: step 179: special_bomb_frente.jpg
+	reimport: step 180: special_bomb_atras.jpg
+	reimport: step 181: special_bomb_64.jpg
+	reimport: step 182: special_bomb.jpg
+	reimport: step 183: roller_tres_cuartos.jpg
+	reimport: step 184: roller_lado.jpg
+	reimport: step 185: roller_frente.jpg
+	reimport: step 186: roller_atras.jpg
+	reimport: step 187: roller_64.jpg
+	reimport: step 188: roller.jpg
+	reimport: step 189: prop_shelf_tres_cuartos.jpg
+	reimport: step 190: prop_shelf_lado.jpg
+	reimport: step 191: prop_shelf_frente.jpg
+	reimport: step 192: prop_shelf_atras.jpg
+	reimport: step 193: prop_shelf_64.jpg
+	reimport: step 194: prop_shelf.jpg
+	reimport: step 195: prop_pencil_tres_cuartos.jpg
+	reimport: step 196: prop_pencil_lado.jpg
+	reimport: step 197: prop_pencil_frente.jpg
+	reimport: step 198: prop_pencil_atras.jpg
+	reimport: step 199: prop_pencil_64.jpg
+	reimport: step 200: prop_pencil.jpg
+	reimport: step 201: prop_cup_tres_cuartos.jpg
+	reimport: step 202: hand_64.jpg
+	reimport: step 203: hand.jpg
+	reimport: step 204: boot_tres_cuartos.jpg
+	reimport: step 205: boot_lado.jpg
+	reimport: step 206: boot_juego_64.jpg
+	reimport: step 207: boot_juego.jpg
+	reimport: step 208: boot_frente.jpg
+	reimport: step 209: boot_atras.jpg
+	reimport: step 210: boot_64.jpg
+	reimport: step 211: boot.jpg
+	reimport: step 212: hand_superior.png
+	reimport: step 213: hand_lateral.png
+	reimport: step 214: hand_ghost_superior.png
+	reimport: step 215: hand_ghost_lateral.png
+	reimport: step 216: boot_superior.png
+	reimport: step 217: boot_lateral.png
+	reimport: step 218: icon.png
+	reimport: step 219: yellow.png
+	reimport: step 220: Script.svg
+	reimport: step 221: red.png
+	reimport: step 222: green.png
+	reimport: step 223: Folder.svg
+	reimport: step 224: play.png
+	reimport: step 225: arrow.png
+	reimport: step 226: pin_64.jpg
+	reimport: step 227: pin.jpg
+	reimport: step 228: iron_tres_cuartos.jpg
+	reimport: step 229: iron_lado.jpg
+	reimport: step 230: iron_juego_64.jpg
+	reimport: step 231: iron_juego.jpg
+	reimport: step 232: iron_frente.jpg
+	reimport: step 233: iron_atras.jpg
+	reimport: step 234: iron_64.jpg
+	reimport: step 235: iron.jpg
+	reimport: step 236: hand_tres_cuartos.jpg
+	reimport: step 237: hand_lado.jpg
+	reimport: step 238: hand_juego_64.jpg
+	reimport: step 239: hand_juego.jpg
+	reimport: step 240: hand_ghost_tres_cuartos.jpg
+	reimport: step 241: hand_ghost_lado.jpg
+	reimport: step 242: hand_ghost_juego_64.jpg
+	reimport: step 243: hand_ghost_juego.jpg
+	reimport: step 244: hand_ghost_frente.jpg
+	reimport: step 245: hand_ghost_atras.jpg
+	reimport: step 246: source_code_pro.fnt
+	reimport: step 247: Archivo.ttf
+	reimport: step 248: BowlbyOne-Regular.ttf
+	reimport: step 249: SpaceMono-Bold.ttf
+	reimport: step 250: SpaceMono-Regular.ttf
+	reimport: step 251: LobsterTwo-Regular.ttf
+	reimport: step 252: LobsterTwo-Italic.ttf
+	reimport: step 253: LobsterTwo-BoldItalic.ttf
+	reimport: step 254: AnonymousPro-Bold.ttf
+	reimport: step 255: AnonymousPro-BoldItalic.ttf
+	reimport: step 256: AnonymousPro-Italic.ttf
+	reimport: step 257: AnonymousPro-Regular.ttf
+	reimport: step 258: CourierPrime-Bold.ttf
+	reimport: step 259: LobsterTwo-Bold.ttf
+	reimport: step 260: CourierPrime-Regular.ttf
+	reimport: step 261: CourierPrime-Italic.ttf
+	reimport: step 262: CourierPrime-BoldItalic.ttf
+	reimport: step 263: clip_4_transition_1.jpg
+	reimport: step 265: clip_3_iron_bomb_3.jpg
+	reimport: step 266: clip_3_iron_bomb_2.jpg
+	reimport: step 268: clip_3_iron_bomb_0.jpg
+	reimport: step 269: Clip_3.jpg
+	reimport: step 270: clip_2_pin_wave_3.jpg
+	reimport: step 271: clip_2_pin_wave_2.jpg
+	reimport: step 272: clip_2_pin_wave_1.jpg
+	reimport: step 273: clip_2_pin_wave_0.jpg
+	reimport: step 274: Clip_2.jpg
+	reimport: step 275: clip_1_zoom_out_3.jpg
+	reimport: step 276: clip_1_zoom_out_2.jpg
+	reimport: step 277: clip_4_transition_2.jpg
+	reimport: step 278: clip_4_transition_3.jpg
+	reimport: step 279: 1_mesa.jpg
+	reimport: step 281: 3_galpon.jpg
+	reimport: step 282: 4_estacionamiento.jpg
+	reimport: step 283: 5_transicion_mitad.jpg
+	reimport: step 284: 6_transicion_fin.jpg
+	reimport: step 285: 30_galpon_plancha_manitos.jpg
+	reimport: step 287: 32_estacionamiento_bota.jpg
+	reimport: step 288: 33_estacionamiento_rodillo.jpg
+	reimport: step 289: 34_tablero_corcho.jpg
+	reimport: step 290: 35_bienvenida.jpg
+	reimport: step 291: 36_escenario_1.jpg
+	reimport: step 292: auto_roller.png
+	reimport: step 293: boot.png
+	reimport: step 294: bubble.png
+	reimport: step 295: finger.png
+	reimport: step 296: hands.png
+	reimport: step 297: iron.png
+	reimport: step 298: palm.png
+	reimport: step 299: rolling_pin.png
+	reimport: step 300: up_auto.png
+	reimport: step 301: up_chain.png
+	reimport: step 302: up_force.png
+	reimport: step 303: up_memory.png
+	reimport: step 304: up_size.png
+	reimport: step 305: up_special.png
+	reimport: step 306: up_speed.png
+	reimport: step 307: up_tense.png
+	reimport: step 308: up_value.png
+	reimport: step 309: 01_inicio.jpg
+	reimport: step 310: 02_hud_tienda.jpg
+	reimport: step 311: 03_palma.jpg
+	reimport: step 312: 04_cadena.jpg
+	reimport: step 313: 06_reciclado_panel.jpg
+	reimport: step 314: special_line.glb
+import: begin: Import Scene steps: 104
+	import: step 0: Importing Scene...
+	import: step 2: Running Custom Script...
+	import: step 104: Saving...
+ERROR: Parameter "t" is null.
+   at: texture_2d_get (servers/rendering/dummy/storage/texture_storage.h:107)
+import: end
+	reimport: step 315: special_gem.glb
+import: begin: Import Scene steps: 104
+	import: step 0: Importing Scene...
+	import: step 2: Running Custom Script...
+	import: step 104: Saving...
+ERROR: Parameter "t" is null.
+   at: texture_2d_get (servers/rendering/dummy/storage/texture_storage.h:107)
+import: end
+	reimport: step 316: special_bomb.glb
+import: begin: Import Scene steps: 104
+	import: step 0: Importing Scene...
+	import: step 2: Running Custom Script...
+	import: step 104: Saving...
+ERROR: Parameter "t" is null.
+   at: texture_2d_get (servers/rendering/dummy/storage/texture_storage.h:107)
+import: end
+	reimport: step 317: roller.glb
+import: begin: Import Scene steps: 104
+	import: step 0: Importing Scene...
+	import: step 2: Running Custom Script...
+	import: step 104: Saving...
+ERROR: Parameter "t" is null.
+   at: texture_2d_get (servers/rendering/dummy/storage/texture_storage.h:107)
+import: end
+	reimport: step 318: prop_shelf.glb
+import: begin: Import Scene steps: 104
+	import: step 0: Importing Scene...
+	import: step 2: Running Custom Script...
+	import: step 104: Saving...
+ERROR: Parameter "t" is null.
+   at: texture_2d_get (servers/rendering/dummy/storage/texture_storage.h:107)
+import: end
+	reimport: step 319: prop_pencil.glb
+import: begin: Import Scene steps: 104
+	import: step 0: Importing Scene...
+	import: step 2: Running Custom Script...
+	import: step 104: Saving...
+ERROR: Parameter "t" is null.
+   at: texture_2d_get (servers/rendering/dummy/storage/texture_storage.h:107)
+import: end
+	reimport: step 320: prop_cup.glb
+import: begin: Import Scene steps: 104
+	import: step 0: Importing Scene...
+	import: step 2: Running Custom Script...
+	import: step 104: Saving...
+ERROR: Parameter "t" is null.
+   at: texture_2d_get (servers/rendering/dummy/storage/texture_storage.h:107)
+import: end
+	reimport: step 321: prop_cone.glb
+import: begin: Import Scene steps: 104
+	import: step 0: Importing Scene...
+	import: step 2: Running Custom Script...
+	import: step 104: Saving...
+ERROR: Parameter "t" is null.
+   at: texture_2d_get (servers/rendering/dummy/storage/texture_storage.h:107)
+import: end
+	reimport: step 322: prop_chair_leg.glb
+import: begin: Import Scene steps: 104
+	import: step 0: Importing Scene...
+	import: step 2: Running Custom Script...
+	import: step 104: Saving...
+ERROR: Parameter "t" is null.
+   at: texture_2d_get (servers/rendering/dummy/storage/texture_storage.h:107)
+import: end
+	reimport: step 323: pin.glb
+import: begin: Import Scene steps: 104
+	import: step 0: Importing Scene...
+	import: step 2: Running Custom Script...
+	import: step 104: Saving...
+ERROR: Parameter "t" is null.
+   at: texture_2d_get (servers/rendering/dummy/storage/texture_storage.h:107)
+import: end
+	reimport: step 324: iron.glb
+import: begin: Import Scene steps: 104
+	import: step 0: Importing Scene...
+	import: step 2: Running Custom Script...
+	import: step 104: Saving...
+ERROR: Parameter "t" is null.
+   at: texture_2d_get (servers/rendering/dummy/storage/texture_storage.h:107)
+import: end
+	reimport: step 325: hand_ghost.glb
+import: begin: Import Scene steps: 104
+	import: step 0: Importing Scene...
+	import: step 2: Running Custom Script...
+	import: step 104: Saving...
+ERROR: Parameter "t" is null.
+   at: texture_2d_get (servers/rendering/dummy/storage/texture_storage.h:107)
+import: end
+	reimport: step 326: hand.glb
+import: begin: Import Scene steps: 104
+	import: step 0: Importing Scene...
+	import: step 2: Running Custom Script...
+	import: step 104: Saving...
+ERROR: Parameter "t" is null.
+   at: texture_2d_get (servers/rendering/dummy/storage/texture_storage.h:107)
+import: end
+	reimport: step 327: boot.glb
+import: begin: Import Scene steps: 104
+	import: step 0: Importing Scene...
+	import: step 2: Running Custom Script...
+	import: step 104: Saving...
+ERROR: Parameter "t" is null.
+   at: texture_2d_get (servers/rendering/dummy/storage/texture_storage.h:107)
+import: end
+	reimport: step 328: Finalizing Asset Import...
+reimport: end
+update_script_paths_documentation: begin: Updating scripts documentation steps: 170
+	update_script_paths_documentation: step 0: change_project_warnings.gd
+	update_script_paths_documentation: step 1: gut_cli.gd
+	update_script_paths_documentation: step 2: optparse.gd
+	update_script_paths_documentation: step 3: BottomPanelShortcuts.gd
+	update_script_paths_documentation: step 4: editor_globals.gd
+	update_script_paths_documentation: step 5: GutBottomPanel.gd
+	update_script_paths_documentation: step 6: GutControl.gd
+	update_script_paths_documentation: step 7: GutRunner.gd
+	update_script_paths_documentation: step 8: gut_config_gui.gd
+	update_script_paths_documentation: step 9: gut_gui.gd
+	update_script_paths_documentation: step 10: gut_user_preferences.gd
+	update_script_paths_documentation: step 11: OutputText.gd
+	update_script_paths_documentation: step 12: panel_controls.gd
+	update_script_paths_documentation: step 13: ResizeHandle.gd
+	update_script_paths_documentation: step 14: ResultsTree.gd
+	update_script_paths_documentation: step 15: RunAtCursor.gd
+	update_script_paths_documentation: step 16: RunResults.gd
+	update_script_paths_documentation: step 17: run_from_editor.gd
+	update_script_paths_documentation: step 18: script_text_editor_controls.gd
+	update_script_paths_documentation: step 19: ShortcutButton.gd
+	update_script_paths_documentation: step 20: autofree.gd
+	update_script_paths_documentation: step 21: awaiter.gd
+	update_script_paths_documentation: step 22: collected_script.gd
+	update_script_paths_documentation: step 23: collected_test.gd
+	update_script_paths_documentation: step 24: comparator.gd
+	update_script_paths_documentation: step 25: compare_result.gd
+	update_script_paths_documentation: step 26: diff_formatter.gd
+	update_script_paths_documentation: step 27: diff_tool.gd
+	update_script_paths_documentation: step 28: doubler.gd
+	update_script_paths_documentation: step 29: double_tools.gd
+	update_script_paths_documentation: step 30: dynamic_gdscript.gd
+	update_script_paths_documentation: step 31: gut.gd
+	update_script_paths_documentation: step 32: GutScene.gd
+	update_script_paths_documentation: step 33: gut_cmdln.gd
+	update_script_paths_documentation: step 34: gut_config.gd
+	update_script_paths_documentation: step 35: gut_loader.gd
+	update_script_paths_documentation: step 36: gut_plugin.gd
+	update_script_paths_documentation: step 37: gut_to_move.gd
+	update_script_paths_documentation: step 38: gut_vscode_debugger.gd
+	update_script_paths_documentation: step 39: hook_script.gd
+	update_script_paths_documentation: step 40: inner_class_registry.gd
+	update_script_paths_documentation: step 41: input_factory.gd
+	update_script_paths_documentation: step 42: input_sender.gd
+	update_script_paths_documentation: step 43: junit_xml_export.gd
+	update_script_paths_documentation: step 44: lazy_loader.gd
+	update_script_paths_documentation: step 45: logger.gd
+	update_script_paths_documentation: step 46: method_maker.gd
+	update_script_paths_documentation: step 47: one_to_many.gd
+	update_script_paths_documentation: step 48: orphan_counter.gd
+	update_script_paths_documentation: step 49: parameter_factory.gd
+	update_script_paths_documentation: step 50: parameter_handler.gd
+	update_script_paths_documentation: step 51: printers.gd
+	update_script_paths_documentation: step 52: result_exporter.gd
+	update_script_paths_documentation: step 53: script_parser.gd
+	update_script_paths_documentation: step 54: signal_watcher.gd
+	update_script_paths_documentation: step 55: spy.gd
+	update_script_paths_documentation: step 56: strutils.gd
+	update_script_paths_documentation: step 57: stubber.gd
+	update_script_paths_documentation: step 58: stub_params.gd
+	update_script_paths_documentation: step 59: summary.gd
+	update_script_paths_documentation: step 60: test.gd
+	update_script_paths_documentation: step 61: test_collector.gd
+	update_script_paths_documentation: step 62: thing_counter.gd
+	update_script_paths_documentation: step 63: UserFileViewer.gd
+	update_script_paths_documentation: step 64: utils.gd
+	update_script_paths_documentation: step 65: version_conversion.gd
+	update_script_paths_documentation: step 66: version_numbers.gd
+	update_script_paths_documentation: step 67: warnings_manager.gd
+	update_script_paths_documentation: step 68: pop_audio.gd
+	update_script_paths_documentation: step 69: pop_audio_logic.gd
+	update_script_paths_documentation: step 70: juice.gd
+	update_script_paths_documentation: step 71: playtest.gd
+	update_script_paths_documentation: step 72: save_system.gd
+	update_script_paths_documentation: step 73: settings.gd
+	update_script_paths_documentation: step 74: air_model.gd
+	update_script_paths_documentation: step 75: app_info.gd
+	update_script_paths_documentation: step 76: auto_roller.gd
+	update_script_paths_documentation: step 77: cfg.gd
+	update_script_paths_documentation: step 78: chain_solver.gd
+	update_script_paths_documentation: step 79: combo_tracker.gd
+	update_script_paths_documentation: step 80: data_db.gd
+	update_script_paths_documentation: step 81: economy.gd
+	update_script_paths_documentation: step 82: game_sim.gd
+	update_script_paths_documentation: step 83: game_state.gd
+	update_script_paths_documentation: step 84: hands_model.gd
+	update_script_paths_documentation: step 85: hex_grid.gd
+	update_script_paths_documentation: step 86: number_format.gd
+	update_script_paths_documentation: step 87: offline_earnings.gd
+	update_script_paths_documentation: step 88: playtest_mode.gd
+	update_script_paths_documentation: step 89: prestige.gd
+	update_script_paths_documentation: step 90: session_log.gd
+	update_script_paths_documentation: step 91: sheet_model.gd
+	update_script_paths_documentation: step 92: tool_model.gd
+	update_script_paths_documentation: step 93: upgrades.gd
+	update_script_paths_documentation: step 94: bubble_log.gd
+	update_script_paths_documentation: step 95: chain_stamp.gd
+	update_script_paths_documentation: step 96: combo_meter.gd
+	update_script_paths_documentation: step 97: digit_wheel.gd
+	update_script_paths_documentation: step 98: flying_numbers.gd
+	update_script_paths_documentation: step 99: hud.gd
+	update_script_paths_documentation: step 100: ink_slider.gd
+	update_script_paths_documentation: step 101: next_bar.gd
+	update_script_paths_documentation: step 102: night_stamp.gd
+	update_script_paths_documentation: step 103: odometer.gd
+	update_script_paths_documentation: step 104: offline_ticket.gd
+	update_script_paths_documentation: step 105: pause_menu.gd
+	update_script_paths_documentation: step 106: perm_card.gd
+	update_script_paths_documentation: step 107: pops_panel.gd
+	update_script_paths_documentation: step 108: recycle_panel.gd
+	update_script_paths_documentation: step 109: shop_sheet.gd
+	update_script_paths_documentation: step 110: stamp_button.gd
+	update_script_paths_documentation: step 111: tool_icon.gd
+	update_script_paths_documentation: step 112: tx.gd
+	update_script_paths_documentation: step 113: ui_kit.gd
+	update_script_paths_documentation: step 114: upgrade_tag.gd
+	update_script_paths_documentation: step 115: work_order.gd
+	update_script_paths_documentation: step 116: clip_1_zoom_out.gd
+	update_script_paths_documentation: step 117: clip_2_pin_wave.gd
+	update_script_paths_documentation: step 118: clip_3_iron_bomb.gd
+	update_script_paths_documentation: step 119: clip_4_transition.gd
+	update_script_paths_documentation: step 120: clip_5_boot_stomp.gd
+	update_script_paths_documentation: step 121: clip_base.gd
+	update_script_paths_documentation: step 122: scenario_preview.gd
+	update_script_paths_documentation: step 123: scenario_director.gd
+	update_script_paths_documentation: step 124: scenario_props.gd
+	update_script_paths_documentation: step 125: automation_view.gd
+	update_script_paths_documentation: step 126: benchmark.gd
+	update_script_paths_documentation: step 127: bubble_mesh.gd
+	update_script_paths_documentation: step 128: camera_rig.gd
+	update_script_paths_documentation: step 129: debug_overlay.gd
+	update_script_paths_documentation: step 130: echo_glow.gd
+	update_script_paths_documentation: step 131: far_view.gd
+	update_script_paths_documentation: step 132: fx_pool.gd
+	update_script_paths_documentation: step 133: hand_rig.gd
+	update_script_paths_documentation: step 134: main.gd
+	update_script_paths_documentation: step 135: sheet_view.gd
+	update_script_paths_documentation: step 136: smoke_bot.gd
+	update_script_paths_documentation: step 137: specials_view.gd
+	update_script_paths_documentation: step 138: spring_math.gd
+	update_script_paths_documentation: step 139: state_packer.gd
+	update_script_paths_documentation: step 140: tool_meshes.gd
+	update_script_paths_documentation: step 141: tool_view.gd
+	update_script_paths_documentation: step 142: toy_style.gd
+	update_script_paths_documentation: step 143: toy_world.gd
+	update_script_paths_documentation: step 144: test_air_chain.gd
+	update_script_paths_documentation: step 145: test_data_db.gd
+	update_script_paths_documentation: step 146: test_economy.gd
+	update_script_paths_documentation: step 147: test_game_sim.gd
+	update_script_paths_documentation: step 148: test_hand_rig.gd
+	update_script_paths_documentation: step 149: test_hex_grid.gd
+	update_script_paths_documentation: step 150: test_performance.gd
+	update_script_paths_documentation: step 151: test_phase3_sim.gd
+	update_script_paths_documentation: step 152: test_playtest.gd
+	update_script_paths_documentation: step 153: test_pop_audio_logic.gd
+	update_script_paths_documentation: step 154: test_scenarios.gd
+	update_script_paths_documentation: step 155: test_sheet_model.gd
+	update_script_paths_documentation: step 156: test_spring.gd
+	update_script_paths_documentation: step 157: test_state_packer.gd
+	update_script_paths_documentation: step 158: test_tool_model.gd
+	update_script_paths_documentation: step 159: test_ui_logic.gd
+	update_script_paths_documentation: step 160: balance_sim.gd
+	update_script_paths_documentation: step 161: gen_icon.gd
+	update_script_paths_documentation: step 162: gen_placeholder_sfx.gd
+	update_script_paths_documentation: step 163: gen_pop_sfx.gd
+	update_script_paths_documentation: step 164: hand_preview.gd
+	update_script_paths_documentation: step 165: inspect_glb.gd
+	update_script_paths_documentation: step 166: lint.gd
+	update_script_paths_documentation: step 167: png_to_jpg.gd
+	update_script_paths_documentation: step 168: tool_preview.gd
+	update_script_paths_documentation: step 169: tool_scale_report.gd
+update_script_paths_documentation: end
+update_scene_groups: begin: Updating Scene Groups steps: 39
+	update_scene_groups: step 0: BottomPanelShortcuts.tscn
+	update_scene_groups: step 1: GutBottomPanel.tscn
+	update_scene_groups: step 2: GutControl.tscn
+	update_scene_groups: step 3: GutRunner.tscn
+	update_scene_groups: step 4: MinGui.tscn
+	update_scene_groups: step 5: NormalGui.tscn
+	update_scene_groups: step 6: OutputText.tscn
+	update_scene_groups: step 7: ResizeHandle.tscn
+	update_scene_groups: step 8: ResultsTree.tscn
+	update_scene_groups: step 9: RunAtCursor.tscn
+	update_scene_groups: step 10: RunResults.tscn
+	update_scene_groups: step 11: run_from_editor.tscn
+	update_scene_groups: step 12: Settings.tscn
+	update_scene_groups: step 13: ShortcutButton.tscn
+	update_scene_groups: step 14: GutScene.tscn
+	update_scene_groups: step 15: gut_loader_the_scene.tscn
+	update_scene_groups: step 16: UserFileViewer.tscn
+	update_scene_groups: step 17: clip_1_zoom_out.tscn
+	update_scene_groups: step 18: clip_2_pin_wave.tscn
+	update_scene_groups: step 19: clip_3_iron_bomb.tscn
+	update_scene_groups: step 20: clip_4_transition.tscn
+	update_scene_groups: step 21: clip_5_boot_stomp.tscn
+	update_scene_groups: step 22: scenario_preview.tscn
+	update_scene_groups: step 23: benchmark.tscn
+	update_scene_groups: step 24: main.tscn
+	update_scene_groups: step 25: boot.glb
+	update_scene_groups: step 26: hand.glb
+	update_scene_groups: step 27: hand_ghost.glb
+	update_scene_groups: step 28: iron.glb
+	update_scene_groups: step 29: pin.glb
+	update_scene_groups: step 30: prop_chair_leg.glb
+	update_scene_groups: step 31: prop_cone.glb
+	update_scene_groups: step 32: prop_cup.glb
+	update_scene_groups: step 33: prop_pencil.glb
+	update_scene_groups: step 34: prop_shelf.glb
+	update_scene_groups: step 35: roller.glb
+	update_scene_groups: step 36: special_bomb.glb
+	update_scene_groups: step 37: special_gem.glb
+	update_scene_groups: step 38: special_line.glb
+update_scene_groups: end
+reimport: begin: (Re)Importing Assets steps: 328
+	reimport: step 0: Executing post-reimport operations...
+reimport: end
+loading_editor_layout: begin: Loading editor steps: 5
+	loading_editor_layout: step 0: Loading editor layout...
+loading_editor_layout: end
