@@ -1,0 +1,22 @@
+archivo: clip_1_zoom_out.mp4  5918 KB
+duration=15.050000
+--- volumedetect
+[Parsed_volumedetect_0 @ 0x555d1acc96c0] mean_volume: -26.8 dB
+[Parsed_volumedetect_0 @ 0x555d1acc96c0] max_volume: -2.9 dB
+[Parsed_volumedetect_0 @ 0x555d1acc96c0] histogram_2db: 2
+[Parsed_volumedetect_0 @ 0x555d1acc96c0] histogram_3db: 8
+[Parsed_volumedetect_0 @ 0x555d1acc96c0] histogram_4db: 28
+[Parsed_volumedetect_0 @ 0x555d1acc96c0] histogram_5db: 88
+[Parsed_volumedetect_0 @ 0x555d1acc96c0] histogram_6db: 178
+[Parsed_volumedetect_0 @ 0x555d1acc96c0] histogram_7db: 350
+[Parsed_volumedetect_0 @ 0x555d1acc96c0] histogram_8db: 616
+[Parsed_volumedetect_0 @ 0x555d1acc96c0] histogram_9db: 1120
+--- astats (general)
+Overall
+Peak level dB: -2.938206
+RMS level dB: -26.843493
+RMS peak dB: -16.471455
+Flat factor: 0.000000
+Peak count: 2.000000
+--- RMS por segundo (dB), para ver picos del crepitar
+-83.881573 -22.005273 -23.169019 -20.610897 -23.599749 -20.277262 -34.862689 -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf 

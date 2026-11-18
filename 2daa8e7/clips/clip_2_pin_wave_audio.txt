@@ -1,0 +1,26 @@
+archivo: clip_2_pin_wave.mp4  4838 KB
+duration=13.050000
+--- volumedetect
+[Parsed_volumedetect_0 @ 0x558fb57d4d00] mean_volume: -34.3 dB
+[Parsed_volumedetect_0 @ 0x558fb57d4d00] max_volume: -2.9 dB
+[Parsed_volumedetect_0 @ 0x558fb57d4d00] histogram_2db: 2
+[Parsed_volumedetect_0 @ 0x558fb57d4d00] histogram_3db: 0
+[Parsed_volumedetect_0 @ 0x558fb57d4d00] histogram_4db: 6
+[Parsed_volumedetect_0 @ 0x558fb57d4d00] histogram_5db: 10
+[Parsed_volumedetect_0 @ 0x558fb57d4d00] histogram_6db: 12
+[Parsed_volumedetect_0 @ 0x558fb57d4d00] histogram_7db: 24
+[Parsed_volumedetect_0 @ 0x558fb57d4d00] histogram_8db: 46
+[Parsed_volumedetect_0 @ 0x558fb57d4d00] histogram_9db: 112
+[Parsed_volumedetect_0 @ 0x558fb57d4d00] histogram_10db: 176
+[Parsed_volumedetect_0 @ 0x558fb57d4d00] histogram_11db: 258
+[Parsed_volumedetect_0 @ 0x558fb57d4d00] histogram_12db: 500
+[Parsed_volumedetect_0 @ 0x558fb57d4d00] histogram_13db: 680
+--- astats (general)
+Overall
+Peak level dB: -2.938206
+RMS level dB: -34.326687
+RMS peak dB: -20.073998
+Flat factor: 0.000000
+Peak count: 2.000000
+--- RMS por segundo (dB), para ver picos del crepitar
+-83.881573 -23.217200 -33.209499 -77.745664 -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf 

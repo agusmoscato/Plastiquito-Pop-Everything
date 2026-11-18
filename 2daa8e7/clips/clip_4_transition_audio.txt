@@ -1,0 +1,22 @@
+archivo: clip_4_transition.mp4  12127 KB
+duration=13.050000
+--- volumedetect
+[Parsed_volumedetect_0 @ 0x55fc772a9d00] mean_volume: -35.6 dB
+[Parsed_volumedetect_0 @ 0x55fc772a9d00] max_volume: -7.5 dB
+[Parsed_volumedetect_0 @ 0x55fc772a9d00] histogram_7db: 4
+[Parsed_volumedetect_0 @ 0x55fc772a9d00] histogram_8db: 6
+[Parsed_volumedetect_0 @ 0x55fc772a9d00] histogram_9db: 48
+[Parsed_volumedetect_0 @ 0x55fc772a9d00] histogram_10db: 94
+[Parsed_volumedetect_0 @ 0x55fc772a9d00] histogram_11db: 156
+[Parsed_volumedetect_0 @ 0x55fc772a9d00] histogram_12db: 360
+[Parsed_volumedetect_0 @ 0x55fc772a9d00] histogram_13db: 426
+[Parsed_volumedetect_0 @ 0x55fc772a9d00] histogram_14db: 696
+--- astats (general)
+Overall
+Peak level dB: -7.498877
+RMS level dB: -35.573211
+RMS peak dB: -22.315927
+Flat factor: 0.000000
+Peak count: 2.000000
+--- RMS por segundo (dB), para ver picos del crepitar
+-24.515959 -38.662193 -54.236842 -inf -inf -45.216050 -57.789721 -45.244926 -44.832574 -44.838689 -44.979830 -44.887407 -44.792043 -44.986836 -53.072779 

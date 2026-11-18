@@ -1,0 +1,21 @@
+archivo: clip_5_boot_stomp.mp4  3885 KB
+duration=13.050000
+--- volumedetect
+[Parsed_volumedetect_0 @ 0x55aa4baaad00] mean_volume: -35.1 dB
+[Parsed_volumedetect_0 @ 0x55aa4baaad00] max_volume: -7.5 dB
+[Parsed_volumedetect_0 @ 0x55aa4baaad00] histogram_7db: 6
+[Parsed_volumedetect_0 @ 0x55aa4baaad00] histogram_8db: 8
+[Parsed_volumedetect_0 @ 0x55aa4baaad00] histogram_9db: 60
+[Parsed_volumedetect_0 @ 0x55aa4baaad00] histogram_10db: 110
+[Parsed_volumedetect_0 @ 0x55aa4baaad00] histogram_11db: 166
+[Parsed_volumedetect_0 @ 0x55aa4baaad00] histogram_12db: 436
+[Parsed_volumedetect_0 @ 0x55aa4baaad00] histogram_13db: 526
+--- astats (general)
+Overall
+Peak level dB: -7.497090
+RMS level dB: -35.148251
+RMS peak dB: -22.312599
+Flat factor: 0.000000
+Peak count: 2.000000
+--- RMS por segundo (dB), para ver picos del crepitar
+-84.339029 -29.702849 -24.883997 -46.520757 -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf 
