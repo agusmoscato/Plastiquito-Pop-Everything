@@ -50,6 +50,8 @@ func buy_mode() -> int:
 
 
 func select_tab(tab: String) -> void:
+	if not _tabs.has(tab): # herramienta sin pestaña todavía: la hoja queda como estaba
+		return
 	_current = tab
 	for t: String in _tabs:
 		var b: StampButton = _tabs[t]

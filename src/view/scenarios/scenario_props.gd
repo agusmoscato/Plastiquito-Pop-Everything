@@ -94,7 +94,7 @@ static func _table(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	# A esta escala (1 unidad = 1 cm) la lámina inicial mide 8 cm: una taza real (15 cm con plato) era
 	# más grande que la lámina, así que en la Mesa solo hay cosas chicas a escala real, en las dos
 	# franjas de mesa que quedan libres a los costados de la lámina, cortadas por el borde de la
-	# pantalla o de la hoja de pedidos: las puntas de dos lápices arriba a la derecha y una moneda a la izquierda.
+	# pantalla o de la hoja de pedidos: las puntas de dos lápices arriba a la derecha (una moneda cortada se leía como una mancha).
 	var h: Vector2 = e * 0.5
 	var edge: float = h.x / sheet_fill * 0.81 # medio ancho visible del área de juego a la altura de la lámina (medido en CI)
 	var lamp_light: OmniLight3D = OmniLight3D.new() # la luz cálida de una lámpara fuera de cuadro
@@ -107,8 +107,6 @@ static func _table(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	for i: int in 2: # lápices que entran desde arriba: solo asoman las puntas (~2 cm)
 		var tip_z: float = c.y - h.y * 1.55 - 0.7 * float(i)
 		_glb(root, "prop_pencil", Vector3(right + 0.9 * float(i), GROUND_Y, tip_z - 21.6), 4.0 - 7.0 * float(i))
-	var left: float = minf(c.x - h.x - 1.6, c.x - edge + 0.3) # franja izquierda (la corta el borde de la pantalla)
-	_add(root, _cyl(1.25, 1.25, 0.18, 32), _mat(Color("#C98A3D"), 0.4), Vector3(left - 0.9, GROUND_Y + 0.09, c.y + h.y * 0.55)) # moneda: asoma un tercio
 
 
 # --- Piso: zócalo, pata de silla y ventana con persiana --------------------------------------------------

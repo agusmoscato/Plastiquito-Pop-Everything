@@ -9,17 +9,17 @@ render_mode blend_mix, depth_draw_opaque, cull_back, specular_toon; // brillo de
 
 uniform vec4 tint : source_color = vec4(0.45, 0.75, 1.0, 1.0);
 uniform float rim_power : hint_range(0.5, 8.0) = 2.6;
-uniform float base_alpha : hint_range(0.0, 1.0) = 0.17;
-uniform float rim_alpha : hint_range(0.0, 1.0) = 0.8;
-uniform float popped_alpha : hint_range(0.0, 1.0) = 0.38;
-uniform float spec_strength : hint_range(0.0, 2.0) = 1.0;
+uniform float base_alpha : hint_range(0.0, 1.0) = 0.24; // enteras: domo más presente
+uniform float rim_alpha : hint_range(0.0, 1.0) = 0.9;
+uniform float popped_alpha : hint_range(0.0, 1.0) = 0.2; // reventadas: apagadas, para que la vista vaya a las enteras
+uniform float spec_strength : hint_range(0.0, 2.0) = 1.3;
 uniform float inflate_per_pressure = 0.30;
 uniform float squash_height = 0.55;
 uniform float squash_width = 0.12;
 uniform float popped_height = 0.15;
 uniform float pop_inflate = 0.10;
 uniform float pop_split = 0.53; // fracción de la animación dedicada a inflarse
-uniform float wrinkle_strength = 0.55;
+uniform float wrinkle_strength = 0.3;
 uniform float reveal_z = 1.0e9; // las filas con z mayor todavía no aparecieron
 uniform float reveal_width = 2.0; // ancho de la "curva" del rollo
 uniform float roll_lift = 0.7;
@@ -112,15 +112,18 @@ void fragment() {
 	float tense = smoothstep(1.3, 1.9, v_pressure);
 
 	vec3 col = tint.rgb * (1.0 + 0.35 * tense);
+	// Reventada: gris apagado, sin brillo ni borde luminoso (antes brillaba más que las enteras).
+	vec3 spent = mix(col, vec3(dot(col, vec3(0.3, 0.59, 0.11))), 0.6) * 0.75;
+	col = mix(col, spent, popped);
 	ALBEDO = col;
-	ROUGHNESS = mix(0.12, 0.3, popped);
-	SPECULAR = spec_strength;
+	ROUGHNESS = mix(0.12, 0.6, popped);
+	SPECULAR = spec_strength * (1.0 - 0.8 * popped);
 	METALLIC = 0.0;
-	EMISSION = col * (fres * 0.5 + tense * 0.12);
+	EMISSION = col * (fres * 0.5 * (1.0 - 0.8 * popped) + tense * 0.12);
 	NORMAL = n;
 
 	float a = mix(base_alpha, rim_alpha, fres);
-	a = mix(a, max(a, popped_alpha), popped);
+	a = mix(a, popped_alpha, popped);
 	a += tense * 0.12;
 	ALPHA = clamp(a, 0.0, 1.0);
 }

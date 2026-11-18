@@ -258,6 +258,7 @@ func _select_tool(id: String) -> void:
 	if sim.select_tool(id):
 		_refresh_tool_view()
 		world.tool_model = sim.selected_tool()
+		hud.shop.select_tab(id) # la hoja de pedidos muestra las mejoras de la herramienta en la mano
 
 
 ## La herramienta del mundo refleja las mejoras: tamaño, velocidad y color por hito.

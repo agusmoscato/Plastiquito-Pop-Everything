@@ -10,6 +10,8 @@ const T: Dictionary = {
 	"work_order": {"es": "ORDEN DE TRABAJO", "en": "WORK ORDER"},
 	"next_order": {"es": "SIGUIENTE PEDIDO", "en": "NEXT ORDER"},
 	"ready": {"es": "LISTO PARA SELLAR", "en": "READY TO STAMP"},
+	"next_all_ready": {"es": "Todo listo: elegí en la hoja", "en": "All set: pick on the sheet"},
+	"next_all_done": {"es": "Hoja completa", "en": "Sheet complete"},
 	"rhythm": {"es": "RITMO", "en": "RHYTHM"},
 	"recycle": {"es": "RECICLAR", "en": "RECYCLE"},
 	"recycle_now": {"es": "RECICLAR AHORA", "en": "RECYCLE NOW"},

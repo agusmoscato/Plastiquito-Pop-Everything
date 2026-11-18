@@ -87,7 +87,8 @@ func _make_heat_aura(half: float) -> MeshInstance3D:
 	pm.size = Vector2(half * 2.0 * 1.6, half * 0.9 * 1.6)
 	var m: StandardMaterial3D = StandardMaterial3D.new()
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	m.albedo_color = Color(1.0, 0.55, 0.2, 0.22)
+	m.albedo_color = Color(1.0, 0.55, 0.2, 0.35)
+	m.albedo_texture = FxPool.soft_dot() # resplandor de calor con bordes suaves (el rectángulo parecía de depuración)
 	m.emission_enabled = true
 	m.emission = Color(1.0, 0.4, 0.1)
 	m.emission_energy_multiplier = 0.8

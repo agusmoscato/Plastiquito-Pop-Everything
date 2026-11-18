@@ -52,7 +52,7 @@ func _draw() -> void:
 	var lang: String = Settings.language
 	var head: String = Tx.t("next_order")
 	UiKit.draw_text(self, Vector2(24.0, 22.0), head, UiKit.font_mono_bold(), 10, UiKit.INK_SOFT)
-	var label: String = sim.upgrades.name_of(upgrade_id, lang) if upgrade_id != "" else "-"
+	var label: String = sim.upgrades.name_of(upgrade_id, lang) if upgrade_id != "" else Tx.t("next_all_ready" if has_ready else "next_all_done") # nunca un "-" suelto
 	UiKit.draw_text(self, Vector2(24.0, 40.0), label.to_upper(), UiKit.font_title(), 14, UiKit.INK)
 	UiKit.draw_ink_bar(self, Rect2(Vector2(size.x - 232.0, 22.0), Vector2(190.0, 14.0)), ratio, UiKit.STAMP_RED if has_ready else UiKit.INK)
 	if has_ready:
