@@ -91,21 +91,26 @@ static func _cyl(top: float, bottom: float, height: float, segments: int = 24) -
 # --- Mesa: lámpara cálida, taza y lápices (todo fuera de la lámina) -------------------------------------
 
 static func _table(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
-	# Con la cámara de trabajo la lámina llena `sheet_fill` del área de juego (camera_sheet_fill): la utilería,
-	# a escala real, solo ASOMA por los bordes (taza cortada a la izquierda, puntas de lápices abajo).
+	# A esta escala (1 unidad = 1 cm) la lámina inicial mide 8 cm: una taza real (15 cm con plato) era
+	# más grande que la lámina, así que en la Mesa solo hay cosas chicas a escala real, en las dos
+	# franjas de mesa que quedan libres a los costados de la lámina, cortadas por el borde de la
+	# pantalla o de la hoja de pedidos: dos lápices a la derecha, una moneda y una goma a la izquierda.
 	var h: Vector2 = e * 0.5
-	var play_half: float = e.x / sheet_fill * 0.5 # medio ancho del área de juego, en el mundo
-	var bottom: float = c.y + maxf(h.y, e.x * 0.42) / sheet_fill # borde de abajo de la pantalla, aproximado
-	var lamp_light: OmniLight3D = OmniLight3D.new() # la luz cálida de la lámpara queda; la lámpara no se ve
+	var edge: float = h.x / sheet_fill * 0.81 # medio ancho visible del área de juego a la altura de la lámina (medido en CI)
+	var lamp_light: OmniLight3D = OmniLight3D.new() # la luz cálida de una lámpara fuera de cuadro
 	lamp_light.light_color = Color("#FFA650")
 	lamp_light.light_energy = 2.2
 	lamp_light.omni_range = 90.0
 	lamp_light.position = Vector3(c.x - h.x - 9.0, 12.0, c.y - h.y - 4.0)
 	root.add_child(lamp_light)
-	_glb(root, "prop_cup", Vector3(c.x - maxf(play_half + 2.0, h.x + 10.5), GROUND_Y, c.y - h.y * 0.35), 20.0) # cortada por el borde izquierdo, con el asa hacia afuera (test de props)
-	for i: int in 3: # lápices que entran desde abajo: se ven solo las puntas
-		var tip_z: float = bottom - 1.2 + 0.6 * float(i)
-		_glb(root, "prop_pencil", Vector3(c.x - h.x * 0.6 + 1.6 * float(i), GROUND_Y, tip_z + 21.6), 180.0 + 8.0 * float(i) - 8.0) # la punta mira a la lámina
+	var right: float = maxf(c.x + h.x + 1.3, c.x + edge - 0.2) # franja derecha (la corta la hoja de pedidos)
+	for i: int in 2: # lápices acostados junto a la lámina, con la punta hacia la cámara
+		var tip_z: float = c.y + h.y * (0.15 + 0.35 * float(i))
+		_glb(root, "prop_pencil", Vector3(right + 0.9 * float(i), GROUND_Y, tip_z - 21.6), 4.0 - 7.0 * float(i))
+	var left: float = minf(c.x - h.x - 1.6, c.x - edge + 0.3) # franja izquierda (la corta el borde de la pantalla)
+	_add(root, _cyl(1.25, 1.25, 0.18, 32), _mat(Color("#C98A3D"), 0.4), Vector3(left, GROUND_Y + 0.09, c.y + h.y * 0.55)) # moneda
+	var eraser: MeshInstance3D = _add(root, _box(Vector3(1.6, 0.7, 3.4)), _mat(Color("#E98C8C"), 0.7), Vector3(left - 0.3, GROUND_Y + 0.35, c.y - h.y * 0.25), Vector3(0.0, 18.0, 0.0)) # goma
+	_add(eraser, _box(Vector3(1.64, 0.74, 1.3)), _mat(Color("#3E6FB0"), 0.7), Vector3(0.0, 0.0, 0.6)) # su faja
 
 
 # --- Piso: zócalo, pata de silla y ventana con persiana --------------------------------------------------

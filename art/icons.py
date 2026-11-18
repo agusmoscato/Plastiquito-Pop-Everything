@@ -473,6 +473,109 @@ def icon_up_auto():
     shoot("up_auto")
 
 
+def icon_up_value():
+    new_scene()
+    gold = lib.material("coin", lib.hex_color("#E0A93B"), rough=0.4)
+    rim = lib.material("coin_rim", lib.hex_color("#B9802A"), rough=0.5)
+    parts = []
+    for k in range(6):  # pila de monedas finas, alternadas
+        prof = [(0.0, 0.0024), (0.024, 0.0024), (0.025, 0.0016), (0.025, -0.0016), (0.024, -0.0024), (0.0, -0.0024)]
+        c = lib.revolve_profile("coin", prof, 40)
+        c.location = (0.003 * (k % 2) - 0.0015, 0.002 * k, 0.0024 + k * 0.005)
+        c.data.materials.append(gold if k % 2 == 0 else rim)
+        parts.append(c)
+    bpy.context.view_layer.update()
+    frame(mesh_points(parts), (0.3, -1.0, 0.8), fill=0.86)
+    shoot("up_value")
+
+
+def icon_up_special():
+    new_scene()
+    gold = lib.material("golden", lib.hex_color("#F2B632"), rough=0.3)
+    b = bubble(0.03, Vector(), mat=gold)
+    patch = [bubble(0.018, Vector((dx, dy, 0.0))) for dx, dy in ((-0.045, 0.02), (0.046, 0.016), (0.0, 0.05))]
+    sparks = []
+    for k in range(6):
+        a = math.radians(k * 60.0 + 15.0)
+        p0 = Vector((math.cos(a) * 0.036, math.sin(a) * 0.036, 0.03))
+        p1 = Vector((math.cos(a) * 0.05, math.sin(a) * 0.05, 0.036))
+        sp = lib.tube_along("spark", [tuple(p0), tuple(p1)], [0.003, 0.001], sides=6)
+        sp.data.materials.append(lib.material("spark", lib.hex_color("#FFF3B0"), rough=0.4))
+        sparks.append(sp)
+    frame(mesh_points([b] + patch + sparks), (0.0, -0.9, 1.0), fill=0.9)
+    shoot("up_special")
+
+
+def icon_up_tense():
+    new_scene()
+    body = lib.material("gauge", lib.hex_color("#D9D4C7"), rough=0.5)
+    face = lib.material("face", lib.hex_color("#FBF7EC"), rough=0.6)
+    red = lib.material("needle", lib.hex_color("#D8432E"), rough=0.5)
+    ink = lib.material("ink", INK, rough=0.8)
+    ring = lib.revolve_profile("gauge", [(0.0, 0.012), (0.04, 0.012), (0.044, 0.008), (0.044, 0.0), (0.0, 0.0)], 48)
+    ring.data.materials.append(body)
+    disc = lib.revolve_profile("face", [(0.0, 0.0125), (0.037, 0.0125), (0.037, 0.011), (0.0, 0.011)], 48)
+    disc.data.materials.append(face)
+    parts = [ring, disc]
+    for k in range(7):  # marcas de 210° a -30°
+        a = math.radians(210.0 - k * 40.0)
+        t = lib.box("tick", (0.0025, 0.009, 0.001), (math.cos(a) * 0.029, math.sin(a) * 0.029, 0.0132), (0.0, 0.0, a - math.pi / 2))
+        t.data.materials.append(red if k >= 5 else ink)
+        parts.append(t)
+    a = math.radians(-5.0)  # aguja casi al máximo
+    needle = lib.tube_along("needle", [(0.0, 0.0, 0.0138), (math.cos(a) * 0.03, math.sin(a) * 0.03, 0.0138)], [0.0028, 0.0008], sides=6)
+    needle.data.materials.append(red)
+    hub = lib.sphere("hub", 0.004, (0.0, 0.0, 0.0138), 12, 6)
+    hub.data.materials.append(ink)
+    parts += [needle, hub]
+    frame(mesh_points(parts), (0.0, -0.45, 1.0), fill=0.9)
+    shoot("up_tense")
+
+
+def icon_up_chain():
+    new_scene()
+    parts = []
+    for k in range(4):  # una fila que revienta en cadena: las de la izquierda ya aplastadas
+        sq = 0.3 if k < 2 else 1.0
+        parts.append(bubble(0.014, Vector((-0.045 + k * 0.03, 0.0, 0.0)), squash=sq))
+    zap = lib.material("spark", YELLOW, rough=0.4)
+    for k in range(3):
+        x = -0.03 + k * 0.03
+        pts = [(x - 0.008, 0.0, 0.022), (x - 0.002, 0.0, 0.03), (x + 0.002, 0.0, 0.022), (x + 0.008, 0.0, 0.03)]
+        z = lib.tube_along("zap", pts, [0.0018, 0.0022, 0.0022, 0.0016], sides=6)
+        z.data.materials.append(zap)
+        parts.append(z)
+    frame(mesh_points(parts), (0.0, -1.0, 0.6), fill=0.94)
+    shoot("up_chain")
+
+
+def icon_up_memory():
+    new_scene()
+    paper = lib.material("paper", lib.hex_color("#F4EEDC"), rough=0.7)
+    cover = lib.material("cover", lib.hex_color("#C24D3A"), rough=0.6)
+    ink = lib.material("ink", INK, rough=0.8)
+    book = lib.box("cover", (0.06, 0.08, 0.008), (0.0, 0.0, 0.004))
+    book.data.materials.append(cover)
+    page = lib.box("page", (0.054, 0.074, 0.003), (0.002, 0.0, 0.0095))
+    page.data.materials.append(paper)
+    parts = [book, page]
+    for k in range(5):
+        ln = lib.box("line", (0.038, 0.0016, 0.0008), (0.006, 0.026 - k * 0.012, 0.0112))
+        ln.data.materials.append(ink)
+        parts.append(ln)
+    for k in range(5):  # espiral
+        sp = lib.revolve_profile("ring", [(0.0035, 0.0), (0.0045, 0.0015), (0.0035, 0.003), (0.0025, 0.0015)], 16)
+        sp.location = (-0.03, 0.03 - k * 0.015, 0.008)
+        sp.rotation_euler = (0.0, math.radians(90.0), 0.0)
+        sp.data.materials.append(ink)
+        parts.append(sp)
+    piv = group(parts, "book")
+    piv.rotation_euler = (0.0, 0.0, math.radians(-12.0))
+    bpy.context.view_layer.update()
+    frame(mesh_points(parts), (0.0, -0.5, 1.0), fill=0.9)
+    shoot("up_memory")
+
+
 ICONS = {
     "finger": icon_finger,
     "palm": icon_palm,
@@ -486,6 +589,11 @@ ICONS = {
     "up_force": icon_up_force,
     "up_speed": icon_up_speed,
     "up_auto": icon_up_auto,
+    "up_value": icon_up_value,
+    "up_special": icon_up_special,
+    "up_tense": icon_up_tense,
+    "up_chain": icon_up_chain,
+    "up_memory": icon_up_memory,
 }
 
 

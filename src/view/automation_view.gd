@@ -15,6 +15,8 @@ var _dip: PackedFloat32Array = PackedFloat32Array()
 var _last_target: PackedInt32Array = PackedInt32Array()
 var _roller: Node3D
 var _roller_key: String = ""
+var _roller_dir: float = 1.0
+const ROLLER_TILT_DEG: float = 62.0
 var _base_h: float = 0.0 ## alto en pantalla de una manito a escala 1 (ToolView.screen_height_of)
 var _scale: float = 1.0
 
@@ -122,4 +124,11 @@ func _sync_roller() -> void:
 		add_child(_roller)
 		_roller_key = key
 	_roller.visible = true
-	_roller.position = Vector3(sim.roller.pos.x, 0.35, sim.roller.pos.y)
+	var new_pos: Vector3 = Vector3(sim.roller.pos.x, 0.35, sim.roller.pos.y)
+	var moved: float = new_pos.x - _roller.position.x
+	if absf(moved) > 0.0001:
+		_roller_dir = signf(moved)
+	_roller.position = new_pos
+	var tilt: Node3D = _roller.find_child("Tilt", true, false) as Node3D
+	if tilt != null: # el mango queda acostado hacia atrás del avance (y se da vuelta al cambiar de sentido)
+		tilt.rotation.x = lerp_angle(tilt.rotation.x, deg_to_rad(ROLLER_TILT_DEG) * _roller_dir, 0.15)

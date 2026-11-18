@@ -93,7 +93,8 @@ func test_chain_stamp_is_small_and_never_over_a_panel() -> void:
 func test_every_tool_and_upgrade_category_has_a_prerendered_icon() -> void:
 	for id: String in ["finger", "palm", "rolling_pin", "iron", "boot", "hands", "auto_roller", "bubble"]:
 		assert_true(ResourceLoader.exists(ToolIcon.DIR + ToolIcon.icon_name(id, "") + ".png"), id)
-	for v: String in ["size", "force", "speed", "count", "smart", "automation", "auto_reload"]:
+	for v: String in ["size", "force", "speed", "count", "smart", "automation", "auto_reload", "value", "global_bonus",
+			"special_chance", "golden_chance", "tense", "chain_k", "memory", "sheet_size", "sheet_growth", "pin_start"]:
 		assert_true(ResourceLoader.exists(ToolIcon.DIR + ToolIcon.icon_name("finger", v) + ".png"), v)
 	assert_eq(ToolIcon.icon_name("iron", "special"), "iron", "las demás mejoras usan el ícono de su herramienta")
 
@@ -102,9 +103,18 @@ func test_flyers_cap_and_panels() -> void:
 	var f: FlyingNumbers = FlyingNumbers.new()
 	f.blocked = [Rect2(Vector2(0, 0), Vector2(200, 100))]
 	for i: int in 30:
-		f.spawn(Vector2(400 + i * 10, 400), 1.0)
+		f.spawn(Vector2(400 + i * 100, 400), 1.0)
 	assert_eq(f.pending(), FlyingNumbers.MAX_ITEMS, "nunca más de 12 en pantalla")
 	assert_false(Rect2(Vector2(0, 0), Vector2(200, 100)).has_point(f.outside_panels(Vector2(50, 50))), "no nace dentro de un panel")
+	f.free()
+
+
+func test_flyers_merge_instead_of_stacking() -> void:
+	var f: FlyingNumbers = FlyingNumbers.new()
+	f.spawn(Vector2(500, 400), 3.0)
+	f.spawn(Vector2(520, 410), 4.0)
+	f.spawn(Vector2(900, 400), 1.0)
+	assert_eq(f.pending(), 2, "dos reventones juntos dan un solo número")
 	f.free()
 
 

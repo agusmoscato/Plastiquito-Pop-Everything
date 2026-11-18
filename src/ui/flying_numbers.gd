@@ -9,6 +9,9 @@ signal arrived(value: float)
 
 const MAX_ITEMS: int = 12
 const OUTLINE: int = 5
+const MERGE_PX: float = 80.0 ## un "+N" que sale a menos de esto de otro recién nacido se suma a ese
+const MERGE_S: float = 0.3
+const POP_IN_S: float = 0.12 ## al nacer el número crece de golpe y se asienta
 
 var target: Vector2 = Vector2(150.0, 80.0)
 var blocked: Array[Rect2] = [] ## paneles del HUD: ahí no se dibuja ningún "+N"
@@ -23,6 +26,13 @@ func setup() -> void:
 
 ## Agrega un "+valor" que sale de `from` (pantalla). Con el tope lleno se suma al más cercano.
 func spawn(from: Vector2, value: float) -> void:
+	var near: int = merge_target(_items, from, MERGE_PX, MERGE_S)
+	if near >= 0: # no se apilan dos números en el mismo lugar: el reciente crece
+		var it: Dictionary = _items[near]
+		var prev_v: float = it["value"]
+		it["value"] = prev_v + value
+		it["bump"] = 1.0
+		return
 	if _items.size() >= MAX_ITEMS:
 		var nearest: Dictionary = _items[0]
 		var best: float = INF
@@ -38,7 +48,24 @@ func spawn(from: Vector2, value: float) -> void:
 	var dur: float = randf_range(0.55, 0.8)
 	var side: float = randf_range(-90.0, 90.0)
 	var start: Vector2 = outside_panels(from)
-	_items.append({"from": start, "value": value, "t": 0.0, "dur": dur, "ctrl": start.lerp(target, 0.35) + Vector2(side, -randf_range(60.0, 140.0))})
+	_items.append({"from": start, "value": value, "t": 0.0, "dur": dur, "bump": 0.0, "ctrl": start.lerp(target, 0.35) + Vector2(side, -randf_range(60.0, 140.0))})
+
+
+## Índice del número recién nacido (menos de `max_age` s) más cercano a `from` dentro de `radius`, o -1.
+static func merge_target(items: Array[Dictionary], from: Vector2, radius: float, max_age: float) -> int:
+	var best: int = -1
+	var best_d: float = radius * radius
+	for i: int in items.size():
+		var it: Dictionary = items[i]
+		var age: float = it["t"]
+		if age > max_age:
+			continue
+		var it_from: Vector2 = it["from"]
+		var d: float = it_from.distance_squared_to(from)
+		if d <= best_d:
+			best_d = d
+			best = i
+	return best
 
 
 func pending() -> int:
@@ -77,6 +104,8 @@ func _process(delta: float) -> void:
 			arrived.emit(v)
 			continue
 		it["t"] = t
+		var bump: float = it.get("bump", 0.0)
+		it["bump"] = maxf(0.0, bump - delta * 6.0)
 		keep.append(it)
 	_items = keep
 	queue_redraw()
@@ -95,7 +124,10 @@ func _draw() -> void:
 		if _inside_panel(p):
 			continue
 		var v: float = it["value"]
-		var fs: int = clampi(int(14.0 + log(maxf(v, 1.0)) / log(10.0) * 3.0), 14, 32)
+		var pop_in: float = clampf(1.0 - t / POP_IN_S, 0.0, 1.0)
+		var bump: float = it.get("bump", 0.0)
+		var grow: float = 1.0 + 0.45 * pop_in * pop_in + 0.25 * bump
+		var fs: int = clampi(int((14.0 + log(maxf(v, 1.0)) / log(10.0) * 3.0) * grow), 14, 44)
 		var text: String = "+" + NumberFormat.pops(v, Settings.language)
 		var alpha: float = clampf((1.0 - k) * 2.2, 0.0, 1.0)
 		draw_string_outline(font, p, text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, fs, OUTLINE, Color(UiKit.PAPER.r, UiKit.PAPER.g, UiKit.PAPER.b, alpha))

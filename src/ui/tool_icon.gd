@@ -15,6 +15,23 @@ const VARIANT_ICON: Dictionary[String, String] = {
 	"smart": "up_auto",
 	"automation": "up_auto",
 	"auto_reload": "up_auto",
+	"value": "up_value",
+	"global_bonus": "up_value",
+	"special_chance": "up_special",
+	"golden_chance": "up_special",
+	"tense": "up_tense",
+	"chain_k": "up_chain",
+	"memory": "up_memory",
+	"sheet_size": "up_size",
+	"sheet_growth": "up_size",
+}
+## "Arrancás con ..." (finger_start, pin_start...): el ícono de esa herramienta.
+const START_ICON: Dictionary[String, String] = {
+	"finger_start": "finger",
+	"palm_start": "palm",
+	"pin_start": "rolling_pin",
+	"iron_start": "iron",
+	"boot_start": "boot",
 }
 
 var kind: String = "finger"
@@ -46,6 +63,8 @@ func set_tier(p_tier: int) -> void:
 static func icon_name(p_kind: String, p_variant: String) -> String:
 	if VARIANT_ICON.has(p_variant):
 		return VARIANT_ICON[p_variant]
+	if START_ICON.has(p_variant):
+		return START_ICON[p_variant]
 	return p_kind
 
 

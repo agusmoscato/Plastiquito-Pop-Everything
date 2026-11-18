@@ -344,8 +344,9 @@ func _build_plane() -> void:
 	var m: StandardMaterial3D = StandardMaterial3D.new()
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	m.albedo_color = Color(0.7, 0.9, 1.0, 0.1)
-	m.roughness = 0.08
-	m.metallic_specular = 1.0
+	m.roughness = 0.6 # mate: casi espejo reflejaba franjas claras que cruzaban todas las burbujas
+	m.metallic_specular = 0.2
+	ToyStyle.toonify(m)
 	m.render_priority = -1
 	pm.material = m
 	_plane = MeshInstance3D.new()
