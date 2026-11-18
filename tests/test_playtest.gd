@@ -4,7 +4,7 @@ extends GutTest
 func test_version_read_from_project_godot() -> void:
 	var text: String = FileAccess.get_file_as_string("res://project.godot")
 	var v: String = AppInfo.parse_version(text)
-	assert_eq(v, "0.2.0")
+	assert_eq(v, "0.3.0")
 	assert_eq(AppInfo.version(), v, "ProjectSettings y el archivo coinciden")
 
 
