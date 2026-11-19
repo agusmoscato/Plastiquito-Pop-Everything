@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.6.1 — Revisión general (2026-11-19, sin mergear)
+
+Revisión del código de la 0.5.0 y la 0.6.0 (un revisor aparte, con scripts sin pantalla) y arreglos:
+- **Guardado:** al cargar se perdía el doble film y las vetas eran de otra lámina (la flecha de la
+  presentación señalaba burbujas comunes). La racha y el encargo no se guardaban: cerrar el juego
+  costaba hasta +20 % de Pops. Ahora se guarda todo (save v5; los v4 se migran).
+- **Encargos:** uno fallado al terminar la lámina se podía cobrar igual con el último 10 %; el de
+  ritmo se cumplía solo al empezar la lámina (traía el ritmo de la anterior); "todas las especiales"
+  podía ser imposible si la plancha derretía alguna (ahora pide el 75 % y baja si se pierde una).
+  Reciclar reinicia la racha. En láminas chicas las vetas son a lo sumo el 25 %.
+- **Meta de fase:** la orden de trabajo muestra "Abrir: el Galpón · 12 / 16 Pellets" y el botón de
+  reciclar late y dice "¡ABRE EL GALPÓN!" cuando ya alcanza (antes había que adivinar cuándo reciclar).
+  Lámina más grande cuesta 1 / 16 / 100 Pellets (antes 18 y 110: la partida del Piso se estiraba 50 min).
+- **Interfaz:** ningún texto se sale de su botón o tarjeta (se achica la letra); menú de pausa en
+  inglés también; el Burbujario explica las vetas y el doble film.
+
+Simulador completo (3 semillas): Piso 24 min (activo) y 33 (casual), Galpón 64-65 y 75-77,
+Estacionamiento 107 y 119-120. El perfil idle aprueba en las tres (26-31 %). Siguen: medianas entre
+compras 27-29 s (objetivo 30) y alguna espera de 3 a 4 min justo antes de abrir una fase.
+
+
 ## 0.6.0 — Escenarios argentinos y niveles con diseño (2026-11-19, sin mergear)
 
 Pedido del dueño: cosas argentinas modeladas en Blender en cada escenario, niveles y dificultad que
