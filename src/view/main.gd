@@ -46,6 +46,11 @@ func _ready() -> void:
 		push_error("main: data inválida: %s" % "; ".join(db.errors))
 		return
 	sim = GameSim.new(db, int(Time.get_ticks_usec() % 100000))
+	if DisplayServer.get_name() != "headless":
+		BubbleCursor.apply()
+	if _has_demo_arg(): # las capturas y el bot de humo juegan con "Mantener apretado" ya comprado
+		sim.state.levels["global_hold"] = 1
+		sim.refresh_stats()
 	if not _has_demo_arg():
 		SaveSystem.sim = sim # las capturas de prueba no tocan el guardado
 		SaveSystem.interval = Cfg.num(db.economy, "autosave_seconds")
@@ -69,6 +74,7 @@ func _ready() -> void:
 	hud.purchased.connect(_on_purchased)
 	hud.recycle_confirmed.connect(_start_recycle)
 	hud.chain_slammed.connect(_on_chain_slammed)
+	hud.reload_requested.connect(request_reload)
 	world.camera_rig.zoomed.connect(Playtest.log.zoomed)
 	automation = AutomationView.new()
 	automation.name = "Automation"
@@ -144,6 +150,15 @@ func _unhandled_input(event: InputEvent) -> void:
 		var key: InputEventKey = event
 		if key.pressed and not key.echo:
 			_on_key(key.keycode)
+	elif event is InputEventMouseButton:
+		var mb: InputEventMouseButton = event
+		if mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT and _over_roll(world.camera_rig.screen_to_plane(mb.position)):
+			request_reload()
+
+
+## true si hay que tirar una lámina nueva y `p` (plano XZ) cae sobre el rollo gigante.
+func _over_roll(p: Vector2) -> bool:
+	return sim.awaiting_reload and p.is_finite() and ScenarioProps.roll_rect.has_point(p)
 
 
 ## F9: oculta o muestra TODA la interfaz (HUD, versión y overlay), para grabar clips.
@@ -180,6 +195,16 @@ func _on_key(code: int) -> void:
 			hud.open_recycle_panel()
 	elif code == KEY_B:
 		hud.bubble_log.visible = not hud.bubble_log.visible
+	elif code == KEY_R or code == KEY_SPACE:
+		request_reload()
+
+
+## Tira una lámina nueva del rollo (botón, tecla R / espacio o clic en el rollo gigante).
+func request_reload() -> void:
+	if _recycling or not sim.request_reload():
+		return
+	PopAudio.play_crinkle()
+	world.scenario.tug_roll()
 
 
 func _process(delta: float) -> void:
@@ -237,6 +262,8 @@ func _update_cursor() -> void:
 		_cursor = p
 	var over_sheet: bool = _cursor_valid and world.grid.world_to_cell(_cursor) >= 0
 	var over_ui: bool = get_viewport().gui_get_hovered_control() != null or hud.is_modal_open()
+	if _over_roll(_cursor): # lámina terminada: sobre el rollo se ve el puntero para tirar de él
+		over_ui = true
 	if over_sheet and not over_ui:
 		Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
 	else:
@@ -313,6 +340,7 @@ func _after_step(_holding: bool, delta: float) -> void:
 		max_p = maxf(max_p, p)
 	PopAudio.report_frame(n, max_p, delta)
 	_update_night(delta)
+	world.scenario.roll_glow = sim.awaiting_reload
 	if sim.ev_squish:
 		PopAudio.play_squish()
 	_burn_cooldown = maxf(0.0, _burn_cooldown - delta)

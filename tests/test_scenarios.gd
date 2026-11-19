@@ -134,3 +134,34 @@ func test_specials_grow_when_bubbles_are_small() -> void:
 	var k: float = SpecialsView.boost_for(far)
 	assert_gt(k, 1.5, "de lejos crecen")
 	assert_gte(CameraRig.bubble_px_at(far) * k, SpecialsView.MIN_SPECIAL_PX - 0.5, "miden al menos el mínimo en pantalla")
+
+
+func test_every_phase_has_the_wrap_roll_behind_the_sheet() -> void:
+	var sizes: Dictionary = {1: Vector2(8, 7), 2: Vector2(20, 17), 3: Vector2(80, 70), 4: Vector2(150, 130)}
+	for phase: int in sizes:
+		var e: Vector2 = sizes[phase]
+		var c: Vector2 = e * 0.5
+		var props: Node3D = ScenarioProps.build(phase, c, e)
+		var roll: Node3D = props.get_node_or_null(ScenarioProps.ROLL_NAME) as Node3D
+		assert_not_null(roll, "fase %d: el rollo gigante" % phase)
+		if roll != null:
+			assert_lt(roll.position.z, c.y - e.y * 0.5, "fase %d: detrás de la lámina" % phase)
+		assert_true(ScenarioProps.roll_rect.has_point(Vector2(c.x, roll.position.z)), "un clic sobre el rollo lo agarra")
+		assert_false(ScenarioProps.roll_rect.has_point(c), "un clic en la lámina no")
+		props.free()
+
+
+func test_camera_keeps_the_players_zoom_between_sheets() -> void:
+	var rig: CameraRig = CameraRig.new()
+	rig.work_mode = true
+	rig.fit_to(Vector2(4, 4), Vector2(8, 7))
+	var work: float = rig.zoom_distance()
+	rig.zoom_by(1.0 / 1.5)
+	var mine: float = rig._target_zoom
+	assert_lt(mine, work)
+	assert_true(rig.is_following(), "con zoom, la cámara acompaña a la herramienta")
+	rig.fit_to(Vector2(4, 4), Vector2(8, 7)) # lámina nueva, mismo tamaño
+	assert_almost_eq(rig._target_zoom, mine, 0.001, "guarda el zoom al recargar")
+	rig.fit_to(Vector2(10, 9), Vector2(20, 17)) # lámina más grande
+	assert_ne(rig._target_zoom, mine, "otra lámina: vuelve al encuadre de trabajo")
+	rig.free()

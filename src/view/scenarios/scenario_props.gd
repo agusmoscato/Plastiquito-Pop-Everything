@@ -7,6 +7,8 @@ extends RefCounted
 const GROUND_Y: float = -0.05
 const TALL_PROP: float = 6.0 ## cm: más alto que esto, sin sombra
 static var sheet_fill: float = 0.58 ## = camera_sheet_fill (ToyWorld lo actualiza): cuánto del área de juego llena la lámina
+const ROLL_NAME: String = "WrapRoll"
+static var roll_rect: Rect2 = Rect2() ## zona del plano XZ donde un clic agarra el rollo (incluye lo que tapa a lo alto)
 
 
 ## Escala de unidad para los objetos: 1 u = 1/20 del lado de la lámina (mínimo 1).
@@ -18,6 +20,7 @@ static func build(phase: int, c: Vector2, e: Vector2) -> Node3D:
 	var root: Node3D = Node3D.new()
 	root.name = "Props%d" % phase
 	var u: float = unit(e)
+	_roll(root, c, e)
 	if phase == 2:
 		_floor(root, c, e, u)
 	elif phase == 3:
@@ -105,6 +108,60 @@ static func _cyl(top: float, bottom: float, height: float, segments: int = 24) -
 	return m
 
 
+# --- El rollo gigante de papel de burbujas, detrás de la lámina (en todas las fases) ----------------------
+
+## Radio del rollo: crece con la lámina (2 cm en la Mesa chica, 24 cm en el Estacionamiento).
+static func roll_radius(e: Vector2) -> float:
+	return clampf(e.y * 0.16, 2.0, 24.0)
+
+
+## Lo que ocupa el rollo detrás de la lámina (los demás objetos de atrás se corren esto).
+static func roll_depth(e: Vector2) -> float:
+	var r: float = roll_radius(e)
+	return _roll_gap(r) + 2.0 * r
+
+
+static func _roll_gap(r: float) -> float:
+	return maxf(0.8, r * 0.15)
+
+
+## El rollo del que sale la lámina: muchas vueltas de film con burbujas, el tubo de cartón asomando
+## por los costados y la lengua de film que baja hasta el borde de la lámina. Sin recarga automática,
+## el jugador tira de acá para sacar una lámina nueva.
+static func _roll(root: Node3D, c: Vector2, e: Vector2) -> void:
+	var r: float = roll_radius(e)
+	var length: float = e.x * 1.02
+	var z: float = c.y - e.y * 0.5 - _roll_gap(r) - r
+	var holder: Node3D = Node3D.new()
+	holder.name = ROLL_NAME
+	holder.position = Vector3(c.x, GROUND_Y + r, z)
+	root.add_child(holder)
+	var spinner: Node3D = Node3D.new() # gira sobre su eje (X) al tirar
+	spinner.name = "Spin"
+	holder.add_child(spinner)
+	var body: MeshInstance3D = _add(spinner, _cyl(r, r, length, 48), _roll_material(r, length), Vector3.ZERO, Vector3(0.0, 0.0, 90.0))
+	body.name = "Body"
+	body.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	var core: MeshInstance3D = _add(spinner, _cyl(r * 0.36, r * 0.36, length + r * 0.3, 24), _mat(Color("#B88A55"), 0.9), Vector3.ZERO, Vector3(0.0, 0.0, 90.0))
+	core.name = "Core"
+	_add(spinner, _cyl(r * 0.26, r * 0.26, length + r * 0.32, 20), _mat(Color("#3A2A1C"), 0.9), Vector3.ZERO, Vector3(0.0, 0.0, 90.0))
+	var tongue_len: float = _roll_gap(r) + r * 0.2
+	var film: StandardMaterial3D = _mat(Color(0.74, 0.88, 0.97, 0.45), 0.3)
+	film.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	var tongue: MeshInstance3D = _add(root, _box(Vector3(length * 0.98, 0.04, tongue_len)), film, Vector3(c.x, GROUND_Y + 0.03, c.y - e.y * 0.5 - tongue_len * 0.5 - 0.05))
+	tongue.name = "Tongue"
+	roll_rect = Rect2(Vector2(c.x - length * 0.5, z - r * 3.6), Vector2(length, r * 4.6))
+
+
+static func _roll_material(r: float, length: float) -> ShaderMaterial:
+	var m: ShaderMaterial = ShaderMaterial.new()
+	m.shader = load("res://shaders/wrap_roll.gdshader") as Shader
+	m.set_shader_parameter("around", roundf(TAU * r / 1.0))
+	m.set_shader_parameter("along", roundf(length / 0.87))
+	m.render_priority = 1
+	return m
+
+
 # --- Mesa: lámpara cálida, taza y lápices (todo fuera de la lámina) -------------------------------------
 
 static func _table(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
@@ -130,7 +187,7 @@ static func _table(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 
 static func _floor(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	# Todo en centímetros reales: pared de 120 cm, zócalo de 8 cm, ventana de 60 x 70 cm.
-	var wall_z: float = c.y - e.y * 0.5 - 18.0
+	var wall_z: float = c.y - e.y * 0.5 - 18.0 - roll_depth(e)
 	_add(root, _box(Vector3(e.x * 2.4, 120.0, 2.0)), _mat(Color("#CFC8B5"), 0.9), Vector3(c.x, 60.0, wall_z - 1.0))
 	_add(root, _box(Vector3(e.x * 2.4, 8.0, 1.5)), _mat(Color("#F1EEE6"), 0.5), Vector3(c.x, 4.0, wall_z + 0.8))
 	# Ventana con persiana: un cuadro luminoso cruzado por tablillas oscuras.
@@ -148,7 +205,7 @@ static func _floor(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 static func _warehouse(root: Node3D, c: Vector2, e: Vector2, u: float) -> void:
 	for sx: int in 2:
 		var bx: float = c.x + (float(sx) - 0.5) * e.x * 0.8
-		_glb(root, "prop_shelf", Vector3(bx, 0.0, c.y - e.y * 0.5 - 20.0))
+		_glb(root, "prop_shelf", Vector3(bx, 0.0, c.y - e.y * 0.5 - 20.0 - roll_depth(e)))
 	# Líneas amarillas de seguridad pintadas a los costados.
 	var yellow: StandardMaterial3D = _mat(Color("#E8C21C"), 0.7)
 	_add(root, _box(Vector3(10.0, 0.06, e.y * 1.5)), yellow, Vector3(c.x - e.x * 0.5 - 25.0, GROUND_Y + 0.04, c.y)) # 10 cm reales
@@ -192,11 +249,12 @@ static func _dust(c: Vector2, e: Vector2, u: float) -> GPUParticles3D:
 
 static func _parking(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	var h: Vector2 = e * 0.5
-	var spots: Array[Vector2] = [Vector2(-h.x - 14.0, -h.y * 0.6), Vector2(-h.x - 14.0, h.y * 0.5), Vector2(-h.x * 0.4, -h.y - 14.0), Vector2(h.x * 0.2, -h.y - 14.0)]
+	var back: float = roll_depth(e)
+	var spots: Array[Vector2] = [Vector2(-h.x - 14.0, -h.y * 0.6), Vector2(-h.x - 14.0, h.y * 0.5), Vector2(-h.x * 0.4, -h.y - 14.0 - back), Vector2(h.x * 0.2, -h.y - 14.0 - back)]
 	for spot: Vector2 in spots:
 		_glb(root, "prop_cone", Vector3(c.x + spot.x, 0.0, c.y + spot.y), spot.x * 7.0)
 	# Cordón de 15 x 15 cm con borde pintado y farol de 4 m, en cm reales, detrás de la lámina.
-	var curb_z: float = c.y - e.y * 0.5 - 40.0
+	var curb_z: float = c.y - e.y * 0.5 - 40.0 - back
 	_add(root, _box(Vector3(e.x * 2.4, 15.0, 15.0)), _mat(Color("#8C8E92"), 0.9), Vector3(c.x, 7.5, curb_z))
 	_add(root, _box(Vector3(e.x * 2.4, 1.0, 15.5)), _mat(Color("#E8C21C"), 0.7), Vector3(c.x, 15.2, curb_z))
 	var post: Vector3 = Vector3(c.x - e.x * 0.5 - 60.0, 0.0, curb_z - 20.0)

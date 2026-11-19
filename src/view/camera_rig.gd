@@ -43,6 +43,8 @@ var _follow_needed: bool = false
 const FOLLOW_INNER: float = 0.35 ## el cursor puede moverse libre en el 35 % central; afuera, la cámara lo sigue
 const FOLLOW_SPEED: float = 3.5
 const HOLD_WHOLE_S: float = 1.2 ## después de la transición, cuánto se sostiene la lámina entera
+var _user_zoom: float = -1.0 ## zoom elegido con la rueda (se conserva al recargar la lámina); -1 = el de trabajo
+var _last_extents: Vector2 = Vector2.ZERO
 
 
 func _init() -> void:
@@ -64,6 +66,12 @@ func _init() -> void:
 
 ## Encuadra una lámina de `extents` centrada en `center` (plano XZ).
 func fit_to(center: Vector2, extents: Vector2, animate_seconds: float = 0.0) -> void:
+	if animate_seconds <= 0.0 and work_mode and extents == _last_extents and _user_zoom > 0.0:
+		_keep_user_view(center, extents) # lámina nueva del mismo tamaño: la cámara queda donde estaba
+		return
+	if extents != _last_extents:
+		_user_zoom = -1.0 # lámina de otro tamaño: vuelve al encuadre de trabajo
+	_last_extents = extents
 	bounds_center = center
 	bounds_half = extents * 0.5
 	var tan_half: float = tan(deg_to_rad(FOV) * 0.5)
@@ -93,6 +101,24 @@ func fit_to(center: Vector2, extents: Vector2, animate_seconds: float = 0.0) -> 
 	_zoom = _target_zoom
 	position = _target_pos
 	_apply_zoom()
+
+
+func _keep_user_view(center: Vector2, extents: Vector2) -> void:
+	bounds_center = center
+	bounds_half = extents * 0.5
+	_target_zoom = clampf(_user_zoom, min_zoom, max_zoom)
+	_update_following()
+
+
+## Sigue a la herramienta si la lámina no entra, o si el jugador se acercó con la rueda.
+func _update_following() -> void:
+	if not work_mode or _return_in >= 0.0:
+		return
+	_following = _follow_needed or _target_zoom < _work_zoom * 0.95
+
+
+func is_following() -> bool:
+	return _following
 
 
 ## Distancia que encuadra toda la lámina (con margen).
@@ -174,21 +200,32 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		var mb: InputEventMouseButton = event
 		if mb.pressed and mb.button_index == MOUSE_BUTTON_WHEEL_UP:
-			_target_zoom = clampf(_target_zoom / ZOOM_STEP, min_zoom, max_zoom)
-			zoomed.emit()
+			zoom_by(1.0 / ZOOM_STEP)
 		elif mb.pressed and mb.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			_target_zoom = clampf(_target_zoom * ZOOM_STEP, min_zoom, max_zoom)
-			zoomed.emit()
-		elif mb.button_index == MOUSE_BUTTON_MIDDLE:
+			zoom_by(ZOOM_STEP)
+		elif mb.button_index == MOUSE_BUTTON_MIDDLE or mb.button_index == MOUSE_BUTTON_RIGHT:
 			_drag_pan = mb.pressed
 	elif event is InputEventMouseMotion and _drag_pan:
 		var mm: InputEventMouseMotion = event
 		_pan(Vector2(-mm.relative.x, -mm.relative.y * 1.6) * _zoom * 0.0018)
 
 
+## Zoom con la rueda: el jugador elige y la cámara lo recuerda entre láminas.
+func zoom_by(factor: float) -> void:
+	_target_zoom = clampf(_target_zoom * factor, min_zoom, max_zoom)
+	_user_zoom = _target_zoom
+	if _return_in > 0.0: # tocó la rueda durante la vista entera: manda el jugador
+		_return_in = -1.0
+		_smooth = SMOOTHING
+	_update_following()
+	zoomed.emit()
+
+
 func _process(delta: float) -> void:
 	var move: Vector2 = Vector2(
 		Input.get_axis("ui_left", "ui_right"), Input.get_axis("ui_up", "ui_down"))
+	move += Vector2(float(Input.is_physical_key_pressed(KEY_D)) - float(Input.is_physical_key_pressed(KEY_A)),
+		float(Input.is_physical_key_pressed(KEY_S)) - float(Input.is_physical_key_pressed(KEY_W)))
 	if move != Vector2.ZERO:
 		_pan(move * PAN_SPEED * _zoom * delta)
 	if _pull_left > 0.0:
@@ -202,6 +239,7 @@ func _process(delta: float) -> void:
 			_smooth = 2.5
 			_pull_left = 1.2
 			_following = _follow_needed
+			_return_in = -1.0
 	var k: float = 1.0 - exp(-_smooth * delta)
 	_zoom = lerpf(_zoom, _target_zoom, k)
 	position = position.lerp(_target_pos, k)

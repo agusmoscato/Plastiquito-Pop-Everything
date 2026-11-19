@@ -36,6 +36,9 @@ var _t: float = 1.0
 var _dur: float = 1.0
 var _old_props: Node3D
 var _new_props: Node3D
+var roll_glow: bool = false ## la lámina está terminada y hay que tirar una nueva del rollo
+var _roll_spin: float = 0.0 ## velocidad de giro del rollo (vueltas por segundo), decae sola
+var _glow: float = 0.0
 
 
 func setup(light: DirectionalLight3D, env: Environment, ground_material: ShaderMaterial) -> void:
@@ -99,7 +102,31 @@ func camera_factor() -> float:
 	return CAMERA_FACTOR[phase - 1]
 
 
+## El jugador tiró del rollo: gira y suelta la lámina nueva.
+func tug_roll() -> void:
+	_roll_spin = 1.6
+
+
+func _animate_roll(delta: float) -> void:
+	if not is_instance_valid(props):
+		return
+	var spin: Node3D = props.get_node_or_null(ScenarioProps.ROLL_NAME + "/Spin") as Node3D
+	if spin == null:
+		return
+	_roll_spin = move_toward(_roll_spin, 0.0, delta * 2.2)
+	spin.rotation.x -= _roll_spin * TAU * delta
+	_glow = move_toward(_glow, 1.0 if roll_glow else 0.0, delta * 3.0)
+	var wobble: float = sin(Time.get_ticks_msec() * 0.006) * 0.035 * _glow # "tirá de acá"
+	spin.rotation.z = wobble
+	var body: MeshInstance3D = spin.get_node_or_null("Body") as MeshInstance3D
+	if body != null:
+		var m: ShaderMaterial = body.material_override as ShaderMaterial
+		if m != null:
+			m.set_shader_parameter("glow", _glow * (0.6 + 0.4 * sin(Time.get_ticks_msec() * 0.008)))
+
+
 func _process(delta: float) -> void:
+	_animate_roll(delta)
 	if _t >= 1.0:
 		return
 	_t = minf(1.0, _t + delta / _dur)
