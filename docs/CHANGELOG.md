@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.5.0 — Arranque progresivo, rollo gigante y papel de burbujas real (2026-11-19, sin mergear)
+
+Pedidos del dueño tras probar la 0.4.0, uno por uno:
+- **Mouse**: el puntero es una burbujita y se ve siempre en el menú de inicio y en la pausa (antes, al
+  apretar Esc sobre la lámina, el puntero quedaba escondido).
+- **Arranque progresivo**: al empezar cada clic revienta una burbuja; "Mantener apretado" (30 Pops,
+  no se pierde al reciclar) habilita arrastrar. La palma pide eso primero (ya no se ofrece al arrancar).
+- **Recarga manual**: la lámina terminada espera; se tira una nueva del **rollo gigante** que está detrás
+  (clic en el rollo, botón "TIRAR LÁMINA NUEVA" o R / espacio). "Recarga automática" ahora se compra en
+  la Mesa. El rollo está en todos los escenarios, gira al tirar y late cuando hay que tirar.
+- **Cámara**: guarda el zoom de la rueda entre láminas y, con zoom, sigue a la herramienta; se mueve con
+  WASD, flechas y arrastrando con el botón derecho o la rueda.
+- **Tienda**: se va la barra "siguiente pedido"; cada pestaña lleva un sello con cuántas mejoras se pueden
+  sellar y el encabezado cuenta sellados / para sellar (antes el número no se actualizaba). Solo se
+  muestra lo que está cerca (30 % de su precio); lo lejano no ocupa lugar.
+- **Para qué**: la orden de trabajo va guiando (mantener apretado, recarga, palma, primer reciclado,
+  cada herramienta nueva) y dice para qué sirve cada meta.
+- **Especiales**: aparecen después del primer reciclado (bomba y línea en el Piso, eco en el
+  Estacionamiento); la primera vez, una tarjeta explica qué hace cada una.
+- **Escenarios**: cada fase arranca con una lámina chica (Piso 20, Galpón 56, Estacionamiento 110) y
+  "Rollo más ancho" la agranda hasta el tope. Pisos siempre oscuros y distintos (nogal, terracota, epoxi
+  verde, asfalto): la lámina transparente ya no se pierde.
+- **Burbujas**: plástico transparente apenas celeste, reflejos nítidos de ventana, borde blanco de
+  costado y el aro soldado de la base (antes, celeste de caricatura).
+- **Gráficos**: Opciones > Gráficos alto / medio / bajo.
+
+Balance (decisión: el primer reciclado antes, porque el dueño sentía que hasta reciclar había mucho
+que hacer sin saber para qué): objetivos del simulador "primer reciclado" 20-36 min (antes 28-42),
+Galpón 62-100, Estacionamiento 105-170 (las fases siguientes duran lo mismo que antes).
+
 ## 0.4.0 — Menú de inicio, progresión y aspecto (2026-11-18, sin mergear)
 
 - **Menú de inicio**: el juego ya no arranca de una. Jugar/Continuar, Nueva partida (con
