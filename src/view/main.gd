@@ -357,6 +357,11 @@ func _after_step(_holding: bool, delta: float) -> void:
 		if Juice.fx != null:
 			Juice.fx.smoke_at(Vector3(bp.x, 0.3, bp.y))
 		PopAudio.play_ui("screech", randf_range(0.94, 1.06), -6.0)
+	if not sim.ev_cracked.is_empty(): # doble film: cruje la capa de afuera y la burbuja queda entera
+		PopAudio.play_ui("tic", randf_range(1.5, 1.7), -3.0)
+		var cp: Vector2 = sim.grid.cell_to_world(sim.ev_cracked[0])
+		if Juice.fx != null:
+			Juice.fx.smoke_at(Vector3(cp.x, 0.35, cp.y))
 	if not sim.ev_revived.is_empty(): # un Eco se vuelve a inflar: entra aire
 		PopAudio.play_ui("air", randf_range(0.95, 1.08), -4.0)
 	hud.on_sim_step(delta)
@@ -426,7 +431,6 @@ func _on_chain_slammed(count: int) -> void:
 func _announce_new_specials() -> void:
 	for t: int in sim.ev_new_specials:
 		world.specials_view.mark_new(t, Tx.t("new"))
-		hud.special_card.show_type(t) # qué hace: la primera vez que aparece, una tarjeta lo explica
 	sim.ev_new_specials = []
 
 

@@ -26,6 +26,8 @@ var shop: ShopSheet
 var recycle_panel: RecyclePanel
 var bubble_log: BubbleLog
 var special_card: SpecialCard
+var encargo_ticket: EncargoTicket
+var _intro_timer: float = 0.0
 
 var _tool_buttons: Dictionary = {} ## id -> StampButton
 var _recycle_button: StampButton
@@ -68,6 +70,9 @@ func setup(p_sim: GameSim, p_camera: Camera3D) -> void:
 	work_order = WorkOrder.new()
 	work_order.setup(sim)
 	root.add_child(work_order)
+	encargo_ticket = EncargoTicket.new()
+	encargo_ticket.setup(sim)
+	root.add_child(encargo_ticket)
 	combo = ComboMeter.new()
 	combo.setup()
 	root.add_child(combo)
@@ -182,6 +187,7 @@ func _layout() -> void:
 	var free_w: float = vp.x - SHOP_W - 16.0
 	pops_panel.position = Vector2(14.0, 10.0)
 	work_order.position = Vector2(20.0, 148.0)
+	encargo_ticket.position = Vector2(20.0, 300.0)
 	shop.position = Vector2(vp.x - SHOP_W - 6.0, 8.0)
 	combo.position = Vector2(14.0, vp.y - 110.0)
 	night_stamp.position = Vector2(18.0, vp.y - 178.0)
@@ -203,6 +209,11 @@ func _layout() -> void:
 ## Llamar una vez por frame, después de GameSim.step().
 func on_sim_step(delta: float) -> void:
 	_handle_pops()
+	encargo_ticket.on_sim_step()
+	if sim.ev_encargo_done:
+		PopAudio.play_ui("milestone", 1.15, -4.0)
+		flyers.spawn(encargo_ticket.get_global_rect().get_center(), sim.ev_encargo_bonus)
+	_notice_tried()
 	var min_chain: int = Cfg.integer(sim.eco, "chain_stamp_min")
 	if sim.chain_count > 0 and _chain_origin.x < 0.0 and sim.ev_idx.size() > 0:
 		_chain_origin = _screen_of(sim.grid.cell_to_world(sim.ev_idx[0])) # donde arrancó la ola
@@ -217,6 +228,62 @@ func on_sim_step(delta: float) -> void:
 		_chain_origin = Vector2(-1.0, -1.0)
 	_rate_acc += _sum_values()
 	_rate_timer += delta
+
+
+## La presentación en curso se da por aprendida cuando el jugador revienta una de esas.
+func _notice_tried() -> void:
+	var t: int = special_card.current_type()
+	if t == 0:
+		return
+	if t == SpecialCard.ARMOR and not sim.ev_cracked.is_empty():
+		special_card.tried(t)
+		return
+	for i: int in sim.ev_idx.size():
+		if (t > 0 and sim.ev_type[i] == t) or (t == SpecialCard.VEIN and sim.ev_pressure[i] >= 1.8):
+			special_card.tried(t)
+			return
+
+
+## Presenta lo que aparece por primera vez (una cosa a la vez) y le apunta la flecha.
+func _update_intros(delta: float) -> void:
+	_intro_timer -= delta
+	var t: int = special_card.current_type()
+	if t != 0:
+		var idx: int = _intro_cell(t)
+		special_card.pointer = _screen_of(sim.grid.cell_to_world(idx)) if idx >= 0 else Vector2.INF
+		return
+	if _intro_timer > 0.0 or is_modal_open() or FirstHint.wanted(sim.state.pops_total):
+		return
+	_intro_timer = 0.3
+	for cand: int in [SpecialCard.VEIN, GameSim.TYPE_GOLDEN, GameSim.TYPE_BOMB, GameSim.TYPE_LINE, GameSim.TYPE_ECHO, SpecialCard.ARMOR]:
+		if Settings.introduced.has(str(cand)) or _intro_cell(cand) < 0:
+			continue
+		if special_card.start_intro(cand):
+			Settings.introduced[str(cand)] = true
+			Settings.save_settings()
+			PopAudio.play_ui("tic", 1.2, -2.0)
+		return
+
+
+## Una burbuja entera de lo que se presenta (la más cercana al centro de la lámina), o -1.
+func _intro_cell(t: int) -> int:
+	var best: int = -1
+	var best_d: float = INF
+	var c: Vector2 = sim.center()
+	var cells: PackedInt32Array = sim.vein_cells
+	if t != SpecialCard.VEIN:
+		cells = PackedInt32Array()
+		for idx: int in sim.sheet.cell_count():
+			if (t == SpecialCard.ARMOR and sim.sheet.armor[idx] > 0) or (t > 0 and sim.sheet.type[idx] == t):
+				cells.append(idx)
+	for idx: int in cells:
+		if sim.sheet.state[idx] == SheetModel.STATE_POPPED:
+			continue
+		var d: float = sim.grid.cell_to_world(idx).distance_squared_to(c)
+		if d < best_d:
+			best_d = d
+			best = idx
+	return best
 
 
 func _sum_values() -> float:
@@ -249,7 +316,7 @@ func _handle_pops() -> void:
 ## Rectángulos de los paneles del HUD (los "+N" no se dibujan encima).
 func _panel_rects() -> Array[Rect2]:
 	var out: Array[Rect2] = []
-	for c: Control in [pops_panel, work_order, shop, combo, _recycle_button, _log_button, _reload_button]:
+	for c: Control in [pops_panel, work_order, encargo_ticket, shop, combo, _recycle_button, _log_button, _reload_button]:
 		if c.visible:
 			out.append(c.get_global_rect())
 	for id: String in _tool_buttons:
@@ -382,6 +449,7 @@ func _process(delta: float) -> void:
 		work_order.refresh()
 	_update_toolbar()
 	_update_recycle_button()
+	_update_intros(delta)
 	_reload_button.visible = sim.awaiting_reload and not is_modal_open()
 	if _reload_button.visible: # late para que se note: la lámina está terminada
 		var k: float = 1.0 + 0.04 * sin(Time.get_ticks_msec() * 0.008)

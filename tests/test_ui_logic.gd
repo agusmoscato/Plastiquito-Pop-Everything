@@ -181,10 +181,26 @@ func test_every_special_has_an_explanation_card() -> void:
 		var key: String = SpecialCard.key_of(t)
 		assert_ne(key, "", "tipo %d" % t)
 		assert_ne(Tx.t(key + "_d"), key + "_d", "explica qué hace %s" % key)
+	for t: int in [SpecialCard.VEIN, SpecialCard.ARMOR]:
+		assert_ne(Tx.t(SpecialCard.key_of(t) + "_d"), SpecialCard.key_of(t) + "_d", "presenta las vetas y el doble film")
 	var card: SpecialCard = SpecialCard.new()
-	card.show_type(GameSim.TYPE_GOLDEN)
-	card.show_type(GameSim.TYPE_GOLDEN)
-	card._process(0.016)
-	assert_eq(card.current_type(), GameSim.TYPE_GOLDEN)
-	assert_true(card._queue.is_empty(), "no se repite")
+	assert_true(card.start_intro(GameSim.TYPE_BOMB))
+	assert_false(card.start_intro(GameSim.TYPE_GOLDEN), "una presentación a la vez")
+	card._process(5.0)
+	assert_eq(card.current_type(), GameSim.TYPE_BOMB, "espera a que la pruebe")
+	card.tried(GameSim.TYPE_BOMB)
+	card._process(SpecialCard.THANKS_S + 0.1)
+	assert_eq(card.current_type(), 0, "probada: se va")
 	card.free()
+
+
+func test_encargo_ticket_texts() -> void:
+	var e: Encargo = Encargo.new()
+	e.kind = "chain"
+	e.target = 12
+	assert_true(EncargoTicket.goal_text(e, [1.0, 1.5, 2.0, 3.0, 5.0]).contains("12"))
+	e.kind = "combo"
+	e.target = 3
+	assert_true(EncargoTicket.goal_text(e, [1.0, 1.5, 2.0, 3.0, 5.0]).contains("3"))
+	for k: String in Encargo.KINDS:
+		assert_ne(Tx.t("enc_" + k), "enc_" + k)

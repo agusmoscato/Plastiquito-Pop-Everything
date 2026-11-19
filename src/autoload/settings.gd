@@ -14,6 +14,7 @@ var reduce_motion: bool = false
 var language: String = "es" ## "es" o "en"
 var discovery_done: bool = false ## ya compró algo: nunca más se señala la tienda
 var graphics: int = 2 ## calidad de gráficos: 0 bajo, 1 medio, 2 alto (GraphicsQuality)
+var introduced: Dictionary = {} ## lo que ya se presentó con tarjeta (SpecialCard): "1".."4", "-1" veta, "-2" doble film
 
 
 func _ready() -> void:
@@ -60,6 +61,7 @@ func save_settings() -> void:
 	cfg.set_value("video", "graphics", graphics)
 	cfg.set_value("ui", "language", language)
 	cfg.set_value("ui", "discovery_done", discovery_done)
+	cfg.set_value("ui", "introduced", introduced.keys())
 	cfg.save(PATH)
 
 
@@ -76,3 +78,7 @@ func load_settings() -> void:
 	graphics = clampi(g, 0, 2)
 	language = cfg.get_value("ui", "language", language)
 	discovery_done = cfg.get_value("ui", "discovery_done", discovery_done)
+	var intro: Array = cfg.get_value("ui", "introduced", [])
+	introduced = {}
+	for k: Variant in intro:
+		introduced[str(k)] = true

@@ -280,7 +280,8 @@ func _write_cell(idx: int) -> void:
 			squash = a.y * (1.0 - pop)
 	else:
 		_squash_shown[idx] = squash
-	var color: Color = Color(sheet.pressure[idx] - 1.0, squash, pop, float(sheet.type[idx]))
+	var armor: float = 0.25 if sheet.armor.size() > idx and sheet.armor[idx] > 0 else 0.0 # doble film: fracción del tipo
+	var color: Color = Color(sheet.pressure[idx] - 1.0, squash, pop, float(sheet.type[idx]) + armor)
 	var loc: Vector2i = _locate(idx)
 	_multimeshes[loc.x].set_instance_custom_data(loc.y, color)
 	if far != null:

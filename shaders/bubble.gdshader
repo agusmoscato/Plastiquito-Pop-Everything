@@ -2,7 +2,7 @@ shader_type spatial;
 // Burbuja de plástico. Una instancia de MultiMesh por burbuja.
 // INSTANCE_CUSTOM: r = presión - 1, g = aplastamiento (0..1),
 //                  b = progreso de reventón (0 = entera, 0..1 animando, 1 = reventada),
-//                  a = tipo (0 = normal).
+//                  a = tipo (0 = normal) + 0,25 si tiene doble film.
 // Transparencia: alpha blend + cull_back + depth prepass por el propio domo. Las burbujas
 // no se superponen entre sí, así que el orden por instancia no importa (ver CHANGELOG).
 // Sesión 4: se parece a un papel de burbujas de verdad: plástico transparente apenas celeste, brillos
@@ -37,6 +37,7 @@ varying float v_pressure;
 varying float v_squash;
 varying float v_pop;
 varying float v_type;
+varying float v_armor;
 varying vec3 v_origin;
 
 float hash21(vec2 p) {
@@ -60,7 +61,8 @@ void vertex() {
 	v_pressure = 1.0 + INSTANCE_CUSTOM.r;
 	v_squash = INSTANCE_CUSTOM.g;
 	v_pop = INSTANCE_CUSTOM.b;
-	v_type = INSTANCE_CUSTOM.a;
+	v_armor = step(0.1, fract(INSTANCE_CUSTOM.a));
+	v_type = floor(INSTANCE_CUSTOM.a + 0.01);
 	v_origin = MODEL_MATRIX[3].xyz;
 
 	float infl = 1.0 + inflate_per_pressure * (v_pressure - 1.0);
@@ -131,6 +133,12 @@ void fragment() {
 	// El aro soldado de la base: una línea más blanca donde el domo se pega al film (UV.y = 1 es la base).
 	float seam = smoothstep(0.72, 0.98, UV.y) * (1.0 - popped * 0.6);
 	ALBEDO = mix(col, vec3(0.92, 0.97, 1.0), seam * 0.5);
+	// Doble film: plástico lechoso y grueso, con un segundo aro (hay que aplastarla dos veces).
+	float ring2 = smoothstep(0.35, 0.45, UV.y) * (1.0 - smoothstep(0.45, 0.55, UV.y));
+	ALBEDO = mix(ALBEDO, vec3(0.93, 0.95, 0.97), v_armor * (0.55 + 0.35 * ring2) * (1.0 - popped));
+	// Veta de aire: las casi llenas laten suave (se ve por dónde va a correr la cadena).
+	float vein = smoothstep(1.8, 1.92, v_pressure) * (1.0 - popped);
+	float beat = 0.6 + 0.4 * sin(TIME * 4.0 + v_origin.x * 0.7 + v_origin.z * 0.5);
 	ROUGHNESS = mix(0.06, 0.65, popped);
 	SPECULAR = spec_strength * 0.7 * (1.0 - 0.8 * popped);
 	METALLIC = 0.0;
@@ -140,9 +148,12 @@ void fragment() {
 	// Lo que va a reventar: brillo suave bajo la herramienta (solo burbujas enteras).
 	float hv = (1.0 - smoothstep(hover_radius * 0.75, hover_radius, distance(v_origin.xz, hover_pos))) * (1.0 - popped);
 	EMISSION += vec3(0.16, 0.2, 0.22) * hv;
+	EMISSION += vec3(0.30, 0.20, 0.08) * vein * beat;
 
 	float a = mix(base_alpha, rim_alpha, fres);
 	a = max(a, seam * seam_alpha);
+	a = mix(a, 0.72, v_armor * (1.0 - popped));
+	a += vein * 0.1;
 	a = max(a, glint * 0.9);
 	a += 0.12 * hv;
 	a = mix(a, popped_alpha, popped);
