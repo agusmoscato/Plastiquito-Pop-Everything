@@ -139,6 +139,7 @@ void fragment() {
 	// Veta de aire: las casi llenas laten suave (se ve por dónde va a correr la cadena).
 	float vein = smoothstep(1.8, 1.92, v_pressure) * (1.0 - popped);
 	float beat = 0.6 + 0.4 * sin(TIME * 4.0 + v_origin.x * 0.7 + v_origin.z * 0.5);
+	ALBEDO = mix(ALBEDO, vec3(1.0, 0.76, 0.45), vein * 0.45); // ámbar: se ve el camino de la cadena
 	ROUGHNESS = mix(0.06, 0.65, popped);
 	SPECULAR = spec_strength * 0.7 * (1.0 - 0.8 * popped);
 	METALLIC = 0.0;
@@ -148,12 +149,12 @@ void fragment() {
 	// Lo que va a reventar: brillo suave bajo la herramienta (solo burbujas enteras).
 	float hv = (1.0 - smoothstep(hover_radius * 0.75, hover_radius, distance(v_origin.xz, hover_pos))) * (1.0 - popped);
 	EMISSION += vec3(0.16, 0.2, 0.22) * hv;
-	EMISSION += vec3(0.30, 0.20, 0.08) * vein * beat;
+	EMISSION += vec3(0.55, 0.34, 0.12) * vein * beat;
 
 	float a = mix(base_alpha, rim_alpha, fres);
 	a = max(a, seam * seam_alpha);
 	a = mix(a, 0.72, v_armor * (1.0 - popped));
-	a += vein * 0.1;
+	a += vein * 0.22;
 	a = max(a, glint * 0.9);
 	a += 0.12 * hv;
 	a = mix(a, popped_alpha, popped);

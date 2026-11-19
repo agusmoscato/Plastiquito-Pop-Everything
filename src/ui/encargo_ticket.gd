@@ -13,7 +13,7 @@ var _bonus_text: String = ""
 func setup(p_sim: GameSim) -> void:
 	sim = p_sim
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	custom_minimum_size = Vector2(318.0, 118.0)
+	custom_minimum_size = Vector2(318.0, 124.0)
 	size = custom_minimum_size
 	rotation = deg_to_rad(0.8)
 	pivot_offset = size * 0.5
@@ -64,14 +64,15 @@ func _draw() -> void:
 		prog = "x" + NumberFormat.decimal(m, 1, Settings.language)
 	UiKit.draw_text(self, Vector2(18.0, 94.0), prog, UiKit.font_mono(), 12, UiKit.INK)
 	var streak_txt: String = Tx.t("enc_streak") % [sim.streak, roundi((sim.streak_mult() - 1.0) * 100.0)]
-	UiKit.draw_text(self, Vector2(size.x - 190.0, 94.0), streak_txt, UiKit.font_mono_bold(), 11, UiKit.STAMP_RED if sim.streak > 0 else UiKit.INK_SOFT, HORIZONTAL_ALIGNMENT_RIGHT, 162.0)
+	UiKit.draw_text(self, Vector2(size.x - 190.0, 110.0), streak_txt, UiKit.font_mono_bold(), 11, UiKit.STAMP_RED if sim.streak > 0 else UiKit.INK_SOFT, HORIZONTAL_ALIGNMENT_RIGHT, 162.0)
 	if _fail_t > 0.0:
 		var a: float = clampf(_fail_t, 0.0, 1.0)
 		UiKit.draw_text(self, Vector2(18.0, 110.0), Tx.t("enc_failed"), UiKit.font_text_bold(), 11, Color(UiKit.STAMP_RED.r, UiKit.STAMP_RED.g, UiKit.STAMP_RED.b, a))
 	if _stamp_t > 0.0 or e.done:
+		# El sello cae sobre la barra, a la derecha: el pedido se sigue leyendo.
 		var t: float = clampf(_stamp_t, 0.0, 2.2)
 		var punch: float = 1.0 + maxf(0.0, t - 1.9) * 2.0
-		var r: Rect2 = Rect2(Vector2(size.x * 0.5 - 90.0 * punch, 30.0 - 6.0 * punch), Vector2(180.0, 44.0) * punch)
-		UiKit.draw_stamp(self, r, Tx.t("enc_done"), UiKit.STAMP_RED, int(20.0 * punch), -0.1, 0.9 if e.done else clampf(t, 0.0, 1.0))
+		var r: Rect2 = Rect2(Vector2(size.x - 172.0 - 10.0 * punch, 62.0 - 6.0 * punch), Vector2(150.0, 34.0) * punch)
+		UiKit.draw_stamp(self, r, Tx.t("enc_done"), UiKit.STAMP_RED, int(16.0 * punch), -0.12, 0.9 if e.done else clampf(t, 0.0, 1.0))
 		if _stamp_t > 0.0:
-			UiKit.draw_text(self, Vector2(size.x - 120.0, 110.0), _bonus_text, UiKit.font_mono_bold(), 12, UiKit.STAMP_RED, HORIZONTAL_ALIGNMENT_RIGHT, 100.0)
+			UiKit.draw_text(self, Vector2(18.0, 110.0), _bonus_text, UiKit.font_mono_bold(), 12, UiKit.STAMP_RED)
