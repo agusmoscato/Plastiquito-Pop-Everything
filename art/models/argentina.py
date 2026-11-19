@@ -102,14 +102,108 @@ def tube(name, points, radii, sides=12, squash=1.0):
 
 
 def mat(name, color, rough=0.5, metal=0.0, alpha=1.0, emission=None):
-    m = lib.material(name, hx(color) if isinstance(color, str) else color, rough=rough, metal=metal, emission=emission, alpha=alpha)
-    if alpha < 1.0:
-        m.blend_method = "BLEND" if hasattr(m, "blend_method") else m.blend_method
+    """Material cuyo color base se multiplica por el atributo de vértice "tint" (manchas, vetas y la
+    oclusión horneada). Godot lo importa como color de vértice en el albedo."""
+    c = hx(color) if isinstance(color, str) else color
+    m = lib.material(name, c, rough=rough, metal=metal, emission=emission, alpha=alpha)
+    nt = m.node_tree
+    bsdf = nt.nodes["Principled BSDF"]
+    attr = nt.nodes.new("ShaderNodeVertexColor")
+    attr.layer_name = "tint"
+    mix = nt.nodes.new("ShaderNodeMix")
+    mix.data_type = "RGBA"
+    mix.blend_type = "MULTIPLY"
+    # El nodo Mix tiene entradas "A"/"B" para número, vector y color: hay que usar las de color.
+    a_in = [i for i in mix.inputs if i.name == "A" and i.type == "RGBA"][0]
+    b_in = [i for i in mix.inputs if i.name == "B" and i.type == "RGBA"][0]
+    out = [o for o in mix.outputs if o.name == "Result" and o.type == "RGBA"][0]
+    mix.inputs[0].default_value = 1.0
+    a_in.default_value = (c[0], c[1], c[2], 1.0)
+    nt.links.new(attr.outputs["Color"], b_in)
+    nt.links.new(out, bsdf.inputs["Base Color"])
     return m
 
 
 def tinted(name, color, rough=0.5):
-    return lib.vertex_tint_material(name, hx(color), rough=rough)
+    return mat(name, color, rough=rough)
+
+
+def paint_rgb(o, fn):
+    """Color de vértice completo: fn(posición) -> (r, g, b) en 0..1 (con material blanco, es el color)."""
+    me = o.data
+    attr = me.color_attributes.get("tint") or me.color_attributes.new("tint", "BYTE_COLOR", "CORNER")
+    for loop in me.loops:
+        r, g, b = fn(me.vertices[loop.vertex_index].co)
+        attr.data[loop.index].color = (r, g, b, 1.0)
+    return o
+
+
+def noise3(p, f=1.0):
+    """Ruido barato y determinista (suma de senos) en -1..1."""
+    x, y, z = p.x * f, p.y * f, p.z * f
+    return (math.sin(x * 1.7 + y * 3.1) * math.sin(y * 2.3 + z * 1.3) + math.sin(z * 2.9 + x * 0.7) * 0.5) / 1.5
+
+
+def bake_ao(obj, samples=14, reach=0.3, strength=0.55):
+    """Oclusión ambiental horneada en el atributo "tint" (como la mano): rayos en el hemisferio de cada
+    vértice contra la propia malla y contra el piso (z = 0)."""
+    from mathutils.bvhtree import BVHTree
+    me = obj.data
+    bm = bmesh.new()
+    bm.from_mesh(me)
+    bvh = BVHTree.FromBMesh(bm)
+    size = max(obj.dimensions) if max(obj.dimensions) > 0 else 1.0
+    maxd = size * reach
+    golden = math.pi * (3.0 - math.sqrt(5.0))
+    dirs = []
+    for i in range(samples):
+        zc = (i + 0.5) / samples
+        r = math.sqrt(1.0 - zc * zc)
+        a = golden * i
+        dirs.append(Vector((r * math.cos(a), r * math.sin(a), zc)))
+    ao = []
+    for v in bm.verts:
+        n = v.normal if v.normal.length > 0.0 else Vector((0, 0, 1))
+        t = n.orthogonal().normalized()
+        b = n.cross(t)
+        occl = 0.0
+        origin = v.co + n * (size * 0.002)
+        for d in dirs:
+            w = t * d.x + b * d.y + n * d.z
+            hit = bvh.ray_cast(origin, w, maxd)
+            if hit[0] is not None:
+                occl += 1.0
+            elif w.z < -0.05 and origin.z / -w.z < maxd:
+                occl += 1.0 # el piso
+        ao.append(1.0 - strength * occl / samples)
+    bm.free()
+    attr = me.color_attributes.get("tint") or me.color_attributes.new("tint", "BYTE_COLOR", "CORNER")
+    for loop in me.loops:
+        c = attr.data[loop.index].color
+        k = ao[loop.vertex_index]
+        attr.data[loop.index].color = (c[0] * k, c[1] * k, c[2] * k, 1.0)
+
+
+def finish(parts, name, angle=40.0):
+    """Une, aplica, suaviza, hornea la oclusión, exporta y renderiza (como lib.finish, más la oclusión)."""
+    for p in parts:
+        if p.data.color_attributes.get("tint") is None:
+            lib.paint(p) # blanco: el material queda con su color
+    for p in parts:
+        lib.apply_modifiers(p)
+    obj = lib.join(parts, name)
+    lib.select_only(obj)
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+    lib.triangulate(obj)
+    lib.smooth(obj, angle)
+    bake_ao(obj)
+    lib.unwrap(obj)
+    print("TRIS", lib.triangles(obj))
+    if A["out"]:
+        lib.export_glb(A["out"])
+    if A["render"]:
+        lib.render_set(A["render"], name)
+    return obj
 
 
 def give(o, m):
@@ -161,29 +255,33 @@ def rbox(name, size, loc, bev=0.003, rot=(0, 0, 0)):
 # --- Mesa ----------------------------------------------------------------------------------------
 
 def mate():
-    # Calabaza: panza ancha, cuello angosto y boca con virola de alpaca. Cuero curtido oscuro abajo.
-    leather = tinted("mate_cuero", "#6B4426", rough=0.55)
+    # Calabaza con vetas y tono quemado, virola de alpaca angosta, montañita de yerba granulada y bombilla
+    # inclinada ~30 grados con el pico aplanado y el filtro (la "cuchara") asomando en la yerba.
+    leather = tinted("mate_calabaza", "#8A5530", rough=0.55)
     outer = [(0.0, 0.0), (0.013, 0.0), (0.019, 0.002), (0.028, 0.008), (0.035, 0.019), (0.0385, 0.033),
-             (0.0375, 0.047), (0.0335, 0.059), (0.029, 0.067), (0.0272, 0.072)]
-    body = revolve("calabaza", outer, 56, cap_end=False)
+             (0.0375, 0.047), (0.0335, 0.059), (0.029, 0.067), (0.0272, 0.0715)]
+    body = revolve("calabaza", outer, 64, cap_end=False)
     lib.subsurf(body, 1)
     give(body, leather)
-    paint(body, lambda c: 0.62 + 0.38 * min(1.0, c.z / 0.05))
-    # Costura de cuero alrededor de la panza.
-    seam = revolve("costura", [(0.03855, 0.0322), (0.03895, 0.033), (0.03855, 0.0338), (0.0382, 0.033)], 56, closed=True)
-    give(seam, mat("mate_costura", "#3A2414", rough=0.8))
-    # Virola: aro de metal con borde redondeado y una línea grabada.
-    alpaca = mat("alpaca", "#C9CCD0", rough=0.3, metal=0.9)
-    virola = revolve("virola", [(0.0262, 0.0700), (0.0292, 0.0700), (0.0298, 0.0745), (0.0296, 0.0790),
-                                (0.0283, 0.0805), (0.0258, 0.0800), (0.0252, 0.0760)], 56, closed=True)
+
+    def calabaza(c):
+        ang = math.atan2(c.y, c.x)
+        veta = 0.5 + 0.5 * math.sin(ang * 13.0 + math.sin(c.z * 140.0) * 1.2 + noise3(c, 260.0) * 0.8)
+        quemado = 0.55 + 0.45 * min(1.0, max(0.0, (c.z - 0.002) / 0.03)) # la base, más oscura
+        cuello = 1.0 - 0.3 * max(0.0, (c.z - 0.058) / 0.014) # el borde de arriba quemado
+        return (0.72 + 0.28 * veta) * quemado * cuello
+    paint(body, calabaza)
+    alpaca = mat("alpaca", "#D2D5D9", rough=0.28, metal=0.9)
+    virola = revolve("virola", [(0.0265, 0.0705), (0.0290, 0.0705), (0.0294, 0.0730), (0.0287, 0.0748),
+                                (0.0262, 0.0746), (0.0257, 0.0725)], 64, closed=True)
     lib.subsurf(virola, 1)
     give(virola, alpaca)
-    # Yerba: la "montañita" contra un costado, con el hueco de la bombilla.
-    yerba = tinted("yerba", "#61792C", rough=0.95)
+    # Yerba: montañita contra un costado, con el granulado (ruido fino de altura y motas de color).
+    yerba = tinted("yerba", "#6E8A30", rough=0.95)
     bm = bmesh.new()
-    rings = 10
-    segs = 48
-    center = bm.verts.new((0.0, 0.0, 0.0740))
+    rings = 12
+    segs = 56
+    center = bm.verts.new((0.0, 0.0, 0.0715))
     prev = None
     for r in range(1, rings + 1):
         rr = 0.0262 * r / rings
@@ -191,9 +289,9 @@ def mate():
         for i in range(segs):
             a = 2.0 * math.pi * i / segs
             x, y = rr * math.cos(a), rr * math.sin(a)
-            mound = 0.010 * max(0.0, 1.0 - ((x + 0.010) ** 2 + y ** 2) / 0.00030) # montañita a un costado
-            z = 0.0705 + mound + 0.0008 * math.sin(i * 1.7 + r * 2.3)
-            ring.append(bm.verts.new((x, y, z)))
+            mound = 0.011 * max(0.0, 1.0 - ((x + 0.010) ** 2 + y ** 2) / 0.00032)
+            grain = 0.0007 * math.sin(i * 2.7 + r * 3.1) * math.sin(i * 1.3 - r * 2.2)
+            ring.append(bm.verts.new((x, y, 0.0705 + mound + grain)))
         if prev is None:
             for i in range(segs):
                 bm.faces.new((center, ring[i], ring[(i + 1) % segs]))
@@ -208,58 +306,87 @@ def mate():
     yo = bpy.data.objects.new("yerba", me)
     bpy.context.scene.collection.objects.link(yo)
     give(yo, yerba)
-    paint(yo, lambda c: 0.75 + 0.25 * min(1.0, (c.z - 0.070) / 0.009) + 0.06 * math.sin(c.x * 900.0) * math.sin(c.y * 800.0))
-    # Bombilla: caño de alpaca inclinado, curva arriba, boquilla aplastada y anillo de bronce.
-    pts = []
-    p0, p1, p2 = Vector((0.005, -0.004, 0.060)), Vector((0.016, -0.004, 0.150)), Vector((0.038, -0.004, 0.160))
-    for i in range(14): # curva suave: recta casi todo el largo y se dobla arriba hacia la boca
-        t = (i / 13.0) ** 0.6
-        q = p0 * (1 - t) ** 2 + p1 * 2 * t * (1 - t) + p2 * t * t
-        pts.append((q.x, q.y, q.z))
-    bomb = tube("bombilla", pts, [0.0026] * 13 + [0.0024], sides=14, squash=1.0)
+    paint(yo, lambda c: 0.62 + 0.38 * (0.5 + 0.5 * math.sin(c.x * 2300.0) * math.sin(c.y * 2100.0 + c.z * 900.0)))
+    objs = [body, virola, yo]
+    random.seed(11)
+    for k in range(46): # granos sueltos de yerba sobre la montañita
+        a = random.uniform(0.0, 2.0 * math.pi)
+        rr = random.uniform(0.0, 0.022)
+        x, y = rr * math.cos(a) - 0.004, rr * math.sin(a)
+        z = 0.0705 + 0.011 * max(0.0, 1.0 - ((x + 0.010) ** 2 + y ** 2) / 0.00032) + 0.0006
+        g = lib.sphere("grano", random.uniform(0.0007, 0.0012), (x, y, z), 6, 4, (1.4, 1.0, 0.6))
+        give(g, yerba)
+        tone = random.uniform(0.55, 1.15)
+        paint(g, lambda c, t=tone: t)
+        objs.append(g)
+    # Bombilla: caño recto inclinado 30 grados, con la boca doblada y aplanada al final.
+    tilt = math.radians(30.0)
+    base = Vector((-0.006, 0.0, 0.069))
+    up = Vector((math.sin(tilt), 0.0, math.cos(tilt)))
+    top = base + up * 0.105
+    mouth_dir = Vector((math.sin(math.radians(62.0)), 0.0, math.cos(math.radians(62.0))))
+    pts = [base + up * (0.105 * i / 10.0) for i in range(11)]
+    bomb = tube("bombilla", [tuple(p) for p in pts], [0.0027] * 11, sides=16)
     give(bomb, alpaca)
-    tip_dir = (Vector(pts[-1]) - Vector(pts[-2])).normalized()
-    tip = tube("boquilla", [pts[-1], tuple(Vector(pts[-1]) + tip_dir * 0.010)], [0.0026, 0.0022], sides=14, squash=0.45)
+    bend = [top + mouth_dir * (0.004 * i) for i in range(5)]
+    tip = tube("pico", [tuple(p) for p in bend], [0.0027, 0.0028, 0.003, 0.0031, 0.0031], sides=16, squash=0.42)
     give(tip, alpaca)
-    ring_p = Vector(pts[9])
-    ring = tube("anillo", [tuple(ring_p - tip_dir * 0.0025), tuple(ring_p + tip_dir * 0.0025)], [0.0036, 0.0036], sides=16)
+    ring = tube("anillo", [tuple(base + up * 0.083), tuple(base + up * 0.089)], [0.0038, 0.0038], sides=18)
     give(ring, mat("bronce", "#C89B4A", rough=0.3, metal=0.9))
-    return [body, seam, virola, yo, bomb, tip, ring]
+    filt = lib.sphere("filtro", 0.0062, tuple(base + Vector((0.0, 0.0, 0.0005))), 16, 8, (1.25, 0.9, 0.55)) # la cuchara, asomando
+    give(filt, alpaca)
+    return objs + [bomb, tip, ring, filt]
 
 
 def termo():
-    # Termo de acero pintado verde, con vaso-tapón, cebador y manija; aros de acero arriba y abajo.
-    paint_green = tinted("termo_verde", "#2F6B4B", rough=0.45)
-    steel = mat("termo_acero", "#B9BEC3", rough=0.28, metal=0.9)
-    dark = mat("termo_negro", "#26282C", rough=0.6)
-    body = revolve("cuerpo", [(0.0, 0.012), (0.041, 0.012), (0.0435, 0.016), (0.0445, 0.030), (0.0445, 0.215),
-                              (0.043, 0.228), (0.037, 0.240), (0.0, 0.240)], 56)
+    # Termo de acero pintado de rojo, con el pico cebador arriba (boca con tapón vertedor: lo que lo hace
+    # argentino), asa de goma negra y la tapa-vaso apoyada al lado, boca abajo. Sin marca ni color de marca.
+    red = tinted("termo_rojo", "#B5302A", rough=0.42)
+    steel = mat("termo_acero", "#BFC4C9", rough=0.26, metal=0.9)
+    dark = mat("termo_negro", "#232428", rough=0.6)
+    body = revolve("cuerpo", [(0.0, 0.012), (0.040, 0.012), (0.0428, 0.017), (0.0435, 0.030), (0.0435, 0.212),
+                              (0.0420, 0.226), (0.034, 0.240), (0.0, 0.240)], 64)
     lib.subsurf(body, 1)
-    give(body, paint_green)
-    paint(body, lambda c: 0.82 + 0.18 * math.cos(c.z * 60.0) ** 2)
-    base = revolve("base", [(0.0, 0.0), (0.040, 0.0), (0.0455, 0.004), (0.0460, 0.016), (0.0430, 0.019), (0.0, 0.019)], 56)
+    give(body, red)
+    paint(body, lambda c: 0.86 + 0.14 * (0.5 + 0.5 * math.cos(c.z * 50.0)) * (0.8 + 0.2 * noise3(c, 300.0)))
+    base = revolve("base", [(0.0, 0.0), (0.039, 0.0), (0.0445, 0.004), (0.0450, 0.016), (0.0420, 0.019), (0.0, 0.019)], 64)
     lib.subsurf(base, 1)
     give(base, steel)
-    collar = revolve("cuello", [(0.0, 0.238), (0.034, 0.238), (0.0345, 0.252), (0.030, 0.256), (0.0, 0.256)], 48)
-    give(collar, steel)
-    cap = revolve("vaso", [(0.0, 0.254), (0.0395, 0.254), (0.0405, 0.258), (0.0400, 0.290), (0.0385, 0.297), (0.0, 0.298)], 56)
-    lib.subsurf(cap, 1)
-    give(cap, steel)
-    grip = revolve("goma", [(0.0408, 0.262), (0.0418, 0.264), (0.0418, 0.284), (0.0408, 0.286), (0.0402, 0.274)], 56, closed=True)
-    give(grip, dark)
-    # Manija: arco grueso de goma negra con sus dos anclajes de acero.
-    hp = [(0.044, 0.0, 0.205), (0.062, 0.0, 0.200), (0.074, 0.0, 0.180), (0.078, 0.0, 0.140), (0.075, 0.0, 0.095), (0.064, 0.0, 0.068), (0.044, 0.0, 0.064)]
-    handle = tube("manija", hp, [0.0072] * len(hp), sides=14, squash=1.0)
+    shoulder = revolve("hombro", [(0.0, 0.236), (0.035, 0.236), (0.026, 0.250), (0.022, 0.255), (0.0, 0.255)], 48)
+    lib.subsurf(shoulder, 1)
+    give(shoulder, steel)
+    # Pico cebador: cuerpo negro con la boquita que sale de costado y el tapón vertedor arriba.
+    cebador = revolve("cebador", [(0.0, 0.253), (0.0215, 0.253), (0.0225, 0.262), (0.0205, 0.282), (0.017, 0.287), (0.0, 0.288)], 40)
+    lib.subsurf(cebador, 1)
+    give(cebador, dark)
+    spout = tube("boquita", [(0.012, 0.0, 0.276), (0.024, 0.0, 0.281), (0.031, 0.0, 0.286)], [0.0055, 0.0048, 0.0042], sides=14)
+    lib.subsurf(spout, 1)
+    give(spout, dark)
+    plug = revolve("tapon", [(0.0, 0.287), (0.012, 0.287), (0.013, 0.292), (0.010, 0.297), (0.0, 0.298)], 28)
+    give(plug, mat("tapon", "#3A3B40", rough=0.5))
+    lever = rbox("gatillo", (0.020, 0.008, 0.004), (0.006, 0.0, 0.299), 0.0015)
+    give(lever, dark)
+    # Asa de goma negra con sus anclajes.
+    hp = [(-0.043, 0.0, 0.200), (-0.061, 0.0, 0.194), (-0.072, 0.0, 0.172), (-0.075, 0.0, 0.135), (-0.072, 0.0, 0.098), (-0.061, 0.0, 0.074), (-0.043, 0.0, 0.068)]
+    handle = tube("asa", hp, [0.0075] * len(hp), sides=16)
     lib.subsurf(handle, 1)
     give(handle, dark)
     anchors = []
-    for z in (0.205, 0.066):
+    for z in (0.200, 0.068):
         a = revolve("anclaje", [(0.0, -0.005), (0.009, -0.005), (0.009, 0.005), (0.0, 0.005)], 20)
         a.rotation_euler = (0.0, math.radians(90.0), 0.0)
-        a.location = (0.043, 0.0, z)
+        a.location = (-0.042, 0.0, z)
         give(a, steel)
         anchors.append(a)
-    return [body, base, collar, cap, grip, handle] + anchors
+    # Tapa-vaso boca abajo, al lado.
+    cup = revolve("vaso", [(0.0, 0.0), (0.036, 0.0), (0.0385, 0.004), (0.0395, 0.040), (0.0375, 0.046), (0.0, 0.046)], 56)
+    lib.subsurf(cup, 1)
+    cup.location = (0.085, 0.020, 0.0)
+    give(cup, steel)
+    grip = revolve("goma_vaso", [(0.0398, 0.012), (0.0408, 0.014), (0.0408, 0.030), (0.0398, 0.032), (0.0392, 0.022)], 56, closed=True)
+    grip.location = cup.location
+    give(grip, dark)
+    return [body, base, shoulder, cebador, spout, plug, lever, handle, cup, grip] + anchors
 
 
 def yerba_pack():
@@ -343,46 +470,72 @@ def pelota():
     return [o]
 
 
-def _alpargata(side):
-    # Suela de yute trenzado (franjas en espiral), capellada de lona azul y ribete.
-    jute = tinted("yute", "#C8A874", rough=0.95)
-    canvas = tinted("lona", "#2B3E66", rough=0.85)
-    L, W = 0.255, 0.092
+def _foot(t, W):
+    """Medio ancho del pie (t = 0 talón, 1 punta)."""
+    w = W / 2 * (0.70 + 0.30 * math.sin(math.pi * min(1.0, t * 1.2)) ** 0.6)
+    if t > 0.82:
+        k = (t - 0.82) / 0.18
+        w *= math.sqrt(max(0.0, 1.0 - k * k)) * 0.9 + 0.1 * (1.0 - k)
+    return w
 
-    def foot(t):  # medio ancho del pie a lo largo (t = 0 talón, 1 punta)
-        return W / 2 * (0.72 + 0.28 * math.sin(math.pi * min(1.0, t * 1.25)) ** 0.7) * (1.0 - 0.6 * max(0.0, t - 0.85) / 0.15 * max(0.0, t - 0.85) / 0.15)
 
-    outline = []
-    n = 28
-    for i in range(n + 1):
-        t = i / n
-        outline.append((-L / 2 + L * t, foot(t) * (0.2 if i in (0, n) else 1.0)))
-    for i in range(n - 1, 0, -1):
-        t = i / n
-        outline.append((-L / 2 + L * t, -foot(t)))
-    sole = extrude_outline("suela", outline, 0.0, 0.021)
-    lib.bevel(sole, 0.004, 2, 40.0)
+def _alpargata(dx, dy, yaw):
+    # Suela de yute trenzado (la cuerda que da la vuelta, con la trenza pintada), capellada de lona negra
+    # cerrada adelante y abierta atrás, y la puntera de goma. Se lee como zapatilla de tela, no como mano.
+    jute = tinted("yute", "#D4B47C", rough=0.95)
+    canvas = tinted("lona", "#22252C", rough=0.85)
+    rubber = tinted("puntera", "#3B3E46", rough=0.7)
+    L, W, T = 0.255, 0.094, 0.024
+    n = 36
+    outline = [(-L / 2 + L * i / n, _foot(i / n, W) * (0.35 if i in (0, n) else 1.0)) for i in range(n + 1)]
+    outline += [(-L / 2 + L * i / n, -_foot(i / n, W)) for i in range(n - 1, 0, -1)]
+    sole = extrude_outline("suela", outline, 0.0, T)
+    lib.bevel(sole, 0.005, 2, 40.0)
     give(sole, jute)
-    paint(sole, lambda c: 0.78 + 0.22 * math.sin(c.z * 900.0 + math.atan2(c.y, c.x) * 6.0) ** 2)
-    # Capellada: un domo estirado sobre los dos tercios delanteros, abierto atrás (la boca).
+    paint(sole, lambda c: 0.55 + 0.45 * (0.5 + 0.5 * math.sin(c.z * 1100.0 + abs(math.sin(c.x * 260.0)) * 4.0))) # espiga del yute
+    # La cuerda trenzada alrededor, a media altura: rayas en diagonal que giran (trenza).
+    # La trenza de yute: dos cordones que giran en espiral alrededor de la suela (relieve de soga).
+    ring = [Vector((x * 1.0, y * 1.04, 0.0)) for (x, y) in outline]
+    dense = []
+    for i in range(len(ring)):
+        p, q = ring[i], ring[(i + 1) % len(ring)]
+        for k in range(4):
+            dense.append(p.lerp(q, k / 4.0))
+    dense.append(dense[0])
+    strands = []
+    for strand in range(2):
+        pts = []
+        for i, p in enumerate(dense):
+            out = Vector((p.x, p.y, 0.0)).normalized()
+            th = i * 0.55 + strand * math.pi
+            off = out * math.cos(th) * T * 0.16 + Vector((0.0, 0.0, 1.0)) * math.sin(th) * T * 0.22
+            pts.append(tuple(p + out * T * 0.10 + Vector((0.0, 0.0, T * 0.5)) + off))
+        cord = tube("cordon", pts, [T * 0.2] * len(pts), sides=8)
+        give(cord, jute)
+        paint(cord, lambda c, k=strand: 0.82 if k == 0 else 0.66)
+        strands.append(cord)
+    rope = lib.join(strands, "trenza")
+    # Capellada: arco de lona sobre el pie; adelante cerrado, atrás solo los costados (la boca).
     bm = bmesh.new()
-    cols = 22
-    rows = 9
+    cols, rows = 30, 12
     grid = []
     for r in range(rows + 1):
-        u = r / rows  # 0 base .. 1 arriba
+        u = r / rows
         row = []
-        for c in range(cols + 1):
-            t = 0.42 + 0.58 * c / cols
+        for cidx in range(cols + 1):
+            t = 0.05 + 0.93 * cidx / cols
+            half = _foot(t, W) * 1.03
+            hmax = 0.050 * (0.55 + 0.45 * math.sin(math.pi * min(1.0, (t - 0.05) / 0.75))) * (1.0 - 0.8 * max(0.0, (t - 0.8) / 0.2) ** 2)
             ang = math.pi * u
-            half = foot(t) * 1.02
-            y = half * math.cos(ang)
-            hgt = 0.048 * math.sin(ang) * (1.0 - 0.75 * ((t - 0.42) / 0.58) ** 2.2)
-            row.append(bm.verts.new((-L / 2 + L * t, y, 0.020 + hgt)))
+            row.append(bm.verts.new((-L / 2 + L * t, half * math.cos(ang), T + hmax * math.sin(ang))))
         grid.append(row)
     for r in range(rows):
-        for c in range(cols):
-            bm.faces.new((grid[r][c], grid[r][c + 1], grid[r + 1][c + 1], grid[r + 1][c]))
+        for cidx in range(cols):
+            t = 0.05 + 0.93 * (cidx + 0.5) / cols
+            u = (r + 0.5) / rows
+            if t < 0.48 and 0.22 < u < 0.78: # la boca del pie
+                continue
+            bm.faces.new((grid[r][cidx], grid[r][cidx + 1], grid[r + 1][cidx + 1], grid[r + 1][cidx]))
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     me = bpy.data.meshes.new("capellada")
     bm.to_mesh(me)
@@ -393,64 +546,95 @@ def _alpargata(side):
     sol.thickness = 0.003
     lib.subsurf(upper, 1)
     give(upper, canvas)
-    paint(upper, lambda c: 0.85 + 0.15 * math.sin(c.x * 700.0) * math.sin(c.y * 700.0))
-    back = tube("talon", [(-L / 2 + 0.115, -W / 2 * 0.74, 0.030), (-L / 2 + 0.03, -W / 2 * 0.55, 0.034),
-                                    (-L / 2 + 0.006, 0.0, 0.036), (-L / 2 + 0.03, W / 2 * 0.55, 0.034), (-L / 2 + 0.115, W / 2 * 0.74, 0.030)],
-                          [0.007] * 5, sides=10, squash=0.45)
-    lib.subsurf(back, 2)
-    give(back, canvas)
-    trim = tube("ribete", [(-L / 2 + L * (0.42 + 0.58 * c / 16), foot(0.42 + 0.58 * c / 16) * 1.02 * math.cos(0.0), 0.021) for c in range(17)], [0.0022] * 17, sides=8)
-    give(trim, mat("ribete", "#1C2640", rough=0.8))
-    objs = [sole, upper, back, trim]
+    paint(upper, lambda c: 0.84 + 0.16 * (0.5 + 0.5 * math.sin(c.x * 1800.0) * math.sin(c.y * 1800.0)))
+    # Puntera de goma: un casquete apenas más grande sobre la punta.
+    toe = lib.sphere("puntera", 1.0, (L / 2 - 0.030, 0.0, T + 0.004), 24, 12, (0.040, _foot(0.93, W) * 1.06, 0.026))
+    give(toe, rubber)
+    insole = extrude_outline("plantilla", [(x * 0.92, y * 0.88) for (x, y) in outline], T - 0.001, T + 0.0015)
+    give(insole, mat("plantilla", "#B99A68", rough=0.9))
+    objs = [sole, rope, upper, toe, insole]
     for o in objs:
-        o.location.y += side * 0.06
-        o.rotation_euler.z += math.radians(8.0 * side)
+        o.location.x += dx
+        o.location.y += dy
+        o.rotation_euler.z += math.radians(yaw)
     return objs
 
 
 def alpargatas():
-    return _alpargata(1) + _alpargata(-1)
+    # El par, apoyado en el piso uno al lado del otro (una un poco adelantada).
+    return _alpargata(0.0, 0.058, 4.0) + _alpargata(0.022, -0.058, -3.0)
 
 
 def sifon():
-    # Sifón de soda: vidrio azulado con estrías, cabezal de metal con palanca y pico.
-    glass = mat("vidrio", (0.35, 0.62, 0.72), rough=0.08, alpha=0.55)
-    metal = mat("cromo", "#C7CBD0", rough=0.22, metal=0.95)
-    prof = [(0.0, 0.0), (0.042, 0.0), (0.0455, 0.006)]
-    for i in range(1, 12):
-        z = 0.006 + 0.17 * i / 11
-        prof.append((0.0455, z))
-    prof += [(0.044, 0.188), (0.036, 0.205), (0.024, 0.215), (0.021, 0.222), (0.0, 0.222)]
-    bottle = revolve("botella", prof, 48)
-    # Estrías verticales del vidrio.
-    for v in bottle.data.vertices:
-        r = math.hypot(v.co.x, v.co.y)
-        if r > 0.03 and 0.01 < v.co.z < 0.18:
-            a = math.atan2(v.co.y, v.co.x)
-            k = 1.0 + 0.035 * math.cos(a * 16.0)
-            v.co.x *= k
-            v.co.y *= k
-    lib.subsurf(bottle, 1)
+    # Sifón de soda clásico: botella alta de vidrio verde botella tallado en rombos (facetas hundidas que
+    # agarran la luz), cabezal de metal grande que abraza el cuello (pollera), cuerpo cilíndrico, palanca
+    # larga arriba que baja hacia adelante, pico que sale hacia adelante y abajo, y el tubo adentro.
+    glass = mat("vidrio_verde", (0.10, 0.42, 0.38), rough=0.06, alpha=0.7)
+    metal = mat("cromo", "#D3D7DC", rough=0.18, metal=0.95)
+    segs, rows = 12, 16
+    bm = bmesh.new()
+    ring_verts = []
+    for k in range(rows + 1):
+        z = 0.008 + 0.215 * k / rows
+        off = (math.pi / segs) * (k % 2) # filas corridas medio paso: rombos
+        r = 0.040 if k % 2 == 0 else 0.0368 # vértices hundidos en las filas impares: facetas talladas
+        if k == 0 or k == rows:
+            r = 0.038
+        ring_verts.append([bm.verts.new((r * math.cos(off + 2 * math.pi * i / segs), r * math.sin(off + 2 * math.pi * i / segs), z)) for i in range(segs)])
+    for k in range(rows):
+        a, b = ring_verts[k], ring_verts[k + 1]
+        for i in range(segs):
+            j = (i + 1) % segs
+            if k % 2 == 0:
+                bm.faces.new((a[i], a[j], b[i]))
+                bm.faces.new((a[j], b[j], b[i]))
+            else:
+                bm.faces.new((a[i], a[j], b[j]))
+                bm.faces.new((a[i], b[j], b[i]))
+    bot = bm.verts.new((0.0, 0.0, 0.0))
+    for i in range(segs):
+        bm.faces.new((bot, ring_verts[0][(i + 1) % segs], ring_verts[0][i]))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    me = bpy.data.meshes.new("botella")
+    bm.to_mesh(me)
+    bm.free()
+    bottle = bpy.data.objects.new("botella", me)
+    bpy.context.scene.collection.objects.link(bottle)
     give(bottle, glass)
-    head = revolve("cabezal", [(0.0, 0.218), (0.024, 0.218), (0.026, 0.232), (0.022, 0.262), (0.024, 0.272), (0.018, 0.282), (0.0, 0.284)], 32)
+    paint(bottle, lambda c: 0.75 + 0.25 * (0.5 + 0.5 * math.sin(math.atan2(c.y, c.x) * 12.0 + c.z * 150.0)))
+    neck = revolve("cuello", [(0.038, 0.223), (0.030, 0.236), (0.022, 0.244), (0.0, 0.244)], 24)
+    give(neck, glass)
+    straw = revolve("tubo", [(0.0, 0.008), (0.0035, 0.008), (0.0035, 0.250), (0.0, 0.250)], 12)
+    give(straw, mat("tubo", "#EEF2F3", rough=0.3))
+    # Cabezal de campana: pollera ancha que abraza el cuello, cuerpo que se angosta y corona arriba.
+    skirt = revolve("pollera", [(0.0, 0.222), (0.040, 0.222), (0.042, 0.230), (0.036, 0.248), (0.027, 0.262), (0.0, 0.263)], 40)
+    lib.subsurf(skirt, 1)
+    give(skirt, metal)
+    head = revolve("cabezal", [(0.0, 0.260), (0.0245, 0.260), (0.0205, 0.290), (0.0225, 0.302), (0.0175, 0.310), (0.0, 0.311)], 40)
     lib.subsurf(head, 1)
     give(head, metal)
-    spout = tube("pico", [(0.012, 0.0, 0.262), (0.040, 0.0, 0.264), (0.062, 0.0, 0.256), (0.072, 0.0, 0.244)], [0.006, 0.0055, 0.005, 0.0045], sides=14)
-    lib.subsurf(spout, 2)
+    # Pico recto y grueso que sale de adelante en diagonal hacia abajo (45 grados).
+    spout = tube("pico", [(0.012, 0.0, 0.286), (0.034, 0.0, 0.276), (0.056, 0.0, 0.258), (0.066, 0.0, 0.248)],
+                 [0.0078, 0.0072, 0.0066, 0.0062], sides=16)
     give(spout, metal)
-    lever = tube("palanca", [(-0.004, 0.0, 0.284), (0.020, 0.0, 0.296), (0.050, 0.0, 0.300), (0.064, 0.0, 0.296)], [0.0045, 0.006, 0.006, 0.005], sides=10, squash=0.5)
-    lib.subsurf(lever, 2)
+    nozzle = tube("boquilla", [(0.064, 0.0, 0.250), (0.070, 0.0, 0.244)], [0.0072, 0.0072], sides=16)
+    give(nozzle, metal)
+    # Palanca chata arriba: nace atrás en la bisagra, va casi horizontal y sobresale por delante del pico.
+    lever = tube("palanca", [(-0.026, 0.0, 0.314), (0.010, 0.0, 0.319), (0.050, 0.0, 0.314), (0.080, 0.0, 0.302)],
+                 [0.0058, 0.0075, 0.0072, 0.0062], sides=12, squash=0.38)
+    lib.subsurf(lever, 1)
     give(lever, metal)
-    straw = revolve("tubo", [(0.0, 0.012), (0.004, 0.012), (0.004, 0.22), (0.0, 0.22)], 12)
-    give(straw, mat("tubo", "#DDE6EA", rough=0.3))
-    return [bottle, head, spout, lever, straw]
+    hinge = revolve("bisagra", [(0.0, -0.011), (0.0065, -0.011), (0.0065, 0.011), (0.0, 0.011)], 14)
+    hinge.rotation_euler = (math.radians(90.0), 0.0, 0.0)
+    hinge.location = (-0.022, 0.0, 0.311)
+    give(hinge, metal)
+    spout = lib.join([spout, nozzle], "pico")
+    return [bottle, neck, straw, skirt, head, spout, lever, hinge]
 
-
-# --- Galpón ---------------------------------------------------------------------------------------
 
 def garrafa():
     # Garrafa de 10 kg: cuerpo con dos casquetes, zócalo, cuello con válvula y el aro protector con manijas.
-    red = tinted("garrafa_pintura", "#D24E2A", rough=0.45)
+    red = tinted("garrafa_pintura", "#3E6F8E", rough=0.45) # azul acero genérico
     steel = mat("garrafa_acero", "#8C9096", rough=0.4, metal=0.7)
     brass = mat("valvula", "#C9A24E", rough=0.3, metal=0.9)
     prof = [(0.0, 0.035), (0.10, 0.035), (0.135, 0.050), (0.152, 0.080), (0.158, 0.12), (0.158, 0.40),
@@ -544,79 +728,92 @@ def _half_drum(name, R, Lg, cz, upper):
 
 
 def chulengo():
-    # Chulengo: medio tambor de 200 l acostado sobre patas, tapa abierta con chimenea, parrilla con
-    # chorizos y brasas encendidas abajo.
-    black = tinted("chapa_negra", "#2A2826", rough=0.75)
-    steel = mat("parrilla", "#55595F", rough=0.45, metal=0.7)
+    # Chulengo: medio tambor de 200 l con pintura negra gastada y óxido, tapa abierta con chimenea y manija,
+    # parrilla con chorizos y morcillas grandes (para que se lean de lejos), brasas que brillan (en Godot
+    # laten) y la pinza apoyada al costado.
+    white = mat("chulengo_chapa", (1.0, 1.0, 1.0), rough=0.8)
+    steel = mat("parrilla", "#5A5E64", rough=0.45, metal=0.7)
     R, Lg, legh = 0.29, 0.86, 0.62
     objs = []
+
+    def chapa(c):
+        rust = max(0.0, noise3(c, 31.0) * 0.7 + noise3(c, 77.0) * 0.5 - 0.35) # manchas chicas de óxido
+        worn = 0.5 + 0.5 * noise3(c, 120.0)
+        base = (0.11 + 0.04 * worn, 0.105 + 0.035 * worn, 0.10 + 0.03 * worn)
+        r = min(1.0, rust * 1.6)
+        return (base[0] * (1 - r) + 0.46 * r, base[1] * (1 - r) + 0.21 * r, base[2] * (1 - r) + 0.08 * r)
     hinge = Vector((0.0, -R, legh + R))
     tub = _half_drum("batea", R, Lg, legh + R, upper=False)
-    give(tub, black)
-    paint(tub, lambda c: 0.75 + 0.25 * math.sin(c.x * 30.0 + c.y * 20.0) ** 2) # óxido y hollín
+    give(tub, white)
+    paint_rgb(tub, chapa)
     objs.append(tub)
-    # Aros del tambor.
     for x in (-Lg / 2 + 0.18, Lg / 2 - 0.18):
         hoop = tube("aro", [(x, R * 1.01 * math.cos(math.pi + math.pi * i / 20), legh + R + R * 1.01 * math.sin(math.pi + math.pi * i / 20)) for i in range(21)], [0.008] * 21, sides=8)
-        give(hoop, black)
+        give(hoop, white)
+        paint_rgb(hoop, chapa)
         objs.append(hoop)
-    # Tapa: la otra mitad del tambor, abierta 110 grados sobre la bisagra de atrás, con su chimenea.
     open_m = Matrix.Translation(hinge) @ Matrix.Rotation(math.radians(110.0), 4, "X") @ Matrix.Translation(-hinge)
     lid = _half_drum("tapa", R, Lg, legh + R, upper=True)
-    give(lid, black)
-    paint(lid, lambda c: 0.75 + 0.25 * math.sin(c.x * 30.0 + c.z * 20.0) ** 2)
+    give(lid, white)
+    paint_rgb(lid, chapa)
     lid.matrix_world = open_m
     objs.append(lid)
-    knob = tube("manija_tapa", [tuple(open_m @ Vector((-0.12, R * 0.45, legh + R + R * 0.95))), tuple(open_m @ Vector((0.12, R * 0.45, legh + R + R * 0.95)))], [0.012, 0.012], sides=10)
+    knob = tube("manija_tapa", [tuple(open_m @ Vector((-0.12, R * 0.45, legh + R + R * 0.95))), tuple(open_m @ Vector((0.12, R * 0.45, legh + R + R * 0.95)))], [0.013, 0.013], sides=12)
     give(knob, mat("madera_manija", "#8A5A34", rough=0.6))
     objs.append(knob)
     chim = tube("chimenea", [tuple(open_m @ Vector((0.28, 0.0, legh + 2.0 * R - 0.01))), tuple(open_m @ Vector((0.28, 0.0, legh + 2.0 * R + 0.22)))], [0.04, 0.04], sides=16)
-    give(chim, black)
+    give(chim, white)
+    paint_rgb(chim, chapa)
     objs.append(chim)
-    # Patas en tijera y travesaños.
     for x in (-Lg / 2 + 0.12, Lg / 2 - 0.12):
         for sgn in (-1, 1):
-            leg = tube("pata", [(x, sgn * 0.30, 0.0), (x, sgn * 0.10, legh + 0.06)], [0.012, 0.012], sides=8)
+            leg = tube("pata", [(x, sgn * 0.30, 0.0), (x, sgn * 0.10, legh + 0.06)], [0.013, 0.013], sides=8)
             give(leg, steel)
             objs.append(leg)
-        bar = tube("travesano", [(x, -0.21, 0.25), (x, 0.21, 0.25)], [0.008, 0.008], sides=8)
+        bar = tube("travesano", [(x, -0.21, 0.25), (x, 0.21, 0.25)], [0.009, 0.009], sides=8)
         give(bar, steel)
         objs.append(bar)
-    # Parrilla: varillas a lo largo del tambor, a la altura del corte.
     gz = legh + R - 0.05
-    for i in range(13):
-        y = -R * 0.85 + i * (R * 1.7 / 12)
-        rod = tube("varilla", [(-Lg / 2 + 0.03, y, gz), (Lg / 2 - 0.03, y, gz)], [0.0035, 0.0035], sides=6)
+    for i in range(11):
+        y = -R * 0.85 + i * (R * 1.7 / 10)
+        rod = tube("varilla", [(-Lg / 2 + 0.03, y, gz), (Lg / 2 - 0.03, y, gz)], [0.004, 0.004], sides=6)
         give(rod, steel)
         objs.append(rod)
-    # Brasas: carbones redondeados encendidos.
-    ember = mat("brasa", (0.9, 0.25, 0.05), rough=0.9, emission=(1.0, 0.35, 0.05))
+    # Brasas: carbones con emisión naranja, a la vista en la mitad de atrás y entre la carne.
+    ember = mat("brasa", (0.95, 0.30, 0.05), rough=0.9, emission=(1.0, 0.38, 0.06))
     coal = mat("carbon", "#1E1B19", rough=0.95)
-    for i in range(40):
-        x = random.uniform(-Lg / 2 + 0.08, Lg / 2 - 0.08)
-        y = random.uniform(-R * 0.55, R * 0.55)
-        z = legh + R - R * math.sqrt(max(0.0, 1.0 - (y / R) ** 2)) + 0.03 + random.uniform(0.0, 0.03)
-        c = lib.sphere("carbon", random.uniform(0.022, 0.034), (x, y, z), 8, 6, (1.0, random.uniform(0.7, 1.2), 0.7))
-        give(c, ember if random.random() < 0.45 else coal)
-        objs.append(c)
-    # Chorizos sobre la parrilla, con las marcas de la parrilla.
-    chori = tinted("chorizo", "#9A3B22", rough=0.45)
-    for i in range(5):
-        y = -0.16 + i * 0.08
-        x0 = -0.28 + random.uniform(-0.02, 0.02)
-        pts = [(x0 + 0.56 * t / 6, y + 0.012 * math.sin(t * 0.9), gz + 0.020) for t in range(7)]
-        ch = tube("chorizo", pts, [0.012, 0.017, 0.018, 0.018, 0.018, 0.017, 0.012], sides=12)
+    random.seed(5)
+    for i in range(70):
+        x = random.uniform(-Lg / 2 + 0.06, Lg / 2 - 0.06)
+        y = random.uniform(-R * 0.6, R * 0.6)
+        z = gz - 0.035 + random.uniform(-0.01, 0.012)
+        cobj = lib.sphere("carbon", random.uniform(0.020, 0.032), (x, y, z), 8, 6, (1.0, random.uniform(0.7, 1.2), 0.7))
+        give(cobj, ember if random.random() < 0.55 else coal)
+        objs.append(cobj)
+    # Chorizos y morcillas en la mitad de adelante de la parrilla, en diagonal, gordos y con marcas.
+    chori = tinted("chorizo", "#A8432A", rough=0.4)
+    morci = tinted("morcilla", "#3A1714", rough=0.45)
+    rows = [(-0.30, 0.16, chori, 0.021), (-0.30, 0.08, chori, 0.021), (-0.30, 0.0, morci, 0.026),
+            (0.04, 0.16, chori, 0.021), (0.04, 0.08, morci, 0.026), (0.04, 0.0, chori, 0.021)]
+    for (x0, y, mt, r) in rows:
+        pts = [(x0 + 0.24 * t / 6, y + 0.012 * math.sin(t * 1.1), gz + r * 0.9) for t in range(7)]
+        ch = tube("embutido", pts, [r * 0.55, r * 0.9, r, r, r, r * 0.9, r * 0.55], sides=14)
         lib.subsurf(ch, 1)
-        give(ch, chori)
-        paint(ch, lambda c: 0.65 + 0.35 * (0.5 + 0.5 * math.cos(c.y * 260.0)))
+        give(ch, mt)
+        paint(ch, lambda c: 0.6 + 0.4 * (0.5 + 0.5 * math.cos(c.y * 0.0 + c.x * 300.0))) # marcas de la parrilla
         objs.append(ch)
+    # Pinza apoyada contra el costado.
+    for dy in (-0.012, 0.012):
+        arm = tube("pinza", [(Lg / 2 + 0.01, dy, legh + R + 0.02), (Lg / 2 + 0.05, dy * 2.5, legh + 0.25), (Lg / 2 + 0.07, dy * 3.2, legh - 0.05)], [0.006, 0.006, 0.006], sides=8)
+        give(arm, steel)
+        objs.append(arm)
     return objs
 
 
 def conservadora():
     # Conservadora de telgopor forrada: cuerpo azul, tapa blanca con manija y traba.
-    blue = tinted("conserv_azul", "#2F69A8", rough=0.5)
-    white = mat("conserv_blanco", "#EDEFF0", rough=0.45)
+    blue = tinted("conserv_cuerpo", "#2F8A78", rough=0.5) # verde agua genérico
+    white = mat("conserv_tapa", "#EFE7D2", rough=0.45)
     W, D, H = 0.50, 0.32, 0.32
     body = extrude_outline("cuerpo", rounded_rect(W, D, 0.03, 4), 0.0, H)
     lib.bevel(body, 0.006, 2, 40.0)
@@ -638,4 +835,4 @@ def conservadora():
 BUILD = {"mate": mate, "termo": termo, "yerba": yerba_pack, "pelota": pelota, "alpargatas": alpargatas,
          "sifon": sifon, "garrafa": garrafa, "cajon": cajon, "chulengo": chulengo, "conservadora": conservadora}
 parts = BUILD[which]()
-lib.finish(parts, "prop_" + which, A, angle=40.0)
+finish(parts, "prop_" + which, angle=15.0 if which == "sifon" else 40.0)
