@@ -617,6 +617,15 @@ func _run_demo(dir: String) -> void:
 	menu.queue_free()
 	await _wait(1.2)
 	_shot(dir, "01_inicio")
+	var vein: PackedInt32Array = PackedInt32Array() # una veta de aire en el medio, para revisarla en la captura
+	for x: int in range(1, sim.sheet.width - 1):
+		var vi: int = sim.grid.index(x, sim.sheet.height >> 1)
+		sim.sheet.pressure[vi] = 1.9
+		sim.sheet.refresh_state(vi)
+		vein.append(vi)
+	sim.sheet.notify_changed(vein)
+	await _wait(0.5)
+	_shot(dir, "01b_veta")
 	sim.state.pops = 4000.0
 	var c: Vector2 = sim.center()
 	await _demo_swipe(c + Vector2(-2.0, -1.0), c + Vector2(2.0, 1.0), 0.7)
