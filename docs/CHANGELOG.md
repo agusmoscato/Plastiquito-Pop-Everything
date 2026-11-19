@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.6.0 — Escenarios argentinos y niveles con diseño (2026-11-19, sin mergear)
+
+Pedido del dueño: cosas argentinas modeladas en Blender en cada escenario, niveles y dificultad que
+no sean solo cliquear, y una presentación de las especiales.
+- **Utilería argentina** (`art/models/argentina.py`, Blender sin interfaz, escala real): Mesa con mate
+  (calabaza, virola de alpaca, yerba en montañita y bombilla), termo y paquete de yerba sin marca; Piso
+  con pelota de cuero de 32 gajos (icosaedro truncado real), alpargatas y sifón de soda; Galpón con
+  garrafa y cajones de naranjas; Estacionamiento con chulengo (chorizos, brasas y humo) y conservadora.
+  En la Mesa y el Piso la lámina llena un poco menos del área de juego para que se vean.
+- **Láminas diseñadas:** cada lámina trae vetas de aire (líneas, anillos, racimos, zigzags y cruces de
+  burbujas casi llenas, en ámbar y latiendo). Reventar una encadena la veta entera: hay que mirar la
+  lámina y elegir dónde apretar.
+- **Dificultad:** desde el Galpón aparece el doble film (7 %, 12 % en el Estacionamiento): la
+  herramienta lo aplasta dos veces; una cadena lo revienta igual.
+- **Encargos:** cada lámina trae un pedido (cadena de N, N tensas, todas las especiales, llegar a un
+  ritmo) que crece con la fase y el tamaño de la lámina. Cumplirlo paga un bono y suma racha (+4 % de
+  Pops por encargo seguido, hasta 5); terminar la lámina sin cumplirlo la corta.
+- **Presentaciones:** la primera vez que aparece cada especial, una veta o el doble film, una tarjeta
+  dice qué hace y una flecha señala una; espera a que la pruebes. Se guarda por PC, así que también
+  aparece en partidas que vienen de versiones anteriores (antes, si ya se habían "descubierto", no se
+  explicaban nunca).
+
+Balance (vetas, bonos y racha casi duplicaban el ingreso): base de Pops por fase x0,5 (0,5 / 50 /
+5.000 / 500.000), divisor de Pellets 1,38 M, Recarga automática 1800, palma 4000, escala de la Mesa 1,0.
+Simulador completo (3 semillas): Piso 21-22 min (activo) y 29-30 (casual), Galpón 71-73 y 79-80,
+Estacionamiento 125-127 y 129-134. Medianas entre compras 27-29 s (objetivo 30; en la 0.5.0 eran 7-14
+en la parte final). El perfil idle rinde 16-26 % del activo (objetivo 20-45 %; antes 3-13 %).
+
+Pendiente:
+- Esperas de 3,5 a 4,5 min sin poder comprar justo antes del reciclado que abre el Galpón y al final
+  del Estacionamiento (el simulador las marca: objetivo 3 min).
+- En la Mesa y el Piso la utilería asoma junto a la hoja de pedidos (a escala real el mate es tan grande
+  como la primera lámina); se ve entera a medida que la lámina crece.
+- Nada de esto se jugó con ventana: solo capturas de CI y el simulador.
+
 ## 0.5.0 — Arranque progresivo, rollo gigante y papel de burbujas real (2026-11-19, sin mergear)
 
 Pedidos del dueño tras probar la 0.4.0, uno por uno:
