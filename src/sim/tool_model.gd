@@ -49,6 +49,7 @@ var last_wave_cells: PackedInt32Array = PackedInt32Array()
 ## Resultados del último step().
 var popped: PackedInt32Array = PackedInt32Array()
 var new_pressed: int = 0 ## celdas que empezaron a aplastarse en este step
+var cracked: PackedInt32Array = PackedInt32Array() ## doble film que se rompió en este step (quedan enteras)
 var last_weights: PackedFloat32Array = PackedFloat32Array()
 
 var _active: Dictionary = {} ## celdas con press > 0 (idx -> true)
@@ -254,6 +255,7 @@ func _roller_cells(from: Vector2, to: Vector2) -> PackedInt32Array:
 func step(touched: PackedInt32Array, delta: float, weights: PackedFloat32Array = PackedFloat32Array(),
 		dir: Vector2 = Vector2.ZERO) -> PackedInt32Array:
 	popped = PackedInt32Array()
+	cracked = PackedInt32Array()
 	new_pressed = 0
 	var changed: PackedInt32Array = PackedInt32Array()
 	var now_touched: Dictionary = {}
@@ -339,6 +341,13 @@ func _press_cell(idx: int, delta: float, entered_dragging: bool, changed: Packed
 		gain += drag_entry_fraction * resistance
 	var value: float = before + gain
 	_squeeze_air(idx, minf(gain, resistance - before) / resistance, now_touched, dir, changed)
+	if value >= resistance and sheet.armor[idx] > 0: # doble film: se rompe la capa de afuera
+		sheet.armor[idx] = 0
+		sheet.press[idx] = 0.0
+		_active.erase(idx)
+		cracked.append(idx)
+		changed.append(idx)
+		return
 	if value >= resistance:
 		sheet.press[idx] = 0.0
 		_active.erase(idx)

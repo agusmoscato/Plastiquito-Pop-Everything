@@ -63,6 +63,8 @@ func test_golden_is_worth_ten_times() -> void:
 	var a: int = sim.grid.index(2, 2)
 	var b: int = sim.grid.index(6, 6)
 	sim.sheet.type[a] = GameSim.TYPE_GOLDEN
+	sim.sheet.pressure[a] = 1.0 # sin veta de aire debajo: misma presión en las dos
+	sim.sheet.pressure[b] = 1.0
 	sim.chain.pop_now(a)
 	sim.chain.pop_now(b)
 	sim._collect_events(false)
@@ -294,3 +296,100 @@ func test_all_upgrade_descriptions_short() -> void:
 		assert_lte(str(u["desc_es"]).length(), 60, str(u["id"]))
 		assert_lte(str(u["desc_en"]).length(), 60, str(u["id"]))
 		assert_false(str(u["desc_es"]).contains("!!"), str(u["id"]))
+
+
+func test_sheets_come_with_air_veins_that_chain() -> void:
+	assert_gt(sim.vein_cells.size(), 3, "la lámina trae vetas de aire")
+	for idx: int in sim.vein_cells:
+		assert_eq(sim.sheet.state[idx], SheetModel.STATE_TENSE, "las vetas se ven tensas")
+	var line: SheetModel = SheetModel.new(12, 12)
+	var g: HexGrid = HexGrid.new(12, 12, 0.5)
+	var cells: PackedInt32Array = PackedInt32Array()
+	for x: int in range(2, 10):
+		cells.append(g.index(x, 6))
+		line.pressure[g.index(x, 6)] = 1.9
+	var ch: ChainSolver = ChainSolver.new(line, g)
+	ch.k = 0.5
+	ch.pop_now(cells[0])
+	for i: int in 40:
+		ch.step()
+	var popped: int = 0
+	for idx: int in cells:
+		if line.state[idx] == SheetModel.STATE_POPPED:
+			popped += 1
+	assert_eq(popped, cells.size(), "reventar la punta encadena la veta entera")
+	assert_lt(line.count_popped(), cells.size() + 3, "y no se desparrama por la lámina")
+
+
+func test_armor_needs_two_presses_but_chains_pop_it() -> void:
+	sim.state.levels["global_hold"] = 1
+	sim.refresh_stats()
+	var idx: int = sim.grid.index(4, 4)
+	sim.sheet.pressure[idx] = 1.0
+	sim.sheet.armor[idx] = 1
+	var p: Vector2 = sim.grid.cell_to_world(idx)
+	var i: int = 0
+	while sim.sheet.armor[idx] == 1 and i < 120:
+		sim.step(1.0 / 60.0, p, true)
+		i += 1
+	assert_eq(sim.sheet.state[idx], SheetModel.STATE_INTACT, "la primera aplastada rompe solo el doble film")
+	for k: int in 120:
+		sim.step(1.0 / 60.0, p, true)
+	assert_eq(sim.sheet.state[idx], SheetModel.STATE_POPPED, "la segunda la revienta")
+	var other: int = sim.grid.index(1, 1)
+	sim.sheet.armor[other] = 1
+	sim.chain.pop_now(other)
+	assert_eq(sim.sheet.state[other], SheetModel.STATE_POPPED, "una cadena la revienta igual")
+	var data: Dictionary = sim.sheet.to_dict()
+	var back: SheetModel = SheetModel.new()
+	assert_true(back.from_dict(data))
+	assert_eq(back.armor[other], 1, "el doble film se guarda")
+
+
+func test_armor_only_from_the_warehouse() -> void:
+	for t: int in sim.sheet.armor:
+		assert_eq(t, 0, "en la Mesa no hay doble film")
+	var w: GameSim = GameSim.new(db, 9)
+	w.state.perm["perm_sheet"] = 2
+	w.refresh_stats()
+	w.new_sheet()
+	var hard: int = 0
+	for t: int in w.sheet.armor:
+		hard += t
+	assert_gt(hard, 0, "en el Galpón aparece")
+
+
+func test_encargo_pays_and_builds_a_streak() -> void:
+	sim.encargo = Encargo.new()
+	sim.encargo.kind = "chain"
+	sim.encargo.target = 3
+	var before: float = sim.state.pops
+	sim.chain_count = 5
+	sim._track_encargo()
+	assert_true(sim.ev_encargo_done)
+	assert_gt(sim.state.pops, before, "paga un bono")
+	assert_eq(sim.streak, 1)
+	assert_gt(sim.streak_mult(), 1.0, "la racha sube el valor de los Pops")
+	sim.encargo = Encargo.new()
+	sim.encargo.kind = "combo"
+	sim.encargo.target = 4
+	sim._sheet_finished = true
+	sim._track_encargo()
+	assert_true(sim.ev_encargo_failed)
+	assert_eq(sim.streak, 0, "terminar la lámina sin cumplirlo corta la racha")
+
+
+func test_encargo_targets_grow_with_phase() -> void:
+	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+	var cfg: Dictionary = db.economy["encargos"]
+	var small: int = 0
+	var big: int = 0
+	for i: int in 30:
+		rng.seed = i
+		var a: Encargo = Encargo.roll(rng, 1, 64, 0, 0, cfg)
+		rng.seed = i
+		var b: Encargo = Encargo.roll(rng, 4, 110 * 110, 0, 0, cfg)
+		if a.kind == "chain" and b.kind == "chain":
+			small = a.target
+			big = b.target
+	assert_gt(big, small, "más fase y más lámina, cadena más larga")

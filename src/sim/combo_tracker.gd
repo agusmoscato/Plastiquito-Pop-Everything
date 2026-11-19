@@ -41,6 +41,17 @@ func rate(now: float) -> float:
 	return total / window_seconds
 
 
+## Escalón del ritmo (0 = x1 .. el último). Para el encargo "llegá al ritmo".
+func level(now: float) -> int:
+	var m: float = multiplier(now)
+	var lv: int = 0
+	for i: int in multipliers.size():
+		var step_m: float = multipliers[i]
+		if m >= step_m - 0.0001:
+			lv = i
+	return lv
+
+
 func multiplier(now: float) -> float:
 	return Economy.combo_multiplier(rate(now), rates, multipliers)
 

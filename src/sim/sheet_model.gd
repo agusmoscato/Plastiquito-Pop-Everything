@@ -24,6 +24,9 @@ var state: PackedByteArray = PackedByteArray()
 var type: PackedByteArray = PackedByteArray()
 ## Aplastamiento acumulado por burbuja (0 .. resistencia).
 var press: PackedFloat32Array = PackedFloat32Array()
+## Doble film (desde el Galpón): 1 = la primera vez que la herramienta la aplasta del todo solo se rompe
+## la capa de afuera y queda como burbuja normal. Las cadenas la revientan igual (premian encadenar).
+var armor: PackedByteArray = PackedByteArray()
 ## Fracción reventada a partir de la cual se pide lámina nueva (DESIGN 2).
 var reload_threshold: float = 0.9
 ## Aire (DESIGN 3.2): una burbuja con presión >= tense_threshold está tensa; max_pressure la revienta.
@@ -59,6 +62,9 @@ func reset(p_width: int, p_height: int) -> void:
 	press = PackedFloat32Array()
 	press.resize(n)
 	press.fill(0.0)
+	armor = PackedByteArray()
+	armor.resize(n)
+	armor.fill(0)
 	_state_counts = PackedInt32Array([n, 0, 0])
 	_reload_signaled = false
 
@@ -213,6 +219,7 @@ func to_dict() -> Dictionary:
 		"state": Marshalls.raw_to_base64(state),
 		"type": Marshalls.raw_to_base64(type),
 		"press": Marshalls.raw_to_base64(press.to_byte_array()),
+		"armor": Marshalls.raw_to_base64(armor),
 	}
 
 
@@ -244,6 +251,13 @@ func from_dict(data: Dictionary) -> bool:
 	state = new_state
 	type = new_type
 	press = new_press
+	armor = PackedByteArray()
+	armor.resize(n)
+	armor.fill(0)
+	if data.has("armor"): # opcional: los guardados de antes no lo tienen
+		var a: PackedByteArray = Marshalls.base64_to_raw(str(data["armor"]))
+		if a.size() == n:
+			armor = a
 	_recount()
 	_reload_signaled = popped_ratio() >= reload_threshold
 	return true

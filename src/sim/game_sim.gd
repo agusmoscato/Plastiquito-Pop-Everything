@@ -39,6 +39,15 @@ var ev_squish: bool = false
 var ev_burned: PackedInt32Array = PackedInt32Array() ## plancha quieta: celdas derretidas (humo y chirrido)
 var ev_revived: PackedInt32Array = PackedInt32Array() ## Ecos que se volvieron a inflar
 var ev_auto_from: int = 0 ## desde este índice de ev_* los reventones son de la automatización
+var ev_cracked: PackedInt32Array = PackedInt32Array() ## doble film que se rompió (siguen enteras)
+var ev_encargo_done: bool = false ## el encargo se cumplió en este paso
+var ev_encargo_bonus: float = 0.0
+var ev_encargo_failed: bool = false ## la lámina terminó sin cumplir el encargo (se cortó la racha)
+
+var encargo: Encargo ## el pedido de la lámina en curso
+var streak: int = 0 ## encargos cumplidos seguidos
+var vein_cells: PackedInt32Array = PackedInt32Array() ## vetas de aire de la lámina en curso
+var _sheet_finished: bool = false
 
 var chain_count: int = 0 ## tamaño de la cadena en curso (0 si no hay)
 var chain_value: float = 0.0
@@ -109,7 +118,10 @@ func new_sheet() -> void:
 	grid = HexGrid.new(dim, dim, Cfg.num(db.sheet, "bubble_radius"))
 	_build_models()
 	_apply_to_sheet()
+	var pat: Dictionary = db.sheet["patterns"]
+	vein_cells = SheetPatterns.apply(sheet, grid, rng, phase(), pat)
 	_generate_specials()
+	_roll_encargo()
 	reload_timer = -1.0
 	awaiting_reload = false
 	_chain_active = false
@@ -220,7 +232,55 @@ func _generate_specials() -> void:
 			ev_new_specials.append(t)
 
 
+func _roll_encargo() -> void:
+	var specials: int = 0
+	for t: int in sheet.type:
+		if t != 0:
+			specials += 1
+	var cfg: Dictionary = eco["encargos"]
+	encargo = Encargo.roll(rng, phase(), sheet.cell_count(), sheet.count_tense(), specials, cfg)
+	_sheet_finished = false
+
+
+## Multiplicador de la racha de encargos (+streak_bonus por cada uno seguido).
+func streak_mult() -> float:
+	var cfg: Dictionary = eco["encargos"]
+	return 1.0 + Cfg.num(cfg, "streak_bonus") * float(streak)
+
+
+## Sigue el encargo con los eventos del paso: paga el bono al cumplirlo y corta la racha si la lámina
+## terminó sin cumplirlo.
+func _track_encargo() -> void:
+	if encargo == null:
+		return
+	var tense: int = 0
+	var specials: int = 0
+	for i: int in ev_idx.size():
+		if ev_pressure[i] >= sheet.tense_threshold:
+			tense += 1
+		if ev_type[i] != 0:
+			specials += 1
+	var chain_now: int = maxi(chain_count, ev_chain_ended_count)
+	if encargo.observe(chain_now, tense, specials, combo.level(now)):
+		var cfg: Dictionary = eco["encargos"]
+		var bases: Array = eco["phase_base_values"]
+		var base: float = bases[mini(phase(), bases.size()) - 1]
+		var bonus: float = float(sheet.cell_count()) * base * Cfg.num(stats, "value_mult") * Cfg.num(cfg, "reward_sheet_fraction") * streak_mult()
+		state.pops += bonus
+		state.pops_run += bonus
+		state.pops_total += bonus
+		streak = mini(streak + 1, Cfg.integer(cfg, "streak_cap"))
+		ev_encargo_done = true
+		ev_encargo_bonus = bonus
+	if _sheet_finished:
+		_sheet_finished = false
+		if not encargo.done:
+			streak = 0
+			ev_encargo_failed = true
+
+
 func _on_reload_requested() -> void:
+	_sheet_finished = true
 	state.sheets_done += 1
 	if auto_reload():
 		reload_timer = Cfg.num(eco, "reload_delay_auto")
@@ -287,6 +347,7 @@ func step(dt: float, pointer: Vector2, pressing: bool) -> void:
 			_enqueue_overloaded(tm.last_wave_cells)
 	elif click_only and not touched.is_empty():
 		popped = tm.step(touched, tm.resistance / maxf(tm.force_per_second, 0.01) + 0.001, tm.last_weights, Vector2.ZERO) # un clic, un reventón
+		ev_cracked = tm.cracked
 		tm.step(PackedInt32Array(), 0.0) # suelta: el próximo reventón pide otro clic
 	else:
 		popped = tm.step(touched, dt, tm.last_weights, dir)
@@ -295,6 +356,7 @@ func step(dt: float, pointer: Vector2, pressing: bool) -> void:
 			tm.apply_heat(pointer, dt, pointer - _prev_pointer)
 			ev_burned = tm.burned
 		ev_squish = tm.new_pressed > 0
+		ev_cracked = tm.cracked
 	_prev_pointer = pointer
 	_prev_pressing = pressing
 	chain.clear_events()
@@ -312,6 +374,7 @@ func step(dt: float, pointer: Vector2, pressing: bool) -> void:
 	_step_automation(dt)
 	_tick_echoes(dt)
 	_track_chain()
+	_track_encargo()
 
 
 ## Manitos y rodillo automático: revientan solos; su valor no lleva combo (premia jugar activo).
@@ -407,6 +470,10 @@ func _clear_events() -> void:
 	ev_squish = false
 	ev_revived = PackedInt32Array()
 	ev_auto_from = 0
+	ev_cracked = PackedInt32Array()
+	ev_encargo_done = false
+	ev_encargo_bonus = 0.0
+	ev_encargo_failed = false
 
 
 ## Valor de cada reventón del step (base * p^2 * tipo * combo * global) y suma a los Pops.
@@ -414,7 +481,7 @@ func _collect_events(auto: bool, direct: int = 0) -> void:
 	var bases: Array = eco["phase_base_values"]
 	var base: float = bases[mini(phase(), bases.size()) - 1]
 	var m_combo: float = 1.0 if auto else combo.multiplier(now)
-	var m_global: float = Cfg.num(stats, "value_mult")
+	var m_global: float = Cfg.num(stats, "value_mult") * streak_mult()
 	for i: int in chain.events_idx.size():
 		var t: int = chain.events_type[i]
 		var m_type: float = Cfg.num(eco, "golden_multiplier") if t == TYPE_GOLDEN else 1.0

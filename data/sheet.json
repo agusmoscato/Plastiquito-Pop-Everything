@@ -15,6 +15,15 @@
     "min_pressure": 0.4,
     "chain_k": 0.5,
     "chain_k_max": 0.62,
-    "chain_budget_per_frame": 40
+    "chain_budget_per_frame": 40,
+    "patterns": {
+      "_note": "Vetas de aire (SheetPatterns): burbujas casi llenas con forma; reventar una encadena la veta. Doble film desde el Galpón.",
+      "veins_per_100_cells": [1.2, 0.9, 0.7, 0.55],
+      "vein_length_k": 0.35,
+      "vein_length_max": 16,
+      "vein_pressure_min": 1.88,
+      "vein_pressure_max": 1.95,
+      "armor_fraction": [0.0, 0.0, 0.07, 0.12]
+    }
   }
 }

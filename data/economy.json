@@ -4,10 +4,10 @@
  "economy": {
   "placeholder": true,
   "phase_base_values": [
-   1.0,
-   100.0,
-   10000.0,
-   1000000.0
+   0.5,
+   50.0,
+   5000.0,
+   500000.0
   ],
   "phase_sheet_sizes": [
    20,
@@ -43,7 +43,7 @@
   "chance_golden": 0.02,
   "chance_bomb": 0.012,
   "chance_line": 0.012,
-  "pellet_divisor": 2300000.0,
+  "pellet_divisor": 1150000.0,
   "pellet_exponent": 0.5,
   "autosave_seconds": 30.0,
   "reload_delay_manual": 0.5,
@@ -82,6 +82,15 @@
   "new_phase_discount": 0.4,
   "relearn_cost_factor": 0.35,
   "reveal_cost_fraction": 0.3,
-  "reveal_free_below": 50.0
+  "reveal_free_below": 50.0,
+  "encargos": {
+   "_note": "Encargo de cada lámina (Encargo): bono = celdas x valor base x mult. global x reward_sheet_fraction. Racha: +streak_bonus de Pops por encargo seguido.",
+   "chain_base": [8, 12, 14, 16],
+   "veins_fraction": 0.6,
+   "combo_level": [2, 3, 3, 4],
+   "reward_sheet_fraction": 0.6,
+   "streak_bonus": 0.04,
+   "streak_cap": 5
+  }
  }
 }
