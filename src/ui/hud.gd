@@ -25,6 +25,7 @@ var flyers: FlyingNumbers
 var shop: ShopSheet
 var recycle_panel: RecyclePanel
 var bubble_log: BubbleLog
+var special_card: SpecialCard
 
 var _tool_buttons: Dictionary = {} ## id -> StampButton
 var _recycle_button: StampButton
@@ -90,6 +91,9 @@ func setup(p_sim: GameSim, p_camera: Camera3D) -> void:
 	var hint: FirstHint = FirstHint.new()
 	hint.setup(sim)
 	root.add_child(hint)
+	special_card = SpecialCard.new()
+	special_card.setup()
+	root.add_child(special_card)
 	chain_stamp = ChainStamp.new()
 	chain_stamp.setup()
 	chain_stamp.slammed.connect(func(n: int) -> void: chain_slammed.emit(n))

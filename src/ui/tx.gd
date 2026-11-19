@@ -20,6 +20,8 @@ const T: Dictionary = {
 	"close": {"es": "CERRAR", "en": "CLOSE"},
 	"bubblepedia": {"es": "BURBUJARIO", "en": "BUBBLE LOG"},
 	"new": {"es": "NUEVA", "en": "NEW"},
+	"new_special": {"es": "BURBUJA NUEVA", "en": "NEW BUBBLE"},
+	"special_more": {"es": "Las mejoras de especiales hacen que salgan más.", "en": "Special upgrades make them show up more."},
 	"night_shift": {"es": "TURNO NOCHE", "en": "NIGHT SHIFT"},
 	"chain": {"es": "CADENA", "en": "CHAIN"},
 	"why_hold": {"es": "Para reventar varias arrastrando, sin soltar.", "en": "To pop many by dragging, without letting go."},

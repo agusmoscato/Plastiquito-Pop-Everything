@@ -9,6 +9,7 @@ const TYPES: Array[Dictionary] = [
 	{"id": 1, "key": "golden"},
 	{"id": 2, "key": "bomb"},
 	{"id": 3, "key": "line"},
+	{"id": 4, "key": "echo"},
 ]
 
 

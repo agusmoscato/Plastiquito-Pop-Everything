@@ -229,3 +229,17 @@ func _flat(mesh: Mesh) -> ArrayMesh:
 	st.deindex()
 	st.generate_normals()
 	return st.commit()
+
+
+## Color de cada especial para la interfaz (la tarjeta de "burbuja nueva").
+static func color_of(t: int) -> Color:
+	match t:
+		GameSim.TYPE_GOLDEN:
+			return Color("#F2C94C")
+		GameSim.TYPE_BOMB:
+			return Color("#2B2A33")
+		GameSim.TYPE_LINE:
+			return Color("#2FB8CC")
+		GameSim.TYPE_ECHO:
+			return Color("#BFE9FF")
+	return UiKit.BUBBLE_BLUE

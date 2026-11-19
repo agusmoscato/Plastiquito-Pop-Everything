@@ -46,7 +46,7 @@
    "name_es": "Eco",
    "name_en": "Echo",
    "shape": "single",
-   "unlock_phase": 4,
+   "unlock_phase": 3,
    "balance": {
     "placeholder": true,
     "spawn_chance": 0.01,
