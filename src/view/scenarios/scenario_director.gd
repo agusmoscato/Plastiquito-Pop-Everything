@@ -8,7 +8,7 @@ extends Node
 ## Luz y entorno por fase: Mesa cálida, Piso con luz de ventana, Galpón frío cenital y
 ## Estacionamiento con atardecer largo.
 const SETTINGS: Array[Dictionary] = [
-	{"rot": Vector3(-50.0, -30.0, 0.0), "color": Color("#FFC98C"), "energy": 1.0, "amb": Color("#E6C7A0"), "amb_e": 0.45, "bg": Color("#2A1D14"), "shadow": 80.0},
+	{"rot": Vector3(-50.0, -30.0, 0.0), "color": Color("#FFD9AE"), "energy": 0.85, "amb": Color("#D8C2A8"), "amb_e": 0.3, "bg": Color("#2A1D14"), "shadow": 80.0},
 	{"rot": Vector3(-34.0, -68.0, 0.0), "color": Color("#FFF0C8"), "energy": 1.25, "amb": Color("#E0C9B8"), "amb_e": 0.5, "bg": Color("#3A2A24"), "shadow": 100.0},
 	{"rot": Vector3(-86.0, 0.0, 0.0), "color": Color("#CFE6FF"), "energy": 0.95, "amb": Color("#7F95B8"), "amb_e": 0.3, "bg": Color("#14181F"), "shadow": 140.0},
 	{"rot": Vector3(-24.0, -112.0, 0.0), "color": Color("#FFD2A8"), "energy": 1.45, "amb": Color("#C9C4C2"), "amb_e": 0.45, "bg": Color("#E9976A"), "shadow": 400.0},
