@@ -43,14 +43,14 @@
   "chance_golden": 0.02,
   "chance_bomb": 0.012,
   "chance_line": 0.012,
-  "pellet_divisor": 1150000.0,
+  "pellet_divisor": 1300000.0,
   "pellet_exponent": 0.5,
   "autosave_seconds": 30.0,
   "reload_delay_manual": 0.5,
   "reload_delay_auto": 0.2,
   "chain_stamp_min": 10,
   "phase_cost_scales": [
-    1.15,
+    1.0,
     320.0,
     36000.0,
     8000000.0

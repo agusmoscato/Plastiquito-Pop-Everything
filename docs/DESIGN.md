@@ -161,6 +161,16 @@ El juego tiene 7 fases, una por escenario. El final llega a las 6,5 horas y el 1
 - **Reciclado (3.7):** además de la lámina más grande, hay mejoras permanentes por herramienta inicial, automatización desde el arranque, probabilidad de especiales y "memoria del turno" (arrancás con un porcentaje de los niveles de la partida anterior). Se compran en un tablero de corcho.
 - **Escenarios (pilar 3):** cada fase tiene su escenario (madera, baldosas, hormigón, asfalto) y cambia durante la transición del reciclado.
 
+### Lo que cambió en las sesiones 4 y 5 (pedidos del dueño, 19/11/2026)
+
+- **Arranque progresivo:** al empezar cada clic revienta una burbuja; "Mantener apretado" (30 Pops, no se pierde al reciclar) habilita arrastrar. La palma pide eso primero. La lámina terminada espera a que el jugador tire una nueva del rollo gigante, hasta comprar "Recarga automática".
+- **Láminas diseñadas (vetas de aire):** cada lámina trae líneas, anillos, racimos, zigzags y cruces de burbujas casi llenas (presión 1,88-1,95). Reventar una encadena la veta entera y nada más: el juego premia mirar la lámina y elegir dónde apretar. Cantidad por fase en `data/sheet.json` ("patterns").
+- **Doble film (dificultad):** desde el Galpón el 7 % de las burbujas (12 % en el Estacionamiento) pide dos aplastadas de la herramienta; las cadenas las revientan igual, así que encadenar vale más.
+- **Encargos:** cada lámina trae un pedido (cadena de N, N tensas, todas las especiales, llegar a un ritmo). Cumplirlo paga el 60 % del valor base de la lámina y suma racha (+4 % de Pops por encargo seguido, hasta 5); terminar la lámina sin cumplirlo corta la racha.
+- **Presentaciones:** la primera vez que aparece cada especial, una veta o el doble film, una tarjeta explica qué hace y una flecha señala una; espera a que el jugador la pruebe. Las especiales aparecen recién después del primer reciclado.
+- **Escala:** la base de Pops por fase pasa a 0,5 / 50 / 5.000 / 500.000 (y el divisor de Pellets a la mitad) para compensar lo que suman vetas, encargos y racha. Primer reciclado del perfil activo a los ~21 min (el dueño pidió no hacer tantas cosas antes de reciclar).
+- **Escenarios argentinos:** Mesa con mate, termo y yerba; Piso con pelota de cuero, alpargatas y sifón; Galpón con garrafa y cajones de naranjas; Estacionamiento con chulengo (chorizos, brasas y humo) y conservadora. Pisos oscuros para que la lámina transparente se lea.
+
 
 ## 5. Estilo visual (todo por código)
 
