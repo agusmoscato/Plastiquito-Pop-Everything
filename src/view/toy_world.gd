@@ -68,7 +68,7 @@ func rebind_game_sheet(roll_in: bool, animate_camera: float = 0.0, scenario_seco
 	specials_view.bind(sheet, grid)
 	specials_view.visible = true
 	camera_rig.min_bubble_px = Cfg.num(db.juice, "camera_min_bubble_px")
-	camera_rig.sheet_fill = Cfg.num(db.juice, "camera_sheet_fill")
+	camera_rig.sheet_fill = sheet_fill_for(game.phase())
 	ScenarioProps.sheet_fill = camera_rig.sheet_fill
 	camera_rig.play_area = Cfg.num(db.juice, "camera_play_area")
 	camera_rig.fit_to(sheet_view.center(), sheet_view.extents(), animate_camera)
@@ -79,6 +79,16 @@ func rebind_game_sheet(roll_in: bool, animate_camera: float = 0.0, scenario_seco
 	if roll_in:
 		sheet_view.begin_roll_in()
 	sheet_replaced.emit()
+
+
+## Cuánto del área de juego llena la lámina en cada fase: en la Mesa y el Piso un poco menos, así se
+## ve la mesa (el mate y el termo) y el piso (la pelota y el sifón) alrededor.
+func sheet_fill_for(phase: int) -> float:
+	if db.juice.has("camera_sheet_fill_by_phase"):
+		var arr: Array = db.juice["camera_sheet_fill_by_phase"]
+		var f: float = arr[clampi(phase, 1, arr.size()) - 1]
+		return f
+	return Cfg.num(db.juice, "camera_sheet_fill")
 
 
 ## Escenario según la fase (1 Mesa, 2 Piso, 3 Galpón, 4 Estacionamiento), de golpe.

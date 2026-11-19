@@ -180,8 +180,9 @@ static func _table(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	lamp_light.position = Vector3(c.x - h.x - 9.0, 12.0, c.y - h.y - 4.0)
 	root.add_child(lamp_light)
 	var back: float = c.y - h.y - roll_depth(e) * 0.5
-	_glb(root, "prop_mate", Vector3(c.x + e.x * 0.51 + 2.0 + 4.6, GROUND_Y, back - 1.0), 20.0) # la bombilla hacia afuera
-	_glb(root, "prop_termo", Vector3(c.x + e.x * 0.51 + 15.0, GROUND_Y, back - 6.0), -10.0)
+	var mate: Vector3 = Vector3(c.x + h.x + 2.3 + 3.9, GROUND_Y, c.y + h.y * 0.25)
+	_glb(root, "prop_mate", mate, 20.0) # la bombilla hacia afuera
+	_glb(root, "prop_termo", mate + Vector3(1.0, 0.0, -9.5), -10.0) # detrás del mate: alto, asoma hacia arriba
 	_glb(root, "prop_yerba", Vector3(c.x - e.x * 0.51 - 6.0, GROUND_Y, back - 2.0), 15.0)
 
 
@@ -201,9 +202,9 @@ static func _floor(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	# Cosas de casa en el piso: la pelota de cuero, las alpargatas tiradas y el sifón de soda.
 	# Van en las esquinas de atrás, a los lados del rollo (lo que la cámara deja ver).
 	var back: float = c.y - e.y * 0.5 - roll_depth(e) * 0.5
-	_glb(root, "prop_pelota", Vector3(c.x + e.x * 0.51 + 3.0 + 11.0, GROUND_Y, back - 4.0))
-	_glb(root, "prop_alpargatas", Vector3(c.x + e.x * 0.5 + 17.0, GROUND_Y, c.y - e.y * 0.05), 75.0)
-	_glb(root, "prop_sifon", Vector3(c.x - e.x * 0.51 - 7.0, GROUND_Y, back - 2.0), 20.0)
+	_glb(root, "prop_pelota", Vector3(c.x + e.x * 0.5 + 1.5 + 11.0, GROUND_Y, c.y + e.y * 0.2))
+	_glb(root, "prop_sifon", Vector3(c.x + e.x * 0.5 + 7.5, GROUND_Y, c.y - e.y * 0.25), 20.0)
+	_glb(root, "prop_alpargatas", Vector3(c.x - e.x * 0.51 - 16.0, GROUND_Y, back - 4.0), 75.0)
 
 
 # --- Galpón: estanterías con cajas, líneas de seguridad y polvo ----------------------------------------
