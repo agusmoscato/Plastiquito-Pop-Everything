@@ -1,6 +1,7 @@
 shader_type spatial;
-// Piso de los escenarios, todo procedural: 1 madera, 2 baldosas en damero con luz de persiana,
-// 3 hormigón con manchas, 4 asfalto con líneas pintadas. Se mezclan dos tipos (kind_a -> kind_b)
+// Piso de los escenarios, todo procedural y siempre OSCURO (la lámina es transparente y celeste: sobre
+// un piso claro se perdía): 1 madera de nogal, 2 baldosas de terracota con luz de persiana, 3 piso epoxi
+// verde de galpón con manchas, 4 asfalto con líneas pintadas. Se mezclan dos tipos (kind_a -> kind_b)
 // para que la transición entre escenarios no tenga cortes.
 render_mode cull_back, diffuse_toon, specular_toon; // estilo juguete (ToyStyle)
 
@@ -46,8 +47,8 @@ vec3 wood(vec2 p, out float rough) {
 	float off = hash21(vec2(id, 3.0)) * 40.0;
 	float grain = fbm(vec2((p.x + off) * 0.3, p.y * 5.0));
 	float rings = sin((p.y + grain * 1.6) * 9.0 + off) * 0.5 + 0.5;
-	vec3 dark = vec3(0.30, 0.18, 0.10);
-	vec3 light = vec3(0.60, 0.40, 0.22);
+	vec3 dark = vec3(0.20, 0.11, 0.06);
+	vec3 light = vec3(0.46, 0.28, 0.15);
 	vec3 col = mix(dark, light, clamp(grain * 0.9 + rings * 0.35, 0.0, 1.0));
 	col *= 0.9 + 0.2 * hash21(vec2(id, 7.0)); // cada tabla un poco distinta
 	float seam = smoothstep(0.0, 0.03, fract(p.y / plank_w)) * smoothstep(0.0, 0.03, 1.0 - fract(p.y / plank_w));
@@ -60,15 +61,15 @@ vec3 tiles(vec2 p, out float rough) {
 	float size = 3.2;
 	vec2 q = p / size;
 	float checker = mod(floor(q.x) + floor(q.y), 2.0);
-	vec3 a = vec3(0.80, 0.76, 0.66);
-	vec3 b = vec3(0.36, 0.46, 0.44);
+	vec3 a = vec3(0.52, 0.24, 0.15); // terracota
+	vec3 b = vec3(0.30, 0.13, 0.09); // terracota oscura
 	float px = fwidth(q.x) + fwidth(q.y); // tamaño de baldosa en píxeles: de lejos se promedia
 	float far_k = smoothstep(0.35, 0.9, px);
 	vec3 col = mix(mix(a, b, checker), (a + b) * 0.5, far_k);
 	col *= 0.93 + 0.14 * vnoise(p * 3.0) * (1.0 - far_k);
 	vec2 f = fract(q);
 	float grout = smoothstep(0.0, 0.025, f.x) * smoothstep(0.0, 0.025, 1.0 - f.x) * smoothstep(0.0, 0.025, f.y) * smoothstep(0.0, 0.025, 1.0 - f.y);
-	col = mix(vec3(0.22, 0.21, 0.19), col, mix(grout, 1.0, far_k));
+	col = mix(vec3(0.14, 0.10, 0.08), col, mix(grout, 1.0, far_k));
 	// Sombras de persiana: franjas diagonales de luz de ventana.
 	float s = sin((p.x * 0.8 + p.y * 0.55) * 0.9);
 	float lit = mix(smoothstep(-0.12, 0.12, s), 0.5, far_k);
@@ -80,9 +81,9 @@ vec3 tiles(vec2 p, out float rough) {
 vec3 concrete(vec2 p, out float rough) {
 	float n = fbm(p * 0.22);
 	float fine = vnoise(p * 6.0);
-	vec3 col = vec3(0.36, 0.37, 0.4) * (0.8 + 0.4 * n) * (0.94 + 0.1 * fine);
+	vec3 col = vec3(0.12, 0.25, 0.19) * (0.8 + 0.4 * n) * (0.94 + 0.1 * fine); // epoxi verde
 	float stain = smoothstep(0.62, 0.8, fbm(p * 0.09 + 11.0));
-	col = mix(col, vec3(0.2, 0.2, 0.22), stain * 0.6); // manchas de aceite
+	col = mix(col, vec3(0.07, 0.12, 0.10), stain * 0.6); // manchas y desgaste
 	vec2 j = abs(fract(p / 13.0) - 0.5);
 	float joint = smoothstep(0.485, 0.5, max(j.x, j.y));
 	col *= 1.0 - 0.45 * joint; // juntas de dilatación

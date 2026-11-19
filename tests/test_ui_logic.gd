@@ -165,3 +165,26 @@ func test_bubble_cursor_is_a_round_bubble() -> void:
 	assert_eq(img.get_pixel(0, 0).a, 0.0, "las esquinas son transparentes")
 	assert_gt(img.get_pixel(mid + 4, mid + 4).a, 0.5, "el centro se ve")
 	assert_lt(img.get_pixel(mid, 1).v, 0.3, "contorno de tinta")
+
+
+func test_graphics_levels_cycle_and_have_names() -> void:
+	assert_eq(GraphicsQuality.next(GraphicsQuality.HIGH), GraphicsQuality.MEDIUM)
+	assert_eq(GraphicsQuality.next(GraphicsQuality.MEDIUM), GraphicsQuality.LOW)
+	assert_eq(GraphicsQuality.next(GraphicsQuality.LOW), GraphicsQuality.HIGH)
+	assert_eq(GraphicsQuality.name_of(0, "es"), "BAJO")
+	assert_eq(GraphicsQuality.name_of(2, "en"), "HIGH")
+	assert_lt(GraphicsQuality.SCALES[0], GraphicsQuality.SCALES[2], "en bajo se dibuja a menos resolución")
+
+
+func test_every_special_has_an_explanation_card() -> void:
+	for t: int in [GameSim.TYPE_GOLDEN, GameSim.TYPE_BOMB, GameSim.TYPE_LINE, GameSim.TYPE_ECHO]:
+		var key: String = SpecialCard.key_of(t)
+		assert_ne(key, "", "tipo %d" % t)
+		assert_ne(Tx.t(key + "_d"), key + "_d", "explica qué hace %s" % key)
+	var card: SpecialCard = SpecialCard.new()
+	card.show_type(GameSim.TYPE_GOLDEN)
+	card.show_type(GameSim.TYPE_GOLDEN)
+	card._process(0.016)
+	assert_eq(card.current_type(), GameSim.TYPE_GOLDEN)
+	assert_true(card._queue.is_empty(), "no se repite")
+	card.free()

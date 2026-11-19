@@ -188,7 +188,7 @@ static func _table(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 static func _floor(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	# Todo en centímetros reales: pared de 120 cm, zócalo de 8 cm, ventana de 60 x 70 cm.
 	var wall_z: float = c.y - e.y * 0.5 - 18.0 - roll_depth(e)
-	_add(root, _box(Vector3(e.x * 2.4, 120.0, 2.0)), _mat(Color("#CFC8B5"), 0.9), Vector3(c.x, 60.0, wall_z - 1.0))
+	_add(root, _box(Vector3(e.x * 2.4, 120.0, 2.0)), _mat(Color("#6F5B4C"), 0.9), Vector3(c.x, 60.0, wall_z - 1.0))
 	_add(root, _box(Vector3(e.x * 2.4, 8.0, 1.5)), _mat(Color("#F1EEE6"), 0.5), Vector3(c.x, 4.0, wall_z + 0.8))
 	# Ventana con persiana: un cuadro luminoso cruzado por tablillas oscuras.
 	var win: Vector3 = Vector3(c.x + e.x * 0.35, 70.0, wall_z + 0.2)

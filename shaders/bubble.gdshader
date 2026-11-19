@@ -5,12 +5,17 @@ shader_type spatial;
 //                  a = tipo (0 = normal).
 // Transparencia: alpha blend + cull_back + depth prepass por el propio domo. Las burbujas
 // no se superponen entre sí, así que el orden por instancia no importa (ver CHANGELOG).
-render_mode blend_mix, depth_draw_opaque, cull_back, specular_toon; // brillo de caricatura, como el resto (ToyStyle)
+// Sesión 4: se parece a un papel de burbujas de verdad: plástico transparente apenas celeste, brillos
+// chicos y nítidos (el reflejo de una ventana y uno más chico), el borde que se ve más blanco por
+// mirar el plástico de costado y el aro soldado donde el domo se pega al film.
+render_mode blend_mix, depth_draw_opaque, cull_back, specular_schlick_ggx;
 
-uniform vec4 tint : source_color = vec4(0.45, 0.75, 1.0, 1.0);
-uniform float rim_power : hint_range(0.5, 8.0) = 2.6;
-uniform float base_alpha : hint_range(0.0, 1.0) = 0.24; // enteras: domo más presente
-uniform float rim_alpha : hint_range(0.0, 1.0) = 0.9;
+uniform vec4 tint : source_color = vec4(0.66, 0.85, 0.98, 1.0);
+uniform float rim_power : hint_range(0.5, 8.0) = 2.2;
+uniform float base_alpha : hint_range(0.0, 1.0) = 0.16; // el centro del domo casi no se ve: es transparente
+uniform float rim_alpha : hint_range(0.0, 1.0) = 0.85;
+uniform float glint_strength : hint_range(0.0, 3.0) = 1.4; // reflejos nítidos de la ventana
+uniform float seam_alpha : hint_range(0.0, 1.0) = 0.42; // el aro soldado de la base
 uniform float popped_alpha : hint_range(0.0, 1.0) = 0.2; // reventadas: apagadas, para que la vista vaya a las enteras
 uniform float spec_strength : hint_range(0.0, 2.0) = 1.3;
 uniform float inflate_per_pressure = 0.30;
@@ -113,15 +118,23 @@ void fragment() {
 	float fres = pow(1.0 - ndv, rim_power);
 	float tense = smoothstep(1.3, 1.9, v_pressure);
 
-	vec3 col = tint.rgb * (1.0 + 0.35 * tense);
-	// Reventada: gris apagado, sin brillo ni borde luminoso (antes brillaba más que las enteras).
-	vec3 spent = mix(col, vec3(dot(col, vec3(0.3, 0.59, 0.11))), 0.6) * 0.75;
+	vec3 col = tint.rgb * (1.0 + 0.3 * tense);
+	// Reventada: plástico arrugado y opaco, gris, sin brillo (para que la vista vaya a las enteras).
+	vec3 spent = mix(col, vec3(dot(col, vec3(0.3, 0.59, 0.11))), 0.65) * 0.8;
 	col = mix(col, spent, popped);
-	ALBEDO = col;
-	ROUGHNESS = mix(0.12, 0.6, popped);
-	SPECULAR = spec_strength * (1.0 - 0.8 * popped);
+	// Reflejos nítidos: una "ventana" grande y un punto chico, fijos respecto de la cámara (como en
+	// las fotos de papel de burbujas). Se calculan en espacio de vista con el reflejo de la normal.
+	vec3 r = reflect(-normalize(VIEW), n);
+	float win = smoothstep(0.90, 0.955, dot(r, normalize(vec3(-0.45, 0.62, 0.64))));
+	float dot2 = smoothstep(0.975, 0.99, dot(r, normalize(vec3(0.35, 0.3, 0.89))));
+	float glint = (win + dot2 * 0.8) * (1.0 - popped);
+	// El aro soldado de la base: una línea más blanca donde el domo se pega al film (UV.y = 1 es la base).
+	float seam = smoothstep(0.72, 0.98, UV.y) * (1.0 - popped * 0.6);
+	ALBEDO = mix(col, vec3(0.92, 0.97, 1.0), seam * 0.5);
+	ROUGHNESS = mix(0.06, 0.65, popped);
+	SPECULAR = spec_strength * 0.7 * (1.0 - 0.8 * popped);
 	METALLIC = 0.0;
-	EMISSION = col * (fres * 0.5 * (1.0 - 0.8 * popped) + tense * 0.12);
+	EMISSION = col * (fres * 0.45 * (1.0 - 0.8 * popped) + tense * 0.12) + vec3(1.0) * glint * glint_strength;
 	NORMAL = n;
 
 	// Lo que va a reventar: brillo suave bajo la herramienta (solo burbujas enteras).
@@ -129,6 +142,8 @@ void fragment() {
 	EMISSION += vec3(0.16, 0.2, 0.22) * hv;
 
 	float a = mix(base_alpha, rim_alpha, fres);
+	a = max(a, seam * seam_alpha);
+	a = max(a, glint * 0.9);
 	a += 0.12 * hv;
 	a = mix(a, popped_alpha, popped);
 	a += tense * 0.12;

@@ -98,6 +98,8 @@ func _ready() -> void:
 		overlay.cheat_pops_requested.connect(func() -> void: sim.state.pops += 1.0e6; sim.state.pops_run += 1.0e6)
 		add_child(overlay)
 	_add_vignette()
+	_apply_graphics()
+	Settings.graphics_changed.connect(_apply_graphics)
 	pause_menu = PauseMenu.new()
 	add_child(pause_menu)
 	if not _has_demo_arg(): # al abrir el juego, primero el menú de inicio (las capturas lo saltean)
@@ -197,6 +199,11 @@ func _on_key(code: int) -> void:
 		hud.bubble_log.visible = not hud.bubble_log.visible
 	elif code == KEY_R or code == KEY_SPACE:
 		request_reload()
+
+
+func _apply_graphics() -> void:
+	if not _has_demo_arg(): # las capturas de CI siempre en calidad alta
+		GraphicsQuality.apply(world, Settings.graphics)
 
 
 ## Tira una lámina nueva del rollo (botón, tecla R / espacio o clic en el rollo gigante).
@@ -419,6 +426,7 @@ func _on_chain_slammed(count: int) -> void:
 func _announce_new_specials() -> void:
 	for t: int in sim.ev_new_specials:
 		world.specials_view.mark_new(t, Tx.t("new"))
+		hud.special_card.show_type(t) # qué hace: la primera vez que aparece, una tarjeta lo explica
 	sim.ev_new_specials = []
 
 
