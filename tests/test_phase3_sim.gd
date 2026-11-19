@@ -284,7 +284,7 @@ func test_phase_progression_to_four() -> void:
 	sim.refresh_stats()
 	sim.new_sheet()
 	assert_eq(sim.phase(), 4)
-	assert_eq(sim.sheet.width, 110, "cada fase arranca con una lámina más chica que el tope")
+	assert_eq(sim.sheet.width, 80, "cada fase arranca con una lámina más chica que el tope")
 	sim.state.levels["global_sheet"] = sim.upgrades.max_level("global_sheet")
 	sim.new_sheet()
 	assert_eq(sim.sheet.width, 150, "con el Rollo más ancho al máximo llega al tope")

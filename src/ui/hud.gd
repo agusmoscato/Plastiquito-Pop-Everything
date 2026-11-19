@@ -181,6 +181,22 @@ func _build_recycle_button() -> void:
 	root.add_child(_log_button)
 
 
+## Rectángulos fijos del HUD en una pantalla de `vp` (los mismos lugares que _layout). Sirve para
+## ubicar la utilería donde se ve y para el test que mide cuánto de cada objeto queda a la vista.
+static func layout_rects(vp: Vector2) -> Array[Rect2]:
+	var free_w: float = vp.x - SHOP_W - 16.0
+	return [
+		Rect2(14.0, 10.0, 380.0, 128.0), # Pops
+		Rect2(20.0, 148.0, 318.0, 142.0), # orden de trabajo
+		Rect2(20.0, 300.0, 318.0, 124.0), # encargo
+		Rect2(vp.x - SHOP_W - 6.0, 8.0, SHOP_W, 790.0), # hoja de pedidos
+		Rect2(14.0, vp.y - 110.0, 190.0, 96.0), # ritmo
+		Rect2(230.0, vp.y - 104.0, 4.0 * 118.0 + 112.0, 92.0), # herramientas
+		Rect2(free_w - 210.0, vp.y - 84.0, 190.0, 64.0), # reciclar
+		Rect2(free_w - 170.0, 76.0, 150.0, 40.0), # burbujario
+	]
+
+
 func _layout() -> void:
 	var vp: Vector2 = get_viewport().get_visible_rect().size
 	_last_vp = vp

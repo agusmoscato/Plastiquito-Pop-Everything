@@ -39,6 +39,8 @@ var _new_props: Node3D
 var roll_glow: bool = false ## la lámina está terminada y hay que tirar una nueva del rollo
 var _roll_spin: float = 0.0 ## velocidad de giro del rollo (vueltas por segundo), decae sola
 var _glow: float = 0.0
+var _embers: Array[StandardMaterial3D] = [] ## brasas del chulengo (laten)
+var _embers_of: Node3D = null
 
 
 func setup(light: DirectionalLight3D, env: Environment, ground_material: ShaderMaterial) -> void:
@@ -125,8 +127,28 @@ func _animate_roll(delta: float) -> void:
 			m.set_shader_parameter("glow", _glow * (0.6 + 0.4 * sin(Time.get_ticks_msec() * 0.008)))
 
 
+## Las brasas del chulengo laten (emisión naranja que sube y baja, con un parpadeo).
+func _animate_embers() -> void:
+	if props != _embers_of:
+		_embers_of = props
+		_embers.clear()
+		if is_instance_valid(props):
+			for n: Node in props.find_children("*", "MeshInstance3D", true, false):
+				var mi: MeshInstance3D = n as MeshInstance3D
+				for i: int in mi.mesh.get_surface_count():
+					var m: StandardMaterial3D = mi.mesh.surface_get_material(i) as StandardMaterial3D
+					if m != null and m.resource_name.begins_with("brasa") and not _embers.has(m):
+						m.emission_enabled = true
+						m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+						_embers.append(m)
+	var t: float = Time.get_ticks_msec() * 0.001
+	for m: StandardMaterial3D in _embers:
+		m.emission_energy_multiplier = 1.6 + 0.9 * sin(t * 2.3) + 0.35 * sin(t * 7.1)
+
+
 func _process(delta: float) -> void:
 	_animate_roll(delta)
+	_animate_embers()
 	if _t >= 1.0:
 		return
 	_t = minf(1.0, _t + delta / _dur)

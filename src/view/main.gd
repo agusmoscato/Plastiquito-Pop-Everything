@@ -33,6 +33,8 @@ var _press_cell: int = -1
 var _fake_press: bool = false
 var _night: float = 0.0 ## turno noche suavizado (0 día .. 1 noche)
 var _burn_cooldown: float = 0.0 ## humo y chirrido de la plancha, como mucho cada 0,35 s
+var _shown_phase: int = 0 ## escenario que ya se presentó (al cambiar, plano de presentación)
+var _hud_fade: float = 1.0
 
 var _recycling: bool = false
 var _recycle_t: float = 0.0
@@ -76,6 +78,7 @@ func _ready() -> void:
 	hud.chain_slammed.connect(_on_chain_slammed)
 	hud.reload_requested.connect(request_reload)
 	world.camera_rig.zoomed.connect(Playtest.log.zoomed)
+	world.camera_rig.intro_finished.connect(func() -> void: _hud_fade = 0.0)
 	automation = AutomationView.new()
 	automation.name = "Automation"
 	add_child(automation)
@@ -107,7 +110,9 @@ func _ready() -> void:
 		title.has_save = SaveSystem.has_save()
 		title.options_menu = pause_menu
 		title.hide_while_open = [hud]
+		title.started.connect(_start_intro)
 		add_child(title)
+	_shown_phase = sim.phase() # sin menú (capturas, bot de humo): el escenario inicial ya cuenta como presentado
 	_add_version_label()
 	_refresh_tool_view()
 	_announce_new_specials()
@@ -154,6 +159,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			_on_key(key.keycode)
 	elif event is InputEventMouseButton:
 		var mb: InputEventMouseButton = event
+		if mb.pressed and world.camera_rig.in_intro(): # un clic saltea el plano de presentación
+			world.camera_rig.skip_intro()
+			get_viewport().set_input_as_handled()
+			return
 		if mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT and _over_roll(world.camera_rig.screen_to_plane(mb.position)):
 			request_reload()
 
@@ -201,6 +210,29 @@ func _on_key(code: int) -> void:
 		request_reload()
 
 
+## Plano de presentación del escenario actual (al empezar a jugar y al llegar a un escenario nuevo).
+## La interfaz se va y vuelve con un fundido cuando la cámara llega a la de trabajo.
+func _start_intro() -> void:
+	_shown_phase = sim.phase()
+	world.play_intro()
+	hud.root.modulate.a = 0.0
+	_hud_fade = -1.0
+
+
+## Si el escenario cambió desde la última presentación, lo presenta.
+func _maybe_intro() -> void:
+	if sim.phase() != _shown_phase:
+		_start_intro()
+
+
+func _update_hud_fade(delta: float) -> void:
+	if _hud_fade < 0.0:
+		return
+	var dur: float = maxf(Cfg.num(db.juice, "intro_hud_fade_s"), 0.01)
+	_hud_fade = minf(1.0, _hud_fade + delta / dur)
+	hud.root.modulate.a = _hud_fade * _hud_fade * (3.0 - 2.0 * _hud_fade)
+
+
 func _apply_graphics() -> void:
 	if not _has_demo_arg(): # las capturas de CI siempre en calidad alta
 		GraphicsQuality.apply(world, Settings.graphics)
@@ -216,6 +248,13 @@ func request_reload() -> void:
 
 func _process(delta: float) -> void:
 	if sim == null:
+		return
+	_update_hud_fade(delta)
+	if world.camera_rig.in_intro(): # el plano de presentación: se mira, no se juega
+		tool_view.visible = false
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		sim.step(delta, _prev_cursor, false)
+		hud.on_sim_step(delta)
 		return
 	if _recycling:
 		_update_recycle(delta)
@@ -328,6 +367,10 @@ func _on_purchased(id: String, count: int, _milestone: bool) -> void:
 	_refresh_tool_view()
 	world.tool_model = sim.selected_tool()
 	var d: Dictionary = sim.upgrades.def(id)
+	if id == "perm_sheet" and not _recycling: # se abrió la fase siguiente: lámina nueva y escenario nuevo ya
+		sim.new_sheet()
+		world.rebind_game_sheet(true)
+		_maybe_intro()
 	if str(d["kind"]) == "unlock" and str(d["tool"]) != "":
 		_select_tool(str(d["tool"]))
 
@@ -525,7 +568,11 @@ func _finish_recycle() -> void:
 		_recycle_roll.queue_free()
 	var gained: int = sim.recycle()
 	world.sheet_view.clear_recycle_effect()
-	world.rebind_game_sheet(true, 3.5, 3.5) # cámara y escenario cambian juntos durante 3,5 s
+	if sim.phase() != _shown_phase: # escenario nuevo: plano de presentación
+		world.rebind_game_sheet(true)
+		_maybe_intro()
+	else:
+		world.rebind_game_sheet(true, 3.5, 3.5) # cámara y lámina se acomodan durante 3,5 s
 	world.tool_model = sim.selected_tool()
 	_refresh_tool_view()
 	_announce_new_specials()
@@ -758,6 +805,15 @@ func _run_demo3(dir: String) -> void:
 		_refresh_tool_view()
 		await _wait(1.2)
 		_shot(dir, "36_escenario_%d" % ph)
+	for ph: int in [1, 2, 3, 4]: # plano de presentación y cámara de trabajo de cada escenario
+		_demo3_phase(ph, 1.0e6)
+		sim.state.pops = 0.0
+		await _wait(0.4)
+		_start_intro()
+		await _wait(0.45)
+		_shot(dir, "37_presentacion_%d" % ph)
+		await _wait(Cfg.num(db.juice, "intro_move_s") + Cfg.num(db.juice, "intro_hold_s") + Cfg.num(db.juice, "intro_hud_fade_s") + 0.4)
+		_shot(dir, "38_trabajo_%d" % ph)
 	PopAudio.quit_clean()
 
 

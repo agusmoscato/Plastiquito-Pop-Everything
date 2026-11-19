@@ -69,6 +69,7 @@ func rebind_game_sheet(roll_in: bool, animate_camera: float = 0.0, scenario_seco
 	specials_view.visible = true
 	camera_rig.min_bubble_px = Cfg.num(db.juice, "camera_min_bubble_px")
 	camera_rig.sheet_fill = sheet_fill_for(game.phase())
+	_configure_heroes()
 	ScenarioProps.sheet_fill = camera_rig.sheet_fill
 	camera_rig.play_area = Cfg.num(db.juice, "camera_play_area")
 	camera_rig.fit_to(sheet_view.center(), sheet_view.extents(), animate_camera)
@@ -79,6 +80,30 @@ func rebind_game_sheet(roll_in: bool, animate_camera: float = 0.0, scenario_seco
 	if roll_in:
 		sheet_view.begin_roll_in()
 	sheet_replaced.emit()
+
+
+## La utilería argentina se ubica con la misma cámara de trabajo que usa el juego.
+func _configure_heroes() -> void:
+	var fills: Array = []
+	for p: int in range(1, 5):
+		fills.append(sheet_fill_for(p))
+	var starts: Array = db.economy["phase_sheet_starts"]
+	ScenarioHeroes.fill_by_phase = fills
+	ScenarioHeroes.play_area = Cfg.num(db.juice, "camera_play_area")
+	ScenarioHeroes.min_bubble_px = Cfg.num(db.juice, "camera_min_bubble_px")
+	ScenarioHeroes.screen_shift = camera_rig.screen_shift
+	ScenarioHeroes.phase_starts = starts
+	ScenarioHeroes.clear_cache()
+
+
+## Plano de presentación del escenario actual: abierto, con toda la utilería argentina entera, y baja a
+## la cámara de trabajo.
+func play_intro() -> void:
+	if scenario.props == null:
+		return
+	var cam: Transform3D = IntroShot.camera_for(scenario.props, sheet_view.center(), sheet_view.extents(), ScenarioHeroes.SCREEN)
+	var tz: Vector4 = IntroShot.target_and_zoom(cam)
+	camera_rig.play_intro(Vector3(tz.x, 0.0, tz.z), tz.w, Cfg.num(db.juice, "intro_hold_s"), Cfg.num(db.juice, "intro_move_s"))
 
 
 ## Cuánto del área de juego llena la lámina en cada fase: en la Mesa y el Piso un poco menos, así se

@@ -4,6 +4,7 @@ extends Node3D
 ## suave por interpolación y sacudida por trauma. Sin rotación libre.
 
 signal zoomed
+signal intro_finished ## terminó el plano de presentación (o se salteó)
 
 const PITCH_DEGREES: float = 55.0
 const FOV: float = 40.0
@@ -43,6 +44,11 @@ var _follow_needed: bool = false
 const FOLLOW_INNER: float = 0.35 ## el cursor puede moverse libre en el 35 % central; afuera, la cámara lo sigue
 const FOLLOW_SPEED: float = 3.5
 const HOLD_WHOLE_S: float = 1.2 ## después de la transición, cuánto se sostiene la lámina entera
+var _intro_t: float = -1.0 ## plano de presentación en curso (segundos), -1 si no hay
+var _intro_hold: float = 0.9
+var _intro_move: float = 2.4
+var _intro_pos: Vector3 = Vector3.ZERO
+var _intro_zoom: float = 20.0
 var _user_zoom: float = -1.0 ## zoom elegido con la rueda (se conserva al recargar la lámina); -1 = el de trabajo
 var _last_extents: Vector2 = Vector2.ZERO
 
@@ -119,6 +125,52 @@ func _update_following() -> void:
 
 func is_following() -> bool:
 	return _following
+
+
+# --- Cuentas de cámara sin nodos (para ubicar la utilería y para los tests) -------------------------
+
+## Transformación de la cámara mirando a `target` desde `zoom` de distancia (la misma que arma el rig).
+static func view_transform(target: Vector3, zoom: float) -> Transform3D:
+	var rig: Transform3D = Transform3D(Basis(Vector3.RIGHT, -deg_to_rad(PITCH_DEGREES)), target)
+	return rig * Transform3D(Basis.IDENTITY, Vector3(0.0, 0.0, zoom))
+
+
+## Punto del mundo en la pantalla (x, y en píxeles; z = profundidad, <= 0 si queda detrás).
+static func project(cam: Transform3D, p: Vector3, screen: Vector2) -> Vector3:
+	var local: Vector3 = cam.affine_inverse() * p
+	var depth: float = -local.z
+	if depth <= 0.001:
+		return Vector3(0.0, 0.0, -1.0)
+	var f: float = 1.0 / tan(deg_to_rad(FOV) * 0.5)
+	var aspect: float = screen.x / screen.y
+	var nx: float = local.x / depth * f / aspect
+	var ny: float = local.y / depth * f
+	return Vector3((nx * 0.5 + 0.5) * screen.x, (0.5 - ny * 0.5) * screen.y, depth)
+
+
+## Punto del plano y = 0 que se ve en `pixel`.
+static func unproject_to_plane(cam: Transform3D, pixel: Vector2, screen: Vector2) -> Vector2:
+	var f: float = 1.0 / tan(deg_to_rad(FOV) * 0.5)
+	var aspect: float = screen.x / screen.y
+	var nx: float = (pixel.x / screen.x - 0.5) * 2.0
+	var ny: float = (0.5 - pixel.y / screen.y) * 2.0
+	var dir_local: Vector3 = Vector3(nx * aspect / f, ny / f, -1.0)
+	var dir: Vector3 = (cam.basis * dir_local).normalized()
+	var o: Vector3 = cam.origin
+	if absf(dir.y) < 0.0001:
+		return Vector2(INF, INF)
+	var t: float = -o.y / dir.y
+	var hit: Vector3 = o + dir * t
+	return Vector2(hit.x, hit.z)
+
+
+## Cámara de trabajo al entrar a una lámina (como fit_to en modo trabajo): (objetivo, distancia).
+static func work_view(c: Vector2, e: Vector2, screen: Vector2, play: float, fill: float, min_px: float, shift: float) -> Transform3D:
+	var aspect: float = screen.x / screen.y
+	var plan: Vector2 = work_plan(e, aspect, play, fill, min_px)
+	var tan_half: float = tan(deg_to_rad(FOV) * 0.5)
+	var visible_w: float = 2.0 * plan.x * tan_half * aspect
+	return view_transform(Vector3(c.x + shift * visible_w, 0.0, c.y), plan.x)
 
 
 ## Distancia que encuadra toda la lámina (con margen).
@@ -221,7 +273,49 @@ func zoom_by(factor: float) -> void:
 	zoomed.emit()
 
 
+## Plano de presentación: la cámara arranca en `target` a `zoom` (el escenario entero), espera `hold` s y
+## en `move` s baja con una curva suave (zoom en escala logarítmica, aceleración y frenado) a la cámara
+## de trabajo que dejó fit_to.
+func play_intro(target: Vector3, zoom: float, hold: float, move: float) -> void:
+	_intro_pos = target
+	_intro_zoom = maxf(zoom, 0.5)
+	_intro_hold = maxf(hold, 0.0)
+	_intro_move = maxf(move, 0.1)
+	_intro_t = 0.0
+	position = target
+	_zoom = _intro_zoom
+	_apply_zoom()
+
+
+func in_intro() -> bool:
+	return _intro_t >= 0.0
+
+
+func skip_intro() -> void:
+	if in_intro():
+		_intro_t = _intro_hold + _intro_move
+
+
+func _step_intro(delta: float) -> void:
+	_intro_t += delta
+	var k: float = clampf((_intro_t - _intro_hold) / _intro_move, 0.0, 1.0)
+	k = k * k * k * (k * (k * 6.0 - 15.0) + 10.0) # arranca y frena suave
+	var lift: float = sin(k * PI) * 0.06 # una curva: se eleva un poco a mitad de camino
+	_zoom = exp(lerpf(log(_intro_zoom), log(maxf(_target_zoom, 0.5)), k)) * (1.0 + lift)
+	position = _intro_pos.lerp(_target_pos, k)
+	_apply_zoom()
+	if _intro_t >= _intro_hold + _intro_move:
+		_intro_t = -1.0
+		_zoom = _target_zoom
+		position = _target_pos
+		intro_finished.emit()
+
+
 func _process(delta: float) -> void:
+	if in_intro():
+		_step_intro(delta)
+		_apply_shake(delta)
+		return
 	var move: Vector2 = Vector2(
 		Input.get_axis("ui_left", "ui_right"), Input.get_axis("ui_up", "ui_down"))
 	move += Vector2(float(Input.is_physical_key_pressed(KEY_D)) - float(Input.is_physical_key_pressed(KEY_A)),

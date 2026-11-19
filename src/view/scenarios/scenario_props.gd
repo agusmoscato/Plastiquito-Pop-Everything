@@ -1,10 +1,10 @@
 class_name ScenarioProps
 extends RefCounted
-## Objetos de cada escenario: modelos .glb (art/models) a ESCALA REAL (1 unidad = 1 cm, una burbuja
-## mide ~1 cm; un mate 9 cm) más algo de geometría simple. Cada lugar tiene sus cosas argentinas:
-## mate, termo y yerba en la Mesa; pelota, alpargatas y sifón en el Piso; garrafa y cajones de naranjas
-## en el Galpón; chulengo con chorizos y conservadora en el Estacionamiento. Se ubican FUERA de la lámina
-## (centro `c`, tamaño `e`, en el plano XZ): enmarcan los bordes y nunca se cruzan con ella.
+## Objetos de cada escenario: modelos .glb (art/models; 1 unidad = 1 cm, una burbuja mide ~1 cm) más algo
+## de geometría simple. Cada lugar tiene sus cosas argentinas: la pareja protagonista (ScenarioHeroes:
+## mate y termo, pelota y sifón, garrafa y cajón de naranjas, chulengo) va donde el HUD no la tapa, y el
+## resto (yerba, alpargatas, conservadora) acompaña con la misma escala de juguete. Todo se ubica FUERA
+## de la lámina (centro `c`, tamaño `e`, en el plano XZ) y nunca se cruza con ella.
 
 const GROUND_Y: float = -0.05
 const TALL_PROP: float = 6.0 ## cm: más alto que esto, sin sombra
@@ -23,6 +23,7 @@ static func build(phase: int, c: Vector2, e: Vector2) -> Node3D:
 	root.name = "Props%d" % phase
 	var u: float = unit(e)
 	_roll(root, c, e)
+	ScenarioHeroes.place(root, phase, c, e)
 	if phase == 2:
 		_floor(root, c, e, u)
 	elif phase == 3:
@@ -86,12 +87,31 @@ static func _add(parent: Node3D, mesh: Mesh, mat: Material, pos: Vector3, rot_de
 
 ## Instancia un modelo (en metros) a escala real: 1 m = 100 unidades.
 static func _glb(root: Node3D, file: String, pos: Vector3, yaw_deg: float = 0.0, scale_factor: float = 100.0) -> Node3D:
+	var m: Node3D = glb_node(file, pos, yaw_deg, scale_factor)
+	root.add_child(m)
+	return m
+
+
+## Un modelo listo para agregar (sin padre).
+static func glb_node(file: String, pos: Vector3, yaw_deg: float = 0.0, scale_factor: float = 100.0) -> Node3D:
 	var ps: PackedScene = load("res://assets/models/%s.glb" % file) as PackedScene
 	var m: Node3D = ps.instantiate() as Node3D
 	m.position = pos
 	m.rotation_degrees = Vector3(0.0, yaw_deg, 0.0)
 	m.scale = Vector3.ONE * scale_factor
-	root.add_child(m)
+	for n: Node in m.find_children("*", "MeshInstance3D", true, false): # manchas, vetas y oclusión horneadas
+		var mi: MeshInstance3D = n as MeshInstance3D
+		for i: int in mi.mesh.get_surface_count():
+			var std: StandardMaterial3D = mi.mesh.surface_get_material(i) as StandardMaterial3D
+			if std != null:
+				std.vertex_color_use_as_albedo = true
+	return m
+
+
+## Utilería argentina que acompaña (no protagonista): a la escala de juguete de la fase.
+static func _arg(root: Node3D, phase: int, e: Vector2, file: String, pos: Vector3, yaw_deg: float) -> Node3D:
+	var m: Node3D = _glb(root, file, pos, yaw_deg, 100.0 * ScenarioHeroes.scale_for(phase, e))
+	m.set_meta(ScenarioHeroes.META_ARG, true)
 	return m
 
 
@@ -180,10 +200,8 @@ static func _table(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	lamp_light.position = Vector3(c.x - h.x - 9.0, 12.0, c.y - h.y - 4.0)
 	root.add_child(lamp_light)
 	var back: float = c.y - h.y - roll_depth(e) * 0.5
-	var mate: Vector3 = Vector3(c.x + h.x + 2.3 + 3.9, GROUND_Y, c.y + h.y * 0.25)
-	_glb(root, "prop_mate", mate, 20.0) # la bombilla hacia afuera
-	_glb(root, "prop_termo", mate + Vector3(1.0, 0.0, -9.5), -10.0) # detrás del mate: alto, asoma hacia arriba
-	_glb(root, "prop_yerba", Vector3(c.x - e.x * 0.51 - 6.0, GROUND_Y, back - 2.0), 15.0)
+	var s: float = ScenarioHeroes.scale_for(1, e)
+	_arg(root, 1, e, "prop_yerba", Vector3(c.x - e.x * 0.51 - 6.0 * s, GROUND_Y, back - 2.0 * s), 15.0)
 
 
 # --- Piso: zócalo, pata de silla y ventana con persiana --------------------------------------------------
@@ -202,9 +220,8 @@ static func _floor(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	# Cosas de casa en el piso: la pelota de cuero, las alpargatas tiradas y el sifón de soda.
 	# Van en las esquinas de atrás, a los lados del rollo (lo que la cámara deja ver).
 	var back: float = c.y - e.y * 0.5 - roll_depth(e) * 0.5
-	_glb(root, "prop_pelota", Vector3(c.x + e.x * 0.5 + 1.5 + 11.0, GROUND_Y, c.y + e.y * 0.2))
-	_glb(root, "prop_sifon", Vector3(c.x + e.x * 0.5 + 7.5, GROUND_Y, c.y - e.y * 0.25), 20.0)
-	_glb(root, "prop_alpargatas", Vector3(c.x - e.x * 0.51 - 16.0, GROUND_Y, back - 4.0), 75.0)
+	var s: float = ScenarioHeroes.scale_for(2, e)
+	_arg(root, 2, e, "prop_alpargatas", Vector3(c.x - e.x * 0.51 - 16.0 * s, GROUND_Y, back - 4.0 * s), 75.0)
 
 
 # --- Galpón: estanterías con cajas, líneas de seguridad y polvo ----------------------------------------
@@ -214,9 +231,8 @@ static func _warehouse(root: Node3D, c: Vector2, e: Vector2, u: float) -> void:
 		var bx: float = c.x + (float(sx) - 0.5) * e.x * 0.8
 		_glb(root, "prop_shelf", Vector3(bx, 0.0, c.y - e.y * 0.5 - 20.0 - roll_depth(e)))
 	# La garrafa de 10 kg y cajones de naranjas esperando el reparto.
-	_glb(root, "prop_garrafa", Vector3(c.x + e.x * 0.5 + 80.0, GROUND_Y, c.y - e.y * 0.5 - 25.0), 30.0)
-	_glb(root, "prop_cajon", Vector3(c.x + e.x * 0.5 + 45.0, GROUND_Y, c.y - e.y * 0.25), 82.0)
-	_glb(root, "prop_cajon", Vector3(c.x + e.x * 0.5 + 45.0, GROUND_Y, c.y + e.y * 0.2), 96.0)
+	var s: float = ScenarioHeroes.scale_for(3, e)
+	_arg(root, 3, e, "prop_cajon", Vector3(c.x - e.x * 0.5 - 3.0 - 34.0 * s, GROUND_Y, c.y - e.y * 0.5 - 3.0 - 30.0 * s), 96.0)
 	# Líneas amarillas de seguridad pintadas a los costados.
 	var yellow: StandardMaterial3D = _mat(Color("#E8C21C"), 0.7)
 	_add(root, _box(Vector3(10.0, 0.06, e.y * 1.5)), yellow, Vector3(c.x - e.x * 0.5 - 25.0, GROUND_Y + 0.04, c.y)) # 10 cm reales
@@ -264,11 +280,9 @@ static func _parking(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	var spots: Array[Vector2] = [Vector2(-h.x - 14.0, -h.y * 0.6), Vector2(-h.x - 14.0, h.y * 0.5), Vector2(-h.x * 0.4, -h.y - 14.0 - back), Vector2(h.x * 0.2, -h.y - 14.0 - back)]
 	for spot: Vector2 in spots:
 		_glb(root, "prop_cone", Vector3(c.x + spot.x, 0.0, c.y + spot.y), spot.x * 7.0)
-	# El asado del estacionamiento: chulengo con chorizos (y su humo) y la conservadora.
-	var grill: Vector3 = Vector3(c.x - h.x - 85.0, GROUND_Y, c.y + h.y * 0.05)
-	_glb(root, "prop_chulengo", grill, -100.0) # la tapa abierta hacia afuera
-	root.add_child(_smoke(grill + Vector3(0.0, 105.0, 0.0)))
-	_glb(root, "prop_conservadora", Vector3(c.x + h.x * 1.02 + 40.0, GROUND_Y, c.y - h.y - roll_depth(e) * 0.5 - 10.0), -15.0)
+	# El asado: el chulengo es el protagonista (ScenarioHeroes); la conservadora lo acompaña.
+	var s: float = ScenarioHeroes.scale_for(4, e)
+	_arg(root, 4, e, "prop_conservadora", Vector3(c.x - h.x - 45.0 * s, GROUND_Y, c.y - h.y - roll_depth(e) * 0.5 - 10.0 * s), -15.0)
 	# Cordón de 15 x 15 cm con borde pintado y farol de 4 m, en cm reales, detrás de la lámina.
 	var curb_z: float = c.y - e.y * 0.5 - 40.0 - back
 	_add(root, _box(Vector3(e.x * 2.4, 15.0, 15.0)), _mat(Color("#8C8E92"), 0.9), Vector3(c.x, 7.5, curb_z))
@@ -278,8 +292,8 @@ static func _parking(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	_add(root, _box(Vector3(60.0, 12.0, 25.0)), _emissive(Color("#FFD59A"), 2.0), post + Vector3(25.0, 402.0, 0.0))
 
 
-## Humo del chulengo: bocanadas grises que suben y se abren.
-static func _smoke(at: Vector3) -> GPUParticles3D:
+## Humo del chulengo: bocanadas grises que suben y se abren (a la escala `s` del escenario).
+static func smoke(at: Vector3, s: float = 1.0) -> GPUParticles3D:
 	var p: GPUParticles3D = GPUParticles3D.new()
 	p.name = "Smoke"
 	p.amount = 40
@@ -288,12 +302,12 @@ static func _smoke(at: Vector3) -> GPUParticles3D:
 	p.position = at
 	var proc: ParticleProcessMaterial = ParticleProcessMaterial.new()
 	proc.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
-	proc.emission_sphere_radius = 18.0
+	proc.emission_sphere_radius = 18.0 * s
 	proc.direction = Vector3(0.2, 1.0, 0.0)
 	proc.spread = 18.0
-	proc.initial_velocity_min = 14.0
-	proc.initial_velocity_max = 26.0
-	proc.gravity = Vector3(3.0, 2.0, 0.0)
+	proc.initial_velocity_min = 14.0 * s
+	proc.initial_velocity_max = 26.0 * s
+	proc.gravity = Vector3(3.0, 2.0, 0.0) * s
 	proc.scale_min = 0.8
 	proc.scale_max = 1.6
 	var grow: Curve = Curve.new()
@@ -310,7 +324,7 @@ static func _smoke(at: Vector3) -> GPUParticles3D:
 	proc.color_ramp = fade_tex
 	p.process_material = proc
 	var q: QuadMesh = QuadMesh.new()
-	q.size = Vector2(40.0, 40.0)
+	q.size = Vector2(40.0, 40.0) * s
 	var m: StandardMaterial3D = StandardMaterial3D.new()
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
