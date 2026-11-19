@@ -15,7 +15,7 @@ const TYPES: Array[Dictionary] = [
 
 func setup(p_sim: GameSim) -> void:
 	sim = p_sim
-	custom_minimum_size = Vector2(360.0, 230.0)
+	custom_minimum_size = Vector2(360.0, 440.0)
 	size = custom_minimum_size
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	material = UiKit.paper_material()
@@ -29,6 +29,19 @@ func _process(_delta: float) -> void:
 		queue_redraw()
 
 
+## Lo que ya apareció: especiales descubiertas, y las vetas y el doble film una vez presentados.
+func entries() -> Array[String]:
+	var out: Array[String] = []
+	for t: Dictionary in TYPES:
+		var type_id: int = t["id"]
+		if sim.state.is_discovered(type_id):
+			out.append(str(t["key"]))
+	for extra: int in [SpecialCard.VEIN, SpecialCard.ARMOR]:
+		if Settings.introduced.has(str(extra)):
+			out.append(SpecialCard.key_of(extra))
+	return out
+
+
 func _draw() -> void:
 	var rect: Rect2 = Rect2(Vector2(4.0, 4.0), size - Vector2(10.0, 10.0))
 	UiKit.draw_sheet(self, rect, UiKit.PAPER, "bubble_log", 2.0, 1.6)
@@ -36,12 +49,8 @@ func _draw() -> void:
 	UiKit.draw_text(self, Vector2(20.0, 38.0), Tx.t("bubblepedia"), UiKit.font_title(), 20, UiKit.INK)
 	var y: float = 70.0
 	var any: bool = false
-	for t: Dictionary in TYPES:
-		var type_id: int = t["id"]
-		if not sim.state.is_discovered(type_id):
-			continue
+	for key: String in entries():
 		any = true
-		var key: String = str(t["key"])
 		UiKit.draw_text(self, Vector2(20.0, y), Tx.t(key).to_upper(), UiKit.font_title(), 14, UiKit.STAMP_RED)
 		draw_multiline_string(UiKit.font_text(), Vector2(20.0, y + 18.0), Tx.t(key + "_d"), HORIZONTAL_ALIGNMENT_LEFT, size.x - 50.0, 12, 2, UiKit.INK_SOFT)
 		y += 64.0
