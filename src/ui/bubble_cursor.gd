@@ -44,6 +44,12 @@ static func apply() -> void:
 	Input.set_custom_mouse_cursor(tex, Input.CURSOR_POINTING_HAND, hot)
 
 
+## Vuelve al puntero del sistema (al salir: si no, la textura queda viva hasta después del renderizador).
+static func clear() -> void:
+	Input.set_custom_mouse_cursor(null, Input.CURSOR_ARROW)
+	Input.set_custom_mouse_cursor(null, Input.CURSOR_POINTING_HAND)
+
+
 ## Los menús siempre muestran el puntero (el juego lo esconde sobre la lámina).
 static func show() -> void:
 	if Input.mouse_mode != Input.MOUSE_MODE_VISIBLE:

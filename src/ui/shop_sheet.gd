@@ -103,7 +103,7 @@ func refresh_tabs() -> void:
 	ready_count = ready_total
 	_layout_tabs()
 	if not _tabs_visible(_current):
-		select_tab("finger")
+		select_tab(_first_visible_tab())
 	queue_redraw() # el encabezado cuenta los pedidos: se redibuja con cada cambio
 
 
@@ -117,6 +117,13 @@ func _layout_tabs() -> void:
 		@warning_ignore("integer_division")
 		b.position = Vector2(24.0 + float(i % 4) * 100.0, 128.0 + float(i / 4) * 66.0)
 		i += 1
+
+
+func _first_visible_tab() -> String:
+	for t: String in TABS:
+		if _tabs_visible(t):
+			return t
+	return "finger"
 
 
 func _tabs_visible(t: String) -> bool:

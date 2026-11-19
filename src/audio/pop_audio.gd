@@ -132,6 +132,7 @@ func quit_clean(exit_code: int = 0) -> void:
 	if _quitting:
 		return
 	_quitting = true
+	BubbleCursor.clear() # la textura del puntero se suelta antes de apagar el renderizador
 	for n: Node in find_children("*", "AudioStreamPlayer", true, false):
 		var p: AudioStreamPlayer = n as AudioStreamPlayer
 		p.stop()

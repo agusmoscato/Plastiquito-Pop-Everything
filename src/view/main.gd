@@ -634,6 +634,14 @@ func _run_demo(dir: String) -> void:
 	_shot(dir, "04_cadena")
 	await _wait(2.2)
 	_shot(dir, "05_cadena_fin")
+	for i: int in sim.sheet.cell_count(): # lámina terminada sin recarga automática: hay que tirar del rollo
+		if sim.sheet.popped_ratio() >= 0.93:
+			break
+		sim.sheet.pop(i)
+	await _wait(0.9)
+	_shot(dir, "05b_tirar_lamina")
+	request_reload()
+	await _wait(1.4)
 	sim.state.pops_run = 2.5 * Cfg.num(db.economy, "pellet_divisor") * 1.6
 	sim.state.pops = 12345.0
 	hud.open_recycle_panel()

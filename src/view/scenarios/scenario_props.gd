@@ -110,9 +110,10 @@ static func _cyl(top: float, bottom: float, height: float, segments: int = 24) -
 
 # --- El rollo gigante de papel de burbujas, detrás de la lámina (en todas las fases) ----------------------
 
-## Radio del rollo: crece con la lámina (2 cm en la Mesa chica, 24 cm en el Estacionamiento).
+## Radio del rollo: crece con la lámina (1 cm en la Mesa chica, ~14 cm en el Estacionamiento). En la
+## Mesa la cámara está muy cerca: más grande tapaba el borde de arriba de la pantalla.
 static func roll_radius(e: Vector2) -> float:
-	return clampf(e.y * 0.16, 2.0, 24.0)
+	return clampf(e.y * 0.13, 1.0, 20.0)
 
 
 ## Lo que ocupa el rollo detrás de la lámina (los demás objetos de atrás se corren esto).
@@ -173,7 +174,7 @@ static func _table(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	var edge: float = h.x / sheet_fill * 0.81 # medio ancho visible del área de juego a la altura de la lámina (medido en CI)
 	var lamp_light: OmniLight3D = OmniLight3D.new() # la luz cálida de una lámpara fuera de cuadro
 	lamp_light.light_color = Color("#FFA650")
-	lamp_light.light_energy = 2.2
+	lamp_light.light_energy = 1.6
 	lamp_light.omni_range = 90.0
 	lamp_light.position = Vector3(c.x - h.x - 9.0, 12.0, c.y - h.y - 4.0)
 	root.add_child(lamp_light)

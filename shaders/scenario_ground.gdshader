@@ -47,8 +47,8 @@ vec3 wood(vec2 p, out float rough) {
 	float off = hash21(vec2(id, 3.0)) * 40.0;
 	float grain = fbm(vec2((p.x + off) * 0.3, p.y * 5.0));
 	float rings = sin((p.y + grain * 1.6) * 9.0 + off) * 0.5 + 0.5;
-	vec3 dark = vec3(0.20, 0.11, 0.06);
-	vec3 light = vec3(0.46, 0.28, 0.15);
+	vec3 dark = vec3(0.11, 0.06, 0.035); // nogal oscuro: con la luz cálida de la Mesa se veía casi pino
+	vec3 light = vec3(0.27, 0.16, 0.085);
 	vec3 col = mix(dark, light, clamp(grain * 0.9 + rings * 0.35, 0.0, 1.0));
 	col *= 0.9 + 0.2 * hash21(vec2(id, 7.0)); // cada tabla un poco distinta
 	float seam = smoothstep(0.0, 0.03, fract(p.y / plank_w)) * smoothstep(0.0, 0.03, 1.0 - fract(p.y / plank_w));
@@ -61,8 +61,8 @@ vec3 tiles(vec2 p, out float rough) {
 	float size = 3.2;
 	vec2 q = p / size;
 	float checker = mod(floor(q.x) + floor(q.y), 2.0);
-	vec3 a = vec3(0.52, 0.24, 0.15); // terracota
-	vec3 b = vec3(0.30, 0.13, 0.09); // terracota oscura
+	vec3 a = vec3(0.34, 0.14, 0.085); // terracota
+	vec3 b = vec3(0.17, 0.065, 0.045); // terracota oscura
 	float px = fwidth(q.x) + fwidth(q.y); // tamaño de baldosa en píxeles: de lejos se promedia
 	float far_k = smoothstep(0.35, 0.9, px);
 	vec3 col = mix(mix(a, b, checker), (a + b) * 0.5, far_k);
