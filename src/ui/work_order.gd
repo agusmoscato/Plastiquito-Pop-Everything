@@ -33,11 +33,19 @@ func refresh() -> void:
 		"recycle":
 			var need: float = Prestige.pops_needed(1, Cfg.num(sim.eco, "pellet_divisor"), Cfg.num(sim.eco, "pellet_exponent"))
 			_set_goal(Tx.t("goal_recycle"), s.pops_run, need, lang)
+		"phase":
+			var cost: float = sim.next_phase_cost()
+			title = Tx.t("goal_phase") % Tx.t("phase_%d" % (up.phase_of(s) + 1))
+			var have: float = s.pellets + float(sim.recycle_gain())
+			ratio = clampf(have / maxf(cost, 1.0), 0.0, 1.0)
+			detail = "%d / %d %s" % [int(have), int(cost), Tx.t("pellets")]
 		_:
 			var gain: int = sim.recycle_gain()
 			var need2: float = Prestige.pops_needed(gain + 1, Cfg.num(sim.eco, "pellet_divisor"), Cfg.num(sim.eco, "pellet_exponent"))
 			_set_goal(Tx.t("goal_next_pellet"), s.pops_run, need2, lang)
 	why = Tx.t("why_" + goal)
+	if goal == "phase" and sim.next_phase_ready():
+		why = Tx.t("why_phase_ready")
 	queue_redraw()
 
 
@@ -55,11 +63,13 @@ static func current_goal(p_sim: GameSim) -> String:
 		if up.level_with_bonus(s, id) < 1 and not (goal == "reload" and p_sim.auto_reload()):
 			return goal
 	if up.phase_of(s) == 1:
-		return "recycle"
+		return "recycle" if s.recycles == 0 else "phase"
 	for goal: String in ["pin", "iron", "hands", "boot"]:
 		var id: String = GOAL_UPGRADE[goal]
 		if up.is_available(s, id) and up.level_with_bonus(s, id) < 1:
 			return goal
+	if p_sim.next_phase_cost() > 0.0:
+		return "phase"
 	return "pellet"
 
 

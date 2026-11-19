@@ -155,7 +155,11 @@ func test_work_order_guides_the_start() -> void:
 	assert_eq(WorkOrder.current_goal(sim), "palm")
 	sim.state.levels["unlock_palm"] = 1
 	assert_eq(WorkOrder.current_goal(sim), "recycle", "después, el primer reciclado y para qué sirve")
-	for goal: String in ["hold", "reload", "palm", "recycle", "pin", "iron", "hands", "boot", "pellet"]:
+	sim.state.recycles = 1
+	assert_eq(WorkOrder.current_goal(sim), "phase", "ya recicló: la meta es abrir el Piso")
+	sim.state.pellets = 1.0
+	assert_gt(sim.next_phase_cost(), 0.0)
+	for goal: String in ["hold", "reload", "palm", "recycle", "pin", "iron", "hands", "boot", "pellet", "phase"]:
 		assert_ne(Tx.t("why_" + goal), "why_" + goal, "cada meta explica para qué sirve: %s" % goal)
 
 

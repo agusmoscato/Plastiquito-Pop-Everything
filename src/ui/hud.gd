@@ -491,10 +491,15 @@ func _update_recycle_button() -> void:
 	var can: bool = sim.can_recycle()
 	var show_pellets: bool = sim.state.pellets > 0.0 or sim.state.recycles > 0
 	_recycle_button.visible = can or show_pellets
+	_recycle_button.scale = Vector2.ONE
 	if can:
 		_recycle_button.text = Tx.t("recycle")
 		_recycle_button.sub_text = "+%d %s" % [sim.recycle_gain(), Tx.t("pellets")]
 		_recycle_button.color = UiKit.STAMP_RED
+		if sim.next_phase_ready(): # alcanza para la fase siguiente: que se note
+			_recycle_button.sub_text = Tx.t("recycle_opens") % Tx.t("phase_%d" % (sim.phase() + 1)).to_upper()
+			var k: float = 1.0 + 0.05 * sin(Time.get_ticks_msec() * 0.009)
+			_recycle_button.scale = Vector2(k, k)
 	elif show_pellets:
 		_recycle_button.text = Tx.t("pellets")
 		_recycle_button.sub_text = NumberFormat.pops(sim.state.pellets, Settings.language)
