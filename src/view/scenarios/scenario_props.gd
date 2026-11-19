@@ -168,24 +168,21 @@ static func _roll_material(r: float, length: float) -> ShaderMaterial:
 # --- Mesa: lámpara cálida, taza y lápices (todo fuera de la lámina) -------------------------------------
 
 static func _table(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
-	# A esta escala (1 unidad = 1 cm) la lámina inicial mide 8 cm: una taza real (15 cm con plato) era
-	# más grande que la lámina, así que en la Mesa solo hay cosas chicas a escala real, en las dos
-	# franjas de mesa que quedan libres a los costados de la lámina, cortadas por el borde de la
-	# pantalla o de la hoja de pedidos: las puntas de dos lápices arriba a la derecha (una moneda cortada se leía como una mancha).
+	# A esta escala (1 unidad = 1 cm) la lámina inicial mide 8 cm. Con la lámina entera en cámara, a los
+	# costados está el HUD: lo que se ve es la esquina de atrás a la derecha, entre la punta del rollo y la
+	# hoja de pedidos. Ahí va el mate con su termo (alguien toma mate mientras revienta burbujas); la
+	# yerba, atrás a la izquierda.
 	var h: Vector2 = e * 0.5
-	var edge: float = h.x / sheet_fill * 0.81 # medio ancho visible del área de juego a la altura de la lámina (medido en CI)
 	var lamp_light: OmniLight3D = OmniLight3D.new() # la luz cálida de una lámpara fuera de cuadro
 	lamp_light.light_color = Color("#FFA650")
 	lamp_light.light_energy = 1.6
 	lamp_light.omni_range = 90.0
 	lamp_light.position = Vector3(c.x - h.x - 9.0, 12.0, c.y - h.y - 4.0)
 	root.add_child(lamp_light)
-	var right: float = maxf(c.x + h.x + 1.3, c.x + edge - 0.2) # franja derecha (la corta la hoja de pedidos)
-	# Un mate con su termo al lado: alguien está tomando mate mientras revienta burbujas. A escala real
-	# el mate (8 cm) es tan grande como la primera lámina: asoma a la izquierda y se ve entero al crecer.
-	_glb(root, "prop_mate", Vector3(c.x - h.x - 2.4 - 3.9, GROUND_Y, c.y + h.y * 0.15), 165.0) # la bombilla apunta afuera
-	_glb(root, "prop_termo", Vector3(c.x - h.x - 6.5, GROUND_Y, c.y - h.y - 4.5), 200.0) # la manija hacia afuera
-	_glb(root, "prop_yerba", Vector3(right + 5.0, GROUND_Y, c.y - h.y * 0.6), -18.0)
+	var back: float = c.y - h.y - roll_depth(e) * 0.5
+	_glb(root, "prop_mate", Vector3(c.x + e.x * 0.51 + 2.0 + 4.6, GROUND_Y, back - 1.0), 20.0) # la bombilla hacia afuera
+	_glb(root, "prop_termo", Vector3(c.x + e.x * 0.51 + 15.0, GROUND_Y, back - 6.0), -10.0)
+	_glb(root, "prop_yerba", Vector3(c.x - e.x * 0.51 - 6.0, GROUND_Y, back - 2.0), 15.0)
 
 
 # --- Piso: zócalo, pata de silla y ventana con persiana --------------------------------------------------
@@ -202,9 +199,11 @@ static func _floor(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 		_add(root, _box(Vector3(62.0, 2.5, 1.2)), _mat(Color("#8D8777"), 0.6), win + Vector3(0.0, (float(i) - 4.0) * 7.5, 0.8))
 	_add(root, _box(Vector3(66.0, 3.0, 4.0)), _mat(Color("#F1EEE6"), 0.5), win + Vector3(0.0, -36.5, 1.5))
 	# Cosas de casa en el piso: la pelota de cuero, las alpargatas tiradas y el sifón de soda.
-	_glb(root, "prop_pelota", Vector3(c.x - e.x * 0.5 - 2.5 - 11.0, GROUND_Y, c.y + e.y * 0.18))
-	_glb(root, "prop_alpargatas", Vector3(c.x + e.x * 0.5 + 17.0, GROUND_Y, c.y - e.y * 0.2), 75.0)
-	_glb(root, "prop_sifon", Vector3(c.x - e.x * 0.5 - 9.0, GROUND_Y, c.y - e.y * 0.5 - 6.0), 20.0)
+	# Van en las esquinas de atrás, a los lados del rollo (lo que la cámara deja ver).
+	var back: float = c.y - e.y * 0.5 - roll_depth(e) * 0.5
+	_glb(root, "prop_pelota", Vector3(c.x + e.x * 0.51 + 3.0 + 11.0, GROUND_Y, back - 4.0))
+	_glb(root, "prop_alpargatas", Vector3(c.x + e.x * 0.5 + 17.0, GROUND_Y, c.y - e.y * 0.05), 75.0)
+	_glb(root, "prop_sifon", Vector3(c.x - e.x * 0.51 - 7.0, GROUND_Y, back - 2.0), 20.0)
 
 
 # --- Galpón: estanterías con cajas, líneas de seguridad y polvo ----------------------------------------
@@ -214,7 +213,7 @@ static func _warehouse(root: Node3D, c: Vector2, e: Vector2, u: float) -> void:
 		var bx: float = c.x + (float(sx) - 0.5) * e.x * 0.8
 		_glb(root, "prop_shelf", Vector3(bx, 0.0, c.y - e.y * 0.5 - 20.0 - roll_depth(e)))
 	# La garrafa de 10 kg y cajones de naranjas esperando el reparto.
-	_glb(root, "prop_garrafa", Vector3(c.x - e.x * 0.5 - 40.0, GROUND_Y, c.y + e.y * 0.15), 30.0)
+	_glb(root, "prop_garrafa", Vector3(c.x + e.x * 0.5 + 80.0, GROUND_Y, c.y - e.y * 0.5 - 25.0), 30.0)
 	_glb(root, "prop_cajon", Vector3(c.x + e.x * 0.5 + 45.0, GROUND_Y, c.y - e.y * 0.25), 82.0)
 	_glb(root, "prop_cajon", Vector3(c.x + e.x * 0.5 + 45.0, GROUND_Y, c.y + e.y * 0.2), 96.0)
 	# Líneas amarillas de seguridad pintadas a los costados.
@@ -268,7 +267,7 @@ static func _parking(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	var grill: Vector3 = Vector3(c.x - h.x - 85.0, GROUND_Y, c.y + h.y * 0.05)
 	_glb(root, "prop_chulengo", grill, -100.0) # la tapa abierta hacia afuera
 	root.add_child(_smoke(grill + Vector3(0.0, 105.0, 0.0)))
-	_glb(root, "prop_conservadora", Vector3(c.x + h.x + 45.0, GROUND_Y, c.y + h.y * 0.25), -15.0)
+	_glb(root, "prop_conservadora", Vector3(c.x + h.x * 1.02 + 40.0, GROUND_Y, c.y - h.y - roll_depth(e) * 0.5 - 10.0), -15.0)
 	# Cordón de 15 x 15 cm con borde pintado y farol de 4 m, en cm reales, detrás de la lámina.
 	var curb_z: float = c.y - e.y * 0.5 - 40.0 - back
 	_add(root, _box(Vector3(e.x * 2.4, 15.0, 15.0)), _mat(Color("#8C8E92"), 0.9), Vector3(c.x, 7.5, curb_z))
