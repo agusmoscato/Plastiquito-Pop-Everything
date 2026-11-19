@@ -390,22 +390,90 @@ def termo():
 
 
 def yerba_pack():
-    # Paquete de yerba de papel madera: sin marca, con una franja verde y la "ventanita" de la hoja.
-    kraft = tinted("kraft", "#C9A36A", rough=0.85)
-    w, d, h = 0.085, 0.055, 0.17
-    o = extrude_outline("paquete", rounded_rect(w, d, 0.006, 3), 0.0, h)
-    give(o, kraft)
-    # Cierre: la bolsa doblada en plano arriba, con el doblez que cae sobre el frente.
-    top = rbox("cierre", (w - 0.002, d - 0.002, 0.010), (0.0, 0.0, h + 0.004), 0.003)
-    give(top, kraft)
-    flap = rbox("doblez", (w - 0.004, 0.0035, 0.030), (0.0, -d / 2 - 0.0008, h - 0.012), 0.0012)
-    give(flap, kraft)
-    band = rbox("franja", (w + 0.0008, d + 0.0008, 0.040), (0.0, 0.0, 0.075), 0.0006)
-    give(band, mat("franja_verde", "#3E7A3A", rough=0.6))
-    leaf = rbox("hoja", (0.030, 0.002, 0.018), (0.0, -d / 2 - 0.0012, 0.075), 0.0008)
-    give(leaf, mat("hoja", "#E8E2C8", rough=0.6))
-    paint(o, lambda c: 0.85 + 0.15 * math.sin(c.z * 220.0 + c.x * 90.0) ** 2) # papel arrugado
-    return [o, top, flap, band, leaf]
+    # Paquete blando de yerba de papel (no una caja): más ancho que profundo, los costados abombados y
+    # arrugados, el borde de arriba doblado y pegado; etiqueta crema con dos hojas verdes (sin texto ni
+    # marca) y un montoncito de yerba volcada al lado.
+    kraft = tinted("papel_yerba", "#D2AE72", rough=0.85)
+    w, d, h = 0.120, 0.070, 0.165
+    bm = bmesh.new()
+    nx, ny, nz = 10, 6, 12
+    verts = {}
+
+    def bulge(u, v):  # el papel se infla en el medio de cada cara
+        return 1.0 + 0.10 * math.sin(math.pi * u) * math.sin(math.pi * v)
+    pts = []
+    for k in range(nz + 1):
+        z = h * k / nz
+        ring = []
+        for i in range(nx):
+            ring.append((-w / 2 + w * i / nx, -d / 2))
+        for j in range(ny):
+            ring.append((w / 2, -d / 2 + d * j / ny))
+        for i in range(nx):
+            ring.append((w / 2 - w * i / nx, d / 2))
+        for j in range(ny):
+            ring.append((-w / 2, d / 2 - d * j / ny))
+        vz = k / nz
+        row = []
+        for (x, y) in ring:
+            ux = (x + w / 2) / w
+            uy = (y + d / 2) / d
+            bx = x * (1.0 + 0.05 * math.sin(math.pi * vz) * math.sin(math.pi * uy))
+            by = y * bulge(ux, vz)
+            wrinkle = 0.0012 * math.sin(x * 260.0 + z * 190.0) * math.sin(z * 150.0 - y * 80.0)
+            row.append(bm.verts.new((bx + wrinkle, by + wrinkle * 0.6, z)))
+        pts.append(row)
+    m = len(pts[0])
+    for k in range(nz):
+        for i in range(m):
+            a, b = pts[k][i], pts[k][(i + 1) % m]
+            c, dd = pts[k + 1][(i + 1) % m], pts[k + 1][i]
+            bm.faces.new((a, b, c, dd))
+    bm.faces.new(list(reversed(pts[0])))
+    bm.faces.new(pts[-1])
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    me = bpy.data.meshes.new("paquete")
+    bm.to_mesh(me)
+    bm.free()
+    bag = bpy.data.objects.new("paquete", me)
+    bpy.context.scene.collection.objects.link(bag)
+    lib.subsurf(bag, 1)
+    give(bag, kraft)
+    paint(bag, lambda c: 0.80 + 0.20 * (0.5 + 0.5 * math.sin(c.z * 230.0 + c.x * 120.0)))
+    # El cierre: el borde de arriba plegado dos veces y pegado (una lengüeta chata y ancha).
+    fold = rbox("doblez", (w * 0.96, d * 0.55, 0.016), (0.0, 0.0, h + 0.006), 0.004)
+    give(fold, kraft)
+    paint(fold, lambda c: 0.72)
+    fold2 = rbox("pliegue", (w * 0.94, 0.006, 0.026), (0.0, -d * 0.30, h - 0.004), 0.002, (math.radians(-18.0), 0.0, 0.0))
+    give(fold2, kraft)
+    # Etiqueta crema con dos hojas de yerba mate verdes.
+    label = rbox("etiqueta", (w * 0.62, 0.003, 0.070), (0.0, -d / 2 * 1.10 - 0.001, 0.080), 0.0015)
+    give(label, mat("etiqueta", "#EFE6CC", rough=0.6))
+    leaf_m = mat("hoja_dibujo", "#3F7F35", rough=0.6)
+    leaves = []
+    for (lx, lz, rot) in ((-0.012, 0.084, 35.0), (0.012, 0.080, -35.0)):
+        leaf = lib.sphere("hoja", 1.0, (lx, -d / 2 * 1.10 - 0.004, lz), 14, 8, (0.012, 0.0016, 0.024))
+        leaf.rotation_euler = (0.0, math.radians(rot), 0.0)
+        give(leaf, leaf_m)
+        leaves.append(leaf)
+    band = rbox("franja", (w * 0.62, 0.0032, 0.010), (0.0, -d / 2 * 1.10 - 0.0012, 0.050), 0.001)
+    give(band, leaf_m)
+    # Montoncito de yerba volcada al lado, con granos.
+    yerba = tinted("yerba_suelta", "#6A8730", rough=0.95)
+    pile = lib.sphere("montoncito", 1.0, (w / 2 + 0.035, -0.010, 0.0), 24, 10, (0.030, 0.024, 0.011))
+    give(pile, yerba)
+    paint(pile, lambda c: 0.65 + 0.35 * (0.5 + 0.5 * math.sin(c.x * 2400.0) * math.sin(c.y * 2100.0)))
+    objs = [bag, fold, fold2, label, band, pile] + leaves
+    random.seed(21)
+    for k in range(30):
+        a = random.uniform(0.0, 2.0 * math.pi)
+        r = random.uniform(0.0, 0.034)
+        g = lib.sphere("grano", random.uniform(0.0008, 0.0014), (w / 2 + 0.035 + r * math.cos(a), -0.010 + r * math.sin(a) * 0.8, 0.0008), 6, 4, (1.4, 1.0, 0.6))
+        give(g, yerba)
+        tone = random.uniform(0.55, 1.1)
+        paint(g, lambda c, t=tone: t)
+        objs.append(g)
+    return objs
 
 
 # --- Piso -----------------------------------------------------------------------------------------
@@ -483,8 +551,8 @@ def _alpargata(dx, dy, yaw):
     # Suela de yute trenzado (la cuerda que da la vuelta, con la trenza pintada), capellada de lona negra
     # cerrada adelante y abierta atrás, y la puntera de goma. Se lee como zapatilla de tela, no como mano.
     jute = tinted("yute", "#D4B47C", rough=0.95)
-    canvas = tinted("lona", "#22252C", rough=0.85)
-    rubber = tinted("puntera", "#3B3E46", rough=0.7)
+    canvas = tinted("lona", "#1F2B47", rough=0.85) # azul marino
+    thread = mat("hilo", "#EDE6D2", rough=0.7)
     L, W, T = 0.255, 0.094, 0.024
     n = 36
     outline = [(-L / 2 + L * i / n, _foot(i / n, W) * (0.35 if i in (0, n) else 1.0)) for i in range(n + 1)]
@@ -526,6 +594,8 @@ def _alpargata(dx, dy, yaw):
             t = 0.05 + 0.93 * cidx / cols
             half = _foot(t, W) * 1.03
             hmax = 0.050 * (0.55 + 0.45 * math.sin(math.pi * min(1.0, (t - 0.05) / 0.75))) * (1.0 - 0.8 * max(0.0, (t - 0.8) / 0.2) ** 2)
+            if t < 0.45: # el talón pisado: la lona baja casi plana hacia atrás (sin aletas paradas)
+                hmax *= 0.12 + 0.88 * ((t - 0.05) / 0.40) ** 2
             ang = math.pi * u
             row.append(bm.verts.new((-L / 2 + L * t, half * math.cos(ang), T + hmax * math.sin(ang))))
         grid.append(row)
@@ -533,7 +603,7 @@ def _alpargata(dx, dy, yaw):
         for cidx in range(cols):
             t = 0.05 + 0.93 * (cidx + 0.5) / cols
             u = (r + 0.5) / rows
-            if t < 0.48 and 0.22 < u < 0.78: # la boca del pie
+            if 0.16 < t < 0.46 and 0.30 < u < 0.70: # la boca del pie
                 continue
             bm.faces.new((grid[r][cidx], grid[r][cidx + 1], grid[r + 1][cidx + 1], grid[r + 1][cidx]))
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
@@ -548,8 +618,16 @@ def _alpargata(dx, dy, yaw):
     give(upper, canvas)
     paint(upper, lambda c: 0.84 + 0.16 * (0.5 + 0.5 * math.sin(c.x * 1800.0) * math.sin(c.y * 1800.0)))
     # Puntera de goma: un casquete apenas más grande sobre la punta.
-    toe = lib.sphere("puntera", 1.0, (L / 2 - 0.030, 0.0, T + 0.004), 24, 12, (0.040, _foot(0.93, W) * 1.06, 0.026))
-    give(toe, rubber)
+    # Costura en zigzag donde la lona se une con la suela (hilo crudo).
+    seam = []
+    for i in range(0, 2 * n + 1):
+        t = 0.05 + 0.93 * (i / (2.0 * n))
+        side = 1.0 if i <= n else -1.0
+        tt = t if side > 0 else 0.05 + 0.93 * ((2 * n - i) / (2.0 * n))
+        zz = T + 0.0015 + (0.0028 if i % 2 == 0 else 0.0)
+        seam.append((-L / 2 + L * tt, side * (_foot(tt, W) * 1.03 + 0.0035), zz)) # por fuera de la lona
+    toe = tube("costura", seam, [0.0011] * len(seam), sides=5)
+    give(toe, thread)
     insole = extrude_outline("plantilla", [(x * 0.92, y * 0.88) for (x, y) in outline], T - 0.001, T + 0.0015)
     give(insole, mat("plantilla", "#B99A68", rough=0.9))
     objs = [sole, rope, upper, toe, insole]
@@ -569,15 +647,15 @@ def sifon():
     # Sifón de soda clásico: botella alta de vidrio verde botella tallado en rombos (facetas hundidas que
     # agarran la luz), cabezal de metal grande que abraza el cuello (pollera), cuerpo cilíndrico, palanca
     # larga arriba que baja hacia adelante, pico que sale hacia adelante y abajo, y el tubo adentro.
-    glass = mat("vidrio_verde", (0.10, 0.42, 0.38), rough=0.06, alpha=0.7)
+    glass = mat("vidrio_verde", (0.05, 0.30, 0.30), rough=0.05, alpha=0.8)
     metal = mat("cromo", "#D3D7DC", rough=0.18, metal=0.95)
     segs, rows = 12, 16
     bm = bmesh.new()
     ring_verts = []
     for k in range(rows + 1):
-        z = 0.008 + 0.215 * k / rows
+        z = 0.008 + 0.185 * k / rows
         off = (math.pi / segs) * (k % 2) # filas corridas medio paso: rombos
-        r = 0.040 if k % 2 == 0 else 0.0368 # vértices hundidos en las filas impares: facetas talladas
+        r = 0.047 if k % 2 == 0 else 0.0425 # vértices hundidos en las filas impares: estrías talladas
         if k == 0 or k == rows:
             r = 0.038
         ring_verts.append([bm.verts.new((r * math.cos(off + 2 * math.pi * i / segs), r * math.sin(off + 2 * math.pi * i / segs), z)) for i in range(segs)])
@@ -602,34 +680,64 @@ def sifon():
     bpy.context.scene.collection.objects.link(bottle)
     give(bottle, glass)
     paint(bottle, lambda c: 0.75 + 0.25 * (0.5 + 0.5 * math.sin(math.atan2(c.y, c.x) * 12.0 + c.z * 150.0)))
-    neck = revolve("cuello", [(0.038, 0.223), (0.030, 0.236), (0.022, 0.244), (0.0, 0.244)], 24)
+    neck = revolve("cuello", [(0.044, 0.193), (0.034, 0.210), (0.022, 0.222), (0.0, 0.222)], 24)
     give(neck, glass)
-    straw = revolve("tubo", [(0.0, 0.008), (0.0035, 0.008), (0.0035, 0.250), (0.0, 0.250)], 12)
+    straw = revolve("tubo", [(0.0, 0.008), (0.0035, 0.008), (0.0035, 0.240), (0.0, 0.240)], 12)
     give(straw, mat("tubo", "#EEF2F3", rough=0.3))
     # Cabezal de campana: pollera ancha que abraza el cuello, cuerpo que se angosta y corona arriba.
-    skirt = revolve("pollera", [(0.0, 0.222), (0.040, 0.222), (0.042, 0.230), (0.036, 0.248), (0.027, 0.262), (0.0, 0.263)], 40)
+    skirt = revolve("pollera", [(0.0, 0.200), (0.046, 0.200), (0.048, 0.208), (0.040, 0.226), (0.029, 0.240), (0.0, 0.241)], 40)
     lib.subsurf(skirt, 1)
     give(skirt, metal)
-    head = revolve("cabezal", [(0.0, 0.260), (0.0245, 0.260), (0.0205, 0.290), (0.0225, 0.302), (0.0175, 0.310), (0.0, 0.311)], 40)
+    head = revolve("cabezal", [(0.0, 0.238), (0.0255, 0.238), (0.0215, 0.272), (0.0235, 0.286), (0.0185, 0.294), (0.0, 0.295)], 40)
     lib.subsurf(head, 1)
     give(head, metal)
     # Pico recto y grueso que sale de adelante en diagonal hacia abajo (45 grados).
-    spout = tube("pico", [(0.012, 0.0, 0.286), (0.034, 0.0, 0.276), (0.056, 0.0, 0.258), (0.066, 0.0, 0.248)],
-                 [0.0078, 0.0072, 0.0066, 0.0062], sides=16)
+    spout = tube("pico", [(0.012, 0.0, 0.266), (0.032, 0.0, 0.256), (0.050, 0.0, 0.240), (0.058, 0.0, 0.232)],
+                 [0.0082, 0.0076, 0.007, 0.0066], sides=16)
     give(spout, metal)
-    nozzle = tube("boquilla", [(0.064, 0.0, 0.250), (0.070, 0.0, 0.244)], [0.0072, 0.0072], sides=16)
+    nozzle = tube("boquilla", [(0.056, 0.0, 0.234), (0.062, 0.0, 0.228)], [0.0076, 0.0076], sides=16)
     give(nozzle, metal)
     # Palanca chata arriba: nace atrás en la bisagra, va casi horizontal y sobresale por delante del pico.
-    lever = tube("palanca", [(-0.026, 0.0, 0.314), (0.010, 0.0, 0.319), (0.050, 0.0, 0.314), (0.080, 0.0, 0.302)],
-                 [0.0058, 0.0075, 0.0072, 0.0062], sides=12, squash=0.38)
+    lever = tube("palanca", [(-0.024, 0.0, 0.298), (0.010, 0.0, 0.300), (0.040, 0.0, 0.286), (0.068, 0.0, 0.262)],
+                 [0.0058, 0.0078, 0.0074, 0.0064], sides=12, squash=0.38) # paralela al pico
     lib.subsurf(lever, 1)
     give(lever, metal)
     hinge = revolve("bisagra", [(0.0, -0.011), (0.0065, -0.011), (0.0065, 0.011), (0.0, 0.011)], 14)
     hinge.rotation_euler = (math.radians(90.0), 0.0, 0.0)
-    hinge.location = (-0.022, 0.0, 0.311)
+    hinge.location = (-0.020, 0.0, 0.295)
     give(hinge, metal)
     spout = lib.join([spout, nozzle], "pico")
-    return [bottle, neck, straw, skirt, head, spout, lever, hinge]
+    # La malla de alambre de los sifones de antes: hilos en diagonal cruzados alrededor del vidrio.
+    wire = mat("malla", "#AEB4BA", rough=0.35, metal=0.85)
+    strands = []
+    turns = 1.15
+    for k in range(10):
+        for sgn in (-1.0, 1.0):
+            pts = []
+            for i in range(25):
+                t = i / 24.0
+                a0 = 2.0 * math.pi * (k / 10.0 + sgn * turns * t * 0.5)
+                z = 0.02 + 0.165 * t
+                pts.append((0.0478 * math.cos(a0), 0.0478 * math.sin(a0), z))
+            w = tube("hilo", pts, [0.0011] * len(pts), sides=5)
+            give(w, wire)
+            strands.append(w)
+    for z in (0.020, 0.186): # aros de arriba y abajo que sujetan la malla
+        ring = revolve("aro_malla", [(0.0472, z - 0.003), (0.0494, z - 0.003), (0.0494, z + 0.003), (0.0472, z + 0.003)], 32, closed=True)
+        give(ring, wire)
+        strands.append(ring)
+    mesh_obj = lib.join(strands, "malla")
+    fizz = mat("burbujitas", (0.85, 0.95, 0.95), rough=0.1, alpha=0.75) # la soda: burbujitas adentro
+    random.seed(9)
+    bubbles = []
+    for k in range(26):
+        a = random.uniform(0.0, 2.0 * math.pi)
+        r = random.uniform(0.008, 0.034)
+        b = lib.sphere("burbujita", random.uniform(0.0018, 0.0032), (r * math.cos(a), r * math.sin(a), random.uniform(0.03, 0.18)), 8, 5)
+        give(b, fizz)
+        bubbles.append(b)
+    strands_b = lib.join(bubbles, "burbujitas")
+    return [bottle, neck, straw, skirt, head, spout, lever, hinge, mesh_obj, strands_b]
 
 
 def garrafa():
@@ -791,10 +899,10 @@ def chulengo():
         give(cobj, ember if random.random() < 0.55 else coal)
         objs.append(cobj)
     # Chorizos y morcillas en la mitad de adelante de la parrilla, en diagonal, gordos y con marcas.
-    chori = tinted("chorizo", "#A8432A", rough=0.4)
-    morci = tinted("morcilla", "#3A1714", rough=0.45)
-    rows = [(-0.30, 0.16, chori, 0.021), (-0.30, 0.08, chori, 0.021), (-0.30, 0.0, morci, 0.026),
-            (0.04, 0.16, chori, 0.021), (0.04, 0.08, morci, 0.026), (0.04, 0.0, chori, 0.021)]
+    chori = tinted("chorizo", "#B8432A", rough=0.4) # rojo ladrillo
+    morci = tinted("morcilla", "#241010", rough=0.45) # casi negro
+    rows = [(-0.32, 0.17, chori, 0.030), (-0.32, 0.07, chori, 0.030), (-0.32, -0.04, morci, 0.036),
+            (0.06, 0.17, morci, 0.036), (0.06, 0.07, chori, 0.030), (0.06, -0.04, chori, 0.030)]
     for (x0, y, mt, r) in rows:
         pts = [(x0 + 0.24 * t / 6, y + 0.012 * math.sin(t * 1.1), gz + r * 0.9) for t in range(7)]
         ch = tube("embutido", pts, [r * 0.55, r * 0.9, r, r, r, r * 0.9, r * 0.55], sides=14)

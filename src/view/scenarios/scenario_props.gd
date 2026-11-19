@@ -199,9 +199,6 @@ static func _table(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	lamp_light.omni_range = 90.0
 	lamp_light.position = Vector3(c.x - h.x - 9.0, 12.0, c.y - h.y - 4.0)
 	root.add_child(lamp_light)
-	var back: float = c.y - h.y - roll_depth(e) * 0.5
-	var s: float = ScenarioHeroes.scale_for(1, e)
-	_arg(root, 1, e, "prop_yerba", Vector3(c.x - e.x * 0.51 - 6.0 * s, GROUND_Y, back - 2.0 * s), 15.0)
 
 
 # --- Piso: zócalo, pata de silla y ventana con persiana --------------------------------------------------
@@ -217,11 +214,7 @@ static func _floor(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	for i: int in 9:
 		_add(root, _box(Vector3(62.0, 2.5, 1.2)), _mat(Color("#8D8777"), 0.6), win + Vector3(0.0, (float(i) - 4.0) * 7.5, 0.8))
 	_add(root, _box(Vector3(66.0, 3.0, 4.0)), _mat(Color("#F1EEE6"), 0.5), win + Vector3(0.0, -36.5, 1.5))
-	# Cosas de casa en el piso: la pelota de cuero, las alpargatas tiradas y el sifón de soda.
-	# Van en las esquinas de atrás, a los lados del rollo (lo que la cámara deja ver).
-	var back: float = c.y - e.y * 0.5 - roll_depth(e) * 0.5
-	var s: float = ScenarioHeroes.scale_for(2, e)
-	_arg(root, 2, e, "prop_alpargatas", Vector3(c.x - e.x * 0.51 - 16.0 * s, GROUND_Y, back - 4.0 * s), 75.0)
+	# La pelota, el sifón y las alpargatas van juntos donde se ven (ScenarioHeroes).
 
 
 # --- Galpón: estanterías con cajas, líneas de seguridad y polvo ----------------------------------------
@@ -280,9 +273,7 @@ static func _parking(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	var spots: Array[Vector2] = [Vector2(-h.x * 0.4, -h.y - 14.0 - back), Vector2(h.x * 0.2, -h.y - 14.0 - back)] # los de adelante tapaban
 	for spot: Vector2 in spots:
 		_glb(root, "prop_cone", Vector3(c.x + spot.x, 0.0, c.y + spot.y), spot.x * 7.0)
-	# El asado: el chulengo es el protagonista (ScenarioHeroes); la conservadora lo acompaña.
-	var s: float = ScenarioHeroes.scale_for(4, e)
-	_arg(root, 4, e, "prop_conservadora", Vector3(c.x - h.x - 45.0 * s, GROUND_Y, c.y - h.y - roll_depth(e) * 0.5 - 10.0 * s), -15.0)
+	# El asado: el chulengo y la conservadora van juntos donde se ven (ScenarioHeroes).
 	# Cordón de 15 x 15 cm con borde pintado y farol de 4 m, en cm reales, detrás de la lámina.
 	var curb_z: float = c.y - e.y * 0.5 - 40.0 - back
 	_add(root, _box(Vector3(e.x * 2.4, 15.0, 15.0)), _mat(Color("#8C8E92"), 0.9), Vector3(c.x, 7.5, curb_z))
