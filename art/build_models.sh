@@ -17,3 +17,5 @@ run hand_mpfb hand
 for m in pin iron boot roller; do run "$m" "$m"; done
 for w in gem bomb line; do run specials "special_$w" --which "$w"; done
 for w in cup pencil chair_leg shelf cone; do run props "prop_$w" --which "$w"; done
+# Utilería argentina de los escenarios (mate, termo, yerba, pelota, alpargatas, sifón, garrafa, cajón, chulengo, conservadora).
+for w in mate termo yerba pelota alpargatas sifon garrafa cajon chulengo conservadora; do run argentina "prop_$w" --which "$w"; done

@@ -1,7 +1,9 @@
 class_name ScenarioProps
 extends RefCounted
 ## Objetos de cada escenario: modelos .glb (art/models) a ESCALA REAL (1 unidad = 1 cm, una burbuja
-## mide ~1 cm; un lápiz 17 cm) más algo de geometría simple. Se ubican FUERA de la lámina
+## mide ~1 cm; un mate 9 cm) más algo de geometría simple. Cada lugar tiene sus cosas argentinas:
+## mate, termo y yerba en la Mesa; pelota, alpargatas y sifón en el Piso; garrafa y cajones de naranjas
+## en el Galpón; chulengo con chorizos y conservadora en el Estacionamiento. Se ubican FUERA de la lámina
 ## (centro `c`, tamaño `e`, en el plano XZ): enmarcan los bordes y nunca se cruzan con ella.
 
 const GROUND_Y: float = -0.05
@@ -179,9 +181,11 @@ static func _table(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	lamp_light.position = Vector3(c.x - h.x - 9.0, 12.0, c.y - h.y - 4.0)
 	root.add_child(lamp_light)
 	var right: float = maxf(c.x + h.x + 1.3, c.x + edge - 0.2) # franja derecha (la corta la hoja de pedidos)
-	for i: int in 2: # lápices que entran desde arriba: solo asoman las puntas (~2 cm)
-		var tip_z: float = c.y - h.y * 1.55 - 0.7 * float(i)
-		_glb(root, "prop_pencil", Vector3(right + 0.9 * float(i), GROUND_Y, tip_z - 21.6), 4.0 - 7.0 * float(i))
+	# Un mate con su termo al lado: alguien está tomando mate mientras revienta burbujas. A escala real
+	# el mate (8 cm) es tan grande como la primera lámina: asoma a la izquierda y se ve entero al crecer.
+	_glb(root, "prop_mate", Vector3(c.x - h.x - 2.4 - 3.9, GROUND_Y, c.y + h.y * 0.15), 165.0) # la bombilla apunta afuera
+	_glb(root, "prop_termo", Vector3(c.x - h.x - 6.5, GROUND_Y, c.y - h.y - 4.5), 200.0) # la manija hacia afuera
+	_glb(root, "prop_yerba", Vector3(right + 5.0, GROUND_Y, c.y - h.y * 0.6), -18.0)
 
 
 # --- Piso: zócalo, pata de silla y ventana con persiana --------------------------------------------------
@@ -197,8 +201,10 @@ static func _floor(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	for i: int in 9:
 		_add(root, _box(Vector3(62.0, 2.5, 1.2)), _mat(Color("#8D8777"), 0.6), win + Vector3(0.0, (float(i) - 4.0) * 7.5, 0.8))
 	_add(root, _box(Vector3(66.0, 3.0, 4.0)), _mat(Color("#F1EEE6"), 0.5), win + Vector3(0.0, -36.5, 1.5))
-	# Pata de silla (modelo real, 42 cm) junto al borde izquierdo, fuera de la lámina.
-	_glb(root, "prop_chair_leg", Vector3(c.x - e.x * 0.5 - 6.0, 0.0, c.y + e.y * 0.1))
+	# Cosas de casa en el piso: la pelota de cuero, las alpargatas tiradas y el sifón de soda.
+	_glb(root, "prop_pelota", Vector3(c.x - e.x * 0.5 - 2.5 - 11.0, GROUND_Y, c.y + e.y * 0.18))
+	_glb(root, "prop_alpargatas", Vector3(c.x + e.x * 0.5 + 17.0, GROUND_Y, c.y - e.y * 0.2), 75.0)
+	_glb(root, "prop_sifon", Vector3(c.x - e.x * 0.5 - 9.0, GROUND_Y, c.y - e.y * 0.5 - 6.0), 20.0)
 
 
 # --- Galpón: estanterías con cajas, líneas de seguridad y polvo ----------------------------------------
@@ -207,6 +213,10 @@ static func _warehouse(root: Node3D, c: Vector2, e: Vector2, u: float) -> void:
 	for sx: int in 2:
 		var bx: float = c.x + (float(sx) - 0.5) * e.x * 0.8
 		_glb(root, "prop_shelf", Vector3(bx, 0.0, c.y - e.y * 0.5 - 20.0 - roll_depth(e)))
+	# La garrafa de 10 kg y cajones de naranjas esperando el reparto.
+	_glb(root, "prop_garrafa", Vector3(c.x - e.x * 0.5 - 40.0, GROUND_Y, c.y + e.y * 0.15), 30.0)
+	_glb(root, "prop_cajon", Vector3(c.x + e.x * 0.5 + 45.0, GROUND_Y, c.y - e.y * 0.25), 82.0)
+	_glb(root, "prop_cajon", Vector3(c.x + e.x * 0.5 + 45.0, GROUND_Y, c.y + e.y * 0.2), 96.0)
 	# Líneas amarillas de seguridad pintadas a los costados.
 	var yellow: StandardMaterial3D = _mat(Color("#E8C21C"), 0.7)
 	_add(root, _box(Vector3(10.0, 0.06, e.y * 1.5)), yellow, Vector3(c.x - e.x * 0.5 - 25.0, GROUND_Y + 0.04, c.y)) # 10 cm reales
@@ -254,6 +264,11 @@ static func _parking(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	var spots: Array[Vector2] = [Vector2(-h.x - 14.0, -h.y * 0.6), Vector2(-h.x - 14.0, h.y * 0.5), Vector2(-h.x * 0.4, -h.y - 14.0 - back), Vector2(h.x * 0.2, -h.y - 14.0 - back)]
 	for spot: Vector2 in spots:
 		_glb(root, "prop_cone", Vector3(c.x + spot.x, 0.0, c.y + spot.y), spot.x * 7.0)
+	# El asado del estacionamiento: chulengo con chorizos (y su humo) y la conservadora.
+	var grill: Vector3 = Vector3(c.x - h.x - 85.0, GROUND_Y, c.y + h.y * 0.05)
+	_glb(root, "prop_chulengo", grill, -100.0) # la tapa abierta hacia afuera
+	root.add_child(_smoke(grill + Vector3(0.0, 105.0, 0.0)))
+	_glb(root, "prop_conservadora", Vector3(c.x + h.x + 45.0, GROUND_Y, c.y + h.y * 0.25), -15.0)
 	# Cordón de 15 x 15 cm con borde pintado y farol de 4 m, en cm reales, detrás de la lámina.
 	var curb_z: float = c.y - e.y * 0.5 - 40.0 - back
 	_add(root, _box(Vector3(e.x * 2.4, 15.0, 15.0)), _mat(Color("#8C8E92"), 0.9), Vector3(c.x, 7.5, curb_z))
@@ -261,6 +276,51 @@ static func _parking(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	var post: Vector3 = Vector3(c.x - e.x * 0.5 - 60.0, 0.0, curb_z - 20.0)
 	_add(root, _cyl(6.0, 9.0, 400.0, 12), _mat(Color("#33353A"), 0.5, 0.6), post + Vector3(0.0, 200.0, 0.0))
 	_add(root, _box(Vector3(60.0, 12.0, 25.0)), _emissive(Color("#FFD59A"), 2.0), post + Vector3(25.0, 402.0, 0.0))
+
+
+## Humo del chulengo: bocanadas grises que suben y se abren.
+static func _smoke(at: Vector3) -> GPUParticles3D:
+	var p: GPUParticles3D = GPUParticles3D.new()
+	p.name = "Smoke"
+	p.amount = 40
+	p.lifetime = 5.0
+	p.preprocess = 5.0
+	p.position = at
+	var proc: ParticleProcessMaterial = ParticleProcessMaterial.new()
+	proc.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+	proc.emission_sphere_radius = 18.0
+	proc.direction = Vector3(0.2, 1.0, 0.0)
+	proc.spread = 18.0
+	proc.initial_velocity_min = 14.0
+	proc.initial_velocity_max = 26.0
+	proc.gravity = Vector3(3.0, 2.0, 0.0)
+	proc.scale_min = 0.8
+	proc.scale_max = 1.6
+	var grow: Curve = Curve.new()
+	grow.add_point(Vector2(0.0, 0.4))
+	grow.add_point(Vector2(1.0, 1.6))
+	var grow_tex: CurveTexture = CurveTexture.new()
+	grow_tex.curve = grow
+	proc.scale_curve = grow_tex
+	var fade: Gradient = Gradient.new()
+	fade.set_color(0, Color(0.75, 0.74, 0.72, 0.5))
+	fade.set_color(1, Color(0.85, 0.85, 0.85, 0.0))
+	var fade_tex: GradientTexture1D = GradientTexture1D.new()
+	fade_tex.gradient = fade
+	proc.color_ramp = fade_tex
+	p.process_material = proc
+	var q: QuadMesh = QuadMesh.new()
+	q.size = Vector2(40.0, 40.0)
+	var m: StandardMaterial3D = StandardMaterial3D.new()
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.vertex_color_use_as_albedo = true
+	m.albedo_texture = FxPool.soft_dot()
+	q.material = m
+	p.draw_pass_1 = q
+	p.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return p
 
 
 static func _cone(root: Node3D, pos: Vector3, u: float) -> void:
