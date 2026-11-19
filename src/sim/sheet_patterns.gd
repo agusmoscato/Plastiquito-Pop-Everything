@@ -27,8 +27,13 @@ static func apply(sheet: SheetModel, grid: HexGrid, rng: RandomNumberGenerator, 
 	var taken: Dictionary = {}
 	for k: int in count:
 		var shape: String = SHAPES[rng.randi() % SHAPES.size()]
-		var start: int = rng.randi() % cells
-		for idx: int in shape_cells(grid, shape, start, length, rng):
+		var picked: PackedInt32Array = PackedInt32Array()
+		for attempt: int in 8: # la forma tiene que entrar casi entera en la lámina
+			var start: int = _inner_cell(grid, rng, length)
+			picked = shape_cells(grid, shape, start, length, rng)
+			if picked.size() >= roundi(float(length) * 0.7):
+				break
+		for idx: int in picked:
 			if taken.has(idx):
 				continue
 			taken[idx] = true
@@ -39,7 +44,16 @@ static func apply(sheet: SheetModel, grid: HexGrid, rng: RandomNumberGenerator, 
 	return out
 
 
-## Celdas de una forma alrededor de `start`, de `length` burbujas de largo (o radio parecido).
+## Una celda lejos de los bordes (a media forma de distancia, si la lámina da).
+static func _inner_cell(grid: HexGrid, rng: RandomNumberGenerator, length: int) -> int:
+	@warning_ignore("integer_division")
+	var m: int = mini(length / 2, (mini(grid.width, grid.height) - 1) / 2)
+	var q: int = rng.randi_range(m, maxi(m, grid.width - 1 - m))
+	var r: int = rng.randi_range(m, maxi(m, grid.height - 1 - m))
+	return grid.index(q, r)
+
+
+## Celdas de una forma centrada en `start`, de `length` burbujas de largo (o radio parecido).
 static func shape_cells(grid: HexGrid, shape: String, start: int, length: int, rng: RandomNumberGenerator) -> PackedInt32Array:
 	var c: Vector2 = grid.cell_to_world(start)
 	var dir: Vector2 = DIRS[rng.randi() % DIRS.size()]
@@ -50,13 +64,13 @@ static func shape_cells(grid: HexGrid, shape: String, start: int, length: int, r
 		"cluster":
 			return grid.cells_in_circle(c, grid.spacing * maxf(1.1, float(length) / 6.0))
 		"zigzag":
-			return _zigzag(grid, c, dir, length)
+			return _zigzag(grid, c - dir * grid.spacing * float(length) * 0.5, dir, length)
 		"cross":
 			var a: PackedInt32Array = _line(grid, c - dir * grid.spacing * float(length) * 0.5, dir, length)
 			var other: Vector2 = DIRS[(DIRS.find(dir) + 2) % DIRS.size()]
 			a.append_array(_line(grid, c - other * grid.spacing * float(length) * 0.5, other, length))
 			return a
-	return _line(grid, c, dir, length)
+	return _line(grid, c - dir * grid.spacing * float(length - 1) * 0.5, dir, length)
 
 
 static func _line(grid: HexGrid, from: Vector2, dir: Vector2, length: int) -> PackedInt32Array:

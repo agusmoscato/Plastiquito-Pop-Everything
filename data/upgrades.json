@@ -79,7 +79,7 @@
    "name_en": "Palm unlocked",
    "desc_es": "Formulario 12-B. Habilita la palma.",
    "desc_en": "Form 12-B. Unlocks the palm.",
-   "base_cost": 4500.0,
+   "base_cost": 4000.0,
    "growth": 1.0,
    "max_level": 1,
    "per_level": 1.0,

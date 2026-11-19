@@ -35,6 +35,7 @@ func test_new_game_state() -> void:
 
 
 func test_pressing_pops_and_earns() -> void:
+	_flat_sheet() # sin vetas: cuenta solo lo que revienta el dedo
 	var c: Vector2 = sim.grid.cell_to_world(sim.grid.index(3, 3))
 	for i: int in 30:
 		sim.step(0.016, c, true)
@@ -151,7 +152,15 @@ func test_saved_finished_sheet_still_waits_for_reload() -> void:
 	assert_true(loaded.awaiting_reload, "al cargar una lámina terminada se puede tirar otra")
 
 
+## Lámina pareja (sin vetas de aire): para medir herramientas sin cadenas de por medio.
+func _flat_sheet() -> void:
+	for i: int in sim.sheet.cell_count():
+		sim.sheet.pressure[i] = 1.0
+		sim.sheet.refresh_state(i)
+
+
 func test_click_pops_one_and_hold_needs_the_upgrade() -> void:
+	_flat_sheet()
 	var c: Vector2 = sim.grid.cell_to_world(sim.grid.index(4, 4))
 	var c2: Vector2 = sim.grid.cell_to_world(sim.grid.index(5, 4))
 	sim.step(1.0 / 60.0, c, true)
