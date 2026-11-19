@@ -277,7 +277,7 @@ static func _dust(c: Vector2, e: Vector2, u: float) -> GPUParticles3D:
 static func _parking(root: Node3D, c: Vector2, e: Vector2, _u: float) -> void:
 	var h: Vector2 = e * 0.5
 	var back: float = roll_depth(e)
-	var spots: Array[Vector2] = [Vector2(-h.x - 14.0, -h.y * 0.6), Vector2(-h.x - 14.0, h.y * 0.5), Vector2(-h.x * 0.4, -h.y - 14.0 - back), Vector2(h.x * 0.2, -h.y - 14.0 - back)]
+	var spots: Array[Vector2] = [Vector2(-h.x * 0.4, -h.y - 14.0 - back), Vector2(h.x * 0.2, -h.y - 14.0 - back)] # los de adelante tapaban
 	for spot: Vector2 in spots:
 		_glb(root, "prop_cone", Vector3(c.x + spot.x, 0.0, c.y + spot.y), spot.x * 7.0)
 	# El asado: el chulengo es el protagonista (ScenarioHeroes); la conservadora lo acompaña.

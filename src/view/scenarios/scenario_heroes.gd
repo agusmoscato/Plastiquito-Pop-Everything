@@ -37,8 +37,7 @@ static func place(root: Node3D, phase: int, c: Vector2, e: Vector2) -> Node3D:
 	var s: float = scale_for(phase, e)
 	var cam: Transform3D = _work_cam(phase, c, e)
 	var zone: Rect2 = free_zone(phase, c, e)
-	hero.transform = _fit(hero, cam, zone, s)
-	_keep_off_sheet(hero, c, e)
+	hero.transform = _placement(hero, cam, zone, s, c, e)
 	root.add_child(hero)
 	if phase == 4: # el humo del chulengo sale siempre de la parrilla
 		var smoke: GPUParticles3D = ScenarioProps.smoke(hero.position + Vector3(0.0, 95.0 * s, 0.0), s)
@@ -64,14 +63,29 @@ static func scale_for(phase: int, e: Vector2 = Vector2.ZERO) -> float:
 	var cam: Transform3D = _work_cam(phase, c0, e0)
 	var zone: Rect2 = free_zone(phase, c0, e0)
 	var s: float = 1.0
-	for i: int in 40: # achica hasta que la pareja entre en la franja (con la cámara cerca, lo alto se sale)
-		var xf: Transform3D = _fit(group, cam, zone, s)
-		if zone.grow(6.0).encloses(screen_box(group, xf, cam)):
+	var hud: Array[Rect2] = Hud.layout_rects(SCREEN)
+	for i: int in 50: # la escala más grande con la que cada protagonista queda a la vista (>= MIN_SEEN)
+		var xf: Transform3D = _placement(group, cam, zone, s, c0, e0)
+		if _all_seen(group, xf, cam, hud):
 			break
-		s *= 0.9
+		s *= 0.92
 	group.free()
 	_scale_cache[key] = s
 	return s
+
+
+const MIN_SEEN: float = 0.78 ## fracción de cada protagonista que tiene que quedar a la vista (el test pide 0,6)
+
+
+static func _all_seen(group: Node3D, xf: Transform3D, cam: Transform3D, hud: Array[Rect2]) -> bool:
+	var box: Rect2 = screen_box(group, xf, cam)
+	if box.position.y < 0.0 or box.end.y > SCREEN.y: # entero a lo alto (cortado de costado, sí)
+		return false
+	for obj: Node in group.get_children():
+		var o: Node3D = obj as Node3D
+		if visible_fraction(o, xf * o.transform, cam, hud) < MIN_SEEN:
+			return false
+	return true
 
 
 static func clear_cache() -> void:
@@ -183,17 +197,18 @@ static func _fit(node: Node3D, cam: Transform3D, zone: Rect2, s: float) -> Trans
 	return xf
 
 
-## Si la caja en el piso llegara a tocar la lámina, la corre hacia afuera.
-static func _keep_off_sheet(node: Node3D, c: Vector2, e: Vector2) -> void:
-	var box: AABB = node.transform * local_aabb(node)
+## Centrada en la franja y, si la caja en el piso llegara a tocar la lámina, corrida hacia afuera.
+static func _placement(node: Node3D, cam: Transform3D, zone: Rect2, s: float, c: Vector2, e: Vector2) -> Transform3D:
+	var xf: Transform3D = _fit(node, cam, zone, s)
+	var box: AABB = xf * local_aabb(node)
 	var sheet: Rect2 = Rect2(c - e * 0.5, e).grow(1.0)
 	var foot: Rect2 = Rect2(Vector2(box.position.x, box.position.z), Vector2(box.size.x, box.size.z))
-	if not foot.intersects(sheet):
-		return
-	if foot.get_center().x >= c.x:
-		node.position.x += sheet.end.x - foot.position.x
-	else:
-		node.position.x -= foot.end.x - sheet.position.x
+	if foot.intersects(sheet):
+		if foot.get_center().x >= c.x:
+			xf.origin.x += sheet.end.x - foot.position.x
+		else:
+			xf.origin.x -= foot.end.x - sheet.position.x
+	return xf
 
 
 ## Qué fracción de la caja de `node` (puesto con `xf`) se ve con `cam`: dentro de la pantalla y fuera de
