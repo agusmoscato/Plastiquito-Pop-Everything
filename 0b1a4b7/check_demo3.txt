@@ -1,0 +1,3 @@
+FALLÓ demo3 (exit_code=0)
+      1 17:ERROR: Parameter "RenderingServer::get_singleton()" is null.
+      1 14:ERROR: 1 RID allocations of type 'N10RendererRD14TextureStorage7TextureE' were leaked at exit.
