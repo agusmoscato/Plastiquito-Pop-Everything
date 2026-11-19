@@ -4,11 +4,12 @@ extends CanvasLayer
 ## abrir carpeta de datos y salir. Mismo material que el resto del HUD (docs/UI_STYLE.md).
 
 const W: float = 420.0
-const H: float = 470.0
+const H: float = 526.0
 
 var _root: Control
 var _shake_button: StampButton
 var _lang_button: StampButton
+var _gfx_button: StampButton
 var _slider: InkSlider
 var _rows: Array = []
 var _bottom: Array = []
@@ -32,11 +33,12 @@ func _ready() -> void:
 	_root.add_child(_slider)
 	_shake_button = _button("", Vector2(W - 60.0, 44.0), UiKit.CARDBOARD_DARK, _toggle_shake)
 	_lang_button = _button("", Vector2(W - 60.0, 44.0), UiKit.CARDBOARD_DARK, _toggle_language)
+	_gfx_button = _button("", Vector2(W - 60.0, 44.0), UiKit.CARDBOARD_DARK, _toggle_graphics)
 	var folder: StampButton = _button("ABRIR CARPETA DE DATOS", Vector2(W - 60.0, 44.0), UiKit.CARDBOARD_DARK, _open_data_folder)
 	folder.font_size = 14
 	_back = _button("VOLVER AL JUEGO", Vector2(180.0, 50.0), UiKit.STAMP_RED, close)
 	_quit_button = _button("SALIR", Vector2(150.0, 50.0), UiKit.CARDBOARD_DARK, _quit)
-	_rows = [_slider, _shake_button, _lang_button, folder]
+	_rows = [_slider, _shake_button, _lang_button, _gfx_button, folder]
 	_bottom = [_back, _quit_button]
 	_place(_rows, _bottom)
 	_refresh_labels()
@@ -112,7 +114,7 @@ func _place(rows: Array, bottom: Array) -> void:
 	var vp: Vector2 = _vp()
 	var left: float = (vp.x - W) * 0.5
 	var top: float = (vp.y - H) * 0.5
-	var ys: Array[float] = [150.0, 222.0, 278.0, 334.0]
+	var ys: Array[float] = [150.0, 222.0, 278.0, 334.0, 390.0]
 	for i: int in rows.size():
 		var c: Control = rows[i]
 		var y: float = ys[i]
@@ -129,11 +131,21 @@ func _refresh_labels() -> void:
 	_shake_button.font_size = 14
 	_lang_button.text = "IDIOMA: %s" % Settings.language.to_upper()
 	_lang_button.font_size = 14
+	var gfx: String = "GRÁFICOS: %s" if Settings.language == "es" else "GRAPHICS: %s"
+	_gfx_button.text = gfx % GraphicsQuality.name_of(Settings.graphics, Settings.language)
+	_gfx_button.font_size = 14
 
 
 func _toggle_shake() -> void:
 	Settings.shake_enabled = not Settings.shake_enabled
 	Settings.save_settings()
+	_refresh_labels()
+
+
+func _toggle_graphics() -> void:
+	Settings.graphics = GraphicsQuality.next(Settings.graphics)
+	Settings.save_settings()
+	Settings.graphics_changed.emit()
 	_refresh_labels()
 
 

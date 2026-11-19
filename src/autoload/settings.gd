@@ -2,6 +2,7 @@ extends Node
 ## Ajustes del jugador, guardados en user://settings.cfg.
 
 signal volume_changed(bus: String, value: float)
+signal graphics_changed
 
 const PATH: String = "user://settings.cfg"
 const BUSES: PackedStringArray = ["Master", "Pops", "Tools", "UI", "Music"]
@@ -12,6 +13,7 @@ var shake_enabled: bool = true
 var reduce_motion: bool = false
 var language: String = "es" ## "es" o "en"
 var discovery_done: bool = false ## ya compró algo: nunca más se señala la tienda
+var graphics: int = 2 ## calidad de gráficos: 0 bajo, 1 medio, 2 alto (GraphicsQuality)
 
 
 func _ready() -> void:
@@ -55,6 +57,7 @@ func save_settings() -> void:
 		cfg.set_value("audio", bus, get_volume(bus))
 	cfg.set_value("video", "shake_enabled", shake_enabled)
 	cfg.set_value("video", "reduce_motion", reduce_motion)
+	cfg.set_value("video", "graphics", graphics)
 	cfg.set_value("ui", "language", language)
 	cfg.set_value("ui", "discovery_done", discovery_done)
 	cfg.save(PATH)
@@ -69,5 +72,7 @@ func load_settings() -> void:
 		volumes[bus] = clampf(v, 0.0, 1.0)
 	shake_enabled = cfg.get_value("video", "shake_enabled", shake_enabled)
 	reduce_motion = cfg.get_value("video", "reduce_motion", reduce_motion)
+	var g: int = cfg.get_value("video", "graphics", graphics)
+	graphics = clampi(g, 0, 2)
 	language = cfg.get_value("ui", "language", language)
 	discovery_done = cfg.get_value("ui", "discovery_done", discovery_done)
