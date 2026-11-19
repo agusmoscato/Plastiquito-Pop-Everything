@@ -87,6 +87,7 @@
    "_note": "Encargo de cada lámina (Encargo): bono = celdas x valor base x mult. global x reward_sheet_fraction. Racha: +streak_bonus de Pops por encargo seguido.",
    "chain_base": [8, 12, 14, 16],
    "veins_fraction": 0.6,
+   "specials_fraction": 0.75,
    "combo_level": [2, 3, 3, 4],
    "reward_sheet_fraction": 0.6,
    "streak_bonus": 0.04,

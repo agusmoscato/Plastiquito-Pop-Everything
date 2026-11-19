@@ -226,7 +226,7 @@ func test_save_v4_roundtrip_and_v2_v3_migration() -> void:
 	var sim: GameSim = GameSim.new(db, 6)
 	sim.state.last_levels = {"finger_force": 7}
 	var data: Dictionary = sim.save_dict(555.0)
-	assert_eq(Cfg.integer(data, "version"), 4)
+	assert_eq(Cfg.integer(data, "version"), 5)
 	var other: GameSim = GameSim.new(db, 8)
 	var parsed: Dictionary = JSON.parse_string(JSON.stringify(data))
 	assert_true(other.load_dict(parsed))
@@ -240,7 +240,7 @@ func test_save_v4_roundtrip_and_v2_v3_migration() -> void:
 	v2.erase("offline_total")
 	var migrated: Dictionary = GameState.migrate(v2)
 	assert_false(migrated.is_empty())
-	assert_eq(Cfg.integer(migrated, "version"), 4)
+	assert_eq(Cfg.integer(migrated, "version"), 5)
 	assert_eq(Cfg.integer(migrated, "run_buys"), 0)
 	assert_true(other.load_dict(v2))
 	assert_eq(other.state.saved_at_unix, 0.0)

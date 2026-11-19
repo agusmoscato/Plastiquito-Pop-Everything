@@ -402,3 +402,64 @@ func test_encargo_targets_grow_with_phase() -> void:
 			small = a.target
 			big = b.target
 	assert_gt(big, small, "más fase y más lámina, cadena más larga")
+
+
+func test_save_keeps_armor_veins_streak_and_encargo() -> void:
+	var w: GameSim = GameSim.new(db, 9)
+	w.state.perm["perm_sheet"] = 2
+	w.refresh_stats()
+	w.new_sheet()
+	w.streak = 3
+	w.encargo.progress = 1
+	var armor: PackedByteArray = w.sheet.armor.duplicate()
+	var veins: int = w.vein_cells.size()
+	var kind: String = w.encargo.kind
+	var data: Dictionary = JSON.parse_string(JSON.stringify(w.save_dict()))
+	var back: GameSim = GameSim.new(db, 77)
+	assert_true(back.load_dict(data))
+	assert_eq(back.sheet.armor, armor, "el doble film queda donde estaba")
+	assert_eq(back.vein_cells.size(), veins, "las vetas son las de la lámina guardada")
+	for idx: int in back.vein_cells:
+		assert_eq(back.sheet.state[idx], SheetModel.STATE_TENSE)
+	assert_eq(back.streak, 3, "la racha se guarda")
+	assert_eq(back.encargo.kind, kind, "el encargo se guarda")
+	assert_eq(back.encargo.progress, 1)
+
+
+func test_failed_encargo_cannot_be_paid_later() -> void:
+	sim.encargo = Encargo.new()
+	sim.encargo.kind = "chain"
+	sim.encargo.target = 3
+	sim.streak = 2
+	sim._sheet_finished = true
+	sim._track_encargo()
+	assert_true(sim.ev_encargo_failed)
+	sim._clear_events()
+	sim.chain_count = 10
+	sim._track_encargo()
+	assert_false(sim.ev_encargo_done, "terminada la lámina, el encargo ya no se cobra")
+	assert_eq(sim.streak, 0)
+
+
+func test_combo_encargo_needs_rhythm_on_this_sheet() -> void:
+	for i: int in 20: # ritmo alto de la lámina anterior
+		sim.combo.add(1.0, sim.now)
+	sim.encargo = Encargo.new()
+	sim.encargo.kind = "combo"
+	sim.encargo.target = 2
+	sim._step_dt = 0.016
+	sim._track_encargo()
+	assert_false(sim.ev_encargo_done, "el ritmo que venía de antes no lo cumple solo")
+
+
+func test_recycle_resets_streak_and_tiny_sheets_are_not_all_veins() -> void:
+	sim.streak = 4
+	sim.state.pops_run = 1.0e9
+	assert_gt(sim.recycle(), 0)
+	assert_eq(sim.streak, 0, "la racha es de la corrida")
+	var tiny: SheetModel = SheetModel.new(3, 3)
+	var g: HexGrid = HexGrid.new(3, 3, 0.5)
+	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+	var pat: Dictionary = db.sheet["patterns"]
+	var cells: PackedInt32Array = SheetPatterns.apply(tiny, g, rng, 1, pat)
+	assert_lte(cells.size(), 3, "en una lámina chiquita no es todo veta")

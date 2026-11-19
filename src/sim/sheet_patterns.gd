@@ -25,6 +25,7 @@ static func apply(sheet: SheetModel, grid: HexGrid, rng: RandomNumberGenerator, 
 	var pmin: float = Cfg.num(cfg, "vein_pressure_min")
 	var pmax: float = Cfg.num(cfg, "vein_pressure_max")
 	var taken: Dictionary = {}
+	var cap: int = maxi(1, int(float(cells) * Cfg.num(cfg, "max_vein_fraction"))) # en láminas chicas no es todo veta
 	for k: int in count:
 		var shape: String = SHAPES[rng.randi() % SHAPES.size()]
 		var picked: PackedInt32Array = PackedInt32Array()
@@ -34,7 +35,7 @@ static func apply(sheet: SheetModel, grid: HexGrid, rng: RandomNumberGenerator, 
 			if picked.size() >= roundi(float(length) * 0.7):
 				break
 		for idx: int in picked:
-			if taken.has(idx):
+			if taken.has(idx) or out.size() >= cap:
 				continue
 			taken[idx] = true
 			sheet.pressure[idx] = rng.randf_range(pmin, pmax)
@@ -51,6 +52,16 @@ static func _inner_cell(grid: HexGrid, rng: RandomNumberGenerator, length: int) 
 	var q: int = rng.randi_range(m, maxi(m, grid.width - 1 - m))
 	var r: int = rng.randi_range(m, maxi(m, grid.height - 1 - m))
 	return grid.index(q, r)
+
+
+## Las vetas de una lámina ya armada (al cargar un guardado): las enteras casi llenas.
+static func veins_of(sheet: SheetModel, cfg: Dictionary) -> PackedInt32Array:
+	var out: PackedInt32Array = PackedInt32Array()
+	var pmin: float = Cfg.num(cfg, "vein_pressure_min") - 0.01
+	for idx: int in sheet.cell_count():
+		if sheet.state[idx] != SheetModel.STATE_POPPED and sheet.pressure[idx] >= pmin:
+			out.append(idx)
+	return out
 
 
 ## Celdas de una forma centrada en `start`, de `length` burbujas de largo (o radio parecido).

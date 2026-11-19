@@ -48,6 +48,7 @@ var encargo: Encargo ## el pedido de la lámina en curso
 var streak: int = 0 ## encargos cumplidos seguidos
 var vein_cells: PackedInt32Array = PackedInt32Array() ## vetas de aire de la lámina en curso
 var _sheet_finished: bool = false
+var _step_dt: float = 0.0
 
 var chain_count: int = 0 ## tamaño de la cadena en curso (0 si no hay)
 var chain_value: float = 0.0
@@ -260,8 +261,11 @@ func _track_encargo() -> void:
 			tense += 1
 		if ev_type[i] != 0:
 			specials += 1
+	for idx: int in ev_burned: # la plancha derritió una especial: ya no se puede reventar
+		if sheet.type[idx] != 0:
+			encargo.lost_special()
 	var chain_now: int = maxi(chain_count, ev_chain_ended_count)
-	if encargo.observe(chain_now, tense, specials, combo.level(now)):
+	if encargo.observe(chain_now, tense, specials, combo.level(now), _step_dt, combo.window_seconds):
 		var cfg: Dictionary = eco["encargos"]
 		var bases: Array = eco["phase_base_values"]
 		var base: float = bases[mini(phase(), bases.size()) - 1]
@@ -274,9 +278,10 @@ func _track_encargo() -> void:
 		ev_encargo_bonus = bonus
 	if _sheet_finished:
 		_sheet_finished = false
-		if not encargo.done:
+		if not encargo.done and not encargo.closed:
 			streak = 0
 			ev_encargo_failed = true
+		encargo.closed = true # lo que se reviente después (el último 10 %) ya no cuenta
 
 
 func _on_reload_requested() -> void:
@@ -322,6 +327,7 @@ func select_tool(id: String) -> bool:
 ## Avanza `dt` segundos. `pointer` es la posición del cursor en el plano XZ.
 func step(dt: float, pointer: Vector2, pressing: bool) -> void:
 	_clear_events()
+	_step_dt = dt
 	now += dt
 	state.playtime_s += dt
 	state.run_time_s += dt
@@ -583,6 +589,20 @@ func recycle_gain() -> int:
 	return Prestige.pellets_for(state.pops_run, Cfg.num(eco, "pellet_divisor"), Cfg.num(eco, "pellet_exponent"))
 
 
+## Pellets que pide la fase siguiente ("Lámina más grande"); -1 si ya están todas abiertas.
+func next_phase_cost() -> float:
+	var lvl: int = state.perm_level("perm_sheet")
+	if lvl >= upgrades.max_level("perm_sheet"):
+		return -1.0
+	return upgrades.next_cost("perm_sheet", lvl)
+
+
+## true si reciclando ahora alcanza para abrir la fase siguiente.
+func next_phase_ready() -> bool:
+	var cost: float = next_phase_cost()
+	return cost > 0.0 and can_recycle() and state.pellets + float(recycle_gain()) >= cost
+
+
 func can_recycle() -> bool:
 	return recycle_gain() >= 1
 
@@ -598,6 +618,7 @@ func recycle() -> int:
 	_apply_memory(previous)
 	_keep_after_recycle(previous)
 	combo.reset()
+	streak = 0 # la racha es de la corrida: reciclar empieza de cero
 	refresh_stats()
 	new_sheet()
 	_echoes = []
@@ -630,6 +651,8 @@ func _apply_memory(previous: Dictionary) -> void:
 
 func save_dict(now_unix: float = 0.0) -> Dictionary:
 	state.sheet = sheet.to_dict()
+	state.streak = streak
+	state.encargo = encargo.to_dict() if encargo != null else {}
 	if now_unix > 0.0:
 		state.saved_at_unix = now_unix
 		state.max_unix_seen = maxf(state.max_unix_seen, now_unix)
@@ -687,10 +710,18 @@ func load_dict(data: Dictionary) -> bool:
 			sheet.state = restored.state
 			sheet.type = restored.type
 			sheet.press = restored.press
+			sheet.armor = restored.armor
 			sheet.reset_counts()
+			var pat: Dictionary = db.sheet["patterns"]
+			vein_cells = SheetPatterns.veins_of(sheet, pat)
+			_roll_encargo() # sobre la lámina restaurada (no sobre la que se armó al azar)
 			if sheet.popped_ratio() >= sheet.reload_threshold: # se guardó con la lámina terminada
 				if auto_reload():
 					reload_timer = Cfg.num(eco, "reload_delay_auto")
 				else:
 					awaiting_reload = true
+	streak = state.streak
+	var saved: Encargo = Encargo.from_dict(state.encargo)
+	if saved != null:
+		encargo = saved
 	return true

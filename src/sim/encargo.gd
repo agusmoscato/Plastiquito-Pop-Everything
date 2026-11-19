@@ -16,7 +16,9 @@ var kind: String = "chain"
 var target: int = 1
 var progress: int = 0
 var done: bool = false
+var closed: bool = false ## la lámina terminó: ya no se cumple ni se cobra
 var specials_left: int = 0
+var elapsed: float = 0.0 ## segundos de lámina en juego (el ritmo cuenta recién pasada la ventana del combo)
 
 
 ## Elige el encargo de una lámina nueva. `tense` = burbujas tensas al empezar, `specials` = especiales.
@@ -38,7 +40,7 @@ static func roll(rng: RandomNumberGenerator, phase: int, cells: int, tense: int,
 		"veins":
 			e.target = maxi(4, roundi(float(tense) * Cfg.num(cfg, "veins_fraction")))
 		"specials":
-			e.target = specials
+			e.target = maxi(1, ceili(float(specials) * Cfg.num(cfg, "specials_fraction")))
 			e.specials_left = specials
 		"combo":
 			var steps: Array = cfg["combo_level"]
@@ -47,10 +49,14 @@ static func roll(rng: RandomNumberGenerator, phase: int, cells: int, tense: int,
 	return e
 
 
-## Avanza con los eventos de un paso. Devuelve true el paso en que se cumple.
-func observe(chain_now: int, popped_tense: int, popped_specials: int, combo_level: int) -> bool:
-	if done:
+## Avanza con los eventos de un paso. Devuelve true el paso en que se cumple. `combo_level` solo cuenta
+## pasados `combo_grace` segundos de lámina (si no, el ritmo de la lámina anterior lo cumplía solo).
+func observe(chain_now: int, popped_tense: int, popped_specials: int, combo_level: int, dt: float = 0.0, combo_grace: float = 0.0) -> bool:
+	if done or closed:
 		return false
+	elapsed += dt
+	if elapsed < combo_grace:
+		combo_level = 0
 	match kind:
 		"chain":
 			progress = maxi(progress, chain_now)
@@ -69,6 +75,33 @@ func observe(chain_now: int, popped_tense: int, popped_specials: int, combo_leve
 
 func ratio() -> float:
 	return clampf(float(progress) / float(maxi(target, 1)), 0.0, 1.0)
+
+
+## Una especial que se perdió sin reventar (derretida por la plancha): el pedido baja uno.
+func lost_special() -> void:
+	if kind == "specials" and not done:
+		specials_left -= 1
+		target = clampi(target, 1, maxi(1, specials_left)) # nunca pide más de las que quedan
+
+
+func to_dict() -> Dictionary:
+	return {"kind": kind, "target": target, "progress": progress, "done": done, "closed": closed,
+		"specials_left": specials_left, "elapsed": elapsed}
+
+
+## Desde un guardado; null si el diccionario no sirve.
+static func from_dict(d: Dictionary) -> Encargo:
+	if not d.has("kind") or not KINDS.has(str(d["kind"])):
+		return null
+	var e: Encargo = Encargo.new()
+	e.kind = str(d["kind"])
+	e.target = maxi(1, Cfg.integer(d, "target"))
+	e.progress = Cfg.integer(d, "progress")
+	e.done = Cfg.flag(d, "done")
+	e.closed = Cfg.flag(d, "closed")
+	e.specials_left = Cfg.integer(d, "specials_left")
+	e.elapsed = Cfg.num(d, "elapsed")
+	return e
 
 
 ## Clave del texto (Tx "enc_<kind>"), con %d = objetivo.

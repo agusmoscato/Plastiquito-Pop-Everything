@@ -2,7 +2,7 @@ class_name GameState
 extends RefCounted
 ## Estado completo y serializable de la partida (DESIGN 8). Lógica pura.
 
-const SAVE_VERSION: int = 4
+const SAVE_VERSION: int = 5
 
 var pops: float = 0.0 ## moneda actual
 var pops_run: float = 0.0 ## Pops ganados en esta corrida (base de la fórmula de Pellets)
@@ -25,6 +25,8 @@ var saved_at_unix: float = 0.0 ## hora del último guardado (ganancias sin conex
 var max_unix_seen: float = 0.0 ## la hora más alta vista (protección contra el reloj atrasado)
 var offline_total: float = 0.0 ## Pops ganados sin conexión (estadística)
 var run_buys: int = 0 ## niveles comprados desde el último reciclado (descuento de las primeras compras)
+var streak: int = 0 ## encargos cumplidos seguidos
+var encargo: Dictionary = {} ## Encargo.to_dict() de la lámina en curso
 
 
 func level(id: String) -> int:
@@ -55,6 +57,7 @@ func to_dict() -> Dictionary:
 		"sheets_done": sheets_done, "tool_pops": tool_pops.duplicate(), "sheet": sheet,
 		"last_levels": last_levels.duplicate(), "saved_at_unix": saved_at_unix,
 		"max_unix_seen": max_unix_seen, "offline_total": offline_total, "run_buys": run_buys,
+		"streak": streak, "encargo": encargo.duplicate(),
 	}
 
 
@@ -90,6 +93,9 @@ func from_dict(data: Dictionary) -> bool:
 	max_unix_seen = Cfg.num(d, "max_unix_seen")
 	offline_total = Cfg.num(d, "offline_total")
 	run_buys = Cfg.integer(d, "run_buys")
+	streak = Cfg.integer(d, "streak")
+	var enc: Dictionary = d["encargo"]
+	encargo = enc.duplicate()
 	return true
 
 
@@ -121,11 +127,18 @@ static func migrate(data: Dictionary) -> Dictionary:
 		d["version"] = 4
 		d["run_buys"] = 0
 		version = 4
+	if version == 4:
+		# v4 -> v5: racha y encargo de la lámina (sesión 5).
+		d["version"] = 5
+		d["streak"] = 0
+		d["encargo"] = {}
+		version = 5
 	if version != SAVE_VERSION:
 		return {}
 	for key: String in ["pops", "pops_run", "pops_total", "pellets", "levels", "perm", "discovered",
 			"selected_tool", "playtime_s", "run_time_s", "recycles", "first_recycle_s", "max_chain",
-			"sheets_done", "tool_pops", "sheet", "last_levels", "saved_at_unix", "max_unix_seen", "offline_total", "run_buys"]:
+			"sheets_done", "tool_pops", "sheet", "last_levels", "saved_at_unix", "max_unix_seen", "offline_total", "run_buys",
+			"streak", "encargo"]:
 		if not d.has(key):
 			return {}
 	return d
