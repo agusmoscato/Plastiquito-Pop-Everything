@@ -58,7 +58,7 @@ const UPGRADE_FIELDS: Dictionary = {
 	"effect_type": TYPE_STRING, "unit": TYPE_STRING, "requires": TYPE_DICTIONARY,
 }
 const ECONOMY_FIELDS: Dictionary = {
-	"phase_base_values": TYPE_ARRAY, "phase_cost_scales": TYPE_ARRAY, "phase_sheet_sizes": TYPE_ARRAY, "sheet_start_size": TYPE_INT,
+	"phase_base_values": TYPE_ARRAY, "phase_cost_scales": TYPE_ARRAY, "phase_sheet_sizes": TYPE_ARRAY, "phase_sheet_starts": TYPE_ARRAY, "sheet_start_size": TYPE_INT,
 	"milestone_every": TYPE_INT, "milestone_multiplier": TYPE_FLOAT, "combo_window_seconds": TYPE_FLOAT,
 	"combo_rates": TYPE_ARRAY, "combo_multipliers": TYPE_ARRAY, "golden_multiplier": TYPE_FLOAT,
 	"chance_golden": TYPE_FLOAT, "chance_bomb": TYPE_FLOAT, "chance_line": TYPE_FLOAT,
@@ -69,6 +69,7 @@ const ECONOMY_FIELDS: Dictionary = {
 	"roller_base_halfwidth": TYPE_FLOAT, "iron_heat_rate": TYPE_FLOAT, "iron_heat_cap": TYPE_FLOAT, "iron_still_force": TYPE_FLOAT, "iron_burn_after_seconds": TYPE_FLOAT, "iron_glide_min_speed": TYPE_FLOAT,
 	"iron_heat_reach": TYPE_FLOAT, "boot_cooldown_seconds": TYPE_FLOAT, "boot_wave_k": TYPE_FLOAT,
 	"boot_wave_reach": TYPE_FLOAT, "reload_delay_manual": TYPE_FLOAT, "reload_delay_auto": TYPE_FLOAT, "chain_stamp_min": TYPE_INT,
+	"reveal_cost_fraction": TYPE_FLOAT, "reveal_free_below": TYPE_FLOAT,
 }
 const TOOL_SHAPES: PackedStringArray = ["cell", "circle", "segment", "rect"]
 

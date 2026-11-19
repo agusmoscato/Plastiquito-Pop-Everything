@@ -20,6 +20,8 @@ var has_target: bool = false
 var click_timer: float = 0.0
 var press_timer: float = 0.0
 var click_cell: int = -1
+var reload_wait: float = -1.0 ## segundos que tarda el bot en tirar la lámina nueva del rollo
+var manual_reloads: int = 0
 
 # Registro
 var csv: PackedStringArray = PackedStringArray(["segundo,evento,detalle,pops,pops_por_s,pops_total"])
@@ -111,6 +113,8 @@ func _run() -> void:
 # --- Bot -------------------------------------------------------------------------------
 
 func _bot_input() -> void:
+	if _manual_reload():
+		return
 	if profile == "idle":
 		if sim.upgrades.level_with_bonus(sim.state, "unlock_hands") >= 1 and sim.upgrades.level_with_bonus(sim.state, "hands_count") >= 1:
 			if not idle_stopped:
@@ -124,6 +128,24 @@ func _bot_input() -> void:
 		_move_active()
 	else:
 		_move_casual()
+
+
+## Sin recarga automática, el bot ve la lámina terminada y tira una nueva del rollo (el activo
+## reacciona en ~0,7 s, el casual en ~1,6 s). El idle que ya dejó de jugar no la tira.
+func _manual_reload() -> bool:
+	if not sim.awaiting_reload:
+		reload_wait = -1.0
+		return false
+	if profile == "idle" and idle_stopped:
+		return true
+	if reload_wait < 0.0:
+		reload_wait = 0.7 if profile == "active" else 1.6
+	reload_wait -= dt
+	press_timer = 0.0
+	if reload_wait <= 0.0 and sim.request_reload():
+		manual_reloads += 1
+		reload_wait = -1.0
+	return true
 
 
 ## Activo: ~8 clics por segundo con buen apunte (tensas y especiales primero). Con el palo
@@ -365,7 +387,9 @@ func _gain(kind: String, level: int) -> float:
 		"sheet_growth":
 			return 0.09
 		"auto_reload":
-			return 0.06
+			return 0.5 # tirar la lámina a mano cansa: un humano la compra apenas puede
+		"hold":
+			return 2.0
 		"count":
 			return 0.22
 		"smart":
@@ -653,8 +677,8 @@ func _report(wall: float) -> bool:
 	var tm: ToolModel = sim.selected_tool()
 	print("   estado: herramienta=%s forma=%s radio=%.2f fuerza=%.2f lámina %d%% reventada, cursor=%s objetivo=%s" % [sim.state.selected_tool, tm.shape, tm.radius, tm.force_per_second, int(sim.sheet.popped_ratio() * 100.0), str(pointer), str(target)])
 	print("   fases: Piso %.1f Galpón %.1f Estacionamiento %.1f min; recuperaciones %d" % [phase2_time / 60.0, phase3_time / 60.0, phase4_time / 60.0, recoveries.size()])
-	print("   pops_total=%.0f pops=%.0f compras=%d cadena_max=%d reciclados=%d" % [
-		sim.state.pops_total, sim.state.pops, purchase_times.size(), sim.state.max_chain, sim.state.recycles])
+	print("   pops_total=%.0f pops=%.0f compras=%d cadena_max=%d reciclados=%d recargas a mano=%d" % [
+		sim.state.pops_total, sim.state.pops, purchase_times.size(), sim.state.max_chain, sim.state.recycles, manual_reloads])
 	print("   reventones=%d (herramienta %d, %.0f%% por cadena) cadenas>=10: %d" % [total_pop_events, tool_pop_events, 100.0 * float(total_pop_events - tool_pop_events) / maxf(float(total_pop_events), 1.0), chain_events])
 	var full: bool = minutes >= 200.0
 	var src_total: float = maxf(1.0, source_value["directo"] + source_value["cadena"] + source_value["automatico"])
@@ -672,10 +696,12 @@ func _report(wall: float) -> bool:
 	var pct: float = 100.0 * near_buy_time / maxf(counted_time, 1.0)
 	checks.append(["% tiempo con compra pagable o a < 30 s", ">= 70 %", pct, pct >= 70.0])
 	checks.append(["primera cadena de 10+ (min)", "< 3", first_chain10 / 60.0, first_chain10 >= 0.0 and first_chain10 < 180.0])
-	checks.append(["primera dorada (min)", "< 4", first_golden / 60.0, first_golden >= 0.0 and first_golden < 240.0])
+	var golden_after: float = first_golden - first_recycle # las doradas aparecen después del primer reciclado
+	checks.append(["primera dorada tras reciclar (min)", "< 4", golden_after / 60.0, first_golden >= 0.0 and first_recycle >= 0.0 and golden_after < 240.0])
 	checks.append(["palma comprada (min)", "< 8", palm_time / 60.0, palm_time >= 0.0 and palm_time < 480.0])
-	checks.append(["llegada a Piso / palo (min)", "28-42", phase2_time / 60.0, phase2_time >= 28.0 * 60.0 and phase2_time <= 42.0 * 60.0])
-	checks.append(["primer reciclado (min)", "28-42", first_recycle / 60.0, first_recycle >= 28.0 * 60.0 and first_recycle <= 42.0 * 60.0])
+	# Sesión 4: el primer reciclado llega antes (el jugador pedía no hacer tantas cosas sin saber para qué).
+	checks.append(["llegada a Piso / palo (min)", "20-36", phase2_time / 60.0, phase2_time >= 20.0 * 60.0 and phase2_time <= 36.0 * 60.0])
+	checks.append(["primer reciclado (min)", "20-36", first_recycle / 60.0, first_recycle >= 20.0 * 60.0 and first_recycle <= 36.0 * 60.0])
 	if full:
 		_late_checks(checks)
 	var all_ok: bool = true

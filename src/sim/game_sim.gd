@@ -43,6 +43,8 @@ var ev_auto_from: int = 0 ## desde este índice de ev_* los reventones son de la
 var chain_count: int = 0 ## tamaño de la cadena en curso (0 si no hay)
 var chain_value: float = 0.0
 var reload_timer: float = -1.0
+## Sin "Recarga automática" la lámina terminada espera a que el jugador tire una nueva del rollo.
+var awaiting_reload: bool = false
 
 var _prev_pointer: Vector2 = Vector2.ZERO
 var _chain_active: bool = false
@@ -75,13 +77,18 @@ func center() -> Vector2:
 	return Vector2(grid.spacing * (float(grid.width) - 0.5) * 0.5, grid.row_step * float(grid.height - 1) * 0.5)
 
 
+## Lado de la lámina: cada fase arranca con una lámina chica (`phase_sheet_starts`) y "Rollo más
+## ancho" la agranda hasta el tope de la fase (`phase_sheet_sizes`), repartido entre sus niveles.
 func sheet_dimension() -> int:
-	var sizes: Array = eco["phase_sheet_sizes"]
-	if phase() >= 2:
-		var s: float = sizes[mini(phase(), sizes.size()) - 1]
-		return int(s)
-	var cap: float = sizes[0]
-	return mini(Cfg.integer(eco, "sheet_start_size") + Cfg.integer(stats, "sheet_growth"), int(cap))
+	var caps: Array = eco["phase_sheet_sizes"]
+	var starts: Array = eco["phase_sheet_starts"]
+	var i: int = mini(phase(), caps.size()) - 1
+	var cap: float = caps[i]
+	var start: float = starts[mini(i, starts.size() - 1)]
+	var max_lv: int = upgrades.max_level("global_sheet")
+	var lv: int = mini(state.level("global_sheet"), max_lv)
+	var grown: float = start + (cap - start) * float(lv) / float(maxi(max_lv, 1))
+	return clampi(roundi(grown), int(start), int(cap))
 
 
 func refresh_stats() -> void:
@@ -104,6 +111,7 @@ func new_sheet() -> void:
 	_apply_to_sheet()
 	_generate_specials()
 	reload_timer = -1.0
+	awaiting_reload = false
 	_chain_active = false
 	chain_count = 0
 	sheet.reload_requested.connect(_on_reload_requested)
@@ -164,13 +172,26 @@ func _configure_tool(id: String) -> void:
 		tm.heat_reach = Cfg.num(eco, "iron_heat_reach")
 
 
+## Desde cuándo aparece cada especial: la dorada tras el primer reciclado, bomba y línea en el
+## Piso y el eco en el Galpón (antes de eso el jugador todavía está aprendiendo lo básico).
+func special_unlocked(t: int) -> bool:
+	match t:
+		TYPE_GOLDEN:
+			return state.recycles >= 1 or phase() >= 2
+		TYPE_BOMB, TYPE_LINE:
+			return phase() >= 2
+		TYPE_ECHO:
+			return phase() >= 3
+	return false
+
+
 ## Reparte las burbujas especiales al generar la lámina; avisa las que el jugador no conocía.
 func _generate_specials() -> void:
 	var chances: Array = [
-		[TYPE_GOLDEN, Cfg.num(stats, "chance_golden"), 1],
-		[TYPE_BOMB, Cfg.num(stats, "chance_bomb"), 2],
-		[TYPE_LINE, Cfg.num(stats, "chance_line"), 2],
-		[TYPE_ECHO, Cfg.num(stats, "chance_echo"), 4],
+		[TYPE_GOLDEN, Cfg.num(stats, "chance_golden")],
+		[TYPE_BOMB, Cfg.num(stats, "chance_bomb")],
+		[TYPE_LINE, Cfg.num(stats, "chance_line")],
+		[TYPE_ECHO, Cfg.num(stats, "chance_echo")],
 	]
 	var present: Dictionary = {}
 	var picked: Array[Vector2i] = []
@@ -180,8 +201,7 @@ func _generate_specials() -> void:
 		for entry: Array in chances:
 			var t: int = entry[0]
 			var chance: float = entry[1]
-			var min_phase: int = entry[2]
-			if phase() < min_phase:
+			if not special_unlocked(t):
 				continue
 			acc += chance
 			if roll < acc:
@@ -201,10 +221,29 @@ func _generate_specials() -> void:
 
 
 func _on_reload_requested() -> void:
-	var auto: bool = stats["auto_reload"]
-	var key: String = "reload_delay_auto" if auto else "reload_delay_manual"
-	reload_timer = Cfg.num(eco, key)
 	state.sheets_done += 1
+	if auto_reload():
+		reload_timer = Cfg.num(eco, "reload_delay_auto")
+	else:
+		awaiting_reload = true
+
+
+func auto_reload() -> bool:
+	return Cfg.flag(stats, "auto_reload")
+
+
+## El jugador tira una lámina nueva del rollo (solo cuando la actual ya está terminada).
+func request_reload() -> bool:
+	if not awaiting_reload or reload_timer >= 0.0:
+		return false
+	awaiting_reload = false
+	reload_timer = Cfg.num(eco, "reload_delay_manual")
+	return true
+
+
+## Sin "Mantener apretado" cada clic revienta una sola vez lo que hay bajo la herramienta.
+func hold_unlocked() -> bool:
+	return Cfg.flag(stats, "hold")
 
 
 # --- Paso de simulación --------------------------------------------------------------
@@ -236,14 +275,19 @@ func step(dt: float, pointer: Vector2, pressing: bool) -> void:
 	var dir: Vector2 = Vector2.ZERO
 	idle_s = 0.0 if pressing else idle_s + dt
 	var live: bool = reload_timer < 0.0
-	if pressing and live:
-		touched = tm.cells_for(_prev_pointer, pointer)
+	var click_only: bool = not hold_unlocked()
+	var press_edge: bool = pressing and not _prev_pressing
+	if pressing and live and (press_edge or not click_only):
+		touched = tm.cells_for(pointer if click_only else _prev_pointer, pointer)
 		dir = pointer - _prev_pointer
 	var popped: PackedInt32Array = PackedInt32Array()
 	if tm.shape == ToolModel.SHAPE_STOMP:
-		if pressing and not _prev_pressing and live:
+		if press_edge and live:
 			popped = tm.stomp(pointer, chain.k)
 			_enqueue_overloaded(tm.last_wave_cells)
+	elif click_only and not touched.is_empty():
+		popped = tm.step(touched, tm.resistance / maxf(tm.force_per_second, 0.01) + 0.001, tm.last_weights, Vector2.ZERO) # un clic, un reventón
+		tm.step(PackedInt32Array(), 0.0) # suelta: el próximo reventón pide otro clic
 	else:
 		popped = tm.step(touched, dt, tm.last_weights, dir)
 		if tm.shape == ToolModel.SHAPE_RECT and live:
@@ -485,11 +529,21 @@ func recycle() -> int:
 	Prestige.recycle(state, gained)
 	state.last_levels = previous
 	_apply_memory(previous)
+	_keep_after_recycle(previous)
 	combo.reset()
 	refresh_stats()
 	new_sheet()
 	_echoes = []
 	return gained
+
+
+## Lo que se aprende una vez y no se olvida (por ejemplo "Mantener apretado") sobrevive al reciclado.
+func _keep_after_recycle(previous: Dictionary) -> void:
+	for id: String in upgrades.order:
+		var keep: bool = upgrades.def(id).get("keep_on_recycle", false)
+		if keep and previous.has(id):
+			var lv: int = previous[id]
+			state.levels[id] = lv
 
 
 ## "Memoria del turno": arrancás con un % de los niveles de la partida anterior.
@@ -567,4 +621,9 @@ func load_dict(data: Dictionary) -> bool:
 			sheet.type = restored.type
 			sheet.press = restored.press
 			sheet.reset_counts()
+			if sheet.popped_ratio() >= sheet.reload_threshold: # se guardó con la lámina terminada
+				if auto_reload():
+					reload_timer = Cfg.num(eco, "reload_delay_auto")
+				else:
+					awaiting_reload = true
 	return true

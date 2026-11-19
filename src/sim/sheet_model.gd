@@ -257,6 +257,7 @@ func _fail(message: String) -> bool:
 ## Recalcula los contadores por estado (después de escribir los arrays directamente).
 func reset_counts() -> void:
 	_recount()
+	_reload_signaled = popped_ratio() >= reload_threshold # ya terminada: no vuelve a avisar
 
 
 func _recount() -> void:

@@ -57,6 +57,11 @@ func _run() -> void:
 		if main.is_recycling():
 			await _frames(5)
 			continue
+		if main.sim.awaiting_reload: # lámina terminada: tira una nueva del rollo (tecla R)
+			await _frames(20)
+			_key(KEY_R)
+			await _frames(5)
+			continue
 		if _t >= next_jump and main.sim.phase() < 4:
 			next_jump += jump_every
 			await _dev_phase_jump()

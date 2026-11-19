@@ -284,7 +284,10 @@ func test_phase_progression_to_four() -> void:
 	sim.refresh_stats()
 	sim.new_sheet()
 	assert_eq(sim.phase(), 4)
-	assert_eq(sim.sheet.width, 150)
+	assert_eq(sim.sheet.width, 75, "cada fase arranca con una lámina chica")
+	sim.state.levels["global_sheet"] = sim.upgrades.max_level("global_sheet")
+	sim.new_sheet()
+	assert_eq(sim.sheet.width, 150, "con el Rollo más ancho al máximo llega al tope")
 	sim.state.levels["unlock_boot"] = 1
 	sim.state.levels["unlock_iron"] = 1
 	assert_true(sim.select_tool("boot"))
@@ -386,6 +389,7 @@ func _iron_sim(seed_value: int) -> GameSim:
 	var sim: GameSim = GameSim.new(db, seed_value)
 	sim.state.perm["perm_sheet"] = 2
 	sim.state.levels["unlock_iron"] = 1
+	sim.state.levels["global_hold"] = 1
 	sim.refresh_stats()
 	sim.new_sheet()
 	assert_true(sim.select_tool("iron"))

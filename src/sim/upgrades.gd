@@ -118,6 +118,21 @@ func is_available(state: GameState, id: String) -> bool:
 	return true
 
 
+## La hoja de pedidos muestra una mejora recién cuando está cerca: disponible y con los Pops de la
+## corrida llegando a `reveal_cost_fraction` de su primer precio (o si ya se compró, o si cuesta
+## menos de `reveal_free_below`: lo del arranque se ve de entrada). Así al arrancar
+## no hay una lista de cosas imposibles, y lo nuevo aparece a medida que se acerca.
+func is_revealed(state: GameState, id: String) -> bool:
+	if is_perm(id):
+		return true
+	if state.level(id) > 0:
+		return true
+	if not is_available(state, id):
+		return false
+	var first: float = next_cost(id, 0)
+	return first <= Cfg.num(eco, "reveal_free_below") or state.pops_run >= first * Cfg.num(eco, "reveal_cost_fraction")
+
+
 ## Nivel efectivo de una mejora: el comprado más lo que regala la automatización permanente.
 func level_with_bonus(state: GameState, id: String) -> int:
 	var lv: int = state.level(id)
@@ -262,6 +277,7 @@ func global_stats(state: GameState) -> Dictionary:
 	g["value_mult"] = effect("global_value", state.level("global_value")) * (1.0 + effect("perm_bonus", state.perm_level("perm_bonus")))
 	g["sheet_growth"] = int(effect("global_sheet", state.level("global_sheet")))
 	g["auto_reload"] = state.level("global_reload") >= 1 or state.perm_level("perm_auto") >= 1
+	g["hold"] = state.level("global_hold") >= 1
 	g["phase"] = phase_of(state)
 	return g
 
@@ -304,7 +320,7 @@ func effect_text(id: String, level: int, lang: String) -> String:
 			return "+" + str(int(v))
 		"count":
 			return "+" + str(int(v))
-		"smart":
+		"smart", "hold", "auto_reload":
 			return "-"
 		"automation":
 			return "Nv " + str(level)

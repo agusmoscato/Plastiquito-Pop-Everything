@@ -100,13 +100,35 @@ func test_milestone_flag_at_25_levels() -> void:
 
 func test_unlock_palm_then_select() -> void:
 	sim.state.pops = 1.0e6
+	assert_false(sim.upgrades.is_available(sim.state, "unlock_palm"), "la palma no se ofrece al arrancar")
+	sim.buy("global_hold", 1)
 	sim.buy("unlock_palm", 1)
 	assert_true(sim.select_tool("palm"))
 	assert_eq(sim.selected_tool().shape, "circle")
 	assert_gt(sim.selected_tool().radius, 1.0)
 
 
-func test_reload_creates_new_sheet_after_90_percent() -> void:
+func test_reload_waits_for_the_player_without_auto_reload() -> void:
+	var total: int = sim.sheet.cell_count()
+	for i: int in ceili(float(total) * 0.9):
+		sim.sheet.pop(i)
+	assert_true(sim.awaiting_reload, "sin la mejora la lámina terminada espera")
+	var first: SheetModel = sim.sheet
+	for i: int in 200:
+		sim.step(0.016, Vector2.ZERO, false)
+	assert_eq(sim.sheet, first, "no se recarga sola")
+	assert_true(sim.request_reload())
+	for i: int in 60:
+		sim.step(0.016, Vector2.ZERO, false)
+	assert_ne(sim.sheet, first)
+	assert_eq(sim.sheet.count_popped(), 0)
+	assert_false(sim.awaiting_reload)
+	assert_false(sim.request_reload(), "la lámina nueva no se puede tirar")
+
+
+func test_auto_reload_creates_new_sheet_after_90_percent() -> void:
+	sim.state.levels["global_reload"] = 1
+	sim.refresh_stats()
 	var total: int = sim.sheet.cell_count()
 	for i: int in ceili(float(total) * 0.9):
 		sim.sheet.pop(i)
@@ -116,6 +138,61 @@ func test_reload_creates_new_sheet_after_90_percent() -> void:
 		sim.step(0.016, Vector2.ZERO, false)
 	assert_ne(sim.sheet, first)
 	assert_eq(sim.sheet.count_popped(), 0)
+
+
+func test_saved_finished_sheet_still_waits_for_reload() -> void:
+	for i: int in ceili(float(sim.sheet.cell_count()) * 0.95):
+		sim.sheet.pop(i)
+	var data: Dictionary = sim.save_dict()
+	var loaded: GameSim = GameSim.new(db, 7)
+	assert_true(loaded.load_dict(data))
+	assert_true(loaded.awaiting_reload, "al cargar una lámina terminada se puede tirar otra")
+
+
+func test_click_pops_one_and_hold_needs_the_upgrade() -> void:
+	var c: Vector2 = sim.grid.cell_to_world(sim.grid.index(4, 4))
+	var c2: Vector2 = sim.grid.cell_to_world(sim.grid.index(5, 4))
+	sim.step(1.0 / 60.0, c, true)
+	assert_eq(sim.sheet.state[sim.grid.index(4, 4)], SheetModel.STATE_POPPED, "un clic revienta la burbuja")
+	var popped_before: int = sim.sheet.count_popped()
+	for i: int in 60: # mantiene apretado y arrastra a la vecina
+		sim.step(1.0 / 60.0, c.lerp(c2, float(i) / 59.0), true)
+	assert_ne(sim.sheet.state[sim.grid.index(5, 4)], SheetModel.STATE_POPPED, "sin la mejora, arrastrar no revienta")
+	assert_eq(sim.sheet.count_popped(), popped_before)
+	sim.step(1.0 / 60.0, c2, false)
+	sim.step(1.0 / 60.0, c2, true)
+	assert_eq(sim.sheet.state[sim.grid.index(5, 4)], SheetModel.STATE_POPPED, "otro clic, otra burbuja")
+	sim.state.pops = 1000.0
+	assert_eq(_int(sim.buy("global_hold", 1), "bought"), 1)
+	assert_lt(sim.upgrades.next_cost("global_hold", 0), 100.0, "mantener apretado es barato")
+	var c3: Vector2 = sim.grid.cell_to_world(sim.grid.index(2, 2))
+	var c4: Vector2 = sim.grid.cell_to_world(sim.grid.index(2, 6))
+	sim.step(1.0 / 60.0, c3, false)
+	var before_drag: int = sim.sheet.count_popped()
+	for i: int in 60:
+		sim.step(1.0 / 60.0, c3.lerp(c4, float(i) / 59.0), true)
+	assert_gt(sim.sheet.count_popped(), before_drag + 2, "con la mejora, arrastrar revienta varias")
+
+
+func test_hold_survives_recycle() -> void:
+	sim.state.levels["global_hold"] = 1
+	sim.state.pops_run = 1.0e8
+	assert_gt(sim.recycle(), 0)
+	assert_eq(sim.state.level("global_hold"), 1, "lo aprendido no se olvida")
+	assert_true(sim.hold_unlocked())
+
+
+func test_specials_only_after_first_recycle() -> void:
+	var fresh: GameSim = GameSim.new(db, 3)
+	fresh.stats["chance_golden"] = 0.5
+	fresh.new_sheet()
+	for t: int in fresh.sheet.type:
+		assert_eq(t, 0, "antes del primer reciclado no hay especiales")
+	assert_false(fresh.special_unlocked(GameSim.TYPE_GOLDEN))
+	fresh.state.recycles = 1
+	assert_true(fresh.special_unlocked(GameSim.TYPE_GOLDEN))
+	assert_false(fresh.special_unlocked(GameSim.TYPE_BOMB), "la bomba llega en el Piso")
+	assert_false(fresh.special_unlocked(GameSim.TYPE_ECHO))
 
 
 func test_chain_event_reported_when_it_ends() -> void:
@@ -149,7 +226,7 @@ func test_recycle_flow_and_permanent_upgrades() -> void:
 	assert_eq(sim.phase(), 2)
 	sim.state.pellets += 5.0
 	sim.new_sheet()
-	assert_eq(sim.sheet.width, 40)
+	assert_eq(sim.sheet.width, 20, "el Piso arranca con una lámina como la última de la Mesa")
 	assert_eq(_int(sim.buy("perm_finger", 1), "bought"), 1)
 	assert_eq(sim.state.level("finger_force"), 0)
 	assert_gt(_tool("finger").force_per_second, 6.0, "el dedo arranca mejorado")
@@ -198,6 +275,7 @@ func test_invalid_saves_rejected() -> void:
 
 func test_specials_generated_and_discovered_once() -> void:
 	var rich: GameSim = GameSim.new(db, 3)
+	rich.state.recycles = 1
 	rich.stats["chance_golden"] = 0.5
 	rich.new_sheet()
 	var golden: int = 0

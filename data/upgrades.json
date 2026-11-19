@@ -85,7 +85,9 @@
    "per_level": 1.0,
    "effect_type": "add",
    "unit": "",
-   "requires": {}
+   "requires": {
+    "upgrade": "global_hold"
+   }
   },
   {
    "id": "palm_size",
@@ -259,6 +261,24 @@
    }
   },
   {
+   "id": "global_hold",
+   "scope": "global",
+   "tool": "",
+   "kind": "hold",
+   "name_es": "Mantener apretado",
+   "name_en": "Hold to pop",
+   "desc_es": "Mantené y arrastrá: revienta sin soltar.",
+   "desc_en": "Hold and drag: pops without letting go.",
+   "base_cost": 30.0,
+   "growth": 1.0,
+   "max_level": 1,
+   "per_level": 1.0,
+   "effect_type": "add",
+   "unit": "",
+   "keep_on_recycle": true,
+   "requires": {}
+  },
+  {
    "id": "global_value",
    "scope": "global",
    "tool": "",
@@ -352,16 +372,16 @@
    "kind": "auto_reload",
    "name_es": "Recarga automática",
    "name_en": "Auto reload",
-   "desc_es": "La lámina nueva llega sola, más rápido.",
-   "desc_en": "New sheet arrives on its own, faster.",
-   "base_cost": 15592.0,
+   "desc_es": "La lámina nueva llega sola del rollo.",
+   "desc_en": "New sheets come off the roll by themselves.",
+   "base_cost": 3000.0,
    "growth": 1.0,
    "max_level": 1,
    "per_level": 1.0,
    "effect_type": "add",
    "unit": "",
    "requires": {
-    "phase": 2
+    "upgrade": "global_hold"
    }
   },
   {
