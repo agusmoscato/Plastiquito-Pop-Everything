@@ -63,7 +63,7 @@ func _draw() -> void:
 	var ink: Color = UiKit.INK_SOFT if disabled else (UiKit.PAPER if toggled_on else color)
 	draw_rect(rect.grow(-3.0), ink, false, 2.0)
 	var font: Font = UiKit.font_title()
-	var fs: int = font_size
+	var fs: int = UiKit.fit_size(font, text, font_size, rect.size.x - 14.0) # nunca se sale del sello
 	var ts: Vector2 = font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, fs)
 	var ty: float = rect.position.y + rect.size.y * 0.5 + ts.y * 0.32
 	if sub_text != "":

@@ -10,6 +10,7 @@ var _root: Control
 var _shake_button: StampButton
 var _lang_button: StampButton
 var _gfx_button: StampButton
+var _folder: StampButton
 var _slider: InkSlider
 var _rows: Array = []
 var _bottom: Array = []
@@ -34,11 +35,11 @@ func _ready() -> void:
 	_shake_button = _button("", Vector2(W - 60.0, 44.0), UiKit.CARDBOARD_DARK, _toggle_shake)
 	_lang_button = _button("", Vector2(W - 60.0, 44.0), UiKit.CARDBOARD_DARK, _toggle_language)
 	_gfx_button = _button("", Vector2(W - 60.0, 44.0), UiKit.CARDBOARD_DARK, _toggle_graphics)
-	var folder: StampButton = _button("ABRIR CARPETA DE DATOS", Vector2(W - 60.0, 44.0), UiKit.CARDBOARD_DARK, _open_data_folder)
-	folder.font_size = 14
+	_folder = _button("", Vector2(W - 60.0, 44.0), UiKit.CARDBOARD_DARK, _open_data_folder)
+	_folder.font_size = 14
 	_back = _button("VOLVER AL JUEGO", Vector2(180.0, 50.0), UiKit.STAMP_RED, close)
 	_quit_button = _button("SALIR", Vector2(150.0, 50.0), UiKit.CARDBOARD_DARK, _quit)
-	_rows = [_slider, _shake_button, _lang_button, _gfx_button, folder]
+	_rows = [_slider, _shake_button, _lang_button, _gfx_button, _folder]
 	_bottom = [_back, _quit_button]
 	_place(_rows, _bottom)
 	_refresh_labels()
@@ -126,10 +127,15 @@ func _place(rows: Array, bottom: Array) -> void:
 
 
 func _refresh_labels() -> void:
-	_shake_button.text = "SACUDIDA DE CÁMARA: %s" % ("SÍ" if Settings.shake_enabled else "NO")
+	var es: bool = Settings.language == "es"
+	_shake_button.text = ("SACUDIDA DE CÁMARA: %s" if es else "SCREEN SHAKE: %s") % (("SÍ" if es else "ON") if Settings.shake_enabled else ("NO" if es else "OFF"))
+	_folder.text = "ABRIR CARPETA DE DATOS" if es else "OPEN DATA FOLDER"
+	_quit_button.text = "SALIR" if es else "QUIT"
+	if not _options_only:
+		_back.text = "VOLVER AL JUEGO" if es else "BACK TO GAME"
 	_shake_button.toggled_on = Settings.shake_enabled
 	_shake_button.font_size = 14
-	_lang_button.text = "IDIOMA: %s" % Settings.language.to_upper()
+	_lang_button.text = ("IDIOMA: %s" if es else "LANGUAGE: %s") % Settings.language.to_upper()
 	_lang_button.font_size = 14
 	var gfx: String = "GRÁFICOS: %s" if Settings.language == "es" else "GRAPHICS: %s"
 	_gfx_button.text = gfx % GraphicsQuality.name_of(Settings.graphics, Settings.language)

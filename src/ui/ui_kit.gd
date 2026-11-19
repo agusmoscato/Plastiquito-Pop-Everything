@@ -147,6 +147,14 @@ static func draw_tape(ci: CanvasItem, center: Vector2, angle: float, length: flo
 
 
 ## Texto con sombra de tinta corrida opcional.
+## Tamaño de letra que hace entrar `text` en `max_width` (achica de a un punto, hasta 8).
+static func fit_size(font: Font, text: String, size: int, max_width: float) -> int:
+	var fs: int = size
+	while fs > 8 and font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, fs).x > max_width:
+		fs -= 1
+	return fs
+
+
 static func draw_text(ci: CanvasItem, pos: Vector2, text: String, font: Font, size: int, color: Color = INK, align: int = HORIZONTAL_ALIGNMENT_LEFT, width: float = -1.0) -> void:
 	ci.draw_string(font, pos, text, align, width, size, color)
 

@@ -60,7 +60,8 @@ func _draw() -> void:
 	var rect: Rect2 = Rect2(Vector2(4.0, 10.0 - lift), Vector2(W - 8.0, H - 14.0))
 	var paper: Color = UiKit.PAPER if avail else UiKit.PAPER_SHADE
 	UiKit.draw_sheet(self, rect, paper, id, lift, 1.2)
-	UiKit.draw_text(self, rect.position + Vector2(12.0, 28.0), sim.upgrades.name_of(id, lang).to_upper(), UiKit.font_title(), 12, UiKit.INK if avail else UiKit.INK_SOFT)
+	var title: String = sim.upgrades.name_of(id, lang).to_upper()
+	UiKit.draw_text(self, rect.position + Vector2(12.0, 28.0), title, UiKit.font_title(), UiKit.fit_size(UiKit.font_title(), title, 12, rect.size.x - 24.0), UiKit.INK if avail else UiKit.INK_SOFT)
 	draw_multiline_string(UiKit.font_text(), rect.position + Vector2(12.0, 44.0), sim.upgrades.desc_of(id, lang), HORIZONTAL_ALIGNMENT_LEFT, W - 34.0, 10, 2, UiKit.INK_SOFT)
 	var line: String = "NIV %d/%d  %s" % [lvl, mx, sim.upgrades.effect_text(id, lvl, lang).left(12)]
 	UiKit.draw_text(self, rect.position + Vector2(12.0, H - 28.0), line, UiKit.font_mono(), 10, UiKit.INK)
