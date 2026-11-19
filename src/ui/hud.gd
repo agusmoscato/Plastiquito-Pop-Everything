@@ -8,6 +8,7 @@ signal tool_selected(id: String)
 signal purchased(id: String, count: int, milestone: bool)
 signal recycle_confirmed
 signal chain_slammed(count: int)
+signal reload_requested
 
 const SHOP_W: float = 452.0
 
@@ -17,7 +18,6 @@ var camera: Camera3D
 var root: Control
 var pops_panel: PopsPanel
 var work_order: WorkOrder
-var next_bar: NextBar
 var combo: ComboMeter
 var chain_stamp: ChainStamp
 var night_stamp: NightStamp
@@ -28,6 +28,7 @@ var bubble_log: BubbleLog
 
 var _tool_buttons: Dictionary = {} ## id -> StampButton
 var _recycle_button: StampButton
+var _reload_button: StampButton ## "TIRAR LÁMINA NUEVA": aparece con la lámina terminada si no hay recarga automática
 var _log_button: StampButton
 var _in_flight: float = 0.0
 var _group_value: float = 0.0
@@ -66,9 +67,6 @@ func setup(p_sim: GameSim, p_camera: Camera3D) -> void:
 	work_order = WorkOrder.new()
 	work_order.setup(sim)
 	root.add_child(work_order)
-	next_bar = NextBar.new()
-	next_bar.setup(sim)
-	root.add_child(next_bar)
 	combo = ComboMeter.new()
 	combo.setup()
 	root.add_child(combo)
@@ -119,7 +117,6 @@ func setup(p_sim: GameSim, p_camera: Camera3D) -> void:
 	pops_panel.odometer.set_target(sim.state.pops)
 	pops_panel.odometer.snap()
 	work_order.refresh()
-	next_bar.refresh()
 
 
 func is_modal_open() -> bool:
@@ -160,6 +157,14 @@ func _build_recycle_button() -> void:
 	_recycle_button.pressed.connect(open_recycle_panel)
 	_recycle_button.visible = false
 	root.add_child(_recycle_button)
+	_reload_button = StampButton.new()
+	_reload_button.setup(Tx.t("reload_sheet"), Vector2(300.0, 66.0), UiKit.STAMP_RED)
+	_reload_button.font_size = 20
+	_reload_button.filled = true
+	_reload_button.sub_text = Tx.t("reload_hint")
+	_reload_button.pressed.connect(func() -> void: reload_requested.emit())
+	_reload_button.visible = false
+	root.add_child(_reload_button)
 	_log_button = StampButton.new()
 	_log_button.setup(Tx.t("bubblepedia"), Vector2(150.0, 40.0), UiKit.CARDBOARD_DARK)
 	_log_button.font_size = 12
@@ -173,7 +178,6 @@ func _layout() -> void:
 	var free_w: float = vp.x - SHOP_W - 16.0
 	pops_panel.position = Vector2(14.0, 10.0)
 	work_order.position = Vector2(20.0, 148.0)
-	next_bar.position = Vector2(free_w * 0.5 - next_bar.size.x * 0.5 + 60.0, 10.0)
 	shop.position = Vector2(vp.x - SHOP_W - 6.0, 8.0)
 	combo.position = Vector2(14.0, vp.y - 110.0)
 	night_stamp.position = Vector2(18.0, vp.y - 178.0)
@@ -183,6 +187,7 @@ func _layout() -> void:
 		b.position = Vector2(x, vp.y - 104.0)
 		x += 118.0
 	_recycle_button.position = Vector2(free_w - 210.0, vp.y - 84.0)
+	_reload_button.position = Vector2(free_w * 0.5 - _reload_button.size.x * 0.5 + 40.0, vp.y - 190.0)
 	_log_button.position = Vector2(free_w - 170.0, 76.0)
 	bubble_log.position = Vector2(free_w - 380.0, 124.0)
 	flyers.target = pops_panel.odometer_center()
@@ -240,7 +245,7 @@ func _handle_pops() -> void:
 ## Rectángulos de los paneles del HUD (los "+N" no se dibujan encima).
 func _panel_rects() -> Array[Rect2]:
 	var out: Array[Rect2] = []
-	for c: Control in [pops_panel, work_order, next_bar, shop, combo, _recycle_button, _log_button]:
+	for c: Control in [pops_panel, work_order, shop, combo, _recycle_button, _log_button, _reload_button]:
 		if c.visible:
 			out.append(c.get_global_rect())
 	for id: String in _tool_buttons:
@@ -371,9 +376,12 @@ func _process(delta: float) -> void:
 	if _refresh_timer <= 0.0:
 		_refresh_timer = 0.2
 		work_order.refresh()
-		next_bar.refresh()
 	_update_toolbar()
 	_update_recycle_button()
+	_reload_button.visible = sim.awaiting_reload and not is_modal_open()
+	if _reload_button.visible: # late para que se note: la lámina está terminada
+		var k: float = 1.0 + 0.04 * sin(Time.get_ticks_msec() * 0.008)
+		_reload_button.scale = Vector2(k, k)
 	_tab_timer -= delta
 	if _tab_timer <= 0.0:
 		_tab_timer = 0.5
@@ -393,11 +401,18 @@ func _update_toolbar() -> void:
 		var b: StampButton = _tool_buttons[id]
 		var unlocked: bool = sim.upgrades.tool_unlocked(sim.state, id)
 		b.disabled = not unlocked
-		b.visible = unlocked or sim.phase() >= (3 if id == "iron" else (4 if id == "boot" else 1)) or id == "finger" or id == "palm" or id == "rolling_pin"
+		b.visible = unlocked or id == "finger" or _unlock_revealed(id) # lo que todavía está lejos no ocupa lugar
 		b.toggled_on = sim.state.selected_tool == id
 		if id == "boot" and unlocked:
 			var tm: ToolModel = sim.tools["boot"]
 			b.sub_text = Tx.t("boot_ready") if tm.cooldown_left <= 0.0 else "%.1f s" % tm.cooldown_left
+
+
+func _unlock_revealed(tool_id: String) -> bool:
+	for up_id: String in sim.upgrades.ids_for_tool(tool_id):
+		if str(sim.upgrades.def(up_id)["kind"]) == "unlock":
+			return sim.upgrades.is_revealed(sim.state, up_id)
+	return false
 
 
 func _update_recycle_button() -> void:

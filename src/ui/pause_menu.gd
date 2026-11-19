@@ -47,6 +47,11 @@ func is_open() -> bool:
 	return _root.visible
 
 
+func _process(_delta: float) -> void:
+	if _root.visible:
+		BubbleCursor.show() # el juego esconde el puntero sobre la lámina; en el menú tiene que verse
+
+
 ## Desde el menú de inicio: las mismas opciones, sin pausar ni salir del juego.
 func open_options() -> void:
 	_options_only = true

@@ -13,6 +13,7 @@ var font_size: int = 16
 var disabled: bool = false
 var seed_id: String = ""
 var text_bottom: bool = false ## el texto va abajo (deja arriba lugar para un ícono)
+var badge: int = 0 ## > 0: un círculo rojo con el número (cosas listas para sellar en esa pestaña)
 
 var _down: bool = false
 var _hover: bool = false
@@ -72,3 +73,15 @@ func _draw() -> void:
 	draw_string(font, Vector2(rect.position.x + (rect.size.x - ts.x) * 0.5, ty), text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, fs, ink)
 	if sub_text != "":
 		UiKit.draw_text(self, Vector2(rect.position.x, ty + 15.0), sub_text, UiKit.font_mono(), 11, ink, HORIZONTAL_ALIGNMENT_CENTER, rect.size.x)
+	if badge > 0:
+		_draw_badge(Vector2(rect.end.x - 4.0, rect.position.y + 4.0))
+
+
+## Sello rojo redondo con la cantidad, en la esquina (late suave para que se note sin gritar).
+func _draw_badge(at: Vector2) -> void:
+	var r: float = 11.0 + 1.2 * sin(Time.get_ticks_msec() * 0.006)
+	draw_circle(at + Vector2(1.5, 2.0), r, Color(0, 0, 0, 0.25))
+	draw_circle(at, r, UiKit.STAMP_RED)
+	draw_arc(at, r - 2.0, 0.0, TAU, 24, UiKit.PAPER, 1.5, true)
+	var label: String = str(badge) if badge < 10 else "9+"
+	UiKit.draw_text(self, at + Vector2(-r, 5.0), label, UiKit.font_mono_bold(), 13, UiKit.PAPER, HORIZONTAL_ALIGNMENT_CENTER, r * 2.0)

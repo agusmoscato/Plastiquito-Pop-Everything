@@ -125,6 +125,7 @@ func pop_bubble(i: int) -> void:
 func _process(delta: float) -> void:
 	if not _root.visible:
 		return
+	BubbleCursor.show()
 	_t += delta
 	_confirm_new = maxf(0.0, _confirm_new - delta)
 	if _confirm_new <= 0.0 and has_save:

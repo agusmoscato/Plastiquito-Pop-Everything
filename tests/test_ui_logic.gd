@@ -129,3 +129,39 @@ func test_first_hint_only_at_the_start() -> void:
 	assert_true(FirstHint.wanted(0.0))
 	assert_false(FirstHint.wanted(50.0), "después de los primeros reventones ya no aparece")
 	assert_true(Tx.T.has("hint_1") and Tx.T.has("hint_2"))
+
+
+func test_shop_reveals_only_what_is_close() -> void:
+	var s: GameState = GameState.new()
+	assert_true(up.is_revealed(s, "global_hold"), "lo primero se ve desde el arranque")
+	assert_false(up.is_revealed(s, "unlock_palm"), "la palma no se ofrece al arrancar")
+	assert_false(up.is_revealed(s, "finger_size"), "lo caro todavía no aparece")
+	s.levels["global_hold"] = 1
+	s.pops_run = up.next_cost("unlock_palm", 0) * 0.31
+	assert_true(up.is_revealed(s, "unlock_palm"), "aparece cuando se acerca")
+	s.pops_run = 0.0
+	s.levels["finger_size"] = 1
+	assert_true(up.is_revealed(s, "finger_size"), "lo ya comprado siempre se ve")
+
+
+func test_work_order_guides_the_start() -> void:
+	var sim: GameSim = GameSim.new(db, 1)
+	assert_eq(WorkOrder.current_goal(sim), "hold")
+	sim.state.levels["global_hold"] = 1
+	sim.refresh_stats()
+	assert_eq(WorkOrder.current_goal(sim), "reload")
+	sim.state.levels["global_reload"] = 1
+	sim.refresh_stats()
+	assert_eq(WorkOrder.current_goal(sim), "palm")
+	sim.state.levels["unlock_palm"] = 1
+	assert_eq(WorkOrder.current_goal(sim), "recycle", "después, el primer reciclado y para qué sirve")
+	for goal: String in ["hold", "reload", "palm", "recycle", "pin", "iron", "hands", "boot", "pellet"]:
+		assert_ne(Tx.t("why_" + goal), "why_" + goal, "cada meta explica para qué sirve: %s" % goal)
+
+
+func test_bubble_cursor_is_a_round_bubble() -> void:
+	var img: Image = BubbleCursor.image(BubbleCursor.SIZE)
+	var mid: int = BubbleCursor.SIZE >> 1
+	assert_eq(img.get_pixel(0, 0).a, 0.0, "las esquinas son transparentes")
+	assert_gt(img.get_pixel(mid + 4, mid + 4).a, 0.5, "el centro se ve")
+	assert_lt(img.get_pixel(mid, 1).v, 0.3, "contorno de tinta")

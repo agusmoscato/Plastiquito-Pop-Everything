@@ -20,6 +20,7 @@ var _current: String = "finger"
 var _mode_buttons: Array[StampButton] = []
 var _scroll: ScrollContainer
 var _clip_shake: float = 0.0
+var ready_count: int = 0 ## mejoras que se pueden sellar ahora (todas las pestañas)
 
 
 func setup(p_sim: GameSim) -> void:
@@ -32,6 +33,7 @@ func setup(p_sim: GameSim) -> void:
 	_build_mode_buttons()
 	_build_pages()
 	select_tab("finger")
+	refresh_tabs()
 
 
 ## El clip de la hoja de pedidos tiembla (se usa la primera vez que algo se puede pagar).
@@ -80,15 +82,50 @@ func _build_tabs() -> void:
 		_tabs[t] = b
 
 
-## Muestra solo las pestañas de lo que ya está al alcance (la plancha y las manitos desde el Galpón,
-## la bota y el rodillo desde el Estacionamiento).
+## Muestra solo lo que ya está cerca (Upgrades.is_revealed): una pestaña aparece cuando tiene alguna
+## mejora a la vista, y lleva un sello rojo con cuántas se pueden sellar ya.
 func refresh_tabs() -> void:
-	var phase: int = sim.phase()
-	var need: Dictionary = {"iron": 3, "hands": 3, "boot": 4, "auto_roller": 4}
+	var ready_total: int = 0
 	for t: String in _tabs:
 		var b: StampButton = _tabs[t]
-		var min_phase: int = need.get(t, 1)
-		b.visible = phase >= min_phase
+		var shown: int = 0
+		var ready: int = 0
+		for id: String in _ids_of_tab(t):
+			var tag: UpgradeTag = _tags[id]
+			tag.visible = sim.upgrades.is_revealed(sim.state, id)
+			if tag.visible:
+				shown += 1
+				if sim.can_afford_next(id):
+					ready += 1
+		b.visible = shown > 0
+		b.badge = ready
+		ready_total += ready
+	ready_count = ready_total
+	_layout_tabs()
+	if not _tabs_visible(_current):
+		select_tab("finger")
+	queue_redraw() # el encabezado cuenta los pedidos: se redibuja con cada cambio
+
+
+## Las pestañas visibles se acomodan en orden, sin huecos.
+func _layout_tabs() -> void:
+	var i: int = 0
+	for t: String in TABS:
+		var b: StampButton = _tabs[t]
+		if not b.visible:
+			continue
+		@warning_ignore("integer_division")
+		b.position = Vector2(24.0 + float(i % 4) * 100.0, 128.0 + float(i / 4) * 66.0)
+		i += 1
+
+
+func _tabs_visible(t: String) -> bool:
+	var b: StampButton = _tabs.get(t)
+	return b != null and b.visible
+
+
+func _ids_of_tab(t: String) -> Array[String]:
+	return sim.upgrades.ids_for_scope("global") if t == "global" else sim.upgrades.ids_for_tool(t)
 
 
 func _build_mode_buttons() -> void:
@@ -127,8 +164,7 @@ func _build_pages() -> void:
 		page.mouse_filter = Control.MOUSE_FILTER_PASS
 		_scroll.add_child(page)
 		_pages[t] = page
-		var ids: Array[String] = sim.upgrades.ids_for_scope("global") if t == "global" else sim.upgrades.ids_for_tool(t)
-		for id: String in ids:
+		for id: String in _ids_of_tab(t):
 			var tag: UpgradeTag = UpgradeTag.new()
 			tag.setup(sim, id, buy_mode)
 			tag.bought.connect(func(i: String, n: int, ms: bool) -> void: tag_bought.emit(i, n, ms))
@@ -174,4 +210,5 @@ func _draw() -> void:
 	draw_rect(clip, Color("#6E747A"), false, 2.0)
 	var lang: String = Settings.language
 	UiKit.draw_text(self, Vector2(34.0, 98.0), "HOJA DE PEDIDOS" if lang == "es" else "ORDER SHEET", UiKit.font_title(), 20, UiKit.INK)
-	UiKit.draw_text(self, Vector2(34.0, 118.0), "N.° %04d  -  DEPTO. DE REVENTONES" % (sim.state.sheets_done + 1), UiKit.font_mono(), 11, UiKit.INK_SOFT)
+	var line: String = ("SELLADOS: %d   ·   PARA SELLAR: %d" if lang == "es" else "STAMPED: %d   ·   READY: %d") % [sim.state.run_buys, ready_count]
+	UiKit.draw_text(self, Vector2(34.0, 118.0), line, UiKit.font_mono_bold(), 11, UiKit.STAMP_RED if ready_count > 0 else UiKit.INK_SOFT)
