@@ -596,8 +596,9 @@ func _late_checks(checks: Array[Array]) -> void:
 	var mid: float = _median(_gaps(2700.0, 12600.0))
 	checks.append(["mediana entre compras 45-210 min", "30-120 s", mid, mid >= 30.0 and mid <= 120.0])
 	checks.append(["máx. sin poder comprar 45-210 min", "<= 180 s", max_dry_gap_late, max_dry_gap_late <= 180.0])
-	checks.append(["llegada al Galpón (min)", "72-108", phase3_time / 60.0, phase3_time >= 72.0 * 60.0 and phase3_time <= 108.0 * 60.0])
-	checks.append(["llegada al Estacionamiento (min)", "120-180", phase4_time / 60.0, phase4_time >= 120.0 * 60.0 and phase4_time <= 180.0 * 60.0])
+	# Sesión 4: el primer reciclado se adelantó ~7 min; las fases siguientes duran lo mismo que antes.
+	checks.append(["llegada al Galpón (min)", "62-100", phase3_time / 60.0, phase3_time >= 62.0 * 60.0 and phase3_time <= 100.0 * 60.0])
+	checks.append(["llegada al Estacionamiento (min)", "105-170", phase4_time / 60.0, phase4_time >= 105.0 * 60.0 and phase4_time <= 170.0 * 60.0])
 	var worst: float = 0.0
 	for r: Vector2 in recoveries:
 		worst = maxf(worst, r.x / maxf(r.y, 1.0))

@@ -173,7 +173,7 @@ func _configure_tool(id: String) -> void:
 
 
 ## Desde cuándo aparece cada especial: la dorada tras el primer reciclado, bomba y línea en el
-## Piso y el eco en el Galpón (antes de eso el jugador todavía está aprendiendo lo básico).
+## Piso y el eco en el Estacionamiento (antes de eso el jugador todavía está aprendiendo lo básico).
 func special_unlocked(t: int) -> bool:
 	match t:
 		TYPE_GOLDEN:
@@ -181,7 +181,7 @@ func special_unlocked(t: int) -> bool:
 		TYPE_BOMB, TYPE_LINE:
 			return phase() >= 2
 		TYPE_ECHO:
-			return phase() >= 3
+			return phase() >= 4
 	return false
 
 

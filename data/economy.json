@@ -19,8 +19,8 @@
   "phase_sheet_starts": [
    8,
    20,
-   40,
-   75
+   56,
+   110
   ],
   "milestone_every": 25,
   "milestone_multiplier": 2.0,
