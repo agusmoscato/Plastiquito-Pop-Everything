@@ -48,7 +48,7 @@
    "balance": {
     "placeholder": true,
     "force": 5.0,
-    "force_per_second": 5.0,
+    "force_per_second": 4.2,
     "radius_cells": 3.0,
     "drag_entry_fraction": 0.4,
     "air_share": 0.6,
@@ -87,7 +87,7 @@
     "force": 1.0,
     "size": 10.0,
     "force_per_second": 30.0,
-    "radius_cells": 5.0,
+    "radius_cells": 3.8,
     "drag_entry_fraction": 1.0,
     "air_share": 0.0,
     "direction_bias": 0.0,
