@@ -26,6 +26,9 @@ var _prev_cursor: Vector2 = Vector2.ZERO
 var _cursor_valid: bool = false
 var _hitstop_bucket: int = 0
 var _demo: bool = false
+var ending: EndingPanel
+var name_prompt: NamePrompt
+var _ending_pop_t: float = 0.0
 var _shots_taken: int = 0
 var _debug: bool = false
 var _was_holding: bool = false
@@ -100,6 +103,23 @@ func _ready() -> void:
 		overlay.mass_pop_requested.connect(_mass_pop)
 		overlay.cheat_pops_requested.connect(func() -> void: sim.state.pops += 1.0e6; sim.state.pops_run += 1.0e6)
 		add_child(overlay)
+	hud.memo_card.suppressed = _has_demo_arg() # las capturas de CI no llevan memos encima (salvo las de historia)
+	ending = EndingPanel.new()
+	ending.setup(sim)
+	ending.finished.connect(func() -> void:
+		hud.set_zen(sim.state.freelance)
+		var frame: EmployeeFrame = world.find_child("EmployeeFrame", true, false) as EmployeeFrame
+		if frame != null:
+			frame.refresh()) # el cuadro recibe el sello EX
+	add_child(ending)
+	name_prompt = NamePrompt.new()
+	name_prompt.setup()
+	name_prompt.done.connect(_on_name_chosen)
+	add_child(name_prompt)
+	PlayerIdentity.try_steam(PlaytestMode.current_tags())
+	if PlayerIdentity.steam_name != "" and sim.state.employee_name == "":
+		sim.state.employee_name = PlayerIdentity.steam_name
+	hud.set_zen(sim.state.freelance and sim.state.ending_done)
 	_add_vignette()
 	_apply_graphics()
 	Settings.graphics_changed.connect(_apply_graphics)
@@ -111,6 +131,7 @@ func _ready() -> void:
 		title.options_menu = pause_menu
 		title.hide_while_open = [hud]
 		title.started.connect(_start_intro)
+		title.started.connect(_ask_name_once)
 		add_child(title)
 	_shown_phase = sim.phase() # sin menú (capturas, bot de humo): el escenario inicial ya cuenta como presentado
 	_add_version_label()
@@ -214,6 +235,8 @@ func _toggle_ui() -> void:
 func _on_key(code: int) -> void:
 	if code == KEY_F3 and overlay != null:
 		overlay.toggle()
+	elif code == KEY_F8 and _debug: # modo DEV: dispara el final (en las builds de jugador solo termina el escenario 7)
+		sim.trigger_ending()
 	elif code == KEY_F9:
 		_toggle_ui()
 	elif code == KEY_F12:
@@ -275,9 +298,38 @@ func request_reload() -> void:
 	world.scenario.tug_roll()
 
 
+## Primera vez, sin Steam: la ficha "¿Cómo te llamás?". Si no se completa queda "Empleado N° 4417".
+func _ask_name_once() -> void:
+	if sim.state.employee_name == "" and not sim.state.story_seen.has("name_asked"):
+		sim.state.story_seen["name_asked"] = true
+		hud.memo_card.suppressed = true
+		name_prompt.open_prompt()
+
+
+func _on_name_chosen(player_name: String) -> void:
+	sim.state.employee_name = player_name
+	hud.memo_card.suppressed = _has_demo_arg()
+
+
+## Mientras pasan los créditos, la lámina se sigue reventando sola.
+func _ending_autopop(delta: float) -> void:
+	_ending_pop_t -= delta
+	if _ending_pop_t > 0.0:
+		return
+	_ending_pop_t = 0.06
+	var idx: int = randi() % sim.sheet.cell_count()
+	var p: Vector2 = sim.grid.cell_to_world(idx)
+	sim.step(0.06, p, true)
+	sim.step(0.001, p, false)
+
+
 func _process(delta: float) -> void:
 	if sim == null:
 		return
+	if sim.ending_pending and not ending.visible:
+		ending.start()
+	if ending.visible and ending.step >= EndingPanel.Step.CREDITS:
+		_ending_autopop(delta)
 	_update_hud_fade(delta)
 	_update_pull(delta)
 	if world.camera_rig.in_intro(): # el plano de presentación: se mira, no se juega
@@ -850,7 +902,44 @@ func _run_demo3(dir: String) -> void:
 		_shot(dir, "38_trabajo_%d" % ph)
 	await _demo_hand(dir)
 	await _demo_orders(dir)
+	await _demo_story(dir)
 	PopAudio.quit_clean()
+
+
+## La historia: memo con credencial, memo del depósito, cuadro de empleado del mes, y el final completo
+## (telegrama, sello EX, créditos, monotributista) disparado como desde el modo DEV.
+func _demo_story(dir: String) -> void:
+	_demo3_phase(1, 1.0e6)
+	hud.memo_card.suppressed = false
+	sim.state.employee_name = "Juan"
+	sim.memo_queue = ["welcome"]
+	await _wait(2.8)
+	_shot(dir, "50_memo_bienvenida")
+	sim.dismiss_memo()
+	_demo3_phase(3, 1.0e6)
+	sim.memo_queue = ["phase_3"]
+	await _wait(2.8)
+	_shot(dir, "51_memo_deposito_cuadro")
+	sim.dismiss_memo()
+	hud.memo_card.suppressed = true
+	sim.trigger_ending()
+	await _wait(3.6)
+	_shot(dir, "53_telegrama")
+	ending._advance()
+	await _wait(2.8)
+	_shot(dir, "54_sello_ex")
+	ending.step = EndingPanel.Step.CREDITS
+	await _wait(3.2)
+	_shot(dir, "55_creditos")
+	ending.step = EndingPanel.Step.FREELANCE
+	await _wait(0.8)
+	_shot(dir, "56_monotributista")
+	ending._finish()
+	await _wait(0.8)
+	_shot(dir, "57_zen_cuadro_ex")
+	hud.set_zen(false)
+	sim.state.freelance = false
+	sim.state.ending_done = false
 
 
 ## Pedido grande (activo, cumplido, vencido), requisitos, herramientas bloqueadas, RUTA y "ya tenés todo".

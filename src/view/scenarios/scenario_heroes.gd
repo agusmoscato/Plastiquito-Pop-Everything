@@ -19,6 +19,7 @@ static var min_bubble_px: float = 10.0
 static var screen_shift: float = 0.144
 static var phase_starts: Array = [8, 20, 56, 80]
 static var _scale_cache: Dictionary = {}
+static var sim_ref: GameSim ## para el cuadro de "Empleado del mes" (nombre y sello EX)
 
 ## Pareja protagonista de cada fase: [archivo, desplazamiento en cm a escala 1, giro].
 const HEROES: Dictionary = {
@@ -39,6 +40,12 @@ static func place(root: Node3D, phase: int, c: Vector2, e: Vector2) -> Node3D:
 	var zone: Rect2 = free_zone(phase, c, e)
 	hero.transform = _placement(hero, cam, zone, s, c, e)
 	root.add_child(hero)
+	if phase == 3 and sim_ref != null: # el cuadro de EMPLEADO DEL MES con tu foto, apoyado junto a la pizarra
+		var frame: EmployeeFrame = EmployeeFrame.new()
+		frame.setup(sim_ref)
+		frame.position = Vector3(-22.0, 0.0, 70.0)
+		frame.rotation_degrees = Vector3(0.0, 8.0, 0.0)
+		hero.add_child(frame)
 	if phase == 4: # el humo del chulengo sale siempre de la parrilla
 		var smoke: GPUParticles3D = ScenarioProps.smoke(hero.position + Vector3(0.0, 95.0 * s, 0.0), s)
 		smoke.set_meta(META_ARG, true)

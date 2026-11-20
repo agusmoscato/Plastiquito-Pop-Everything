@@ -1,0 +1,39 @@
+{
+ "version": 1,
+ "_note": "Historia (sección 7 de la 0.7.0): sos el empleado nuevo de Plastiquito S.R.L. El jefe nunca aparece: habla con memos a máquina. {name} se reemplaza por el nombre del jugador. Cada memo, 2-3 líneas como máximo.",
+ "story": {
+  "company": "Plastiquito S.R.L.",
+  "fallback_name_es": "Empleado N° 4417",
+  "fallback_name_en": "Employee No. 4417",
+  "ranks": [
+   {"recycles": 0, "es": "Pasante", "en": "Intern"},
+   {"recycles": 2, "es": "Reventador Junior", "en": "Junior Popper"},
+   {"recycles": 5, "es": "Reventador Senior", "en": "Senior Popper"},
+   {"recycles": 9, "es": "Jefe de Cuadrilla", "en": "Crew Chief"}
+  ],
+  "memos": {
+   "welcome": {"es": "Hola, {name}. Bienvenido al Departamento de Reventones.\nSu credencial está lista. Su sueldo, en trámite.", "en": "Hello, {name}. Welcome to the Popping Department.\nYour badge is ready. Your salary is pending."},
+   "first_client": {"es": "Primer cliente: Doña Marta. Reviente lo que haya sobre la mesa.\nNo toque el mate.", "en": "First client: Mrs. Marta. Pop whatever is on the table.\nDo not touch the mate."},
+   "first_recycle": {"es": "Reciclar es empezar de nuevo con orgullo.\nLos Pellets son suyos. La lámina, de la empresa.", "en": "Recycling is starting over with pride.\nThe Pellets are yours. The sheet belongs to the company."},
+   "phase_2": {"es": "Los Gómez piden rapidez y discreción. Hay partido.\nCuidado con la pelota.", "en": "The Gómez family wants speed and discretion. There is a match on.\nMind the ball."},
+   "phase_3": {"es": "Don Tito tiene mercadería frágil. El film térmico no se derrite con la plancha.\nSe le colgó un cuadro en la pared.", "en": "Don Tito has fragile goods. Thermal film does not melt under the iron.\nA picture was hung on the wall for you."},
+   "phase_4": {"es": "El Club exige un asado sin humo. Es imposible.\nTrabaje igual.", "en": "The Club demands a smokeless barbecue. Impossible.\nWork anyway."},
+   "big_done": {"es": "Pedido grande cumplido. El sello se le descontará de la vianda.", "en": "Big order done. The stamp will be deducted from your lunch."},
+   "big_failed": {"es": "Pedido vencido. Se descontó de sus Pops.\nNo es personal: es contable.", "en": "Big order expired. It was deducted from your Pops.\nNot personal: accounting."},
+   "promotion": {"es": "Ascenso: ahora usted es {rank}.\nEl ascenso no incluye aumento.", "en": "Promotion: you are now {rank}.\nThe promotion does not include a raise."},
+   "freelance": {"es": "Su relación con la empresa ha concluido.\nPuede seguir reventando por su cuenta. Facture.", "en": "Your relationship with the company has ended.\nYou may keep popping on your own. Invoice us."}
+  },
+  "telegram": {
+   "header_es": "TELEGRAMA COLACIONADO",
+   "header_en": "COLLATED TELEGRAM",
+   "body_es": "POR LA PRESENTE SE LE COMUNICA QUE, HABIENDO REVENTADO LA TOTALIDAD DEL STOCK DE BURBUJAS DE LA EMPRESA, SE PRESCINDE DE SUS SERVICIOS A PARTIR DE LA FECHA. SÍRVASE RETIRAR SUS PERTENENCIAS (UN MATE). STOP. SALUDA ATTE. LA GERENCIA.",
+   "body_en": "THIS IS TO INFORM YOU THAT, HAVING POPPED THE ENTIRE BUBBLE STOCK OF THE COMPANY, YOUR SERVICES ARE NO LONGER REQUIRED AS OF TODAY. PLEASE COLLECT YOUR BELONGINGS (ONE MATE CUP). STOP. REGARDS. MANAGEMENT.",
+   "stamp_es": "EX",
+   "stamp_en": "EX"
+  },
+  "freelance_title_es": "AHORA SOS MONOTRIBUTISTA",
+  "freelance_title_en": "NOW YOU ARE SELF-EMPLOYED",
+  "credits_es": ["PLASTIQUITO: POP EVERYTHING", "Un juego de reventar burbujas", "Diseño, programación y arte: el equipo", "Sonidos propios y CC0 · Tipografías OFL", "Gracias por reventar todo."],
+  "credits_en": ["PLASTIQUITO: POP EVERYTHING", "A bubble-popping game", "Design, code and art: the team", "Own and CC0 sounds · OFL typefaces", "Thanks for popping everything."]
+ }
+}

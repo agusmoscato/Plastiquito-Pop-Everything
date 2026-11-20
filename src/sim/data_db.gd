@@ -13,6 +13,7 @@ const UPGRADES_FILE: String = "upgrades.json"
 const ECONOMY_FILE: String = "economy.json"
 const ACCESSORIES_FILE: String = "accessories.json"
 const BIG_ORDERS_FILE: String = "big_orders.json"
+const STORY_FILE: String = "story.json"
 
 ## Campos requeridos y su tipo (TYPE_*) por archivo.
 const PHASE_FIELDS: Dictionary = {
@@ -84,6 +85,11 @@ const BIG_ORDER_FIELDS: Dictionary = {
 	"reward_pellets": TYPE_INT, "client_es": TYPE_STRING, "client_en": TYPE_STRING, "title_es": TYPE_STRING, "title_en": TYPE_STRING,
 	"text_es": TYPE_STRING, "text_en": TYPE_STRING,
 }
+const STORY_FIELDS: Dictionary = {
+	"company": TYPE_STRING, "fallback_name_es": TYPE_STRING, "fallback_name_en": TYPE_STRING, "ranks": TYPE_ARRAY,
+	"memos": TYPE_DICTIONARY, "telegram": TYPE_DICTIONARY, "freelance_title_es": TYPE_STRING, "freelance_title_en": TYPE_STRING,
+	"credits_es": TYPE_ARRAY, "credits_en": TYPE_ARRAY,
+}
 const TOOL_SHAPES: PackedStringArray = ["cell", "circle", "segment", "rect"]
 
 var phases: Array[Dictionary] = []
@@ -96,6 +102,7 @@ var upgrades: Array[Dictionary] = []
 var economy: Dictionary = {}
 var accessories: Array[Dictionary] = []
 var big_orders: Array[Dictionary] = []
+var story: Dictionary = {}
 var errors: PackedStringArray = PackedStringArray()
 
 
@@ -112,6 +119,7 @@ func load_all(dir: String = "res://data") -> bool:
 	economy = _load_section(dir.path_join(ECONOMY_FILE), "economy", ECONOMY_FIELDS)
 	accessories = _load_list(dir.path_join(ACCESSORIES_FILE), "accessories", ACCESSORY_FIELDS)
 	big_orders = _load_list(dir.path_join(BIG_ORDERS_FILE), "orders", BIG_ORDER_FIELDS)
+	story = _load_section(dir.path_join(STORY_FILE), "story", STORY_FIELDS)
 	_validate_phases()
 	_validate_tools()
 	_validate_bubbles()

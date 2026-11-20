@@ -54,6 +54,7 @@ func _ready() -> void:
 ## Modo juego: usa la lámina de GameSim. Llamar después de agregar el nodo al árbol.
 func attach(sim: GameSim) -> void:
 	game = sim
+	ScenarioHeroes.sim_ref = sim
 	camera_rig.screen_shift = 0.144
 	camera_rig.work_mode = true # el juego trabaja de cerca y sigue a la herramienta
 	rebind_game_sheet(false)

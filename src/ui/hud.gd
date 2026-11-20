@@ -32,6 +32,8 @@ var bubble_log: BubbleLog
 var special_card: SpecialCard
 var encargo_ticket: EncargoTicket
 var big_ticket: BigOrderTicket
+var memo_card: MemoCard
+var _zen: bool = false
 var _intro_timer: float = 0.0
 
 var _tool_buttons: Dictionary = {} ## id -> StampButton
@@ -81,6 +83,9 @@ func setup(p_sim: GameSim, p_camera: Camera3D) -> void:
 	big_ticket = BigOrderTicket.new()
 	big_ticket.setup(sim)
 	root.add_child(big_ticket)
+	memo_card = MemoCard.new()
+	memo_card.setup(sim)
+	root.add_child(memo_card)
 	combo = ComboMeter.new()
 	combo.setup()
 	root.add_child(combo)
@@ -141,6 +146,15 @@ func setup(p_sim: GameSim, p_camera: Camera3D) -> void:
 	pops_panel.odometer.set_target(sim.state.pops)
 	pops_panel.odometer.snap()
 	work_order.refresh()
+
+
+## Modo zen "AHORA SOS MONOTRIBUTISTA" (después del final): sin números, trabajás por tu cuenta.
+func set_zen(on: bool) -> void:
+	_zen = on
+
+
+func is_zen() -> bool:
+	return _zen
 
 
 func is_modal_open() -> bool:
@@ -230,6 +244,7 @@ func _layout() -> void:
 	work_order.position = Vector2(20.0, 148.0)
 	encargo_ticket.position = Vector2(20.0, 148.0 + work_order.size.y + 10.0)
 	big_ticket.position = Vector2(20.0, encargo_ticket.position.y + encargo_ticket.size.y + 10.0)
+	memo_card.position = Vector2(vp.x - SHOP_W - 6.0 - memo_card.size.x - 12.0, 214.0)
 	shop.position = Vector2(vp.x - SHOP_W - 6.0, 8.0)
 	combo.position = Vector2(14.0, vp.y - 110.0)
 	night_stamp.position = Vector2(18.0, vp.y - 178.0)
@@ -495,6 +510,9 @@ func _process(delta: float) -> void:
 		_layout()
 	_update_toolbar()
 	_update_recycle_button()
+	if _zen:
+		for c: Control in [pops_panel, work_order, encargo_ticket, big_ticket, shop, combo, _recycle_button, _log_button, _route_button, _reload_button]:
+			c.visible = false
 	_update_intros(delta)
 	_reload_button.visible = sim.awaiting_reload and not is_modal_open()
 	if _reload_button.visible: # late para que se note: la lámina está terminada

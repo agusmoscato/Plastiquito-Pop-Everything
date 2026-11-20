@@ -13,6 +13,9 @@ var db: DataDB
 var upgrades: Upgrades
 var acc: Accessories
 var big: BigOrder
+var story: Story
+var memo_queue: Array[String] = [] ## memos esperando (el primero se muestra; un clic lo cierra)
+var ending_pending: bool = false ## hay que mostrar la secuencia final (telegrama, sello EX, créditos)
 var acc_fx: Dictionary = {} ## efectos de los accesorios equipados (Accessories.aggregate)
 var state: GameState = GameState.new()
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
@@ -89,6 +92,7 @@ func _init(p_db: DataDB, seed_value: int = 1) -> void:
 	upgrades = Upgrades.new(db)
 	acc = Accessories.new(db)
 	big = BigOrder.new(db)
+	story = Story.new(db)
 	rng.seed = seed_value
 	combo.configure(eco)
 	refresh_stats()
@@ -449,6 +453,7 @@ func step(dt: float, pointer: Vector2, pressing: bool) -> void:
 	_track_encargo()
 	_track_rate(dt)
 	_track_big(dt)
+	_track_story()
 
 
 ## Gasta el desgaste de la herramienta en uso y deja descansar a las demás.
@@ -619,6 +624,62 @@ func _collect_events(auto: bool, direct: int = 0) -> void:
 		state.pops_total += v
 		_rate_acc += v
 	_credit_tools(auto, sum_a, sum_b)
+
+
+## Memos de la historia: bienvenida, primer cliente, primer reciclado, cada escenario nuevo, cada pedido grande
+## y cada ascenso. "Una vez" se recuerda en el guardado; el final solo se dispara con `trigger_ending()`.
+func _track_story() -> void:
+	_once("welcome")
+	_once("first_client")
+	if state.recycles >= 1:
+		_once("first_recycle")
+	for ph: int in range(2, 5):
+		if phase() >= ph:
+			_once("phase_%d" % ph)
+	if ev_big_done:
+		memo_queue.append("big_done")
+	if ev_big_failed:
+		memo_queue.append("big_failed")
+	var rank: int = story.rank_index(state.recycles)
+	if rank > state.last_rank:
+		state.last_rank = rank
+		memo_queue.append("promotion")
+
+
+func _once(id: String) -> void:
+	if not state.story_seen.has(id):
+		state.story_seen[id] = true
+		memo_queue.append(id)
+
+
+func current_memo() -> String:
+	return memo_queue[0] if not memo_queue.is_empty() else ""
+
+
+func dismiss_memo() -> void:
+	if not memo_queue.is_empty():
+		memo_queue.pop_front()
+
+
+## El nombre del empleado para los textos (el de Steam o de la ficha; si no, "Empleado N° 4417").
+func player_name(lang: String) -> String:
+	return state.employee_name if state.employee_name != "" else story.fallback_name(lang)
+
+
+func memo_text_now(lang: String) -> String:
+	var id: String = current_memo()
+	return story.memo_text(id, lang, player_name(lang), story.rank_name(state.last_rank, lang)) if id != "" else ""
+
+
+## FINAL: reventaste todo el plástico del mundo y la empresa se quedó sin mercadería. En las builds de
+## jugador se dispara al terminar el escenario 7 (todavía no existe); el modo DEV lo dispara con F8.
+func trigger_ending() -> void:
+	if state.ending_done:
+		return
+	ending_pending = true
+	state.ending_done = true
+	state.freelance = true # después del final se desbloquea el modo "AHORA SOS MONOTRIBUTISTA"
+	memo_queue.clear()
 
 
 func _count_material(cells: PackedInt32Array, mat: int) -> int:

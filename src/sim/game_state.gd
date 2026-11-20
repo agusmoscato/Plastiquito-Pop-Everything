@@ -31,6 +31,11 @@ var big: Dictionary = {} ## pedido grande en curso (BigOrder): fase, estado, pla
 var big_done: Dictionary = {} ## fase (como String) -> true: pedidos grandes cumplidos (permanentes)
 var phase_sheets: int = 0 ## láminas terminadas en el escenario actual (dispara el pedido grande)
 var latched: Dictionary = {} ## requisitos de escenario ya demostrados ("fase:tool", "fase:rate")
+var story_seen: Dictionary = {} ## memos "una vez" ya mostrados
+var employee_name: String = "" ## nombre del empleado (Steam o la ficha); solo local, nunca se sube
+var last_rank: int = 0 ## cargo mostrado por última vez (para el memo de ascenso)
+var ending_done: bool = false ## ya te echaron (final visto)
+var freelance: bool = false ## modo zen "AHORA SOS MONOTRIBUTISTA": se desbloquea después del final
 var acc_owned: Dictionary = {} ## accesorios comprados (id -> true); permanentes, sobreviven al reciclado
 var acc_equipped: Dictionary = {} ## ranura (ring0, ring1, ring2, bracelet, watch, glove) -> id de accesorio
 
@@ -66,6 +71,8 @@ func to_dict() -> Dictionary:
 		"streak": streak, "encargo": encargo.duplicate(),
 		"acc_owned": acc_owned.duplicate(), "acc_equipped": acc_equipped.duplicate(),
 		"big": big.duplicate(true), "big_done": big_done.duplicate(), "phase_sheets": phase_sheets, "latched": latched.duplicate(),
+		"story_seen": story_seen.duplicate(), "employee_name": employee_name, "last_rank": last_rank,
+		"ending_done": ending_done, "freelance": freelance,
 	}
 
 
@@ -115,6 +122,12 @@ func from_dict(data: Dictionary) -> bool:
 	phase_sheets = Cfg.integer(d, "phase_sheets")
 	var lt: Dictionary = d["latched"]
 	latched = lt.duplicate()
+	var ss: Dictionary = d["story_seen"]
+	story_seen = ss.duplicate()
+	employee_name = str(d["employee_name"])
+	last_rank = Cfg.integer(d, "last_rank")
+	ending_done = d["ending_done"] == true
+	freelance = d["freelance"] == true
 	return true
 
 
@@ -161,13 +174,18 @@ static func migrate(data: Dictionary) -> Dictionary:
 		d["big_done"] = {}
 		d["phase_sheets"] = 0
 		d["latched"] = {}
+		d["story_seen"] = {}
+		d["employee_name"] = ""
+		d["last_rank"] = 0
+		d["ending_done"] = false
+		d["freelance"] = false
 		version = 6
 	if version != SAVE_VERSION:
 		return {}
 	for key: String in ["pops", "pops_run", "pops_total", "pellets", "levels", "perm", "discovered",
 			"selected_tool", "playtime_s", "run_time_s", "recycles", "first_recycle_s", "max_chain",
 			"sheets_done", "tool_pops", "sheet", "last_levels", "saved_at_unix", "max_unix_seen", "offline_total", "run_buys",
-			"streak", "encargo", "acc_owned", "acc_equipped", "big", "big_done", "phase_sheets", "latched"]:
+			"streak", "encargo", "acc_owned", "acc_equipped", "big", "big_done", "phase_sheets", "latched", "story_seen", "employee_name", "last_rank", "ending_done", "freelance"]:
 		if not d.has(key):
 			return {}
 	return d
