@@ -52,6 +52,8 @@ func refresh() -> void:
 		reqs = sim.phase_requirements()
 	if not (goal in ["hold", "reload", "palm"]) and sim.nothing_left_to_buy():
 		why = Tx.t("nothing_left") % Tx.t("client_%d" % sim.phase())
+		if not sim.phase_gate_ok(): # compraste todo, pero todavía falta algo para abrir el siguiente escenario
+			why = Tx.t("nothing_left_blocked")
 	elif goal == "phase" and not reqs.is_empty() and not sim.phase_gate_ok():
 		why = Tx.t("why_requirements")
 	size.y = 142.0 + 17.0 * float(reqs.size()) + (6.0 if not reqs.is_empty() else 0.0)
@@ -97,7 +99,7 @@ func _draw() -> void:
 	draw_circle(Vector2(size.x * 0.5 - 3.0, 8.0), 2.0, Color(1, 1, 1, 0.6))
 	UiKit.draw_text(self, Vector2(20.0, 44.0), Tx.t("work_order"), UiKit.font_mono_bold(), 11, UiKit.INK_SOFT)
 	UiKit.draw_text(self, Vector2(20.0, 68.0), title.to_upper(), UiKit.font_title(), 16, UiKit.INK)
-	UiKit.draw_text(self, Vector2(20.0, 88.0), why, UiKit.font_text(), 12, UiKit.INK_SOFT)
+	UiKit.draw_text(self, Vector2(20.0, 88.0), why, UiKit.font_text(), UiKit.fit_size(UiKit.font_text(), why, 12, size.x - 44.0), UiKit.INK_SOFT)
 	UiKit.draw_ink_bar(self, Rect2(Vector2(20.0, 102.0), Vector2(size.x - 48.0, 12.0)), ratio, UiKit.STAMP_RED if ratio >= 1.0 else UiKit.INK)
 	UiKit.draw_text(self, Vector2(20.0, 132.0), detail, UiKit.font_mono(), 12, UiKit.INK)
 	UiKit.draw_text(self, Vector2(size.x - 80.0, 132.0), "%d%%" % int(ratio * 100.0), UiKit.font_mono_bold(), 12, UiKit.STAMP_RED, HORIZONTAL_ALIGNMENT_RIGHT, 52.0)

@@ -70,7 +70,7 @@ func _draw() -> void:
 	var progress: float = Cfg.num(st, "progress") if not st.is_empty() else 0.0
 	var ratio: float = clampf(progress / float(maxi(target, 1)), 0.0, 1.0)
 	UiKit.draw_ink_bar(self, Rect2(Vector2(ox, 100.0), Vector2(rect.size.x - 100.0, 10.0)), ratio, UiKit.STAMP_RED if ratio >= 1.0 else UiKit.INK)
-	UiKit.draw_text(self, Vector2(ox, 128.0), "%d / %d" % [int(progress), target], UiKit.font_mono(), 12, UiKit.INK)
+	UiKit.draw_text(self, Vector2(ox, 128.0), "%d / %d" % [mini(int(progress), target), target], UiKit.font_mono(), 12, UiKit.INK)
 	var left: float = maxf(Cfg.num(st, "left"), 0.0) if not st.is_empty() else 0.0
 	var total: float = maxf(sim.big.seconds(st, sim.big_order_time_mult()), 1.0) if not st.is_empty() else 1.0
 	var urgent: bool = left < 15.0 and _stamp_t <= 0.0

@@ -43,9 +43,8 @@ for name, glb in PROPS.items():
     sc.render.film_transparent = True
     sc.render.image_settings.file_format = "PNG"
     sc.render.image_settings.color_mode = "RGBA"
-    sc.render.use_freestyle = True
-    sc.view_layers[0].freestyle_settings.linesets.new("l") if not sc.view_layers[0].freestyle_settings.linesets else None
-    sc.render.line_thickness = 1.6
+    sc.render.use_freestyle = False
+    sc.world = None
     sc.render.filepath = os.path.join(ROOT, "assets", "icons", name + ".png")
     bpy.ops.render.render(write_still=True)
     print("ICON", name)

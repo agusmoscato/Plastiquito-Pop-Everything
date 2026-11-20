@@ -104,6 +104,7 @@ const T: Dictionary = {
 	"phase_4": {"es": "el Estacionamiento", "en": "the Parking lot"},
 	"why_phase": {"es": "Reciclá para juntar Pellets: abren la lámina más grande.", "en": "Recycle to earn Pellets: they open the bigger sheet."},
 	"nothing_left": {"es": "Ya tenés todo en %s. Reciclá para ir al próximo cliente.", "en": "You have everything at %s. Recycle to reach the next client."},
+	"nothing_left_blocked": {"es": "Nada más para comprar: cumplí los requisitos de abajo.", "en": "Nothing left to buy: meet the requirements below."},
 	"why_requirements": {"es": "Para abrir el próximo escenario faltan requisitos.", "en": "Requirements missing to open the next scenario."},
 	"client_1": {"es": "la cocina de Doña Marta", "en": "Mrs. Marta's kitchen"},
 	"client_2": {"es": "el living de los Gómez", "en": "the Gómez living room"},
