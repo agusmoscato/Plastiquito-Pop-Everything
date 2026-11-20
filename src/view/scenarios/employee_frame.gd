@@ -18,7 +18,7 @@ func setup(p_sim: GameSim) -> void:
 	_viewport = SubViewport.new()
 	_viewport.size = TEX_SIZE
 	_viewport.transparent_bg = true
-	_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
+	_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS # el cuadro es chico: se redibuja siempre (así la foto y los textos nunca quedan en blanco)
 	add_child(_viewport)
 	_canvas = FrameCanvas.new()
 	_canvas.sim = p_sim

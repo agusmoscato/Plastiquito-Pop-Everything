@@ -94,6 +94,8 @@ func _draw_hourglass(c: Vector2, sand: float, col: Color) -> void:
 	var h: float = 15.0
 	draw_polyline(PackedVector2Array([c + Vector2(-w, -h), c + Vector2(w, -h), c, c + Vector2(-w, h), c + Vector2(w, h), c, c + Vector2(-w, -h)]), col, 1.6)
 	var top: float = h * sand
-	draw_colored_polygon(PackedVector2Array([c + Vector2(-w * sand, -top), c + Vector2(w * sand, -top), c + Vector2(0.0, 0.0)]), Color(col.r, col.g, col.b, 0.55))
+	if sand > 0.03:
+		draw_colored_polygon(PackedVector2Array([c + Vector2(-w * sand, -top), c + Vector2(w * sand, -top), c + Vector2(0.0, 0.0)]), Color(col.r, col.g, col.b, 0.55))
 	var bot: float = h * (1.0 - sand)
-	draw_colored_polygon(PackedVector2Array([c + Vector2(-w * (1.0 - sand), h), c + Vector2(w * (1.0 - sand), h), c + Vector2(0.0, h - bot)]), Color(col.r, col.g, col.b, 0.55))
+	if sand < 0.97:
+		draw_colored_polygon(PackedVector2Array([c + Vector2(-w * (1.0 - sand), h), c + Vector2(w * (1.0 - sand), h), c + Vector2(0.0, h - bot)]), Color(col.r, col.g, col.b, 0.55))

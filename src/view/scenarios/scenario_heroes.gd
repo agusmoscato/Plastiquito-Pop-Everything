@@ -29,7 +29,7 @@ const HEROES: Dictionary = {
 	3: [["prop_cajon", Vector3(0.0, 0.0, 0.0), 90.0], ["prop_garrafa", Vector3(4.0, 0.0, -48.0), 30.0], ["prop_pizarra", Vector3(4.0, 0.0, 44.0), 0.0], ["prop_bolsa", Vector3(-16.0, 0.0, 22.0), 0.0],
 		["prop_lampara", Vector3(-30.0, 80.0, 10.0), 0.0]],
 	4: [["prop_chulengo", Vector3(0.0, 0.0, 0.0), 180.0], ["prop_conservadora", Vector3(-10.0, 0.0, 62.0), 15.0],
-		["prop_paredon", Vector3(4.0, 0.0, -96.0), 0.0], ["prop_silla", Vector3(-46.0, 0.0, 30.0), 200.0], ["prop_silla", Vector3(40.0, 0.0, 74.0), 150.0]],
+		["prop_paredon", Vector3(36.0, 0.0, -50.0), 0.0], ["prop_silla", Vector3(-46.0, 0.0, 30.0), 200.0], ["prop_silla", Vector3(40.0, 0.0, 74.0), 150.0]],
 }
 
 
@@ -46,7 +46,7 @@ static func place(root: Node3D, phase: int, c: Vector2, e: Vector2) -> Node3D:
 	if phase == 3 and sim_ref != null: # el cuadro de EMPLEADO DEL MES con tu foto, apoyado junto a la pizarra
 		var frame: EmployeeFrame = EmployeeFrame.new()
 		frame.setup(sim_ref)
-		frame.position = Vector3(-22.0, 0.0, 70.0)
+		frame.position = Vector3(-4.0, 0.0, 104.0)
 		frame.rotation_degrees = Vector3(0.0, 8.0, 0.0)
 		hero.add_child(frame)
 	if phase == 4: # el humo del chulengo sale siempre de la parrilla
