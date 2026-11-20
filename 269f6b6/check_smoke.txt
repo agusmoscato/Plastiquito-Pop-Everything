@@ -1,0 +1,6 @@
+FALLÓ smoke (exit_code=0)
+      1 52:ERROR: 2 resources still in use at exit (run with --verbose for details).
+      1 4:SCRIPT ERROR: Invalid access to property or key 'open_panel' on a base object of type 'Nil'.
+      1 47:ERROR: 1 RID allocations of type 'N10RendererRD15MaterialStorage6ShaderE' were leaked at exit.
+      1 46:ERROR: 1 RID allocations of type 'N10RendererRD15MaterialStorage8MaterialE' were leaked at exit.
+      1 44:ERROR: 1 shaders of type CanvasShaderRD were never freed
