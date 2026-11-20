@@ -31,13 +31,21 @@ func test_hands_and_roller_never_tire() -> void:
 	assert_eq(sim.wear_fraction("hands"), 0.0)
 
 
+## Usa la plancha a rachas hasta que se recaliente (como mucho 4 minutos de uso).
+func _overheat_iron() -> void:
+	for k: int in 12:
+		_drive("iron", 20.0)
+		if sim.tool_locked("iron"):
+			return
+
+
 func test_iron_overheats_and_locks() -> void:
-	_drive("iron", 30.0)
+	_overheat_iron()
 	assert_true(sim.tool_locked("iron"), "la plancha se recalienta y se traba")
 
 
 func test_iron_cools_down_when_resting() -> void:
-	_drive("iron", 30.0)
+	_overheat_iron()
 	assert_true(sim.tool_locked("iron"))
 	sim.select_tool("finger")
 	for i: int in 400:
@@ -47,7 +55,7 @@ func test_iron_cools_down_when_resting() -> void:
 
 
 func test_locked_tool_does_not_pop() -> void:
-	_drive("iron", 30.0)
+	_overheat_iron()
 	var before: float = sim.state.pops
 	sim.step(0.033, sim.center(), true)
 	assert_eq(sim.state.pops, before, "trabada no reviente nada")

@@ -26,6 +26,8 @@ var grid: HexGrid
 var chain: ChainSolver
 var tools: Dictionary = {} ## id -> ToolModel
 var wear: Dictionary[String, WearModel] = {} ## id -> WearModel (desgaste: plancha que se recalienta, bota que cansa...)
+var _fresh_tool: String = ""
+var _fresh_since: float = 0.0
 var ev_tool_locked: String = "" ## herramienta que se trabó en este paso (la vista suena y echa humo)
 var hands: HandsModel
 var roller: AutoRoller
@@ -229,6 +231,9 @@ func _configure_wear(id: String) -> void:
 	var cap_mult: float = 1.0 + Accessories.per(acc_fx, "wear_capacity", id)
 	var rec_mult: float = 1.0 + Accessories.per(acc_fx, "wear_recover", id) + Accessories.per(acc_fx, "wear_recover", "all")
 	var drain_mult: float = maxf(0.2, 1.0 + Accessories.per(acc_fx, "wear_drain", id))
+	if w.has("size_drain"): # la palma se cansa más rápido cuanto más grande es la lámina (por cada duplicación del área)
+		var doublings: float = maxf(0.0, log(float(sheet.cell_count()) / 400.0) / log(2.0))
+		drain_mult *= 1.0 + Cfg.num(w, "size_drain") * doublings
 	wm.configure(Cfg.num(w, "capacity") * k * cap_mult, Cfg.num(w, "drain") * drain_mult, Cfg.num(w, "recover") * k * rec_mult, Cfg.num(w, "resume"))
 
 
@@ -408,6 +413,13 @@ func step(dt: float, pointer: Vector2, pressing: bool) -> void:
 	var dir: Vector2 = Vector2.ZERO
 	idle_s = 0.0 if pressing else idle_s + dt
 	var wm: WearModel = wear[state.selected_tool]
+	var wear_cfg: Dictionary = eco["wear"]
+	var tired: float = Cfg.num(wear_cfg, "tired_penalty")
+	if state.selected_tool != _fresh_tool:
+		_fresh_tool = state.selected_tool
+		_fresh_since = now
+	var fresh: float = Cfg.num(wear_cfg, "fresh_bonus") * exp(-(now - _fresh_since) / Cfg.num(wear_cfg, "fresh_seconds"))
+	tm.fatigue_mult = (1.0 - tired * pow(wm.fraction(), 1.5)) * (1.0 + fresh) # cansada rinde menos; recién agarrada, más: alternar paga
 	var live: bool = reload_timer < 0.0 and wm.available()
 	var click_only: bool = not hold_unlocked()
 	var press_edge: bool = pressing and not _prev_pressing

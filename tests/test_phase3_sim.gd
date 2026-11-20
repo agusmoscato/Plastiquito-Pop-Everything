@@ -392,6 +392,7 @@ func _iron_sim(seed_value: int) -> GameSim:
 	sim.state.levels["global_hold"] = 1
 	sim.refresh_stats()
 	sim.new_sheet()
+	sim.sheet.material.fill(0) # esta prueba es de la plancha sola: sin películas térmicas ni burbujas frías o pesadas
 	assert_true(sim.select_tool("iron"))
 	return sim
 
@@ -406,7 +407,7 @@ func test_still_iron_burns_plastic_without_value() -> void:
 	assert_gt(burned, 0, "quieta más de iron_burn_after_seconds, derrite el plástico")
 	var pops_before: float = sim.state.pops
 	var more: int = 0
-	for i: int in 15:
+	for i: int in 8: # (más tiempo, la plancha empieza a aplastar de a poco incluso quieta)
 		sim.step(1.0 / 30.0, c + Vector2(0.2, 0.0), true) # sigue casi quieta
 		more += sim.ev_burned.size()
 	assert_eq(sim.state.pops, pops_before, "lo derretido no da Pops")

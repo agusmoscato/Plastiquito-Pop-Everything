@@ -17,6 +17,7 @@ var sheet: SheetModel
 var grid: HexGrid
 var shape: String = SHAPE_SINGLE
 var force_per_second: float = 8.0
+var fatigue_mult: float = 1.0 ## una herramienta cansada rinde menos antes de trabarse (GameSim lo actualiza)
 var resistance: float = 1.0
 var recovery_per_second: float = 1.5
 ## Fracción de la resistencia que recibe al instante una celda a la que se entra arrastrando.
@@ -341,7 +342,7 @@ func _press_cell(idx: int, delta: float, entered_dragging: bool, changed: Packed
 	var before: float = sheet.press[idx]
 	if before <= 0.0 and not _active.has(idx):
 		new_pressed += 1
-	var gain: float = force_per_second * delta * _material_factor(idx)
+	var gain: float = force_per_second * delta * _material_factor(idx) * fatigue_mult
 	if entered_dragging:
 		gain += drag_entry_fraction * resistance
 	var value: float = before + gain

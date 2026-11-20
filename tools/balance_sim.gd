@@ -25,6 +25,7 @@ var click_cell: int = -1
 var reload_wait: float = -1.0 ## segundos que tarda el bot en tirar la lámina nueva del rollo
 var manual_reloads: int = 0
 var big_done_count: int = 0
+var phase_seconds: Dictionary[int, float] = {} ## tiempo jugado en cada escenario (el reparto de herramientas solo cuenta los de >= 20 min)
 var big_failed_count: int = 0
 var big_first_try_by_phase: Dictionary[int, int] = {} ## por escenario: 1 si se cumplió al primer intento, 0 si no
 
@@ -346,11 +347,31 @@ func _material_share(mat: int) -> float:
 	return float(n) / float(sim.sheet.cell_count())
 
 
+## Un jugador no usa la misma herramienta todo el rato (manos frescas rinden más): cada `rotate_s` segundos pasa a
+## la siguiente descansada de la lista.
+const ROTATE_S: float = 40.0
+var _tool_since: float = 0.0
+var _last_picked: String = ""
+
+
 func _pick_tool() -> void:
-	for id: String in ["boot", "iron", "rolling_pin", "palm", "finger"]:
+	var order: Array[String] = ["boot", "iron", "rolling_pin", "palm", "finger"]
+	if sim.now - _tool_since >= ROTATE_S and profile != "solo_recicla":
+		var ok: Array[String] = []
+		for cand: String in order:
+			if _rested_enough(cand) and cand != "finger":
+				ok.append(cand)
+		if ok.size() > 1:
+			var cur: int = ok.find(sim.state.selected_tool)
+			order = [ok[(cur + 1) % ok.size()]]
+		_tool_since = sim.now
+	for id: String in order:
 		if not _rested_enough(id):
 			continue
 		if sim.select_tool(id):
+			if id != _last_picked:
+				_tool_since = sim.now
+				_last_picked = id
 			if not tool_used.has(id):
 				tool_used[id] = sim.now
 				if id == "rolling_pin" or id == "iron" or id == "boot":
@@ -551,6 +572,7 @@ func _purchase(id: String) -> void:
 # --- Seguimiento --------------------------------------------------------------------------
 
 func _after_step(_was_phase: int) -> void:
+	phase_seconds[sim.phase()] = (phase_seconds[sim.phase()] if phase_seconds.has(sim.phase()) else 0.0) + dt
 	if sim.ev_big_done and not big_first_try_by_phase.has(sim.phase()):
 		var tries: int = sim.state.big.get("tries", 0)
 		big_first_try_by_phase[sim.phase()] = 1 if tries == 0 else 0
@@ -766,7 +788,8 @@ func _tool_share_checks(checks: Array[Array]) -> void:
 			line += " %s %.0f" % [id, share]
 			best_share[id] = maxf(_bs(best_share, id), share)
 			mx = maxf(mx, share)
-		if ph >= 3:
+		var played: float = phase_seconds[ph] if phase_seconds.has(ph) else 0.0
+		if ph >= 3 and played >= 1200.0: # un escenario de pocos minutos no mide el reparto
 			worst_max = maxf(worst_max, mx)
 			auto_late.append(100.0 * (_tv("%d:hands" % ph) + _tv("%d:auto_roller" % ph)) / total)
 		print(line)

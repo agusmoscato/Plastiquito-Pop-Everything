@@ -93,20 +93,23 @@
   "tool_matrix": {
    "_note": "Herramienta x material -> multiplicador de fuerza (0 = no la afecta). Materiales: thermal (film térmico), cold (fría: la plancha la ablanda al pasar), heavy (pesada/gigante). auto_roller y hands: multiplicador de valor del reventón.",
    "finger": {"thermal": 0.25, "cold": 0.35, "heavy": 0.15},
-   "palm": {"thermal": 0.25, "cold": 0.35, "heavy": 0.18},
-   "rolling_pin": {"thermal": 1.5, "cold": 0.5, "heavy": 0.6},
+   "palm": {"thermal": 0.12, "cold": 0.35, "heavy": 0.08},
+   "rolling_pin": {"thermal": 0.7, "cold": 0.4, "heavy": 0.3},
    "iron": {"thermal": 0.0, "cold": 1.0, "heavy": 0.2},
-   "boot": {"thermal": 1.6, "cold": 0.8, "heavy": 2.6},
+   "boot": {"thermal": 1.0, "cold": 0.8, "heavy": 1.15},
    "auto_roller": {"thermal": 2.0, "cold": 1.5, "heavy": 1.0},
    "hands": {"thermal": 0.6, "cold": 0.6, "heavy": 0.6}
   },
   "wear": {
    "_note": "Desgaste por herramienta (WearModel). capacity en segundos de uso (en pisotones para la bota); recover por segundo de descanso; resume = fracción a la que se destraba. Las mejoras de velocidad suben capacidad y recuperación (speed_gain por nivel) pero nunca quitan el límite. Manitos y rodillo no se cansan.",
    "speed_gain": 0.08,
+   "tired_penalty": 0.6,
+   "fresh_bonus": 0.3,
+   "fresh_seconds": 15.0,
    "finger": {"capacity": 120.0, "drain": 1.0, "recover": 4.0, "resume": 0.5},
-   "palm": {"capacity": 20.0, "drain": 1.0, "recover": 1.2, "resume": 0.5},
-   "rolling_pin": {"capacity": 18.0, "drain": 1.0, "recover": 1.2, "resume": 0.5},
-   "iron": {"capacity": 7.0, "drain": 1.0, "recover": 0.6, "resume": 0.3},
+   "palm": {"capacity": 20.0, "drain": 1.0, "recover": 1.2, "resume": 0.5, "size_drain": 0.2},
+   "rolling_pin": {"capacity": 12.0, "drain": 1.0, "recover": 1.0, "resume": 0.5, "size_drain": 1.4},
+   "iron": {"capacity": 9.0, "drain": 1.0, "recover": 0.6, "resume": 0.3},
    "boot": {"capacity": 4.0, "drain": 1.0, "recover": 0.25, "resume": 0.34}
   }
  }
