@@ -388,3 +388,49 @@ contradecía el diseño): en los escenarios 3 y 4 ninguna herramienta pasa del 4
 menos al 10 % en algún escenario; rodillo + manitos entre 15 % y 40 %. Y cada herramienta rinde al menos el
 doble que las demás en su terreno (tests `test_wear.gd`: la bota en pesadas, la plancha en frías, el palo y la
 bota en film térmico donde la plancha no puede).
+
+## 12. Historia (0.7.0)
+
+**Premisa**: el jugador es el empleado nuevo de *Plastiquito S.R.L.*, una empresa de embalaje con un servicio
+absurdo: manda empleados a domicilio a reventar el plástico de burbujas de los clientes. Se cuenta en serio, con
+humor seco. Cada escenario es la casa o el lugar de un cliente (Doña Marta, los Gómez, Don Tito, el Club).
+
+**El jefe nunca aparece**: habla con memos escritos a máquina que llegan sujetos a la hoja de pedidos, con firma
+ilegible y sello de la empresa (`MemoCard`). Cada memo, 2-3 líneas; un clic lo cierra. Textos en
+`data/story.json` (es/en, `{name}` y `{rank}`).
+
+**Momentos**: 1) bienvenida ("Hola, {nombre}. Bienvenido al Departamento de Reventones.") con la credencial
+armada con tu foto; 2) primer cliente, primer reciclado, cada cliente nuevo y cada pedido grande cumplido o
+vencido; 3) ascensos (Pasante → Reventador Junior → Senior → Jefe de Cuadrilla, por reciclados); 4) en el
+depósito de Don Tito aparece el cuadro "EMPLEADO DEL MES" con tu foto (`EmployeeFrame`); 5) FINAL, después del
+meteorito del escenario 7: reventaste todo el plástico del mundo, la empresa se quedó sin mercadería y llega un
+TELEGRAMA DE DESPIDO a tu nombre; el cuadro recibe un sello rojo "EX"; los créditos pasan sobre una lámina que
+se sigue reventando sola; 6) se desbloquea el modo zen "AHORA SOS MONOTRIBUTISTA" (sin números).
+`GameSim.trigger_ending()` dispara el final; en las builds de jugador solo se disparará al terminar el
+escenario 7 (todavía no existe) y en desarrollo con **F8**.
+
+**Identidad (Steam)**: el nombre es `Steam.getPersonaName()` y la foto el avatar grande (`getPlayerAvatar` →
+`avatar_loaded` → `Image`), siempre estilizada (foto carnet desaturada con borde de papel, nunca cruda)
+(`PlayerIdentity`). Sin Steam o en el CI: la primera vez la ficha "¿Cómo te llamás?"; si no se completa,
+"Empleado N° 4417" y una silueta dibujada. **Privacidad**: el nombre y la foto se usan solo en esta PC; nunca se
+suben. **Pendiente**: App ID propio (hoy se usa el 480 de prueba, solo en builds de desarrollo).
+
+## 13. Una mano, accesorios y pedidos grandes (0.7.0)
+
+**Una sola mano**: la del jugador usa todas las herramientas (dedo señalando, palma abierta, palo y plancha
+agarrados, bota agarrada de la caña). Las manitos son ayudantes fantasma distintos. Cambiar de herramienta es una
+animación de 0,3-0,4 s (la mano suelta una y agarra la otra). Pendiente: la mano que le da cuerda al rodillo.
+
+**Accesorios permanentes** (`data/accessories.json`, `Accessories`): se compran con Pellets y no se pierden al
+reciclar. Ranuras: 3 anillos (índice, medio, anular), 1 pulsera, 1 reloj, 1 guante. 13 accesorios con efectos
+sobre el desgaste, los materiales, las cadenas grandes, la racha y el plazo de los pedidos grandes. Se ven en la
+mano (modelados en Blender, montados en los huesos); el guante cambia el material y la forma. Pantalla "MI MANO".
+
+**Pedido grande** (`data/big_orders.json`, `BigOrder`): a mitad de cada escenario aparece un objetivo difícil con
+plazo (cliente del escenario). Cumplido: multiplicador permanente y Pellets. Vencido: multa en Pops y vuelve más
+tarde y más fácil. Es requisito para abrir el escenario siguiente.
+
+**Requisitos de escenario** (`data/phases.json` → `requires`, `PhaseGate`): además de los Pellets, el pedido
+grande cumplido, la herramienta del escenario a cierto nivel y un ritmo de Pops por segundo (en burbujas
+equivalentes). Los dos últimos se traban al cumplirse (reciclar reinicia los niveles). La hoja de ruta ("RUTA")
+muestra los 7 escenarios; los lejanos aparecen como "???".
