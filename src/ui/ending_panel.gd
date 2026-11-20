@@ -10,6 +10,12 @@ signal finished
 enum Step { TELEGRAM, STAMP, CREDITS, FREELANCE }
 
 const TELEGRAM_SIZE: Vector2 = Vector2(640.0, 430.0)
+const FRAME_W: float = 196.0
+
+
+## Borde izquierdo del conjunto cuadro + telegrama, centrado en la pantalla (sin tapar nada: el HUD está oculto).
+func _group_left(vp: Vector2) -> float:
+	return (vp.x - (FRAME_W + 36.0 + TELEGRAM_SIZE.x)) * 0.5
 
 var sim: GameSim
 var step: Step = Step.TELEGRAM
@@ -95,7 +101,7 @@ func _draw() -> void:
 	var lang: String = Settings.language
 	match step:
 		Step.TELEGRAM, Step.STAMP:
-			draw_rect(Rect2(Vector2.ZERO, vp), Color(0.05, 0.03, 0.02, 0.78))
+			draw_rect(Rect2(Vector2.ZERO, vp), Color(0.04, 0.025, 0.015, 0.94)) # fondo oscuro: escena limpia
 			_draw_telegram(vp, lang)
 			_draw_frame(vp)
 		Step.CREDITS:
@@ -111,25 +117,31 @@ func _draw() -> void:
 ## Telegrama argentino: papel amarillento, cinta de texto pegada en renglones y encabezado en mayúsculas.
 func _draw_telegram(vp: Vector2, lang: String) -> void:
 	var slide: float = clampf(t / 0.8, 0.0, 1.0) if step == Step.TELEGRAM else 1.0
-	var r: Rect2 = Rect2(Vector2(vp.x * 0.5 - TELEGRAM_SIZE.x * 0.5 + 120.0, vp.y * 0.5 - TELEGRAM_SIZE.y * 0.5 + (1.0 - slide) * 400.0), TELEGRAM_SIZE)
+	var r: Rect2 = Rect2(Vector2(_group_left(vp) + FRAME_W + 36.0, vp.y * 0.5 - TELEGRAM_SIZE.y * 0.5 + (1.0 - slide) * 400.0), TELEGRAM_SIZE)
 	UiKit.draw_sheet(self, r, Color("#F0E3B6"), "telegram", 1.5, 1.6)
 	draw_rect(Rect2(r.position + Vector2(24.0, 24.0), Vector2(r.size.x - 48.0, 46.0)), Color("#2B3F7A"))
 	UiKit.draw_text(self, r.position + Vector2(0.0, 56.0), sim.story.telegram_header(lang), UiKit.font_title(), 22, Color("#F4EFE6"), HORIZONTAL_ALIGNMENT_CENTER, r.size.x)
 	UiKit.draw_text(self, r.position + Vector2(30.0, 100.0), "%s: %s" % [Tx.t("ending_to"), sim.player_name(lang).to_upper()], UiKit.font_mono_bold(), 14, UiKit.INK)
 	var body: String = sim.story.telegram_body(lang)
-	var shown: String = body.left(int(t * 60.0)) if step == Step.TELEGRAM else body
-	# Cinta pegada: el texto va en una franja más clara, como un telegrama de verdad.
+	# Cinta pegada: el texto va en una franja más clara, como un telegrama de verdad, con ajuste de línea.
 	draw_rect(Rect2(r.position + Vector2(26.0, 118.0), Vector2(r.size.x - 52.0, 240.0)), Color("#F7EFD2"))
-	UiKit.draw_text(self, r.position + Vector2(36.0, 146.0), shown, UiKit.font_mono_bold(), 15, UiKit.INK, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 72.0)
+	var lines: PackedStringArray = UiKit.wrap_text(UiKit.font_mono_bold(), body, 15, r.size.x - 76.0)
+	var left: int = int(t * 70.0) if step == Step.TELEGRAM else 100000
+	for i: int in lines.size():
+		if left <= 0:
+			break
+		UiKit.draw_text(self, r.position + Vector2(38.0, 150.0 + 24.0 * float(i)), lines[i].left(left), UiKit.font_mono_bold(), 15, UiKit.INK)
+		left -= lines[i].length() + 1
 	UiKit.draw_text(self, r.position + Vector2(30.0, r.size.y - 20.0), "PLASTIQUITO S.R.L. · " + Tx.t("ending_no_reply"), UiKit.font_mono(), 10, UiKit.INK_SOFT)
 
 
 ## El cuadro de "EMPLEADO DEL MES" con tu foto: recibe el sello rojo "EX".
 func _draw_frame(vp: Vector2) -> void:
-	var at: Vector2 = Vector2(vp.x * 0.5 - TELEGRAM_SIZE.x * 0.5 - 220.0, vp.y * 0.5 - 130.0)
+	var at: Vector2 = Vector2(_group_left(vp), vp.y * 0.5 - 130.0)
 	draw_rect(Rect2(at + Vector2(-8.0, -8.0), Vector2(196.0, 252.0)), Color("#5A3A1E"))
 	draw_rect(Rect2(at, Vector2(180.0, 236.0)), Color("#F4EFE6"))
-	UiKit.draw_text(self, at + Vector2(0.0, 28.0), Tx.t("employee_month"), UiKit.font_title(), 14, UiKit.INK, HORIZONTAL_ALIGNMENT_CENTER, 180.0)
+	var tt: String = Tx.t("employee_month")
+	UiKit.draw_text(self, at + Vector2(0.0, 28.0), tt, UiKit.font_title(), UiKit.fit_size(UiKit.font_title(), tt, 14, 172.0), UiKit.INK, HORIZONTAL_ALIGNMENT_CENTER, 180.0)
 	if _photo != null:
 		draw_texture_rect(_photo, Rect2(at + Vector2(24.0, 44.0), Vector2(132.0, 132.0)), false)
 	UiKit.draw_text(self, at + Vector2(0.0, 206.0), sim.player_name(Settings.language), UiKit.font_text_bold(), 13, UiKit.INK, HORIZONTAL_ALIGNMENT_CENTER, 180.0)

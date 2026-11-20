@@ -569,7 +569,7 @@ func _unlock_place(tool_id: String) -> String:
 				n = Cfg.integer(req, "phase")
 	for p: Dictionary in sim.db.phases:
 		if Cfg.integer(p, "number") == n:
-			return str(p["name_" + Settings.language])
+			return Tx.t("short_%d" % n)
 	return "?"
 
 

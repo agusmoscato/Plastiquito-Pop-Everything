@@ -6,6 +6,7 @@ extends RefCounted
 const KRAFT: Color = Color("#C8A27A")
 const KRAFT_DARK: Color = Color("#8E6B47")
 const CARDBOARD_DARK: Color = Color("#5A4330")
+const NEWLINE: String = "\n"
 const PAPER: Color = Color("#F4EFE6")
 const PAPER_SHADE: Color = Color("#DDD4C2")
 const INK: Color = Color("#1E1B18")
@@ -156,7 +157,91 @@ static func fit_size(font: Font, text: String, size: int, max_width: float) -> i
 
 
 static func draw_text(ci: CanvasItem, pos: Vector2, text: String, font: Font, size: int, color: Color = INK, align: int = HORIZONTAL_ALIGNMENT_LEFT, width: float = -1.0) -> void:
+	if audit_on:
+		_audit_record(ci, pos, text, font, size, align, width)
 	ci.draw_string(font, pos, text, align, width, size, color)
+
+
+## Parte `text` en renglones de como mucho `width` px (respeta los saltos de línea; una palabra más larga
+## que el ancho se queda sola en su renglón).
+static func wrap_text(font: Font, text: String, size: int, width: float) -> PackedStringArray:
+	var out: PackedStringArray = PackedStringArray()
+	for para: String in text.split(NEWLINE):
+		var line: String = ""
+		for word: String in para.split(" "):
+			var trial: String = word if line == "" else line + " " + word
+			if line != "" and font.get_string_size(trial, HORIZONTAL_ALIGNMENT_LEFT, -1.0, size).x > width:
+				out.append(line)
+				line = word
+			else:
+				line = trial
+		out.append(line)
+	return out
+
+
+## Párrafo con ajuste automático de línea. Devuelve el alto que ocupó.
+static func draw_paragraph(ci: CanvasItem, pos: Vector2, text: String, font: Font, size: int, color: Color, width: float, line_h: float = -1.0) -> float:
+	var lh: float = line_h if line_h > 0.0 else float(size) * 1.3
+	var lines: PackedStringArray = wrap_text(font, text, size, width)
+	for i: int in lines.size():
+		draw_text(ci, pos + Vector2(0.0, lh * float(i)), lines[i], font, size, color)
+	return lh * float(lines.size())
+
+
+# --- Auditoría de textos (test automático: nada se sale de su contenedor ni se pisa con otro texto) --------
+
+static var audit_on: bool = false
+static var _audit: Array[Dictionary] = []
+
+
+static func _audit_record(ci: CanvasItem, pos: Vector2, text: String, font: Font, size: int, align: int, width: float) -> void:
+	if text == "":
+		return
+	var w: float = font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, size).x
+	var x: float = pos.x
+	if width > 0.0 and align == HORIZONTAL_ALIGNMENT_CENTER:
+		x += (width - w) * 0.5
+	elif width > 0.0 and align == HORIZONTAL_ALIGNMENT_RIGHT:
+		x += width - w
+	var box: Rect2 = Rect2(Vector2(x, pos.y - float(size) * 0.78), Vector2(w, float(size) * 0.98)) # el cuerpo visible de la letra
+	var cont: Rect2 = Rect2()
+	if ci is Control:
+		cont = Rect2(Vector2.ZERO, (ci as Control).size)
+	_audit.append({"id": ci.get_instance_id(), "who": str(ci.name) + ":" + ci.get_class(), "rect": box, "text": text, "limit": width, "container": cont, "w": w})
+
+
+static func audit_count() -> int:
+	return _audit.size()
+
+
+## Problemas de lo dibujado desde la última llamada (y vacía el registro).
+static func audit_take() -> PackedStringArray:
+	var out: PackedStringArray = PackedStringArray()
+	for i: int in _audit.size():
+		var a: Dictionary = _audit[i]
+		var r: Rect2 = a["rect"]
+		var limit: float = a["limit"]
+		var w: float = a["w"]
+		if limit > 0.0 and w > limit + 1.0:
+			out.append("%s: '%s' (%d px) excede su ancho de %d px" % [a["who"], a["text"], int(w), int(limit)])
+		var cont: Rect2 = a["container"]
+		if cont.size.x > 0.0 and r.size.x > 0.0:
+			var inside: bool = cont.grow(3.0).encloses(r)
+			var vertical_off: bool = r.end.y < 0.0 or r.position.y > cont.size.y # fuera a propósito (desplazamiento)
+			if not inside and not vertical_off:
+				out.append("%s: '%s' se sale del contenedor %s (texto %s)" % [a["who"], a["text"], str(cont.size), str(r)])
+		for j: int in range(i + 1, _audit.size()):
+			var b: Dictionary = _audit[j]
+			if b["id"] != a["id"]:
+				continue
+			var rb: Rect2 = b["rect"]
+			if a["text"] == b["text"]:
+				continue # el mismo texto dibujado dos veces en el mismo lugar (dos frames), no es un encime
+			var inter: Rect2 = r.intersection(rb)
+			if inter.size.x > 2.0 and inter.size.y > 3.0:
+				out.append("%s: '%s' se pisa con '%s'" % [a["who"], a["text"], b["text"]])
+	_audit.clear()
+	return out
 
 
 ## Sello de goma: borde doble, texto en Bowlby, color tinta roja con desgaste (puntitos faltantes).

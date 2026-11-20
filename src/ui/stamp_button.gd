@@ -75,7 +75,8 @@ func _draw() -> void:
 		ty = rect.end.y - 9.0
 	draw_string(font, Vector2(rect.position.x + (rect.size.x - ts.x) * 0.5, ty), text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, fs, ink)
 	if sub_text != "":
-		UiKit.draw_text(self, Vector2(rect.position.x, ty + 15.0), sub_text, UiKit.font_mono(), 11, ink, HORIZONTAL_ALIGNMENT_CENTER, rect.size.x)
+		var sub_y: float = ty - 14.0 if text_bottom else ty + 15.0 # con el nombre abajo, la leyenda va encima (dentro del sello)
+		UiKit.draw_text(self, Vector2(rect.position.x, sub_y), sub_text, UiKit.font_mono(), UiKit.fit_size(UiKit.font_mono(), sub_text, 11, rect.size.x - 8.0), ink, HORIZONTAL_ALIGNMENT_CENTER, rect.size.x)
 	if meter >= 0.0:
 		_draw_meter(rect)
 	if locked:

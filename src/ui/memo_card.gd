@@ -41,6 +41,10 @@ func _gui_input(event: InputEvent) -> void:
 			accept_event()
 
 
+func _text_x() -> float:
+	return 22.0 + (118.0 if _with_credential() else 0.0)
+
+
 func _with_credential() -> bool:
 	return _shown_id == "welcome" or _shown_id == "promotion"
 
@@ -56,7 +60,9 @@ func _process(delta: float) -> void:
 		_typed = 0.0
 		_text = sim.memo_text_now(Settings.language)
 		_photo = PlayerIdentity.id_texture(112)
-		size.y = 196.0 if _with_credential() else 170.0
+		var tw: float = size.x - _text_x() - 22.0
+		var n_lines: int = UiKit.wrap_text(UiKit.font_mono(), _text, 12, tw).size()
+		size.y = maxf(196.0 if _with_credential() else 150.0, 112.0 + 16.0 * float(n_lines))
 		pivot_offset = size * 0.5
 		PopAudio.play_ui("tic", 0.8, -8.0)
 	var before: int = int(_typed)
@@ -74,8 +80,14 @@ func _draw() -> void:
 	UiKit.draw_text(self, Vector2(20.0, 34.0), "MEMO · " + Tx.t("memo_company"), UiKit.font_mono_bold(), 11, UiKit.INK_SOFT)
 	draw_line(Vector2(18.0, 42.0), Vector2(size.x - 24.0, 42.0), UiKit.INK_SOFT, 1.0)
 	var shown: String = _text.left(int(_typed))
-	var tx: float = 22.0 + (118.0 if _with_credential() else 0.0)
-	UiKit.draw_text(self, Vector2(tx, 66.0), shown, UiKit.font_mono(), 12, UiKit.INK, HORIZONTAL_ALIGNMENT_LEFT, size.x - tx - 20.0)
+	var tx: float = _text_x()
+	var full: PackedStringArray = UiKit.wrap_text(UiKit.font_mono(), _text, 12, size.x - tx - 22.0)
+	var left: int = int(_typed)
+	for i: int in full.size():
+		if left <= 0:
+			break
+		UiKit.draw_text(self, Vector2(tx, 66.0 + 16.0 * float(i)), full[i].left(left), UiKit.font_mono(), 12, UiKit.INK)
+		left -= full[i].length() + 1
 	if _with_credential():
 		_draw_credential(Vector2(18.0, 54.0))
 	# Firma ilegible (garabato) y sello de la empresa.

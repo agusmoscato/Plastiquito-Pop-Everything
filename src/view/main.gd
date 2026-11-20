@@ -29,6 +29,7 @@ var _demo: bool = false
 var ending: EndingPanel
 var name_prompt: NamePrompt
 var _ending_pop_t: float = 0.0
+var _ending_hidden: bool = false
 var _shots_taken: int = 0
 var _debug: bool = false
 var _was_holding: bool = false
@@ -111,7 +112,10 @@ func _ready() -> void:
 		var frame: EmployeeFrame = world.find_child("EmployeeFrame", true, false) as EmployeeFrame
 		if frame != null:
 			frame.refresh()) # el cuadro recibe el sello EX
-	add_child(ending)
+	var ending_layer: CanvasLayer = CanvasLayer.new() # por encima de todo el HUD
+	ending_layer.layer = 60
+	add_child(ending_layer)
+	ending_layer.add_child(ending)
 	name_prompt = NamePrompt.new()
 	name_prompt.setup()
 	name_prompt.done.connect(_on_name_chosen)
@@ -312,6 +316,19 @@ func _on_name_chosen(player_name: String) -> void:
 	hud.memo_card.suppressed = _has_demo_arg()
 
 
+## El final es una escena limpia: se oculta TODO el HUD (y la herramienta), el juego se detiene y recién
+## en los créditos la lámina se sigue reventando sola.
+func _ending_scene(delta: float) -> void:
+	var on: bool = ending.visible
+	if on != _ending_hidden:
+		_ending_hidden = on
+		hud.visible = not on
+		tool_view.visible = not on
+		automation.visible = not on
+	if on and ending.step >= EndingPanel.Step.CREDITS:
+		_ending_autopop(delta)
+
+
 ## Mientras pasan los créditos, la lámina se sigue reventando sola.
 func _ending_autopop(delta: float) -> void:
 	_ending_pop_t -= delta
@@ -329,8 +346,9 @@ func _process(delta: float) -> void:
 		return
 	if sim.ending_pending and not ending.visible:
 		ending.start()
-	if ending.visible and ending.step >= EndingPanel.Step.CREDITS:
-		_ending_autopop(delta)
+	_ending_scene(delta)
+	if ending.visible and ending.step < EndingPanel.Step.CREDITS:
+		return # el final detiene el juego: telegrama y sello son una escena limpia
 	_update_hud_fade(delta)
 	_update_pull(delta)
 	if world.camera_rig.in_intro(): # el plano de presentación: se mira, no se juega

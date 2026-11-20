@@ -66,7 +66,7 @@ func _draw() -> void:
 	UiKit.draw_text(self, Vector2(ox, 30.0), "%s  ·  %s" % [Tx.t("big_title"), str(d["client_" + lang])], UiKit.font_mono_bold(), 11, UiKit.STAMP_RED)
 	UiKit.draw_text(self, Vector2(ox, 52.0), str(d["title_" + lang]).to_upper(), UiKit.font_title(), UiKit.fit_size(UiKit.font_title(), str(d["title_" + lang]).to_upper(), 16, rect.size.x - 28.0), UiKit.INK)
 	var target: int = sim.big.target(st) if not st.is_empty() else Cfg.integer(d, "n")
-	UiKit.draw_text(self, Vector2(ox, 70.0), str(d["text_" + lang]) % target, UiKit.font_text(), 11, UiKit.INK_SOFT, HORIZONTAL_ALIGNMENT_LEFT, rect.size.x - 28.0)
+	UiKit.draw_paragraph(self, Vector2(ox, 69.0), str(d["text_" + lang]) % target, UiKit.font_text(), 11, UiKit.INK_SOFT, rect.size.x - 32.0, 13.0)
 	var progress: float = Cfg.num(st, "progress") if not st.is_empty() else 0.0
 	var ratio: float = clampf(progress / float(maxi(target, 1)), 0.0, 1.0)
 	UiKit.draw_ink_bar(self, Rect2(Vector2(ox, 100.0), Vector2(rect.size.x - 100.0, 10.0)), ratio, UiKit.STAMP_RED if ratio >= 1.0 else UiKit.INK)

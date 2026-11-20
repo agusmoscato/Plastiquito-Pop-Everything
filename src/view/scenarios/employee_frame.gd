@@ -48,7 +48,8 @@ class FrameCanvas extends Control:
 		var h: float = size.y
 		draw_rect(Rect2(0.0, 0.0, w, h), Color("#5A3A1E")) # marco de madera
 		draw_rect(Rect2(10.0, 10.0, w - 20.0, h - 20.0), Color("#F4EFE6"))
-		UiKit.draw_text(self, Vector2(0.0, 52.0), Tx.t("employee_month"), UiKit.font_title(), 22, UiKit.INK, HORIZONTAL_ALIGNMENT_CENTER, w)
+		var tt: String = Tx.t("employee_month")
+		UiKit.draw_text(self, Vector2(0.0, 52.0), tt, UiKit.font_title(), UiKit.fit_size(UiKit.font_title(), tt, 22, w - 32.0), UiKit.INK, HORIZONTAL_ALIGNMENT_CENTER, w)
 		var photo: ImageTexture = PlayerIdentity.id_texture(160)
 		draw_texture_rect(photo, Rect2(48.0, 68.0, 160.0, 160.0), false)
 		var nm: String = sim.player_name(Settings.language) if sim != null else ""
