@@ -601,3 +601,18 @@ render.yml ni el revisor externo para las secciones 1 y 2, ni se subió la versi
 - Reparto actual (activo s1): esc. 3: palo 49 %, palma 25 %, plancha 24 %; esc. 4: bota 44 %, palma 34 %,
   plancha 16 %; rodillo + manitos solo 5 % (FALLA 15-40 %): se arregla en el ajuste final.
 - Sin render/revisor externo todavía (se corre al final de cada sección visual con render.yml).
+
+## Sección 3 · Una mano y accesorios (en curso)
+
+Hecho: catálogo de 13 accesorios (`data/accessories.json`: 5 anillos, 3 pulseras, 2 relojes, 3 guantes) con
+efectos conectados al desgaste, los materiales, las cadenas grandes, la racha y el plazo de los pedidos
+grandes (`Accessories`, `GameSim.buy_accessory/equip_accessory`); guardado v6 (permanentes: no se pierden al
+reciclar); modelos en Blender (`art/models/accessories.py` → `assets/models/accessories.glb`) montados en los
+huesos con `BoneAttachment3D` (`HandRig.attach_accessories`); el guante cambia el color (y la forma, el de lana);
+pantalla `HandPanel` ("MI MANO": botón en la hoja de pedidos y en el tablero de corcho, mostrador de joyería
+con la mano girando, 6 ranuras, compra con sonido `clink`); cambio de herramienta animado de 0,3-0,4 s
+(`ToolView._swap_out`); la mano agarra la bota; el simulador compra accesorios (`--build=auto|fire|boot|chain|none`).
+
+Para verificar con las capturas de CI (carpeta `40_mano_juego_*` y `41_mi_mano_*` en `demo3/`): posición de
+cada accesorio sobre el hueso (los offsets `RING_Y` y `WRIST_Y` de `hand_rig.gd` son estimados) y orientación
+del dorso. El rodillo automático no lleva mano (es automático); la mano que "le da cuerda" queda pendiente.

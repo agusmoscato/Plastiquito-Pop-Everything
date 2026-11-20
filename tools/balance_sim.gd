@@ -9,6 +9,8 @@ const OUT_DIR: String = "res://tools/out"
 
 var dt: float = 1.0 / 30.0
 var profile: String = "active"
+var build: String = "auto" ## accesorios: auto (tapa el cuello de botella de la partida anterior), fire, boot, chain, none
+var lock_counts: Dictionary[String, int] = {} ## veces que se trabó cada herramienta en la partida en curso
 var minutes: float = 60.0
 var seed_value: int = 1
 
@@ -88,6 +90,8 @@ func _parse_args() -> void:
 	for arg: String in OS.get_cmdline_user_args():
 		if arg.begins_with("--profile="):
 			profile = arg.trim_prefix("--profile=")
+		elif arg.begins_with("--build="):
+			build = arg.trim_prefix("--build=")
 		elif arg.begins_with("--minutes="):
 			minutes = float(arg.trim_prefix("--minutes="))
 		elif arg.begins_with("--seed="):
@@ -360,12 +364,48 @@ func _spend_pellets() -> void:
 			_log("compra_perm", "%s x%d" % [id, n])
 
 
+## Accesorios en orden de preferencia según la estrategia (sección 3). "auto" mira qué herramienta
+## se trabó más en la partida anterior y compra lo que la alivia.
+func _accessory_order() -> Array[String]:
+	match build:
+		"none":
+			return []
+		"fire":
+			return ["ring_alpaca", "glove_cocina", "watch_feria", "ring_quince", "ring_cobre"]
+		"boot":
+			return ["ring_cobre", "glove_latex", "bracelet_cuero", "watch_feria", "ring_quince"]
+		"chain":
+			return ["ring_sello", "bracelet_hilo", "glove_lana", "ring_turquesa", "watch_feria"]
+	var worst: String = ""
+	var worst_n: int = 0
+	for id: String in lock_counts:
+		if lock_counts[id] > worst_n:
+			worst_n = lock_counts[id]
+			worst = id
+	match worst:
+		"iron":
+			return ["ring_alpaca", "glove_cocina", "watch_feria", "ring_sello"]
+		"boot":
+			return ["ring_cobre", "glove_latex", "watch_feria", "ring_sello"]
+		"palm", "rolling_pin":
+			return ["ring_quince", "glove_latex", "watch_feria", "ring_sello"]
+	return ["ring_sello", "watch_feria", "glove_lana", "bracelet_hilo"]
+
+
+func _buy_accessories() -> void:
+	for id: String in _accessory_order():
+		if sim.buy_accessory(id):
+			_log("compra_accesorio", id)
+	lock_counts.clear()
+
+
 func _do_recycle() -> void:
 	var before: float = sim.state.pops_run
 	var gained: int = sim.recycle()
 	_log("reciclar", "pellets=%d pops_corrida=%.0f" % [gained, before])
 	if first_recycle < 0.0:
 		first_recycle = sim.now
+	_buy_accessories()
 	_spend_pellets()
 	if sim.phase() >= 2 and phase2_time < 0.0:
 		phase2_time = sim.now
@@ -475,6 +515,8 @@ func _purchase(id: String) -> void:
 # --- Seguimiento --------------------------------------------------------------------------
 
 func _after_step(_was_phase: int) -> void:
+	if sim.ev_tool_locked != "":
+		lock_counts[sim.ev_tool_locked] = (lock_counts[sim.ev_tool_locked] if lock_counts.has(sim.ev_tool_locked) else 0) + 1
 	total_pop_events += sim.ev_idx.size()
 	if sim.phase() == 3:
 		for i: int in sim.ev_value.size():
