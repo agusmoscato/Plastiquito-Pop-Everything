@@ -47,7 +47,9 @@ func refresh() -> void:
 	why = Tx.t("why_" + goal)
 	if goal == "phase" and sim.next_phase_ready():
 		why = Tx.t("why_phase_ready")
-	reqs = [] if goal in ["hold", "reload", "palm"] else sim.phase_requirements()
+	reqs = []
+	if not (goal in ["hold", "reload", "palm"]):
+		reqs = sim.phase_requirements()
 	if not (goal in ["hold", "reload", "palm"]) and sim.nothing_left_to_buy():
 		why = Tx.t("nothing_left") % Tx.t("client_%d" % sim.phase())
 	elif goal == "phase" and not reqs.is_empty() and not sim.phase_gate_ok():

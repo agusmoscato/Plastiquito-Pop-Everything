@@ -179,6 +179,10 @@ func _dev_phase_jump() -> void:
 	var sim: GameSim = main.sim
 	var level: int = sim.state.perm_level("perm_sheet")
 	sim.state.pellets += sim.upgrades.next_cost("perm_sheet", level)
+	var ph: int = sim.phase() # atajo de desarrollo: da por cumplidos los requisitos del escenario (sección 5)
+	sim.state.big_done[str(ph)] = true
+	sim.state.latched["%d:tool" % ph] = true
+	sim.state.latched["%d:rate" % ph] = true
 	sim.buy("perm_sheet", 1)
 	sim.state.pops_run = maxf(sim.state.pops_run, 4.0 * Cfg.num(sim.eco, "pellet_divisor"))
 	_counts["phase_jumps"] += 1
