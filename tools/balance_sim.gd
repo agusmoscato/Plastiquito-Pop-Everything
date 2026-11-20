@@ -26,7 +26,7 @@ var reload_wait: float = -1.0 ## segundos que tarda el bot en tirar la lámina n
 var manual_reloads: int = 0
 var big_done_count: int = 0
 var big_failed_count: int = 0
-var big_first_try: Array[int] = [] ## por escenario: 1 si se cumplió al primer intento, 0 si no
+var big_first_try_by_phase: Dictionary[int, int] = {} ## por escenario: 1 si se cumplió al primer intento, 0 si no
 
 # Registro
 var csv: PackedStringArray = PackedStringArray(["segundo,evento,detalle,pops,pops_por_s,pops_total"])
@@ -134,7 +134,7 @@ func _bot_input() -> void:
 	if profile == "active":
 		_move_active()
 	else:
-		_move_casual()
+		_move_casual() # casual, idle (hasta tener manitos) y solo_recicla
 
 
 ## Sin recarga automática, el bot ve la lámina terminada y tira una nueva del rollo (el activo
@@ -290,6 +290,10 @@ func _decide() -> void:
 	if sim.now < _next_decision:
 		return
 	_next_decision = sim.now + 0.5
+	if profile == "solo_recicla": # nunca compra mejoras: solo recicla cuando puede y prueba abrir el escenario siguiente
+		if sim.can_recycle() and sim.recycle_gain() >= 1 and sim.now - run_start > 120.0:
+			_do_recycle()
+		return
 	_pick_tool()
 	if sim.can_recycle() and _should_recycle():
 		_do_recycle()
@@ -432,7 +436,7 @@ func _buy_accessories() -> void:
 func _do_recycle() -> void:
 	var before: float = sim.state.pops_run
 	var gained: int = sim.recycle()
-	_log("reciclar", "pellets=%d pops_corrida=%.0f" % [gained, before])
+	_log("reciclar", "pellets=%d pops_corrida=%.0f escenario=%d ritmo=%.0f" % [gained, before, sim.phase(), sim.norm_rate])
 	if first_recycle < 0.0:
 		first_recycle = sim.now
 	_buy_accessories()
@@ -547,6 +551,11 @@ func _purchase(id: String) -> void:
 # --- Seguimiento --------------------------------------------------------------------------
 
 func _after_step(_was_phase: int) -> void:
+	if sim.ev_big_done and not big_first_try_by_phase.has(sim.phase()):
+		var tries: int = sim.state.big.get("tries", 0)
+		big_first_try_by_phase[sim.phase()] = 1 if tries == 0 else 0
+	if sim.ev_big_failed and not big_first_try_by_phase.has(sim.phase()):
+		big_first_try_by_phase[sim.phase()] = 0
 	if sim.ev_big_done:
 		big_done_count += 1
 		_log("pedido_grande", "cumplido escenario %d" % sim.phase())
@@ -711,6 +720,21 @@ func _late_checks(checks: Array[Array]) -> void:
 		if t.z > 0.0:
 			print("   herramienta nueva %s: %.2fx (ritmo %.0f contra pico %.0f)  [informativo]" % [["palo", "plancha", "bota"][int(t.x)], t.y / t.z, t.y, t.z])
 	_tool_share_checks(checks)
+	_big_order_checks(checks)
+
+
+## Pedidos grandes (sección 4): el activo los cumple al primer intento entre el 50 % y el 80 % de las veces;
+## el casual, entre el 30 % y el 60 %. (Con 4 escenarios, cada semilla da múltiplos de 25 %: se miran las 3 semillas.)
+func _big_order_checks(checks: Array[Array]) -> void:
+	var done: int = 0
+	for ph: int in big_first_try_by_phase:
+		done += big_first_try_by_phase[ph]
+	var n: int = big_first_try_by_phase.size()
+	var ratio: float = 100.0 * float(done) / float(maxi(n, 1))
+	var lo: float = 50.0 if profile == "active" else 30.0
+	var hi: float = 80.0 if profile == "active" else 60.0
+	print("   pedidos grandes al primer intento: %d de %d" % [done, n])
+	checks.append(["pedido grande al 1.er intento (%)", "%d-%d %%" % [int(lo), int(hi)], ratio, n > 0 and ratio >= lo and ratio <= hi])
 
 
 ## Reparto de Pops por herramienta y escenario (sección 2 de la 0.7.0). Reemplaza a "la herramienta nueva
@@ -758,6 +782,17 @@ func _tool_share_checks(checks: Array[Array]) -> void:
 		auto_min = auto_late.min()
 		auto_max = auto_late.max()
 	checks.append(["rodillo + manitos 15-40 % (esc. 3 y 4)", "15-40 %", auto_max, auto_min >= 15.0 and auto_max <= 40.0])
+
+
+## "solo_recicla": nunca compra mejoras. NO puede abrir el Piso antes de los 60 minutos ni llegar al tercer
+## escenario nunca (hay que mejorar: pedido grande, herramienta y ritmo para abrir cada escenario).
+func _report_solo() -> bool:
+	var floor_ok: bool = phase2_time < 0.0 or phase2_time >= 60.0 * 60.0
+	var third_ok: bool = phase3_time < 0.0
+	print("   solo_recicla: Piso a los %.1f min (objetivo: no antes de 60 o nunca) %s | tercer escenario %s" % [
+		phase2_time / 60.0, "APROBADO" if floor_ok else "FALLÓ", "nunca (APROBADO)" if third_ok else "ALCANZADO (FALLÓ)"])
+	csv.append("0,metrica,solo_recicla,%.1f,%s" % [phase2_time / 60.0, "APROBADO" if floor_ok and third_ok else "FALLO"])
+	return floor_ok and third_ok
 
 
 ## Idle: tras comprar manitos, sus Pops/min deben ser entre el 20% y el 45% de los del perfil activo.
@@ -841,6 +876,8 @@ func _report(wall: float) -> bool:
 	print("   Galpón por origen: directo %.0f%%  cadena %.0f%%  automático %.0f%%" % [100.0 * source_value["directo"] / src_total, 100.0 * source_value["cadena"] / src_total, 100.0 * source_value["automatico"] / src_total])
 	if profile == "idle":
 		return _report_idle()
+	if profile == "solo_recicla":
+		return _report_solo()
 	var checks: Array[Array] = []
 	var early: float = _median(_gaps(0.0, 600.0))
 	var late: float = _median(_gaps(600.0, 2700.0))
