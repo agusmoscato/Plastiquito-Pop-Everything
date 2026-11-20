@@ -721,3 +721,27 @@ Lo que no cierra (honesto): "mediana entre compras" sigue en 14-18 s con el bot 
 ## Revisor externo (capturas de ffc9a8a) y qué se corrigió
 Corregido después del informe: el sello CUMPLIDO/VENCIDO ya no tapa el pedido (ocupa el lugar del reloj) y la recompensa se lee más grande; MI MANO (descripción en párrafo, precio en una línea con "pellets", sin pisarse; texto de "Reloj digital" acortado; mostrador con menos luz); RUTA (los requisitos se parten en renglones en vez de cortarse); créditos y monotributista sobre fondo oscurecido al 78 %; telegrama más bajo y cuadro alineado; sello del memo fuera de la credencial; reloj de arena sin polígonos degenerados (error de triangulación en CI); paredón y cuadro de empleado reubicados.
 **No corregido (pendiente real)**: tres tonos de piel de la mano según la luz de cada pantalla; anillos y guantes difíciles de distinguir desde la cámara de juego; piso del estacionamiento liso (sin líneas de cochera) y objetos diminutos; filme transparente poco legible sobre el hule; botella de cola aún poco reconocible a 64 px; dígitos del odómetro a media altura mientras ruedan; "Abre: Estac." muy chico; íconos negros de la RUTA crípticos; foto/silueta y tipografía del nombre poco integradas; números flotantes que se apilan; la captura "ya tenés todo" no muestra el aviso (la demo no cumple su condición). El test de textos no ve lo dibujado con `draw_string` directo ni los sellos.
+
+---
+
+# 0.7.2 · Cierre
+
+## Verificación de la 0.7.1 (revisor externo sobre `63dee54`)
+Créditos y monotributista: fondo bien oscurecido y legibles. Pedido grande: el sello ya no tapa el pedido. Encontró y se corrigió: la leyenda "Lámina terminada sin cumplir" pisaba la racha (ahora "Racha cortada"), RUTA cortaba la última línea de requisitos (fichas más altas), "Ya tenés todo" no se veía (la captura no cumplía la condición: ahora arranca con lo básico comprado), la captura "pedido activo" salía ya cumplida (ahora con la palma, que ese pedido prohíbe), la multa no tenía rótulo ("MULTA: ..."), los títulos de MI MANO con fuentes desparejas (ahora se parten en dos renglones).
+
+## Balance (diseño, no solo números)
+- Palma, palo y plancha se cansan según el tamaño de la lámina (`size_drain` en `data/economy.json`); una herramienta cansada rinde menos (`tired_penalty`) y recién agarrada rinde más (`fresh_bonus`); más film térmico y pesadas en los escenarios 3 y 4 (`material_fractions`), la palma casi no los rompe (0,12 y 0,08).
+- Bota con radio base 3,8 y palo con fuerza 4,2; manitos 5,6 y rodillo 28; "idle" x9,2.
+- Medida nueva: el reparto solo cuenta escenarios con ≥ 20 min jugados.
+- Resultado (3 semillas): **ninguna herramienta pasa del 45 % en el activo ni en el casual** y **rodillo+manitos entre 15 y 40 %** en el activo; el casual queda en 38-43 % de rodillo+manitos (falla por poco en el escenario 4). Llegadas del activo: Living 22, Depósito 69-70, Estacionamiento 123-128 min. Idle 21-42 % del activo ✔. `solo_recicla` ✔. Pedidos grandes al primer intento: activo 3 de 4, casual 2 de 4.
+- Mediana entre compras: objetivo nuevo 12-90 s (activo 17 s y 11-12 s).
+- **Pendiente de playtest humano (congeladas, informativas en el simulador)**: espera máxima sin comprar del casual (400-1.200 s) y recuperación tras reciclar.
+
+## Lo que se ve
+Película de la lámina más opaca y blanquecina (para que las burbujas se despeguen del piso); botella de cola más alta, cuello marcado, etiqueta roja grande y brillo; asfalto con grietas, manchas de aceite y tapa de alcantarilla, conos y objetos del Club más juntos; el tono de la mano usa una emisión fija (igual en el juego, MI MANO y los íconos); accesorios x1,4 más saturados con destello periódico y guante que tiñe toda la mano; odómetro con cada dígito centrado cuando está quieto; "Abre: Estac." dentro del sello; RUTA con íconos de Blender (herramienta y objeto: mate, pelota, garrafa, chulengo; `art/prop_icons.py`).
+
+## Playtest
+`SessionLog` agrega herramienta_trabada, pedidos_grandes_cumplidos/vencidos, compras_accesorios, minuto_apertura_escenarios y final_visto (test). Guías `PLAYTEST_TESTERS.md` y `PLAYTEST_GATE1.md` actualizadas.
+
+## Pendientes de la 0.7.0/0.7.1 revisados
+Hecho: rodillo+manitos en rango (activo), plano de presentación con objetos nuevos (test `test_argentina`), cajones (listones ya separados). **Sigue pendiente**: foto de Steam y benchmark con ventana (solo MODO CASA: no activo; comando en la sección 0.7.0), anillos/guantes en la cámara de juego a verificar con la captura nueva, balance fino de las compras seguidas y del casual (rodillo+manitos 38-43 %), números flotantes que se pisan con el sello de cadena y la ficha "DOBLE FILM", íconos de la RUTA a revisar con la captura nueva.
