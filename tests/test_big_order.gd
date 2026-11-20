@@ -95,7 +95,7 @@ func test_next_scenario_needs_big_order_tool_and_rate() -> void:
 
 
 func test_tool_requirement_latches_and_survives_recycling() -> void:
-	sim.state.levels["finger_force"] = 6
+	sim.state.levels["finger_force"] = 14
 	for i: int in 40:
 		sim.step(0.05, Vector2.ZERO, false)
 	assert_true(sim.state.latched.has("1:tool"))
