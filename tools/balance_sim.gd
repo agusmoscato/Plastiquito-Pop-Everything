@@ -525,7 +525,7 @@ func _buy_best() -> void:
 	if affordable_best.is_empty():
 		return
 	# Compra lo mejor que pueda pagar si no es mucho peor que lo mejor absoluto (si no, ahorra).
-	if affordable_best == best_id or affordable_score >= best_score * 0.3:
+	if affordable_best == best_id or affordable_score >= best_score * 0.15:
 		_purchase(affordable_best)
 
 
