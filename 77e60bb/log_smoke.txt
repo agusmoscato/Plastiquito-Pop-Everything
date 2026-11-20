@@ -1,0 +1,2363 @@
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+Vulkan 1.4.335 - Forward+ - Using Device #0: Unknown - llvmpipe (LLVM 21.1.8, 256 bits)
+
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t000_inicio fase=1 nodos=390 objetos=2514 mem_mb=68.7 draw_calls=320 fps=2
+smoke: captura t000_inicio
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t025_fase1 fase=1 nodos=390 objetos=2580 mem_mb=74.2 draw_calls=332 fps=2
+smoke: captura t025_fase1
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t050_fase1 fase=1 nodos=390 objetos=2588 mem_mb=74.5 draw_calls=332 fps=2
+smoke: captura t050_fase1
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t075_fase1 fase=1 nodos=390 objetos=2589 mem_mb=74.5 draw_calls=332 fps=2
+smoke: captura t075_fase1
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+smoke: salto de fase DEV (lámina más grande nivel 0)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t085_reciclado_panel fase=1 nodos=390 objetos=2670 mem_mb=82.6 draw_calls=1551 fps=2
+smoke: captura t085_reciclado_panel
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+reciclado: +2 pellets
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t092_reciclando fase=1 nodos=394 objetos=2686 mem_mb=83.7 draw_calls=353 fps=1
+smoke: captura t092_reciclando
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t096_fase1_llegada fase=1 nodos=394 objetos=2685 mem_mb=83.7 draw_calls=349 fps=2
+smoke: captura t096_fase1_llegada
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t100_fase1 fase=1 nodos=394 objetos=2697 mem_mb=84.3 draw_calls=388 fps=2
+smoke: captura t100_fase1
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t125_fase1 fase=1 nodos=394 objetos=2712 mem_mb=84.5 draw_calls=374 fps=2
+smoke: captura t125_fase1
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t150_fase1 fase=1 nodos=394 objetos=2717 mem_mb=84.5 draw_calls=347 fps=2
+smoke: captura t150_fase1
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+smoke: salto de fase DEV (lámina más grande nivel 0)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t155_reciclado_panel fase=1 nodos=394 objetos=2725 mem_mb=85.3 draw_calls=1575 fps=2
+smoke: captura t155_reciclado_panel
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+reciclado: +2 pellets
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t163_reciclando fase=1 nodos=396 objetos=2731 mem_mb=84.6 draw_calls=324 fps=2
+smoke: captura t163_reciclando
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t167_fase1_llegada fase=1 nodos=396 objetos=2730 mem_mb=84.6 draw_calls=322 fps=2
+smoke: captura t167_fase1_llegada
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t175_fase1 fase=1 nodos=396 objetos=2733 mem_mb=84.6 draw_calls=328 fps=2
+smoke: captura t175_fase1
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t200_fase1 fase=1 nodos=393 objetos=2734 mem_mb=84.7 draw_calls=324 fps=2
+smoke: captura t200_fase1
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t225_fase1 fase=1 nodos=393 objetos=2739 mem_mb=85.3 draw_calls=324 fps=2
+smoke: captura t225_fase1
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+smoke: salto de fase DEV (lámina más grande nivel 0)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t229_reciclado_panel fase=1 nodos=393 objetos=2741 mem_mb=85.9 draw_calls=1552 fps=2
+smoke: captura t229_reciclado_panel
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+reciclado: +2 pellets
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t236_reciclando fase=1 nodos=399 objetos=2747 mem_mb=85.3 draw_calls=326 fps=1
+smoke: captura t236_reciclando
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t240_fase1_llegada fase=1 nodos=399 objetos=2746 mem_mb=85.3 draw_calls=320 fps=2
+smoke: captura t240_fase1_llegada
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t250_fase1 fase=1 nodos=396 objetos=2747 mem_mb=85.4 draw_calls=351 fps=2
+smoke: captura t250_fase1
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t275_fase1 fase=1 nodos=390 objetos=2738 mem_mb=85.1 draw_calls=341 fps=2
+smoke: captura t275_fase1
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t300_fase1 fase=1 nodos=390 objetos=2740 mem_mb=85.1 draw_calls=345 fps=2
+smoke: captura t300_fase1
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+PERF t306_final fase=1 nodos=390 objetos=2740 mem_mb=85.0 draw_calls=341 fps=2
+smoke: captura t306_final
+SMOKE OK | 307 s | fase 1 | pops 26137 | capturas 23 | {"buys":0,"drags":19,"phase_jumps":3,"recycles":3,"taps":103,"tool_switches":1}
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+          at: WorkOrder.refresh (res://src/ui/work_order.gd:50)
+exit_code=0
