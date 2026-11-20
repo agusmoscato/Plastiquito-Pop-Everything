@@ -1,0 +1,65 @@
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+Vulkan 1.4.335 - Forward+ - Using Device #0: Unknown - llvmpipe (LLVM 21.1.8, 256 bits)
+
+PERF t000_inicio fase=1 nodos=414 objetos=2562 mem_mb=69.1 draw_calls=320 fps=2
+smoke: captura t000_inicio
+PERF t025_fase1 fase=1 nodos=414 objetos=2619 mem_mb=74.2 draw_calls=311 fps=2
+smoke: captura t025_fase1
+PERF t050_fase1 fase=1 nodos=414 objetos=2641 mem_mb=74.8 draw_calls=311 fps=2
+smoke: captura t050_fase1
+PERF t075_fase1 fase=1 nodos=414 objetos=2649 mem_mb=74.8 draw_calls=311 fps=2
+smoke: captura t075_fase1
+smoke: salto de fase DEV (lámina más grande nivel 1)
+PERF t085_reciclado_panel fase=2 nodos=414 objetos=2730 mem_mb=82.9 draw_calls=1538 fps=2
+smoke: captura t085_reciclado_panel
+reciclado: +2 pellets
+PERF t092_reciclando fase=2 nodos=483 objetos=2866 mem_mb=86.1 draw_calls=441 fps=2
+smoke: captura t092_reciclando
+PERF t096_fase2_llegada fase=2 nodos=483 objetos=2867 mem_mb=86.1 draw_calls=445 fps=2
+smoke: captura t096_fase2_llegada
+PERF t100_fase2 fase=2 nodos=480 objetos=2882 mem_mb=86.7 draw_calls=462 fps=2
+smoke: captura t100_fase2
+PERF t125_fase2 fase=2 nodos=441 objetos=2895 mem_mb=87.7 draw_calls=486 fps=2
+smoke: captura t125_fase2
+smoke: salto de fase DEV (lámina más grande nivel 2)
+PERF t150_fase3 fase=3 nodos=441 objetos=2905 mem_mb=88.7 draw_calls=486 fps=2
+smoke: captura t150_fase3
+PERF t152_reciclado_panel fase=3 nodos=441 objetos=2905 mem_mb=88.5 draw_calls=1582 fps=2
+smoke: captura t152_reciclado_panel
+reciclado: +2 pellets
+PERF t160_reciclando fase=3 nodos=698 objetos=3151 mem_mb=90.4 draw_calls=391 fps=2
+smoke: captura t160_reciclando
+PERF t164_fase3_llegada fase=3 nodos=698 objetos=3150 mem_mb=90.4 draw_calls=403 fps=1
+smoke: captura t164_fase3_llegada
+PERF t175_fase3 fase=3 nodos=617 objetos=3090 mem_mb=93.5 draw_calls=484 fps=1
+smoke: captura t175_fase3
+PERF t200_fase3 fase=3 nodos=611 objetos=3090 mem_mb=94.2 draw_calls=457 fps=1
+smoke: captura t200_fase3
+PERF t207_reciclado_panel fase=3 nodos=611 objetos=3091 mem_mb=94.6 draw_calls=1561 fps=1
+smoke: captura t207_reciclado_panel
+reciclado: +4 pellets
+PERF t215_reciclando fase=3 nodos=698 objetos=3178 mem_mb=94.1 draw_calls=366 fps=2
+smoke: captura t215_reciclando
+PERF t225_fase3 fase=3 nodos=593 objetos=3078 mem_mb=95.8 draw_calls=453 fps=1
+smoke: captura t225_fase3
+smoke: salto de fase DEV (lámina más grande nivel 3)
+PERF t232_reciclado_panel fase=4 nodos=593 objetos=3080 mem_mb=96.1 draw_calls=1522 fps=1
+smoke: captura t232_reciclado_panel
+reciclado: +4 pellets
+PERF t240_reciclando fase=4 nodos=820 objetos=3314 mem_mb=97.0 draw_calls=433 fps=1
+smoke: captura t240_reciclando
+PERF t244_fase4_llegada fase=4 nodos=820 objetos=3313 mem_mb=97.0 draw_calls=457 fps=1
+smoke: captura t244_fase4_llegada
+PERF t250_fase4 fase=4 nodos=799 objetos=3307 mem_mb=100.6 draw_calls=496 fps=1
+smoke: captura t250_fase4
+PERF t253_reciclado_panel fase=4 nodos=799 objetos=3306 mem_mb=100.9 draw_calls=1578 fps=1
+smoke: captura t253_reciclado_panel
+reciclado: +61 pellets
+PERF t260_reciclando fase=4 nodos=819 objetos=3326 mem_mb=100.1 draw_calls=390 fps=1
+smoke: captura t260_reciclando
+PERF t275_fase4 fase=4 nodos=741 objetos=3262 mem_mb=104.6 draw_calls=485 fps=1
+smoke: captura t275_fase4
+PERF t300_final fase=4 nodos=735 objetos=3257 mem_mb=104.5 draw_calls=489 fps=1
+smoke: captura t300_final
+SMOKE OK | 300 s | fase 4 | pops 6720979854 | capturas 26 | {"buys":5,"drags":17,"phase_jumps":3,"recycles":5,"taps":88,"tool_switches":0}
+exit_code=0
