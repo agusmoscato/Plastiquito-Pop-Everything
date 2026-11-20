@@ -51,7 +51,7 @@ func configure(juice: Dictionary) -> void:
 
 ## Define qué herramienta se muestra, su tamaño en el mundo, el hito (color) y la velocidad (0..1).
 func set_tool(id: String, p_radius: float, p_tier: int, speed01: float, force_ratio: float = 1.0) -> void:
-	var key: String = "%s|%.2f|%d" % [id, p_radius, p_tier]
+	var key: String = "%s|%.2f|%d|%s" % [id, p_radius, p_tier, ToolMeshes.equipped_signature()]
 	_follow = lerpf(16.0, 60.0, clampf(speed01, 0.0, 1.0))
 	_press_rate = 22.0 * clampf(0.8 + 0.12 * force_ratio, 0.8, 2.2) # más fuerza: aprieta más rápido y más hondo
 	_depth_scale = clampf(0.85 + 0.05 * force_ratio, 0.85, 1.25)

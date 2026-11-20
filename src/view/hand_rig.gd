@@ -9,6 +9,11 @@ extends Node3D
 const MODEL: String = "res://assets/models/hand.glb"
 const MODEL_GHOST: String = "res://assets/models/hand_ghost.glb"
 const FINGERS: Array[String] = ["index", "middle", "ring", "pinky"]
+const ACCESSORIES: String = "res://assets/models/accessories.glb"
+## Dónde va cada accesorio, en el marco del hueso (Y = eje del dedo o del antebrazo, Z = dorso).
+const RING_Y: Dictionary = {"index": 0.032, "middle": 0.030, "ring": 0.026}
+const WRIST_Y: Dictionary = {"bracelet": -0.006, "watch": -0.026, "glove": -0.052}
+static var _acc_scene: PackedScene
 
 
 ## Ángulos (grados) por dedo: [metacarpo, falange 1, 2, 3]; el pulgar tiene tres valores.
@@ -63,6 +68,52 @@ func setup(pose: String, material: Material) -> void:
 		_bones[skeleton.get_bone_name(i)] = i
 	_model = model
 	set_pose(pose, true)
+	if not (material is ShaderMaterial): # las manitos fantasma no llevan accesorios: son ayudantes, no la mano del jugador
+		attach_accessories(ToolMeshes.equipped, material)
+
+
+## Pone los accesorios equipados en la mano del jugador (BoneAttachment3D: siguen a los huesos) y, con
+## guante, cambia el material y la forma de la mano. `equipped`: ranura -> id (ver Accessories.SLOTS).
+func attach_accessories(equipped: Dictionary, material: Material) -> void:
+	if equipped.is_empty():
+		return
+	if _acc_scene == null:
+		_acc_scene = load(ACCESSORIES) as PackedScene
+	var lib: Node3D = _acc_scene.instantiate() as Node3D
+	for slot: String in equipped:
+		var id: String = str(equipped[slot])
+		var src: MeshInstance3D = lib.find_child(id, true, false) as MeshInstance3D
+		if src == null:
+			continue
+		var holder: BoneAttachment3D = BoneAttachment3D.new()
+		holder.name = "acc_" + slot
+		var bone: String = "wrist"
+		var y: float = 0.0
+		if slot.begins_with("ring"):
+			var finger: String = Accessories.RING_FINGERS[int(slot.substr(4))]
+			bone = finger + "_1"
+			y = RING_Y[finger]
+		else:
+			y = WRIST_Y[slot]
+		holder.bone_name = bone
+		skeleton.add_child(holder)
+		var piece: MeshInstance3D = src.duplicate() as MeshInstance3D
+		piece.position = Vector3(0.0, y, 0.0)
+		holder.add_child(piece)
+		if slot == "glove":
+			_dress_glove(id, material)
+	lib.free()
+
+
+## Guante: la mano toma el color del material del guante y, si es de lana, engorda un poco.
+func _dress_glove(id: String, material: Material) -> void:
+	var sm: StandardMaterial3D = material as StandardMaterial3D
+	if sm != null:
+		var tint: Dictionary = {"glove_cocina": Color("#EFE6D2"), "glove_lana": Color("#D8805C"), "glove_latex": Color("#F2D43C")}
+		var c: Color = tint.get(id, Color.WHITE)
+		sm.albedo_color = Color.WHITE.lerp(c, 0.7)
+	if id == "glove_lana":
+		mesh.scale = Vector3(1.06, 1.0, 1.06)
 
 
 func _ready() -> void:

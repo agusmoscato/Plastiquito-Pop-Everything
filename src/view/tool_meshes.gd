@@ -59,6 +59,19 @@ static func hand_material() -> Material:
 	return m
 
 
+static var equipped: Dictionary = {} ## accesorios de la mano (ranura -> id) que llevan todas las manos nuevas
+
+
+## Firma de lo equipado: cambia cuando hay que reconstruir la mano.
+static func equipped_signature() -> String:
+	var keys: Array = equipped.keys()
+	keys.sort()
+	var out: String = ""
+	for k: Variant in keys:
+		out += "%s=%s;" % [str(k), str(equipped[k])]
+	return out
+
+
 const ROLLER_THIN: float = 0.5 ## diámetro y mango del rodillo respecto de su ancho
 const ROLLER_AXLE_Y: float = -0.155 ## alto del eje del cilindro en roller.glb (metros, del centro del modelo)
 const OUTLINE_DARK: Color = Color(0.12, 0.10, 0.09) ## contorno de juguete de la mano y las herramientas

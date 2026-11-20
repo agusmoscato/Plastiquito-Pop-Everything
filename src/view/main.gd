@@ -383,6 +383,7 @@ func _refresh_tool_view() -> void:
 	for up_id: String in sim.upgrades.ids_for_tool(id):
 		@warning_ignore("integer_division")
 		tier = maxi(tier, sim.state.level(up_id) / every)
+	ToolMeshes.equipped = sim.state.acc_equipped
 	tool_view.set_tool(id, tm.radius, mini(tier, 3), tm.drag_entry_fraction, tm.force_per_second / 6.0)
 
 
