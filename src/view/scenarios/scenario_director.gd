@@ -36,6 +36,8 @@ var _t: float = 1.0
 var _dur: float = 1.0
 var _old_props: Node3D
 var _new_props: Node3D
+var roll_crank: bool = false ## recarga automática comprada: se ve la manivela y gira
+var roll_pull: float = 0.0 ## 0..1: cuánto lleva tirado el jugador (el rollo gira con la mano)
 var roll_glow: bool = false ## la lámina está terminada y hay que tirar una nueva del rollo
 var _roll_spin: float = 0.0 ## velocidad de giro del rollo (vueltas por segundo), decae sola
 var _glow: float = 0.0
@@ -115,7 +117,11 @@ func _animate_roll(delta: float) -> void:
 	var spin: Node3D = props.get_node_or_null(ScenarioProps.ROLL_NAME + "/Spin") as Node3D
 	if spin == null:
 		return
-	_roll_spin = move_toward(_roll_spin, 0.0, delta * 2.2)
+	_roll_spin = maxf(move_toward(_roll_spin, 0.0, delta * 2.2), roll_pull * 1.4)
+	var crank: Node3D = props.get_node_or_null(ScenarioProps.ROLL_NAME + "/" + ScenarioProps.CRANK_NAME) as Node3D
+	if crank != null:
+		crank.visible = roll_crank
+		crank.rotation.x -= (2.2 if roll_crank and _roll_spin > 0.1 else 0.35 if roll_crank else 0.0) * TAU * delta
 	spin.rotation.x -= _roll_spin * TAU * delta
 	_glow = move_toward(_glow, 1.0 if roll_glow else 0.0, delta * 3.0)
 	var wobble: float = sin(Time.get_ticks_msec() * 0.006) * 0.035 * _glow # "tirá de acá"

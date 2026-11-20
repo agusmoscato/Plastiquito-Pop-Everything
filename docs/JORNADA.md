@@ -515,3 +515,44 @@ primera corrida de `render.yml`: el "antes" va a ser la carpeta del commit `2485
 - Prueba de humo de `render.yml`: ✘ (no corrió; la headless da ✔).
 - Modelos aprobados por el revisor: ✘ (plancha y palo sí; mano, manitos y bota no).
 - CHANGELOG y DESIGN.md: ✔.
+
+
+---
+
+# 0.7.0 (en curso)
+
+Prompt de la 0.7.0 (ocho secciones). Este diario se va completando por sección; lo no hecho queda en
+"Pendientes de la 0.7.0" al final de la sección.
+
+## Sección 1 · Recarga, rollo y auditoría de mejoras
+
+**Causa del "se carga sola"**: la permanente *Automatización de fábrica* (`perm_auto`) encendía la
+recarga automática en silencio (`global_stats` miraba `perm_auto`), sin que la mejora "Recarga
+automática" figurara comprada. Ahora `global_stats` solo mira `global_reload`, y la fábrica (al reciclar y
+al cargar) deja `global_reload` en nivel 1: queda comprada y visible en la hoja de pedidos.
+
+**Tirá del rollo**: sin la mejora, al terminar la lámina el rollo late, el cartel dice "TIRÁ DEL ROLLO" y
+se arrastra el rollo hacia abajo 110 px (o se lo deja apretado 0,7 s); el rollo gira con la mano y suelta
+si no se completa (`main.gd`, `_update_pull`). Con la mejora, se ve una manivela roja que gira
+(`ScenarioProps._crank`). Tests: `test_reload_waits_for_the_player_without_auto_reload`,
+`test_auto_reload_creates_new_sheet_after_90_percent`, `test_nothing_is_active_without_being_bought`,
+`test_factory_automation_leaves_reload_visibly_bought`.
+
+### Auditoría: efecto, cómo se ve, test
+
+| Mejora | Efecto (solo con la compra) | Cómo se ve | Test |
+| --- | --- | --- | --- |
+| `*_size` (dedo, palma, palo, plancha, bota) | radio/largo de la herramienta | la herramienta crece en pantalla y en el cursor | `test_tool_model`, `test_game_sim` |
+| `*_force` | fuerza por segundo | revienta más rápido (pops/s en la hoja) | `test_game_sim` |
+| `*_speed` | arrastre / enfriamiento de la bota | el trazo y el pisotón | `test_game_sim` |
+| `*_special` | aire, vapor, onda | más cadenas, anillo y vapor | `test_air_chain`, `test_phase3_sim` |
+| `unlock_*` | habilita la herramienta | aparece su botón | `test_game_sim` |
+| `global_hold` | revienta mientras apretás | el trazo continuo | `test_game_sim` |
+| `global_reload` | la lámina se repone sola | manivela que gira en el rollo | los cuatro de arriba |
+| `global_value`, `global_special`, `global_tense`, `global_chain`, `global_sheet` | valor, especiales, umbral, cadena, tamaño | números, especiales, láminas más grandes | `test_economy`, `test_game_sim` |
+| `hands_*`, `unlock_hands` | manitos fantasma | las manitos en la lámina | `test_phase3_sim` |
+| `unlock_roller`, `roller_*` | rodillo automático | el rodillo recorre la lámina | `test_phase3_sim` |
+| `perm_*` | arranques y bonos permanentes | tablero de corcho | `test_economy`, `test_game_sim` |
+
+Pendiente de la auditoría: los efectos de `perm_*` no tienen todavía una marca visible en el mundo más allá
+del tablero (se resuelve con los accesorios de la sección 3).

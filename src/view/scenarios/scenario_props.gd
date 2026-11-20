@@ -134,6 +134,8 @@ static func _cyl(top: float, bottom: float, height: float, segments: int = 24) -
 
 ## Radio del rollo: crece con la lámina (1 cm en la Mesa chica, ~14 cm en el Estacionamiento). En la
 ## Mesa la cámara está muy cerca: más grande tapaba el borde de arriba de la pantalla.
+const CRANK_NAME: String = "Crank"
+
 static func roll_radius(e: Vector2) -> float:
 	return clampf(e.y * 0.13, 1.0, 20.0)
 
@@ -173,7 +175,21 @@ static func _roll(root: Node3D, c: Vector2, e: Vector2) -> void:
 	film.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	var tongue: MeshInstance3D = _add(root, _box(Vector3(length * 0.98, 0.04, tongue_len)), film, Vector3(c.x, GROUND_Y + 0.03, c.y - e.y * 0.5 - tongue_len * 0.5 - 0.05))
 	tongue.name = "Tongue"
+	_crank(holder, r, length)
 	roll_rect = Rect2(Vector2(c.x - length * 0.5, z - r * 3.6), Vector2(length, r * 4.6))
+
+
+## Manivela de la recarga automática (solo se ve con la mejora comprada): brazo y manija que giran.
+static func _crank(holder: Node3D, r: float, length: float) -> void:
+	var crank: Node3D = Node3D.new()
+	crank.name = CRANK_NAME
+	crank.position = Vector3(length * 0.5 + r * 0.25, 0.0, 0.0)
+	crank.visible = false
+	holder.add_child(crank)
+	var steel: StandardMaterial3D = _mat(Color("#8A8F96"), 0.4)
+	steel.metallic = 0.6
+	_add(crank, _box(Vector3(r * 0.14, r * 0.9, r * 0.14)), steel, Vector3(0.0, r * 0.45, 0.0))
+	_add(crank, _cyl(r * 0.12, r * 0.12, r * 0.5, 12), _mat(Color("#C23B2E"), 0.6), Vector3(r * 0.2, r * 0.9, 0.0), Vector3(0.0, 0.0, 90.0))
 
 
 static func _roll_material(r: float, length: float) -> ShaderMaterial:

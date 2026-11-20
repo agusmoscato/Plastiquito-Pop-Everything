@@ -163,8 +163,37 @@ func _unhandled_input(event: InputEvent) -> void:
 			world.camera_rig.skip_intro()
 			get_viewport().set_input_as_handled()
 			return
-		if mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT and _over_roll(world.camera_rig.screen_to_plane(mb.position)):
-			request_reload()
+		if mb.button_index == MOUSE_BUTTON_LEFT and mb.pressed and _over_roll(world.camera_rig.screen_to_plane(mb.position)):
+			_pulling = true # tirar del rollo: arrastrar hacia abajo (o dejar apretado)
+			_pull_from_y = mb.position.y
+			_pull_hold = 0.0
+		elif mb.button_index == MOUSE_BUTTON_LEFT and not mb.pressed:
+			_pulling = false
+			_pull = 0.0
+	elif event is InputEventMouseMotion and _pulling:
+		var mm: InputEventMouseMotion = event
+		_pull = maxf(_pull, clampf((mm.position.y - _pull_from_y) / PULL_PIXELS, 0.0, 1.0))
+
+
+const PULL_PIXELS: float = 110.0 ## cuánto hay que arrastrar hacia abajo para soltar la lámina
+const PULL_HOLD_SECONDS: float = 0.7 ## o dejar apretado el rollo este tiempo
+var _pulling: bool = false
+var _pull: float = 0.0
+var _pull_from_y: float = 0.0
+var _pull_hold: float = 0.0
+
+
+## Avanza el tirón del rollo; al completarse suelta la lámina nueva.
+func _update_pull(delta: float) -> void:
+	if not _pulling or not sim.awaiting_reload:
+		_pull = 0.0
+		return
+	_pull_hold += delta
+	_pull = maxf(_pull, clampf(_pull_hold / PULL_HOLD_SECONDS, 0.0, 1.0))
+	if _pull >= 1.0:
+		_pulling = false
+		request_reload()
+		_pull = 0.0
 
 
 ## true si hay que tirar una lámina nueva y `p` (plano XZ) cae sobre el rollo gigante.
@@ -250,6 +279,7 @@ func _process(delta: float) -> void:
 	if sim == null:
 		return
 	_update_hud_fade(delta)
+	_update_pull(delta)
 	if world.camera_rig.in_intro(): # el plano de presentación: se mira, no se juega
 		tool_view.visible = false
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -391,6 +421,8 @@ func _after_step(_holding: bool, delta: float) -> void:
 	PopAudio.report_frame(n, max_p, delta)
 	_update_night(delta)
 	world.scenario.roll_glow = sim.awaiting_reload
+	world.scenario.roll_crank = sim.auto_reload()
+	world.scenario.roll_pull = _pull if sim.awaiting_reload else 0.0
 	if sim.ev_squish:
 		PopAudio.play_squish()
 	_burn_cooldown = maxf(0.0, _burn_cooldown - delta)
