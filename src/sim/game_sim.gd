@@ -617,12 +617,20 @@ func recycle() -> int:
 	state.last_levels = previous
 	_apply_memory(previous)
 	_keep_after_recycle(previous)
+	grant_factory_gifts()
 	combo.reset()
 	streak = 0 # la racha es de la corrida: reciclar empieza de cero
 	refresh_stats()
 	new_sheet()
 	_echoes = []
 	return gained
+
+
+## "Automatización de fábrica" deja la Recarga automática COMPRADA (nivel 1 visible en la hoja de
+## pedidos): nada se activa sin figurar como comprado.
+func grant_factory_gifts() -> void:
+	if state.perm_level("perm_auto") >= 1 and state.level("global_reload") < 1:
+		state.levels["global_reload"] = 1
 
 
 ## Lo que se aprende una vez y no se olvida (por ejemplo "Mantener apretado") sobrevive al reciclado.
@@ -700,6 +708,7 @@ func load_dict(data: Dictionary) -> bool:
 	if not loaded.from_dict(data):
 		return false
 	state = loaded
+	grant_factory_gifts()
 	refresh_stats()
 	new_sheet()
 	if not state.sheet.is_empty():

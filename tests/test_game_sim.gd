@@ -129,6 +129,24 @@ func test_reload_waits_for_the_player_without_auto_reload() -> void:
 	assert_false(sim.request_reload(), "la lámina nueva no se puede tirar")
 
 
+func test_nothing_is_active_without_being_bought() -> void:
+	assert_false(sim.auto_reload(), "recién empezada no hay recarga automática")
+	assert_false(sim.hold_unlocked(), "ni mantener apretado")
+	assert_eq(sim.hands.count, 0)
+	assert_false(sim.roller.enabled)
+	assert_eq(sim.state.level("global_reload"), 0)
+
+
+func test_factory_automation_leaves_reload_visibly_bought() -> void:
+	sim.state.perm["perm_auto"] = 1
+	assert_false(sim.auto_reload(), "la permanente sola no la activa en silencio")
+	sim.state.pops_run = 1.0e9
+	sim.state.pops = 1.0e9
+	sim.recycle()
+	assert_eq(sim.state.level("global_reload"), 1, "queda comprada y visible en la hoja")
+	assert_true(sim.auto_reload())
+
+
 func test_auto_reload_creates_new_sheet_after_90_percent() -> void:
 	sim.state.levels["global_reload"] = 1
 	sim.refresh_stats()

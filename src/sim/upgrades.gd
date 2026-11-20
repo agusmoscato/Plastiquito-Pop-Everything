@@ -276,7 +276,7 @@ func global_stats(state: GameState) -> Dictionary:
 	g["chance_echo"] = Cfg.num(eco, "chance_echo") + special_add * 0.5 + perm_special * 0.5
 	g["value_mult"] = effect("global_value", state.level("global_value")) * (1.0 + effect("perm_bonus", state.perm_level("perm_bonus")))
 	g["sheet_growth"] = int(effect("global_sheet", state.level("global_sheet")))
-	g["auto_reload"] = state.level("global_reload") >= 1 or state.perm_level("perm_auto") >= 1
+	g["auto_reload"] = state.level("global_reload") >= 1 # solo comprada (o regalada por la fábrica, que la deja comprada)
 	g["hold"] = state.level("global_hold") >= 1
 	g["phase"] = phase_of(state)
 	return g
