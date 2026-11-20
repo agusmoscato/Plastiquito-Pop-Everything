@@ -689,3 +689,31 @@ modo CASA. Comando listo: `godot --path . --resolution 1280x800 scenes/benchmark
 - Balance fino: mediana entre compras, reparto de Pops por herramienta, rodillo+manitos, pedidos grandes del casual.
 - Sección 8: LOD de utilería y sombras selectivas; benchmarks con ventana.
 - Memos con las mejoras futuras grisadas al final de la hoja de pedidos ("Próximamente en: ...").
+
+---
+
+# 0.7.1 · Cierre de la 0.7.0
+
+## Qué se hizo
+1. **Correcciones pendientes**
+   - **Final** = escena limpia: se oculta todo el HUD y la herramienta, el juego se detiene (la lámina solo se revienta sola durante los créditos), fondo oscuro, telegrama centrado con ajuste de línea (`UiKit.wrap_text` / `draw_paragraph`), cuadro de empleado del mes al lado, sello EX y créditos. Verificado en la captura `53_telegrama` de CI (texto completo, sin HUD).
+   - **Cuadro de empleado del mes**: apoyado inclinado hacia la cámara de trabajo junto a la pizarra, fuera de la lámina.
+   - **Club**: paredón con escudo inventado (turquesa y naranja, "CLUB BURBUJA") y dos sillas plegables.
+   - **Textos encimados**: `UiKit.audit_*` registra cada texto dibujado y `tests/test_text_audit.gd` recorre HUD (4 escenarios, 8 pestañas de la hoja de pedidos, reciclado, Burbujario), MI MANO, RUTA, pedidos grandes, los 10 memos, ficha de nombre y los 4 pasos del final, en español e inglés. Falla si un texto excede su ancho, se sale del contenedor o se pisa con otro. Encontró y se corrigieron: descripción del pedido grande, "COMPRADO" en MI MANO, telegrama, leyenda "Se abre en" de las herramientas bloqueadas (ahora "Abre: Estac.", dentro del sello), título del cuadro. El test no mira los textos dibujados con `draw_string` directo (odómetro, sello de cadena, números flotantes).
+2. **Escenarios**: botella de cola de vidrio claro con gaseosa marrón oscura, burbujas, tapita roja y etiqueta; lámpara colgante y pata de sillón (Living) agregadas; la mesa de la cocina ya tenía el hule a cuadros (shader del piso). El test de geometría (`test_argentina`) mantiene ≥ 60 % de cada objeto fuera del HUD en los 4 escenarios. Costo: los objetos nuevos achican la escala (fase 4: 0,12 → 0,09). Los cajones: los listones separados ya estaban modelados (`cajon`), sin cambios.
+3. **Balance**: `*_speed` y `*_special` de cada herramienta pasan a la mitad de niveles con el doble de efecto (juntadas); palma y dedo casi no rompen film térmico ni pesadas (multiplicadores 0,25 / 0,15-0,18) y hay más manchas (`material_fractions`); manitos 3,0, rodillo 16, turno noche x1,5, el "Reloj digital de feria" potencia manitos y rodillo (+30 %); pedidos grandes: 600 burbujas (esc. 1) y 90 de film térmico en 150 s (esc. 3). Intento descartado: pasar la fuerza de 40 niveles a 20 (llegaba 40 min antes: revertido).
+4. **Chicos**: la mano le da cuerda al rodillo al comprarlo y lo suelta (`AutomationView._start_winding`); mejoras de escenarios futuros grisadas al final de la hoja de pedidos con "Próximamente en: ..." (`FutureTag`).
+
+## Simulador, balance_full (4 perfiles, 3 semillas)
+| Perfil | Llegadas Living / Depósito / Estac. (min) | Resultado |
+| --- | --- | --- |
+| Activo | 20 / 73-74 / 126-131 (en rango) | pedidos grandes 1.er intento 3 de 4 ✔; fallan: mediana entre compras 10-45 min (17 s) y 45-210 min (14 s), una herramienta > 45 % (48-50 %), rodillo+manitos (25-26 % promedio, pero el mínimo por escenario queda < 15 %) |
+| Casual | 30 / 72-73 / 120-125 | pedidos 2 de 4 ✔ (50 %); fallan: compras 45-210 min, espera máxima (400-570 s), recuperación, palma 60-64 %, rodillo+manitos por escenario |
+| Idle | 30 / 72-74 / 154-155 | 25-27 % del activo ✔ |
+| solo_recicla | nunca abre el Living | ✔ |
+Lo que no cierra (honesto): "mediana entre compras" sigue en 14-18 s con el bot (las tiras de compras baratas tras cada reciclado) y la palma sigue siendo la herramienta más usada por el casual. Sin cambiar de estructura (por ejemplo, una compra por escalón de herramienta) no baja más.
+
+## Verificación con ojos
+- Revisado a mano: MI MANO con accesorios y mano en juego (carpeta `4626b61`), telegrama de `2e7c5d6`.
+- Pendiente de ver: las capturas de pedidos, RUTA, memos, sello EX, escenarios nuevos y mejoras grisadas de `ffc9a8a` en adelante, y el revisor externo (R2).
+- MODO CASA no estaba activo: sin benchmark con ventana ni prueba de GodotSteam (App ID 480). Comando de benchmark en la sección 0.7.0.
