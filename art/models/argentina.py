@@ -961,8 +961,8 @@ def text_mesh(name, body, size, loc, color_mat, rot=(0, 0, 0), extrude=0.0015):
 def cola():
     # Botella de vidrio de litro retornable: cuerpo recto o levemente cónico (NO la silueta curva de ninguna
     # marca), gaseosa oscura con burbujas, tapita corona roja y etiqueta genérica "COLA".
-    glass = mat("cola_vidrio", "#BFD6CC", rough=0.05, alpha=0.28)
-    liquid = mat("cola_liquido", "#2A1208", rough=0.15)
+    glass = mat("cola_vidrio", "#D8D2C4", rough=0.04, alpha=0.18)
+    liquid = mat("cola_liquido", "#3A1808", rough=0.2)
     cap = mat("cola_tapa", "#C23A2E", rough=0.35, metal=0.5)
     label = mat("cola_etiqueta", "#EFE4C8", rough=0.7)
     ink = mat("cola_tinta", "#9C2A20", rough=0.6)
@@ -970,7 +970,7 @@ def cola():
                                (0.030, 0.285), (0.017, 0.305), (0.0135, 0.32), (0.0135, 0.345), (0.0155, 0.352), (0.0, 0.352)], 40)
     lib.subsurf(body, 1)
     give(body, glass)
-    fill = revolve("gaseosa", [(0.0, 0.004), (0.0325, 0.004), (0.0355, 0.02), (0.0365, 0.20), (0.0345, 0.255), (0.0, 0.255)], 36)
+    fill = revolve("gaseosa", [(0.0, 0.004), (0.0325, 0.004), (0.0355, 0.02), (0.0372, 0.20), (0.0360, 0.26), (0.028, 0.285), (0.015, 0.305), (0.0, 0.305)], 36)
     give(fill, liquid)
     crown = revolve("corona", [(0.0, 0.352), (0.0175, 0.352), (0.0190, 0.358), (0.0168, 0.362), (0.0, 0.362)], 24)
     give(crown, cap)
@@ -979,7 +979,14 @@ def cola():
     lib.apply_modifiers(body)
     letters = text_mesh("cola_texto", "COLA", 0.026, (0.0, -0.0398, 0.132), ink, rot=(math.radians(90), 0, 0))
     bpy.ops.object.select_all(action="DESELECT")
-    return [body, fill, crown, band, letters]
+    foam = mat("cola_espuma", "#E8D9BE", rough=0.9)
+    parts = [body, fill, crown, band, letters]
+    rng = random.Random(5)
+    for k in range(14): # burbujitas que suben
+        b = lib.sphere("burbuja%d" % k, rng.uniform(0.0025, 0.0045), loc=(rng.uniform(-0.02, 0.02), rng.uniform(-0.02, 0.02), rng.uniform(0.05, 0.28)), segs=8, rings=5)
+        give(b, foam)
+        parts.append(b)
+    return parts
 
 
 def control():
@@ -1056,8 +1063,82 @@ def bolsa():
     return [body, tie]
 
 
+def silla():
+    # Silla plegable de asado: caño de acero en X, asiento y respaldo de vinilo azul.
+    steel = mat("silla_acero", "#9AA0A6", rough=0.4, metal=0.8)
+    vinyl = mat("silla_vinilo", "#3B6FA0", rough=0.6)
+    parts = []
+    seat = rbox("asiento", (0.40, 0.38, 0.025), (0.0, 0.0, 0.43), 0.008)
+    give(seat, vinyl)
+    back = rbox("respaldo", (0.40, 0.025, 0.22), (0.0, 0.19, 0.64), 0.008, rot=(math.radians(-10), 0, 0))
+    give(back, vinyl)
+    parts += [seat, back]
+    for sx in (-1, 1):
+        leg1 = tube("pata_a%d" % sx, [(sx * 0.19, -0.18, 0.0), (sx * 0.19, 0.18, 0.42)], [0.011, 0.011], sides=8)
+        leg2 = tube("pata_b%d" % sx, [(sx * 0.19, 0.18, 0.0), (sx * 0.19, -0.18, 0.42)], [0.011, 0.011], sides=8)
+        post = tube("poste%d" % sx, [(sx * 0.19, 0.19, 0.44), (sx * 0.19, 0.21, 0.74)], [0.011, 0.011], sides=8)
+        for o in (leg1, leg2, post):
+            give(o, steel)
+            parts.append(o)
+    return parts
+
+
+def paredon():
+    # Paredón de club de barrio con un escudo INVENTADO (turquesa y naranja; ninguna camiseta real): muro de
+    # ladrillo pintado con zócalo, escudo en forma de blasón con franja y estrella, y el nombre del club.
+    wall = mat("paredon_pared", "#CDBFA2", rough=0.9)
+    base = mat("paredon_zocalo", "#5E6B73", rough=0.85)
+    teal = mat("escudo_turquesa", "#1E9A94", rough=0.5)
+    orange = mat("escudo_naranja", "#E0782C", rough=0.5)
+    cream = mat("escudo_crema", "#F3EBD3", rough=0.5)
+    W, H, T = 1.0, 0.70, 0.06
+    body = rbox("muro", (W, T, H), (0.0, 0.0, H / 2), 0.006)
+    give(body, wall)
+    zoc = rbox("zocalo", (W + 0.01, T + 0.01, 0.12), (0.0, 0.0, 0.06), 0.004)
+    give(zoc, base)
+    parts = [body, zoc]
+    shield_pts = [(-0.14, 0.18), (0.14, 0.18), (0.14, -0.02), (0.08, -0.12), (0.0, -0.17), (-0.08, -0.12), (-0.14, -0.02)]
+    sh = extrude_outline("escudo", shield_pts, 0.0, 0.012)
+    sh.rotation_euler = (math.radians(90), 0, 0)
+    sh.location = (0.0, -T / 2 - 0.002, 0.43)
+    give(sh, teal)
+    band = extrude_outline("franja", [(-0.14, 0.07), (0.14, 0.07), (0.14, 0.00), (-0.14, 0.00)], 0.0, 0.016)
+    band.rotation_euler = (math.radians(90), 0, 0)
+    band.location = (0.0, -T / 2 - 0.004, 0.43)
+    give(band, orange)
+    star_pts = []
+    for i in range(10):
+        r = 0.05 if i % 2 == 0 else 0.022
+        a = math.radians(90 + 36 * i)
+        star_pts.append((r * math.cos(a), r * math.sin(a) + 0.095))
+    star = extrude_outline("estrella", star_pts, 0.0, 0.018)
+    star.rotation_euler = (math.radians(90), 0, 0)
+    star.location = (0.0, -T / 2 - 0.006, 0.43)
+    give(star, cream)
+    name = text_mesh("club_nombre", "CLUB BURBUJA", 0.07, (0.0, -T / 2 - 0.003, 0.20), cream, rot=(math.radians(90), 0, 0), extrude=0.004)
+    return parts + [sh, band, star, name]
+
+
+def lampara():
+    # Lámpara colgante de almacén: cable, pantalla esmaltada tipo campana y foco encendido. Cuelga: el origen
+    # es el punto donde el cable llega al cielorraso; en el juego se suspende a ~70 cm sobre el suelo.
+    shade = mat("lampara_pantalla", "#2F6B52", rough=0.35)
+    inner = mat("lampara_interior", "#F3E3B4", rough=0.5)
+    cable = mat("lampara_cable", "#1D1B19", rough=0.7)
+    bulb = mat("lampara_foco", "#FFE2A0", rough=0.3, emission=hx("#FFD27A"))
+    cab = tube("cable", [(0.0, 0.0, 0.0), (0.0, 0.0, -0.28)], [0.004, 0.004], sides=8)
+    give(cab, cable)
+    cone = revolve("campana", [(0.020, -0.28), (0.032, -0.30), (0.12, -0.40), (0.135, -0.415), (0.125, -0.415), (0.11, -0.395), (0.026, -0.30)], 36, closed=True)
+    give(cone, shade)
+    inside = revolve("interior", [(0.026, -0.30), (0.11, -0.395), (0.125, -0.415)], 36, closed=False)
+    give(inside, inner)
+    foco = lib.sphere("foco", 0.045, loc=(0.0, 0.0, -0.385), segs=14, rings=8)
+    give(foco, bulb)
+    return [cab, cone, inside, foco]
+
+
 BUILD = {"mate": mate, "termo": termo, "yerba": yerba_pack, "pelota": pelota, "alpargatas": alpargatas,
          "sifon": sifon, "garrafa": garrafa, "cajon": cajon, "chulengo": chulengo, "conservadora": conservadora,
-         "cola": cola, "control": control, "bizcochos": bizcochos, "pizarra": pizarra, "bolsa": bolsa}
+         "lampara": lampara, "silla": silla, "paredon": paredon, "cola": cola, "control": control, "bizcochos": bizcochos, "pizarra": pizarra, "bolsa": bolsa}
 parts = BUILD[which]()
 finish(parts, "prop_" + which, angle=15.0 if which == "sifon" else 40.0)

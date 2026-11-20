@@ -27,8 +27,8 @@ func setup(p_sim: GameSim) -> void:
 	_sprite = Sprite3D.new()
 	_sprite.texture = _viewport.get_texture()
 	_sprite.pixel_size = WORLD_SIZE.x / float(TEX_SIZE.x)
-	_sprite.position = Vector3(0.0, WORLD_SIZE.y * 0.5, 0.0)
-	_sprite.rotation_degrees = Vector3(-10.0, 0.0, 0.0)
+	_sprite.position = Vector3(0.0, WORLD_SIZE.y * 0.5 * 0.62, -WORLD_SIZE.y * 0.22)
+	_sprite.rotation_degrees = Vector3(-52.0, 0.0, 0.0) # apoyado inclinado hacia atrás: de frente a la cámara de trabajo
 	_sprite.shaded = false
 	_sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
 	add_child(_sprite)

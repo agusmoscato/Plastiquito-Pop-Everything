@@ -24,9 +24,12 @@ static var sim_ref: GameSim ## para el cuadro de "Empleado del mes" (nombre y se
 ## Pareja protagonista de cada fase: [archivo, desplazamiento en cm a escala 1, giro].
 const HEROES: Dictionary = {
 	1: [["prop_mate", Vector3(0.0, 0.0, 0.0), 200.0], ["prop_termo", Vector3(2.0, 0.0, -17.0), -25.0], ["prop_yerba", Vector3(-12.0, 0.0, -6.0), 20.0], ["prop_bizcochos", Vector3(12.0, 0.0, 14.0), 0.0]],
-	2: [["prop_pelota", Vector3(0.0, 0.0, 0.0), 30.0], ["prop_cola", Vector3(4.0, 0.0, -26.0), -20.0], ["prop_control", Vector3(14.0, 0.0, 16.0), 70.0]],
-	3: [["prop_cajon", Vector3(0.0, 0.0, 0.0), 90.0], ["prop_garrafa", Vector3(4.0, 0.0, -48.0), 30.0], ["prop_pizarra", Vector3(4.0, 0.0, 44.0), 0.0], ["prop_bolsa", Vector3(-16.0, 0.0, 22.0), 0.0]],
-	4: [["prop_chulengo", Vector3(0.0, 0.0, 0.0), 180.0], ["prop_conservadora", Vector3(-10.0, 0.0, 62.0), 15.0]],
+	2: [["prop_pelota", Vector3(0.0, 0.0, 0.0), 30.0], ["prop_cola", Vector3(4.0, 0.0, -26.0), -20.0], ["prop_control", Vector3(14.0, 0.0, 16.0), 70.0],
+		["prop_chair_leg", Vector3(-36.0, 0.0, -8.0), 20.0]],
+	3: [["prop_cajon", Vector3(0.0, 0.0, 0.0), 90.0], ["prop_garrafa", Vector3(4.0, 0.0, -48.0), 30.0], ["prop_pizarra", Vector3(4.0, 0.0, 44.0), 0.0], ["prop_bolsa", Vector3(-16.0, 0.0, 22.0), 0.0],
+		["prop_lampara", Vector3(-30.0, 80.0, 10.0), 0.0]],
+	4: [["prop_chulengo", Vector3(0.0, 0.0, 0.0), 180.0], ["prop_conservadora", Vector3(-10.0, 0.0, 62.0), 15.0],
+		["prop_paredon", Vector3(4.0, 0.0, -96.0), 0.0], ["prop_silla", Vector3(-46.0, 0.0, 30.0), 200.0], ["prop_silla", Vector3(40.0, 0.0, 74.0), 150.0]],
 }
 
 
