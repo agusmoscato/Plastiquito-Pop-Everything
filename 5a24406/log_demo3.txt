@@ -1,0 +1,46 @@
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+Vulkan 1.4.335 - Forward+ - Using Device #0: Unknown - llvmpipe (LLVM 21.1.8, 256 bits)
+
+demo: 30_galpon_plancha_manitos
+demo: 31_tienda_iconos
+demo: 32_estacionamiento_bota
+demo: 33_estacionamiento_rodillo
+demo: 34_tablero_corcho
+demo: 35_bienvenida
+demo: 36_escenario_1
+demo: 36_escenario_2
+demo: 36_escenario_3
+demo: 36_escenario_4
+demo: 37_presentacion_1
+demo: 38_trabajo_1
+demo: 37_presentacion_2
+demo: 38_trabajo_2
+demo: 37_presentacion_3
+demo: 38_trabajo_3
+demo: 37_presentacion_4
+demo: 38_trabajo_4
+demo: 40_mano_juego_0
+demo: 41_mi_mano_0
+demo: 41_mi_mano_0_b
+demo: 40_mano_juego_3
+demo: 41_mi_mano_3
+demo: 41_mi_mano_3_b
+demo: 40_mano_juego_todos
+demo: 41_mi_mano_todos
+demo: 41_mi_mano_todos_b
+demo: 42_pedido_grande_activo
+demo: 43_pedido_cumplido
+demo: 44_pedido_vencido
+demo: 45_ruta
+demo: 46_bloqueadas_y_requisitos
+demo: 47_ya_tenes_todo
+demo: 50_memo_bienvenida
+ERROR: Invalid polygon data, triangulation failed.
+   at: canvas_item_add_polygon (servers/rendering/renderer_canvas_cull.cpp:1713)
+demo: 51_memo_deposito_cuadro
+demo: 53_telegrama
+demo: 54_sello_ex
+demo: 55_creditos
+demo: 56_monotributista
+demo: 57_zen_cuadro_ex
+exit_code=0
