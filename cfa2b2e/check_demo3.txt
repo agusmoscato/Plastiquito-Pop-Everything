@@ -1,0 +1,3 @@
+FALLÓ demo3 (exit_code=0)
+      1 40:ERROR: Invalid polygon data, triangulation failed.
+      1 38:ERROR: Invalid polygon data, triangulation failed.
