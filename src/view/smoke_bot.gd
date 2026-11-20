@@ -278,6 +278,10 @@ func _frames(n: int) -> void:
 # --- Capturas y cierre ---------------------------------------------------------------------------
 
 func _shoot(shot_name: String) -> void:
+	print("PERF %s fase=%d nodos=%d objetos=%d mem_mb=%.1f draw_calls=%d fps=%.0f" % [shot_name, main.sim.phase(),
+		int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT)), int(Performance.get_monitor(Performance.OBJECT_COUNT)),
+		Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0, int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)),
+		Performance.get_monitor(Performance.TIME_FPS)])
 	if _headless(): # sin render (PC del dueño): solo la lógica
 		return
 	var img: Image = get_viewport().get_texture().get_image()

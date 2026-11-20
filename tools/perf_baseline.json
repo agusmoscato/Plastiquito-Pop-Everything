@@ -1,0 +1,13 @@
+{
+  "load_data_ms": 4.461,
+  "mem_end_mb": 20.6089611053467,
+  "mem_growth_pct": 0.0233093910648383,
+  "mem_start_mb": 20.6041584014893,
+  "new_game_ms": 1.335,
+  "objects_end": 1468.0,
+  "objects_start": 1468.0,
+  "save_ms": 0.043,
+  "sim_step_avg_ms": 0.3148875,
+  "sim_step_max_ms": 10.419,
+  "sim_step_p95_ms": 0.892
+}

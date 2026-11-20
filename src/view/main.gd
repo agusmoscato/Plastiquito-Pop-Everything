@@ -116,6 +116,7 @@ func _ready() -> void:
 	name_prompt.setup()
 	name_prompt.done.connect(_on_name_chosen)
 	add_child(name_prompt)
+	add_child(ShaderWarmup.new()) # precompila los shaders durante el menú de inicio
 	PlayerIdentity.try_steam(PlaytestMode.current_tags())
 	if PlayerIdentity.steam_name != "" and sim.state.employee_name == "":
 		sim.state.employee_name = PlayerIdentity.steam_name

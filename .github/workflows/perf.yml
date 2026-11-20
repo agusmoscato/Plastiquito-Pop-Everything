@@ -1,0 +1,35 @@
+# Rendimiento sin pantalla (sección 8 de la 0.7.0): simulación en el peor caso, tiempos de carga y fugas de
+# memoria (30 min de juego acelerado). Alerta si una métrica empeora más de 15 % respecto de la línea de base
+# de CI (tools/perf_baseline_ci.json; si no existe todavía, solo valen los objetivos duros: sim <= 2 ms y
+# memoria <= +5 %). Para fijar la línea de base de CI: copiar el artefacto perf.json a ese archivo.
+name: perf
+
+on:
+  push:
+    branches: [fase-3b]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  GODOT_VERSION: 4.4.1-stable
+
+jobs:
+  perf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-godot
+      - name: Informe de rendimiento
+        run: |
+          mkdir -p tools/out
+          ./godot/godot --headless -s tools/perf_report.gd -- --minutes=30 --out=res://tools/out/perf.json | tee tools/out/perf_log.txt
+          BASE=tools/perf_baseline_ci.json
+          python3 tools/ci/perf_compare.py tools/out/perf.json "$BASE" tools/out/perf_report.md | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: perf
+          path: tools/out/
