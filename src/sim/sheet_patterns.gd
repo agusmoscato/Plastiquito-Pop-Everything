@@ -7,6 +7,8 @@ extends RefCounted
 ## que la herramienta tiene que aplastar dos veces; las cadenas las revientan igual).
 ## Todo número sale de data/sheet.json ("patterns"). Lógica pura.
 
+## Código de material de cada columna de `material_fractions` (fría, térmico, pesada).
+const ROW_CODES: Array[int] = [SheetModel.MAT_COLD, SheetModel.MAT_THERMAL, SheetModel.MAT_HEAVY]
 const SHAPES: Array[String] = ["line", "ring", "cluster", "zigzag", "cross"]
 ## Las 6 direcciones del hexágono en el plano (para trazar líneas).
 const DIRS: Array[Vector2] = [Vector2(1.0, 0.0), Vector2(0.5, 0.866), Vector2(-0.5, 0.866),
@@ -42,7 +44,42 @@ static func apply(sheet: SheetModel, grid: HexGrid, rng: RandomNumberGenerator, 
 			sheet.refresh_state(idx)
 			out.append(idx)
 	_apply_armor(sheet, rng, i, cfg, taken)
+	_apply_materials(sheet, rng, i, cfg, taken)
 	return out
+
+
+## Materiales nuevos por escenario: fría (Piso), film térmico (Depósito) y pesada (Estacionamiento).
+## Cada fila de `material_fractions` es [fría, térmico, pesada]; las de cada material van agrupadas en
+## manchas (no sueltas), para que una herramienta las resuelva de a muchas.
+static func _apply_materials(sheet: SheetModel, rng: RandomNumberGenerator, i: int, cfg: Dictionary, skip: Dictionary) -> void:
+	var rows: Array = cfg["material_fractions"]
+	var row: Array = rows[mini(i, rows.size() - 1)]
+	var cells: int = sheet.cell_count()
+	var width: int = sheet.width
+	for m: int in 3:
+		var fr: float = row[m]
+		if fr <= 0.0:
+			continue
+		var target: int = roundi(float(cells) * fr)
+		var patch: int = clampi(roundi(sqrt(float(cells)) * 0.5), 3, 14)
+		var placed: int = 0
+		var guard: int = 0
+		while placed < target and guard < target * 4 + 8:
+			guard += 1
+			var center: int = rng.randi() % cells
+			var cq: int = center % width
+			@warning_ignore("integer_division")
+			var cr: int = center / width
+			for k: int in patch:
+				var q: int = clampi(cq + rng.randi_range(-2, 2), 0, width - 1)
+				var r: int = clampi(cr + rng.randi_range(-2, 2), 0, sheet.height - 1)
+				var idx: int = r * width + q
+				if skip.has(idx) or sheet.material[idx] != 0 or sheet.type[idx] != 0:
+					continue
+				sheet.material[idx] = ROW_CODES[m]
+				placed += 1
+				if placed >= target:
+					break
 
 
 ## Una celda lejos de los bordes (a media forma de distancia, si la lámina da).

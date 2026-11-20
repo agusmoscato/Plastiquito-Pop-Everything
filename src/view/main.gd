@@ -432,6 +432,7 @@ func _after_step(_holding: bool, delta: float) -> void:
 		if Juice.fx != null:
 			Juice.fx.smoke_at(Vector3(bp.x, 0.3, bp.y))
 		PopAudio.play_ui("screech", randf_range(0.94, 1.06), -6.0)
+	_wear_fx(delta)
 	if not sim.ev_cracked.is_empty(): # doble film: cruje la capa de afuera y la burbuja queda entera
 		PopAudio.play_ui("tic", randf_range(1.5, 1.7), -3.0)
 		var cp: Vector2 = sim.grid.cell_to_world(sim.ev_cracked[0])
@@ -893,3 +894,22 @@ func _run_demo_tools(dir: String) -> void:
 			await _closeup_shot(dir)
 		tool_view.set_pressing(false)
 	PopAudio.quit_clean()
+
+
+var _wear_smoke_t: float = 0.0
+
+
+## Humo y sonido del desgaste: la plancha echa humo desde el 70 % del medidor y se traba con un chirrido;
+## la bota resopla al quedarse sin aire.
+func _wear_fx(delta: float) -> void:
+	_wear_smoke_t = maxf(0.0, _wear_smoke_t - delta)
+	var id: String = sim.state.selected_tool
+	if sim.ev_tool_locked != "":
+		PopAudio.play_ui("screech" if id == "iron" else "air", 0.7 if id == "iron" else 0.8, -2.0)
+		Juice.add_pop_trauma(6)
+		if Juice.fx != null:
+			for k: int in 3:
+				Juice.fx.smoke_at(Vector3(_cursor.x + float(k - 1) * 0.6, 0.4, _cursor.y))
+	elif id == "iron" and sim.wear_fraction(id) > 0.7 and _wear_smoke_t <= 0.0 and Juice.fx != null:
+		_wear_smoke_t = 0.4
+		Juice.fx.smoke_at(Vector3(_cursor.x, 0.4, _cursor.y))

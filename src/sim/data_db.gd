@@ -70,6 +70,7 @@ const ECONOMY_FIELDS: Dictionary = {
 	"iron_heat_reach": TYPE_FLOAT, "boot_cooldown_seconds": TYPE_FLOAT, "boot_wave_k": TYPE_FLOAT,
 	"boot_wave_reach": TYPE_FLOAT, "reload_delay_manual": TYPE_FLOAT, "reload_delay_auto": TYPE_FLOAT, "chain_stamp_min": TYPE_INT,
 	"reveal_cost_fraction": TYPE_FLOAT, "reveal_free_below": TYPE_FLOAT,
+	"tool_matrix": TYPE_DICTIONARY, "wear": TYPE_DICTIONARY,
 }
 const TOOL_SHAPES: PackedStringArray = ["cell", "circle", "segment", "rect"]
 

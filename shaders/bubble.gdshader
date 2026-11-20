@@ -38,6 +38,7 @@ varying float v_squash;
 varying float v_pop;
 varying float v_type;
 varying float v_armor;
+varying float v_mat;
 varying vec3 v_origin;
 
 float hash21(vec2 p) {
@@ -61,7 +62,9 @@ void vertex() {
 	v_pressure = 1.0 + INSTANCE_CUSTOM.r;
 	v_squash = INSTANCE_CUSTOM.g;
 	v_pop = INSTANCE_CUSTOM.b;
-	v_armor = step(0.1, fract(INSTANCE_CUSTOM.a));
+	float fa = fract(INSTANCE_CUSTOM.a);
+	v_armor = step(0.2, fa) * step(fa, 0.3);
+	v_mat = step(0.35, fa) * (1.0 + step(0.5, fa) + step(0.65, fa)); // 1 térmico, 2 fría, 3 pesada
 	v_type = floor(INSTANCE_CUSTOM.a + 0.01);
 	v_origin = MODEL_MATRIX[3].xyz;
 
@@ -136,6 +139,9 @@ void fragment() {
 	// Doble film: plástico lechoso y grueso, con un segundo aro (hay que aplastarla dos veces).
 	float ring2 = smoothstep(0.35, 0.45, UV.y) * (1.0 - smoothstep(0.45, 0.55, UV.y));
 	ALBEDO = mix(ALBEDO, vec3(0.93, 0.95, 0.97), v_armor * (0.55 + 0.35 * ring2) * (1.0 - popped));
+	// Materiales: térmico = naranja ceniza opaco, fría = azul escarcha, pesada = gris oscuro grueso.
+	vec3 mat_col = v_mat > 2.5 ? vec3(0.34, 0.36, 0.40) : (v_mat > 1.5 ? vec3(0.62, 0.80, 1.0) : vec3(0.95, 0.62, 0.30));
+	ALBEDO = mix(ALBEDO, mat_col, step(0.5, v_mat) * (0.55 + 0.3 * ring2) * (1.0 - popped));
 	// Veta de aire: las casi llenas laten suave (se ve por dónde va a correr la cadena).
 	float vein = smoothstep(1.8, 1.92, v_pressure) * (1.0 - popped);
 	float beat = 0.6 + 0.4 * sin(TIME * 4.0 + v_origin.x * 0.7 + v_origin.z * 0.5);
@@ -154,6 +160,7 @@ void fragment() {
 	float a = mix(base_alpha, rim_alpha, fres);
 	a = max(a, seam * seam_alpha);
 	a = mix(a, 0.72, v_armor * (1.0 - popped));
+	a = mix(a, 0.82, step(0.5, v_mat) * (1.0 - popped));
 	a = mix(a, max(a, 0.66), vein); // el plástico es casi transparente: sin esto el ámbar no se veía
 	a = max(a, glint * 0.9);
 	a += 0.12 * hv;

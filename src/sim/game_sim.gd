@@ -63,6 +63,10 @@ var _chain_active: bool = false
 var idle_s: float = 0.0 ## segundos sin apretar
 var hands_power: float = 1.0 ## multiplicador de valor del toque de las Manitos
 var _hands_in_events: int = 0
+var _auto_mult: Dictionary[int, float] = {}
+## Pops ganados por herramienta (incluye lo que arrastran sus cadenas) y por escenario: clave "fase:herramienta".
+## Es solo una medición (el simulador de balance la lee; no se guarda).
+var tool_value: Dictionary[String, float] = {} ## idx -> multiplicador de valor por material (solo reventones automáticos)
 var _dr_count: int = 0 ## reventones de la cadena en curso (rendimientos decrecientes)
 var _prev_pressing: bool = false
 var _echoes: Array[Vector2] = [] ## (índice, segundos que faltan para volver a inflarse)
@@ -184,6 +188,9 @@ func _configure_tool(id: String) -> void:
 	tm.heat_reach = Cfg.num(eco, "iron_heat_reach")
 	tm.cooldown = Cfg.num(p, "cooldown")
 	_configure_wear(id)
+	var mx: Dictionary = eco["tool_matrix"]
+	var row: Dictionary = mx[id]
+	tm.material_mult = PackedFloat32Array([Cfg.num(row, "thermal"), Cfg.num(row, "cold"), Cfg.num(row, "heavy")])
 	tm.wave_k = Cfg.num(eco, "boot_wave_k")
 	tm.wave_reach = Cfg.num(p, "wave_reach")
 	if tm.shape == "rect":
@@ -433,6 +440,9 @@ func _step_automation(dt: float) -> void:
 		return
 	chain.clear_events()
 	chain.budget_per_frame = maxi(1, roundi(float(Cfg.integer(db.sheet, "chain_budget_per_frame")) * dt * 30.0))
+	_auto_mult.clear()
+	_note_material_mult(hand_cells, "hands")
+	_note_material_mult(roll_cells, "auto_roller")
 	for idx: int in hand_cells:
 		chain.pop_now(idx)
 	for idx: int in roll_cells:
@@ -442,6 +452,16 @@ func _step_automation(dt: float) -> void:
 	_collect_events(true, hand_cells.size() + roll_cells.size())
 	_count_tool_pops("hands", hand_cells.size())
 	_count_tool_pops("auto_roller", roll_cells.size())
+
+
+## Valor extra o menor de lo que reventan las manitos y el rodillo según el material (tool_matrix).
+func _note_material_mult(cells: PackedInt32Array, tool_id: String) -> void:
+	var row: Dictionary = eco["tool_matrix"][tool_id]
+	var keys: Array[String] = ["thermal", "cold", "heavy"]
+	for idx: int in cells:
+		var m: int = sheet.material[idx]
+		if m > 0 and sheet.state[idx] != SheetModel.STATE_POPPED:
+			_auto_mult[idx] = Cfg.num(row, keys[m - 1])
 
 
 ## TURNO NOCHE (DESIGN 3.5): tras `idle_hand_after_seconds` sin apretar, las Manitos rinden
@@ -529,15 +549,23 @@ func _collect_events(auto: bool, direct: int = 0) -> void:
 	var base: float = bases[mini(phase(), bases.size()) - 1]
 	var m_combo: float = 1.0 if auto else combo.multiplier(now)
 	var m_global: float = Cfg.num(stats, "value_mult") * streak_mult()
+	var sum_a: float = 0.0 ## herramienta del jugador (o manitos en lo automático)
+	var sum_b: float = 0.0 ## rodillo automático
 	for i: int in chain.events_idx.size():
 		var t: int = chain.events_type[i]
 		var m_type: float = Cfg.num(eco, "golden_multiplier") if t == TYPE_GOLDEN else 1.0
 		var v: float = Economy.pop_value(base, chain.events_pressure[i], m_type, m_combo, m_global)
+		if auto and i < direct and _auto_mult.has(chain.events_idx[i]):
+			v *= _auto_mult[chain.events_idx[i]]
 		if auto and i < _hands_in_events:
 			v *= hands_power * hands_idle_mult()
 		if i >= direct:
 			_dr_count += 1
 			v *= Economy.chain_factor(_dr_count, Cfg.integer(eco, "chain_dr_size"), Cfg.num(eco, "chain_dr_alpha"))
+		if auto and i >= _hands_in_events and i < direct:
+			sum_b += v
+		else:
+			sum_a += v
 		ev_idx.append(chain.events_idx[i])
 		ev_value.append(v)
 		ev_pressure.append(chain.events_pressure[i])
@@ -547,6 +575,15 @@ func _collect_events(auto: bool, direct: int = 0) -> void:
 		state.pops += v
 		state.pops_run += v
 		state.pops_total += v
+	_credit_tools(auto, sum_a, sum_b)
+
+
+func _credit_tools(auto: bool, sum_a: float, sum_b: float) -> void:
+	var ph: String = str(phase()) + ":"
+	var main_id: String = "hands" if auto else state.selected_tool
+	tool_value[ph + main_id] = tool_value.get(ph + main_id, 0.0) + sum_a
+	if sum_b > 0.0:
+		tool_value[ph + "auto_roller"] = tool_value.get(ph + "auto_roller", 0.0) + sum_b
 
 
 func _track_chain() -> void:
@@ -761,6 +798,7 @@ func load_dict(data: Dictionary) -> bool:
 			sheet.type = restored.type
 			sheet.press = restored.press
 			sheet.armor = restored.armor
+			sheet.material = restored.material
 			sheet.reset_counts()
 			var pat: Dictionary = db.sheet["patterns"]
 			vein_cells = SheetPatterns.veins_of(sheet, pat)

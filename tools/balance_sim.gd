@@ -296,8 +296,19 @@ func _rested_enough(id: String) -> bool:
 		return false
 	if sim.tool_locked(id):
 		return false
+	if id == "iron" and _material_share(SheetModel.MAT_THERMAL) > 0.08:
+		return false # el film térmico no lo derrite la plancha
 	var limit: float = 0.9 if sim.state.selected_tool == id else 0.3
 	return sim.wear_fraction(id) < limit or id == "finger"
+
+
+## Fracción de la lámina que es de `mat` y sigue entera (el bot "mira" la lámina).
+func _material_share(mat: int) -> float:
+	var n: int = 0
+	for i: int in sim.sheet.cell_count():
+		if sim.sheet.material[i] == mat and sim.sheet.state[i] != SheetModel.STATE_POPPED:
+			n += 1
+	return float(n) / float(sim.sheet.cell_count())
 
 
 func _pick_tool() -> void:
@@ -616,12 +627,57 @@ func _late_checks(checks: Array[Array]) -> void:
 	for r: Vector2 in recoveries:
 		worst = maxf(worst, r.x / maxf(r.y, 1.0))
 	checks.append(["recuperación tras reciclar (% de la partida anterior)", "< 40 %", worst * 100.0, recoveries.size() > 0 and worst < 0.4])
-	var min_leap: float = 99.0
 	for t: Vector3 in new_tool_results:
 		if t.z > 0.0:
-			min_leap = minf(min_leap, t.y / t.z)
-			print("   herramienta nueva %s: %.2fx (ritmo %.0f contra pico %.0f)" % [["palo", "plancha", "bota"][int(t.x)], t.y / t.z, t.y, t.z])
-	checks.append(["herramienta nueva vs. la anterior al máximo (x)", ">= 2", min_leap if min_leap < 99.0 else 0.0, min_leap >= 2.0 and min_leap < 99.0])
+			print("   herramienta nueva %s: %.2fx (ritmo %.0f contra pico %.0f)  [informativo]" % [["palo", "plancha", "bota"][int(t.x)], t.y / t.z, t.y, t.z])
+	_tool_share_checks(checks)
+
+
+## Reparto de Pops por herramienta y escenario (sección 2 de la 0.7.0). Reemplaza a "la herramienta nueva
+## rinde 2x": ninguna herramienta sirve para todo.
+func _tv(key: String) -> float:
+	return sim.tool_value[key] if sim.tool_value.has(key) else 0.0
+
+
+func _bs(d: Dictionary[String, float], key: String) -> float:
+	return d[key] if d.has(key) else 0.0
+
+
+func _tool_share_checks(checks: Array[Array]) -> void:
+	var ids: Array[String] = ["finger", "palm", "rolling_pin", "iron", "boot", "hands", "auto_roller"]
+	var best_share: Dictionary[String, float] = {}
+	var worst_max: float = 0.0
+	var auto_late: Array[float] = []
+	print("   reparto de Pops por herramienta y escenario (%):")
+	for ph: int in range(1, 5):
+		var total: float = 0.0
+		for id: String in ids:
+			total += _tv("%d:%s" % [ph, id])
+		if total <= 0.0:
+			continue
+		var line: String = "     escenario %d:" % ph
+		var mx: float = 0.0
+		for id: String in ids:
+			var share: float = 100.0 * _tv("%d:%s" % [ph, id]) / total
+			line += " %s %.0f" % [id, share]
+			best_share[id] = maxf(_bs(best_share, id), share)
+			mx = maxf(mx, share)
+		if ph >= 3:
+			worst_max = maxf(worst_max, mx)
+			auto_late.append(100.0 * (_tv("%d:hands" % ph) + _tv("%d:auto_roller" % ph)) / total)
+		print(line)
+		csv.append("0,reparto,%s,%.0f,info" % [line.strip_edges().replace(",", ";"), 0.0])
+	checks.append(["ninguna herramienta > 45 % (esc. 3 y 4)", "<= 45 %", worst_max, worst_max <= 45.0])
+	var lowest: float = 100.0
+	for id: String in ["finger", "palm", "rolling_pin", "iron", "boot"]:
+		lowest = minf(lowest, _bs(best_share, id))
+	checks.append(["toda herramienta >= 10 % en algún escenario", ">= 10 %", lowest, lowest >= 10.0])
+	var auto_min: float = 0.0
+	var auto_max: float = 0.0
+	if not auto_late.is_empty():
+		auto_min = auto_late.min()
+		auto_max = auto_late.max()
+	checks.append(["rodillo + manitos 15-40 % (esc. 3 y 4)", "15-40 %", auto_max, auto_min >= 15.0 and auto_max <= 40.0])
 
 
 ## Idle: tras comprar manitos, sus Pops/min deben ser entre el 20% y el 45% de los del perfil activo.

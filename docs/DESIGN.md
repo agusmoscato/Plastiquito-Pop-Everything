@@ -353,3 +353,38 @@ El riesgo más grande es que reventar no dé gusto. Por eso hay un control en la
 | Se superpone con el juego 1 | Medio | Plastiquito arranca después del lanzamiento de INFLATION. Mientras tanto, solo diseño y quizás el prototipo de la semana 2. |
 | Claude Code se desvía de la arquitectura | Medio | CLAUDE.md con reglas, tests obligatorios, prompts cortos por fase y revisión al final de cada fase. |
 | Problemas de derechos | Bajo | Nada de marcas ni personajes. La aplanadora y las herramientas son genéricas y sin logos. Sonidos propios o CC0, fuentes OFL. |
+
+## 11. Herramientas: desgaste y materiales (0.7.0)
+
+Principio: ninguna herramienta sirve para todo. La mejor compra y la mejor herramienta dependen del cuello de
+botella de la partida (idea tomada de Bills Must Be Paid: el cansancio corta las partidas), sin copiar sus sistemas.
+
+**Desgaste** (`WearModel`, `data/economy.json` → `wear`): cada herramienta tiene un medidor que sube al usarla y
+baja al descansar (también mientras se usa otra). Al llenarse se traba hasta bajar de `resume`. Dedo casi nada,
+palma y palo cansancio leve, plancha se recalienta (humo desde el 70 %, chirrido al trabarse), bota cansa por
+pisotón. Manitos y rodillo no se cansan: esa es su gracia. Las mejoras de velocidad suben capacidad y
+recuperación, nunca quitan el límite.
+
+**Materiales** (`SheetModel.material`, `data/sheet.json` → `material_fractions`, en manchas): fría (desde el Piso;
+la plancha la ablanda al pasar), film térmico (desde el Depósito; la plancha no lo derrite), pesada/gigante
+(desde el Estacionamiento; la bota). Tabla herramienta × material → multiplicador de fuerza, en
+`data/economy.json` → `tool_matrix`:
+
+| Herramienta | Film térmico | Fría | Pesada |
+| --- | --- | --- | --- |
+| Dedo | 0,5 | 0,35 | 0,3 |
+| Palma | 0,5 | 0,35 | 0,4 |
+| Palo | 1,5 | 0,5 | 0,6 |
+| Plancha | 0 | 1 (y la ablanda) | 0,2 |
+| Bota | 1,6 | 0,8 | 2,6 |
+| Rodillo automático (valor) | 2 | 1,5 | 1 |
+| Manitos (valor) | 0,6 | 0,6 | 0,6 |
+
+**Trabajo propio del rodillo**: es lo único que sigue trabajando mientras la plancha se enfría y el único que
+rinde doble sobre el film térmico y 1,5x sobre las frías (alisa), sin cansarse.
+
+**Métricas del reparto de Pops** (`tools/balance_sim.gd`; reemplazan a "la herramienta nueva rinde 2x", que
+contradecía el diseño): en los escenarios 3 y 4 ninguna herramienta pasa del 45 %; toda herramienta llega al
+menos al 10 % en algún escenario; rodillo + manitos entre 15 % y 40 %. Y cada herramienta rinde al menos el
+doble que las demás en su terreno (tests `test_wear.gd`: la bota en pesadas, la plancha en frías, el palo y la
+bota en film térmico donde la plancha no puede).

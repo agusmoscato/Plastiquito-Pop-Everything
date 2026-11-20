@@ -89,3 +89,72 @@ func test_wear_model_basic() -> void:
 	for i: int in 3:
 		w.tick(1.0)
 	assert_false(w.locked)
+
+
+func _material_sim(phase: int, mat: int) -> GameSim:
+	var s: GameSim = GameSim.new(db, 5)
+	s.state.perm["perm_sheet"] = phase - 1
+	s.state.levels["global_hold"] = 1
+	for id: String in ["unlock_palm", "unlock_pin", "unlock_iron", "unlock_boot"]:
+		s.state.levels[id] = 1
+	s.refresh_stats()
+	s.new_sheet()
+	for i: int in s.sheet.cell_count():
+		s.sheet.pressure[i] = 1.0
+		s.sheet.refresh_state(i)
+		s.sheet.material[i] = mat
+		s.sheet.armor[i] = 0
+	return s
+
+
+func _pops_with(tool_id: String, mat: int, seconds: float) -> int:
+	var s: GameSim = _material_sim(4, mat)
+	s.select_tool(tool_id)
+	var c: Vector2 = s.center()
+	var t: float = 0.0
+	while t < seconds:
+		s.step(0.033, c + Vector2(sin(t * 3.0) * 8.0, cos(t * 2.0) * 8.0), true)
+		t += 0.033
+	return s.sheet.count_popped()
+
+
+func test_iron_cannot_press_thermal_film() -> void:
+	assert_eq(_pops_with("iron", SheetModel.MAT_THERMAL, 4.0), 0, "la plancha no derrite el film térmico")
+	assert_gt(_pops_with("boot", SheetModel.MAT_THERMAL, 4.0), 0, "la bota sí")
+
+
+func test_boot_beats_everyone_on_heavy_bubbles() -> void:
+	var boot: int = _pops_with("boot", SheetModel.MAT_HEAVY, 6.0)
+	for id: String in ["finger", "palm", "rolling_pin"]:
+		assert_gt(boot, 2 * _pops_with(id, SheetModel.MAT_HEAVY, 6.0), "la bota rinde el doble en pesadas que " + id)
+
+
+func test_iron_softens_cold_bubbles() -> void:
+	var s: GameSim = _material_sim(2, SheetModel.MAT_COLD)
+	s.select_tool("iron")
+	var c: Vector2 = s.center()
+	for i: int in 60:
+		s.step(0.033, c + Vector2(float(i) * 0.4 - 12.0, 0.0), true)
+	var warmed: int = 0
+	for m: int in s.sheet.material:
+		if m == SheetModel.MAT_NORMAL:
+			warmed += 1
+	assert_gt(warmed, 0, "al pasar, la plancha ablanda burbujas frías")
+
+
+func test_materials_appear_by_scenario_and_are_saved() -> void:
+	var f: GameSim = GameSim.new(db, 3)
+	f.state.perm["perm_sheet"] = 1
+	f.refresh_stats()
+	f.new_sheet()
+	var cold: int = 0
+	for m: int in f.sheet.material:
+		if m == SheetModel.MAT_COLD:
+			cold += 1
+	assert_gt(cold, 0, "el Piso trae burbujas frías")
+	var t: GameSim = GameSim.new(db, 3)
+	for m: int in t.sheet.material:
+		assert_eq(m, 0, "la Mesa no trae materiales")
+	var back: SheetModel = SheetModel.new()
+	assert_true(back.from_dict(f.sheet.to_dict()))
+	assert_eq(back.material, f.sheet.material)

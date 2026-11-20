@@ -589,3 +589,15 @@ gigantes), trabajo propio del rodillo, humo/sonido al trabarse, métricas de rep
 Secciones 3 (una sola mano y accesorios), 4 (pedidos grandes), 5 (progresión y mapa RUTA), 6 (escenarios
 y plano de presentación nuevos), 7 (historia, Steam, final) y 8 (rendimiento). Tampoco se corrió
 render.yml ni el revisor externo para las secciones 1 y 2, ni se subió la versión a 0.7.0 ni hay build.
+
+### Sección 2 · cierre (sesión 2 de la 0.7.0)
+- Materiales (fría, film térmico, pesada) con tabla `tool_matrix`, shader con tintes y tests; la plancha no
+  derrite el film térmico; la plancha ablanda las frías; humo y chirrido al trabarse (`_wear_fx`).
+- Simulador: reparto de Pops por herramienta y escenario, y las tres métricas nuevas; "2x" eliminada. El bot
+  evita la plancha si hay film térmico y alterna por desgaste.
+- Una pasada de `phase_cost_scales` ([1, 392, 78000, 14,4 M]): arribos activo semilla 1 = Piso 21,7 / Galpón
+  54,4 / Estacionamiento 95,2 min (objetivo ±30 %: 43-130 → piso ok; Galpón ~ borde 57; Estac. ~ borde 96).
+  Subir más el costo del Piso (430) deja al bot trabado sin palo: es un precipicio, no una rampa.
+- Reparto actual (activo s1): esc. 3: palo 49 %, palma 25 %, plancha 24 %; esc. 4: bota 44 %, palma 34 %,
+  plancha 16 %; rodillo + manitos solo 5 % (FALLA 15-40 %): se arregla en el ajuste final.
+- Sin render/revisor externo todavía (se corre al final de cada sección visual con render.yml).

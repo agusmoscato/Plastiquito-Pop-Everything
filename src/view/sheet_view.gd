@@ -281,6 +281,8 @@ func _write_cell(idx: int) -> void:
 	else:
 		_squash_shown[idx] = squash
 	var armor: float = 0.25 if sheet.armor.size() > idx and sheet.armor[idx] > 0 else 0.0 # doble film: fracción del tipo
+	if armor == 0.0 and sheet.material.size() > idx and sheet.material[idx] > 0:
+		armor = 0.25 + 0.15 * float(sheet.material[idx]) # 0,40 térmico · 0,55 fría · 0,70 pesada
 	var color: Color = Color(sheet.pressure[idx] - 1.0, squash, pop, float(sheet.type[idx]) + armor)
 	var loc: Vector2i = _locate(idx)
 	_multimeshes[loc.x].set_instance_custom_data(loc.y, color)

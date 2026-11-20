@@ -44,6 +44,8 @@ var cooldown: float = 4.0
 var cooldown_left: float = 0.0
 var wave_k: float = 0.5 ## fracción de la presión pisada que la onda empuja hacia afuera
 var wave_reach: float = 2.5 ## en celdas
+## Multiplicador de fuerza por material de la burbuja: [térmico, fría, pesada] (data/economy.json "tool_matrix").
+var material_mult: PackedFloat32Array = PackedFloat32Array([1.0, 1.0, 1.0])
 var last_wave_cells: PackedInt32Array = PackedInt32Array()
 
 ## Resultados del último step().
@@ -171,6 +173,9 @@ func apply_heat(center: Vector2, dt: float, moved: Vector2 = Vector2.INF) -> Pac
 		if sheet.state[idx] == SheetModel.STATE_POPPED:
 			continue
 		var room: float = heat_cap - sheet.pressure[idx]
+		if sheet.material[idx] == SheetModel.MAT_COLD:
+			sheet.material[idx] = SheetModel.MAT_NORMAL # la plancha ablanda la burbuja fría al pasar
+			changed.append(idx)
 		if room > 0.0:
 			sheet.add_pressure_quiet(idx, minf(heat_rate * dt, room))
 			changed.append(idx)
@@ -290,7 +295,7 @@ func _burn_if_still(touched: PackedInt32Array, dir: Vector2, delta: float) -> Pa
 	if _still_t < burn_after:
 		return out
 	for idx: int in touched:
-		if sheet.state[idx] != SheetModel.STATE_POPPED:
+		if sheet.state[idx] != SheetModel.STATE_POPPED and sheet.material[idx] != SheetModel.MAT_THERMAL: # el film térmico no se derrite
 			sheet.press[idx] = 0.0
 			_active.erase(idx)
 			sheet.pressure[idx] = 0.0 # el aire se va con el plástico derretido: no alimenta cadenas
@@ -336,7 +341,7 @@ func _press_cell(idx: int, delta: float, entered_dragging: bool, changed: Packed
 	var before: float = sheet.press[idx]
 	if before <= 0.0 and not _active.has(idx):
 		new_pressed += 1
-	var gain: float = force_per_second * delta
+	var gain: float = force_per_second * delta * _material_factor(idx)
 	if entered_dragging:
 		gain += drag_entry_fraction * resistance
 	var value: float = before + gain
@@ -356,6 +361,11 @@ func _press_cell(idx: int, delta: float, entered_dragging: bool, changed: Packed
 	sheet.press[idx] = value
 	_active[idx] = true
 	changed.append(idx)
+
+
+func _material_factor(idx: int) -> float:
+	var m: int = sheet.material[idx]
+	return 1.0 if m == 0 else material_mult[m - 1]
 
 
 ## Al aplastar sin reventar, la burbuja pasa parte de su aire a las vecinas libres.
