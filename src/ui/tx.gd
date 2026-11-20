@@ -12,6 +12,8 @@ const T: Dictionary = {
 	"hint_1": {"es": "APRETÁ UNA BURBUJA", "en": "PRESS A BUBBLE"},
 	"hint_2": {"es": "un clic, una burbuja  ·  con 30 Pops comprá MANTENER APRETADO", "en": "one click, one bubble  ·  at 30 Pops buy HOLD TO POP"},
 	"sheet_done": {"es": "¡LÁMINA LISTA!", "en": "SHEET DONE!"},
+	"overheated": {"es": "RECALENTADA", "en": "TOO HOT"},
+	"tired": {"es": "CANSADA", "en": "TIRED"},
 	"reload_sheet": {"es": "TIRÁ DEL ROLLO", "en": "PULL THE ROLL"},
 	"reload_hint": {"es": "arrastrá el rollo hacia abajo  ·  tecla R", "en": "drag the roll down  ·  R key"},
 	"rhythm": {"es": "RITMO", "en": "RHYTHM"},

@@ -19,6 +19,8 @@ var sheet: SheetModel
 var grid: HexGrid
 var chain: ChainSolver
 var tools: Dictionary = {} ## id -> ToolModel
+var wear: Dictionary[String, WearModel] = {} ## id -> WearModel (desgaste: plancha que se recalienta, bota que cansa...)
+var ev_tool_locked: String = "" ## herramienta que se trabó en este paso (la vista suena y echa humo)
 var hands: HandsModel
 var roller: AutoRoller
 var combo: ComboTracker = ComboTracker.new()
@@ -138,6 +140,8 @@ func _build_models() -> void:
 		tm.resistance = Cfg.num(db.sheet, "resistance")
 		tm.recovery_per_second = Cfg.num(db.sheet, "recovery_per_second")
 		tools[id] = tm
+		if not wear.has(id):
+			wear[id] = WearModel.new()
 	sheet.reload_threshold = Cfg.num(db.sheet, "reload_threshold")
 	hands = HandsModel.new(sheet, grid, rng.randi())
 	roller = AutoRoller.new(sheet, grid)
@@ -179,10 +183,30 @@ func _configure_tool(id: String) -> void:
 	tm.glide_min_speed = Cfg.num(eco, "iron_glide_min_speed")
 	tm.heat_reach = Cfg.num(eco, "iron_heat_reach")
 	tm.cooldown = Cfg.num(p, "cooldown")
+	_configure_wear(id)
 	tm.wave_k = Cfg.num(eco, "boot_wave_k")
 	tm.wave_reach = Cfg.num(p, "wave_reach")
 	if tm.shape == "rect":
 		tm.heat_reach = Cfg.num(eco, "iron_heat_reach")
+
+
+## El desgaste de la herramienta: la capacidad y la recuperación suben con su mejora de velocidad
+## (data/economy.json "wear"), pero el límite siempre existe.
+func _configure_wear(id: String) -> void:
+	var cfg: Dictionary = eco["wear"]
+	var w: Dictionary = cfg[id]
+	var k: float = 1.0 + Cfg.num(cfg, "speed_gain") * float(state.level(id + "_speed"))
+	var wm: WearModel = wear[id]
+	wm.configure(Cfg.num(w, "capacity") * k, Cfg.num(w, "drain"), Cfg.num(w, "recover") * k, Cfg.num(w, "resume"))
+
+
+## Medidor de desgaste de una herramienta (0 fresca, 1 trabada). Manitos y rodillo: 0.
+func wear_fraction(id: String) -> float:
+	return wear[id].fraction() if wear.has(id) else 0.0
+
+
+func tool_locked(id: String) -> bool:
+	return wear.has(id) and wear[id].locked
 
 
 ## Desde cuándo aparece cada especial: la dorada tras el primer reciclado, bomba y línea en el
@@ -340,7 +364,8 @@ func step(dt: float, pointer: Vector2, pressing: bool) -> void:
 	var touched: PackedInt32Array = PackedInt32Array()
 	var dir: Vector2 = Vector2.ZERO
 	idle_s = 0.0 if pressing else idle_s + dt
-	var live: bool = reload_timer < 0.0
+	var wm: WearModel = wear[state.selected_tool]
+	var live: bool = reload_timer < 0.0 and wm.available()
 	var click_only: bool = not hold_unlocked()
 	var press_edge: bool = pressing and not _prev_pressing
 	if pressing and live and (press_edge or not click_only):
@@ -365,6 +390,7 @@ func step(dt: float, pointer: Vector2, pressing: bool) -> void:
 		ev_cracked = tm.cracked
 	_prev_pointer = pointer
 	_prev_pressing = pressing
+	_tick_wear(dt, wm, tm, touched, press_edge)
 	chain.clear_events()
 	for idx: int in popped:
 		chain.pop_now(idx)
@@ -381,6 +407,20 @@ func step(dt: float, pointer: Vector2, pressing: bool) -> void:
 	_tick_echoes(dt)
 	_track_chain()
 	_track_encargo()
+
+
+## Gasta el desgaste de la herramienta en uso y deja descansar a las demás.
+func _tick_wear(dt: float, wm: WearModel, tm: ToolModel, touched: PackedInt32Array, press_edge: bool) -> void:
+	var was_locked: bool = wm.locked
+	if tm.shape == ToolModel.SHAPE_STOMP:
+		if press_edge and tm.cooldown_left >= tm.cooldown - 0.0001 and tm.cooldown > 0.0 and reload_timer < 0.0:
+			wm.use(1.0) # un pisotón
+	elif not touched.is_empty():
+		wm.use(dt if hold_unlocked() else 0.15)
+	for id: String in wear:
+		wear[id].tick(dt)
+	if wm.locked and not was_locked:
+		ev_tool_locked = state.selected_tool
 
 
 ## Manitos y rodillo automático: revientan solos; su valor no lleva combo (premia jugar activo).
@@ -464,6 +504,7 @@ func _do_reload() -> void:
 
 func _clear_events() -> void:
 	ev_burned = PackedInt32Array()
+	ev_tool_locked = ""
 	ev_idx = PackedInt32Array()
 	ev_value = PackedFloat64Array()
 	ev_pressure = PackedFloat32Array()

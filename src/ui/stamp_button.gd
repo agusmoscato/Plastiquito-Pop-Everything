@@ -13,6 +13,8 @@ var font_size: int = 16
 var disabled: bool = false
 var seed_id: String = ""
 var text_bottom: bool = false ## el texto va abajo (deja arriba lugar para un ícono)
+var meter: float = -1.0 ## >= 0: medidor de desgaste de 0 (fresca) a 1 (trabada); < 0 no se dibuja
+var meter_locked: bool = false ## trabada (recalentada): el medidor queda rojo y parpadea
 var badge: int = 0 ## > 0: un círculo rojo con el número (cosas listas para sellar en esa pestaña)
 
 var _down: bool = false
@@ -73,8 +75,24 @@ func _draw() -> void:
 	draw_string(font, Vector2(rect.position.x + (rect.size.x - ts.x) * 0.5, ty), text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, fs, ink)
 	if sub_text != "":
 		UiKit.draw_text(self, Vector2(rect.position.x, ty + 15.0), sub_text, UiKit.font_mono(), 11, ink, HORIZONTAL_ALIGNMENT_CENTER, rect.size.x)
+	if meter >= 0.0:
+		_draw_meter(rect)
 	if badge > 0:
 		_draw_badge(Vector2(rect.end.x - 4.0, rect.position.y + 4.0))
+
+
+## Termómetro de desgaste en el borde izquierdo (al lado del ícono): tinta verde fresca, ámbar a mitad
+## y roja al trabarse (parpadea).
+func _draw_meter(rect: Rect2) -> void:
+	var bar: Rect2 = Rect2(rect.position.x + 9.0, rect.position.y + 9.0, 7.0, rect.size.y - 38.0)
+	draw_rect(bar, Color(0.0, 0.0, 0.0, 0.18))
+	var hot: Color = Color("#C8372D")
+	var col: Color = Color("#4C7A5A").lerp(Color("#E0A030"), clampf(meter * 2.0, 0.0, 1.0)).lerp(hot, clampf(meter * 2.0 - 1.0, 0.0, 1.0))
+	if meter_locked:
+		col = hot if int(Time.get_ticks_msec() / 220) % 2 == 0 else hot.lightened(0.35)
+	var h: float = bar.size.y * clampf(meter, 0.0, 1.0)
+	draw_rect(Rect2(bar.position.x, bar.end.y - h, bar.size.x, h), col)
+	draw_rect(bar, UiKit.INK_SOFT, false, 1.0)
 
 
 ## Sello rojo redondo con la cantidad, en la esquina (late suave para que se note sin gritar).

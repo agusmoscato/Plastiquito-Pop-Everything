@@ -289,8 +289,21 @@ func _decide() -> void:
 	_buy_best()
 
 
+## Desgaste (sección 2): la mejor herramienta que no esté trabada; la que se está usando se suelta
+## recién al 90 % del medidor y una descansada se retoma al 30 % (así el bot alterna como un jugador).
+func _rested_enough(id: String) -> bool:
+	if not sim.upgrades.tool_unlocked(sim.state, id):
+		return false
+	if sim.tool_locked(id):
+		return false
+	var limit: float = 0.9 if sim.state.selected_tool == id else 0.3
+	return sim.wear_fraction(id) < limit or id == "finger"
+
+
 func _pick_tool() -> void:
 	for id: String in ["boot", "iron", "rolling_pin", "palm", "finger"]:
+		if not _rested_enough(id):
+			continue
 		if sim.select_tool(id):
 			if not tool_used.has(id):
 				tool_used[id] = sim.now

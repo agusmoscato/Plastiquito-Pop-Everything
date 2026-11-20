@@ -491,7 +491,17 @@ func _update_toolbar() -> void:
 		b.disabled = not unlocked
 		b.visible = unlocked or id == "finger" or _unlock_revealed(id) # lo que todavía está lejos no ocupa lugar
 		b.toggled_on = sim.state.selected_tool == id
-		if id == "boot" and unlocked:
+		var tires: bool = unlocked and sim.wear.has(id) and sim.wear[id].tires()
+		b.meter = sim.wear_fraction(id) if tires else -1.0
+		b.meter_locked = sim.tool_locked(id)
+		if b.meter_locked:
+			b.sub_text = Tx.t("overheated") if id == "iron" else Tx.t("tired")
+			b.queue_redraw()
+		elif tires and sim.wear_fraction(id) > 0.0:
+			b.queue_redraw()
+		if id != "boot" and not b.meter_locked:
+			b.sub_text = ""
+		if id == "boot" and unlocked and not b.meter_locked:
 			var tm: ToolModel = sim.tools["boot"]
 			b.sub_text = Tx.t("boot_ready") if tm.cooldown_left <= 0.0 else "%.1f s" % tm.cooldown_left
 

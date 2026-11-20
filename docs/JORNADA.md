@@ -556,3 +556,36 @@ si no se completa (`main.gd`, `_update_pull`). Con la mejora, se ve una manivela
 
 Pendiente de la auditoría: los efectos de `perm_*` no tienen todavía una marca visible en el mundo más allá
 del tablero (se resuelve con los accesorios de la sección 3).
+
+## Sección 2 · Desgaste por herramienta (parcial)
+
+Hecho:
+- `WearModel` (`src/sim/wear_model.gd`) y `GameSim.wear`: cada herramienta tiene un medidor que sube al
+  usarla y baja al descansar (también cuando se usa otra, así cambiar de herramienta es la decisión).
+  Al llenarse se traba hasta bajar de `resume`. Dedo casi nada, palma y palo cansancio leve, plancha se
+  recalienta, bota cansa por pisotón; manitos y rodillo no tienen medidor. Todo en `data/economy.json`,
+  clave `wear`; las mejoras de velocidad suben capacidad y recuperación (`speed_gain`) sin quitar el límite.
+- Botones de la barra: termómetro de desgaste (verde → ámbar → rojo) y cartel RECALENTADA / CANSADA
+  parpadeando (`StampButton.meter`).
+- Tests: `tests/test_wear.gd` (7). El bot del simulador (`_rested_enough`) alterna herramienta según el desgaste.
+
+Resultado del simulador (perfil activo, semilla 1, 215 min), **balance NO cerrado**:
+
+| | Sin desgaste (0.6.1) | Desgaste suave | Desgaste ajustado (en data) |
+| --- | --- | --- | --- |
+| Galpón / Estacionamiento (min) | 64 / 107 | 52 / 89 | 47 / 82 |
+| Bota vs. herramienta anterior | 6,4x (plancha) | 1,12x | 0,81x |
+
+Un bot que alterna herramientas progresa MÁS rápido que el que usaba siempre la última: el desgaste
+premia la variedad, pero hoy las fases llegan antes del objetivo (62-100 y 105-170 min) y la bota sale
+peor que la plancha. Hay que reencuadrar costos de fase o los valores de `wear` antes de dar el balance por bueno.
+
+Pendiente de la sección 2: tabla herramienta × tipo de burbuja (film térmico, burbuja fría, racimos,
+gigantes), trabajo propio del rodillo, humo/sonido al trabarse, métricas de reparto de Pops por herramienta
+(45 % / 10 % / 15-40 %) y su tabla.
+
+## Pendientes de la 0.7.0 (no empezados)
+
+Secciones 3 (una sola mano y accesorios), 4 (pedidos grandes), 5 (progresión y mapa RUTA), 6 (escenarios
+y plano de presentación nuevos), 7 (historia, Steam, final) y 8 (rendimiento). Tampoco se corrió
+render.yml ni el revisor externo para las secciones 1 y 2, ni se subió la versión a 0.7.0 ni hay build.

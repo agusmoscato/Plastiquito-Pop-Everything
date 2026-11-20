@@ -92,6 +92,15 @@
    "reward_sheet_fraction": 0.6,
    "streak_bonus": 0.04,
    "streak_cap": 5
+  },
+  "wear": {
+   "_note": "Desgaste por herramienta (WearModel). capacity en segundos de uso (en pisotones para la bota); recover por segundo de descanso; resume = fracción a la que se destraba. Las mejoras de velocidad suben capacidad y recuperación (speed_gain por nivel) pero nunca quitan el límite. Manitos y rodillo no se cansan.",
+   "speed_gain": 0.08,
+   "finger": {"capacity": 120.0, "drain": 1.0, "recover": 4.0, "resume": 0.5},
+   "palm": {"capacity": 20.0, "drain": 1.0, "recover": 1.2, "resume": 0.5},
+   "rolling_pin": {"capacity": 18.0, "drain": 1.0, "recover": 1.2, "resume": 0.5},
+   "iron": {"capacity": 7.0, "drain": 1.0, "recover": 0.6, "resume": 0.3},
+   "boot": {"capacity": 4.0, "drain": 1.0, "recover": 0.25, "resume": 0.34}
   }
  }
 }
