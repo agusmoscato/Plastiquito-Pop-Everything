@@ -616,3 +616,76 @@ con la mano girando, 6 ranuras, compra con sonido `clink`); cambio de herramient
 Para verificar con las capturas de CI (carpeta `40_mano_juego_*` y `41_mi_mano_*` en `demo3/`): posición de
 cada accesorio sobre el hueso (los offsets `RING_Y` y `WRIST_Y` de `hand_rig.gd` son estimados) y orientación
 del dorso. El rodillo automático no lleva mano (es automático); la mano que "le da cuerda" queda pendiente.
+
+---
+
+# 0.7.0 · Cierre
+
+Versión 0.7.0 en `project.godot`. Las secciones 1-8 tienen su parte lógica y de interfaz; lo marcado como
+pendiente abajo no se hizo. **No se mergeó a `main`.**
+
+## Qué se hizo por sección
+1. **Recarga**: la causa era `perm_auto` (la activaba en silencio); ahora solo vale `global_reload` (la fábrica la
+   deja comprada). "TIRÁ DEL ROLLO" (arrastrar o dejar apretado) y manivela con la mejora. Tabla de auditoría arriba.
+2. **Desgaste y materiales**: `WearModel`, termómetros en la barra, humo y chirrido; fría / film térmico / pesada y
+   tabla herramienta × material (DESIGN 11); métricas de reparto de Pops. Rodillo: lo único que no se cansa y
+   alisa el film térmico (x2).
+3. **Mano y accesorios**: 13 accesorios (Blender, huesos), MI MANO, cambio de herramienta de 0,3 s, mano en la bota.
+4. **Pedidos grandes**: ticket con reloj de arena, CUMPLIDO/VENCIDO, multa, reintento más fácil, recompensas.
+5. **Progresión**: requisitos de escenario (pedido grande, herramienta, ritmo), RUTA, candados, "ya tenés todo".
+6. **Escenarios (parcial)**: botella de cola, control, bizcochitos, pizarra, bolsa; pisos de hule, parquet y cemento;
+   se sacaron sifón y alpargatas; Depósito reemplaza a Galpón (nombres cortos: Cocina, Living, Depósito).
+7. **Historia**: memos, credencial, ficha de nombre, cuadro de empleado del mes, telegrama, sello EX, créditos,
+   monotributista; F8 en desarrollo; tests (`test_story.gd`).
+8. **Rendimiento**: `tools/perf_report.sh`, línea de base `tools/perf_baseline.json`, workflow `perf.yml`, precompilado
+   de shaders (`ShaderWarmup`), líneas `PERF` en la prueba de humo.
+
+## Simulador (3 semillas; activo, casual, idle, solo_recicla)
+| Perfil | Llegadas Living / Depósito / Estac. (min) | Lo que falla |
+| --- | --- | --- |
+| Activo | 20-21 / 77-81 / 131-137 (en rango en las 3 semillas) | mediana entre compras (18-20 s, objetivo 30-90), reparto: una herramienta pasa del 45 % (49-58 %), rodillo+manitos 13-19 % |
+| Casual | 30 / 74-77 / 124-127 | mediana entre compras, una herramienta > 45 % (palma 66 %), rodillo+manitos 6 %, pedido grande 1.er intento 75 % (objetivo 30-60) |
+| Idle | 30 / 74 / 160-200 | cumple 20-45 % contra el activo (20-27 %) |
+| solo_recicla | nunca abre el Living (en 215 min) | cumple (no abre el Piso antes de 60 min ni el 3.er escenario) |
+
+Hallazgos: el bot activo se trababa con la palma al 89 % de la lámina (`_still_pressing`); corregido. Los
+requisitos de herramienta (finger 14, pin 24, iron 16) y el costo del 3.er escenario fijan las llegadas.
+Las "perm" de Pellets compiten con los accesorios: el bot compra accesorios solo con lo que sobra tras reservar
+el costo de "Lámina más grande". Combinaciones de accesorios (`--build=`) con llegada dentro de ±20 %: auto 135,
+fire 148 y boot 156 min (medido antes de los requisitos de escenario; hay que repetirlo).
+
+## Uso de herramientas (% de Pops, activo semilla 1, antes de subir manitos/rodillo)
+| Escenario | Dedo | Palma | Palo | Plancha | Bota | Manitos | Rodillo |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 33 | 67 | - | - | - | - | - |
+| 2 | 1 | 67 | 32 | - | - | - | - |
+| 3 | 1 | 17-25 | 49-53 | 24-28 | - | 1-2 | 0 |
+| 4 | 1 | 28-35 | 0-10 | 15-20 | 35-44 | 4-5 | 1 |
+
+## Rendimiento (sin ventana; antes = después: la simulación no necesitó optimizarse)
+| Métrica | Valor | Objetivo |
+| --- | --- | --- |
+| Simulación por frame, 1000x1000 con todo a la vez | 0,31 ms prom. · 0,89 ms p95 · 10,4 ms máx. | <= 2 ms |
+| Cargar datos / armar partida / guardar | 4,5 ms / 1,3 ms / 0,04 ms | (juego: <= 5 s) |
+| Memoria tras 30 min acelerados | +0,02 % (20,6 MB) | <= +5 % |
+| Nodos por escenario (humo headless) | 390 / 448 / 672 / 784 | - |
+| Objetos / memoria estática en el humo | 2.600-3.200 / 46-52 MB | - |
+Pendiente: draw calls, partículas activas, fps reales y picos de shaders se miden con el CI de render y el benchmark en
+modo CASA. Comando listo: `godot --path . --resolution 1280x800 scenes/benchmark.tscn -- --variant=all --seconds=20 --auto-quit`
+(y 1600x900; Steam Deck: 1280x800 con gráficos "bajo").
+
+## PARA REVISAR CON OJOS Y OÍDOS HUMANOS
+- Posición de anillos, pulsera, reloj y guante sobre la mano (offsets estimados) y que se distingan desde la cámara de juego.
+- La mano agarrando la bota; el cambio de herramienta de 0,3 s; el sonido `clink`, `done` y `fail` (generados por código).
+- Tickets: pedido grande, memos a máquina, telegrama, sello EX, créditos; textos en inglés.
+- Mantel a cuadros, parquet, cemento; botella de cola, control, bizcochitos, pizarra, bolsa; cuadro de empleado del mes.
+- Dificultad real: requisitos y plazos de los pedidos (los tiempos son de un bot).
+
+## Pendientes
+- **Revisor externo** (R2) con las capturas de CI de cada sección: no se corrió (las últimas capturas llegan tras el push).
+- Escenarios: composición definitiva con plano de presentación para los objetos nuevos, mate/termo nuevos, chulengo y
+  conservadora ya rehechos antes; falta el hule realmente en la mesa, la lámpara colgante, los listones del cajón.
+- Mano que le da cuerda al rodillo; foto de Steam sin probar (sin GodotSteam instalado); App ID propio.
+- Balance fino: mediana entre compras, reparto de Pops por herramienta, rodillo+manitos, pedidos grandes del casual.
+- Sección 8: LOD de utilería y sombras selectivas; benchmarks con ventana.
+- Memos con las mejoras futuras grisadas al final de la hoja de pedidos ("Próximamente en: ...").
