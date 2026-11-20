@@ -71,6 +71,7 @@
   "idle_hand_after_seconds": 8.0,
   "night_rate_mult": 1.5,
   "chain_dr_size": 60,
+  "chain_big_size": 30,
   "chain_dr_alpha": 0.6,
   "special_cap_k": 1.6,
   "new_phase_discount_levels": 3,

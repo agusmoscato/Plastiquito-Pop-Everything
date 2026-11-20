@@ -2,7 +2,7 @@ class_name GameState
 extends RefCounted
 ## Estado completo y serializable de la partida (DESIGN 8). Lógica pura.
 
-const SAVE_VERSION: int = 5
+const SAVE_VERSION: int = 6
 
 var pops: float = 0.0 ## moneda actual
 var pops_run: float = 0.0 ## Pops ganados en esta corrida (base de la fórmula de Pellets)
@@ -27,6 +27,8 @@ var offline_total: float = 0.0 ## Pops ganados sin conexión (estadística)
 var run_buys: int = 0 ## niveles comprados desde el último reciclado (descuento de las primeras compras)
 var streak: int = 0 ## encargos cumplidos seguidos
 var encargo: Dictionary = {} ## Encargo.to_dict() de la lámina en curso
+var acc_owned: Dictionary = {} ## accesorios comprados (id -> true); permanentes, sobreviven al reciclado
+var acc_equipped: Dictionary = {} ## ranura (ring0, ring1, ring2, bracelet, watch, glove) -> id de accesorio
 
 
 func level(id: String) -> int:
@@ -58,6 +60,7 @@ func to_dict() -> Dictionary:
 		"last_levels": last_levels.duplicate(), "saved_at_unix": saved_at_unix,
 		"max_unix_seen": max_unix_seen, "offline_total": offline_total, "run_buys": run_buys,
 		"streak": streak, "encargo": encargo.duplicate(),
+		"acc_owned": acc_owned.duplicate(), "acc_equipped": acc_equipped.duplicate(),
 	}
 
 
@@ -96,6 +99,10 @@ func from_dict(data: Dictionary) -> bool:
 	streak = Cfg.integer(d, "streak")
 	var enc: Dictionary = d["encargo"]
 	encargo = enc.duplicate()
+	var ao: Dictionary = d["acc_owned"]
+	acc_owned = ao.duplicate()
+	var ae: Dictionary = d["acc_equipped"]
+	acc_equipped = ae.duplicate()
 	return true
 
 
@@ -133,12 +140,18 @@ static func migrate(data: Dictionary) -> Dictionary:
 		d["streak"] = 0
 		d["encargo"] = {}
 		version = 5
+	if version == 5:
+		# v5 -> v6: accesorios de la mano (compras permanentes y ranuras).
+		d["version"] = 6
+		d["acc_owned"] = {}
+		d["acc_equipped"] = {}
+		version = 6
 	if version != SAVE_VERSION:
 		return {}
 	for key: String in ["pops", "pops_run", "pops_total", "pellets", "levels", "perm", "discovered",
 			"selected_tool", "playtime_s", "run_time_s", "recycles", "first_recycle_s", "max_chain",
 			"sheets_done", "tool_pops", "sheet", "last_levels", "saved_at_unix", "max_unix_seen", "offline_total", "run_buys",
-			"streak", "encargo"]:
+			"streak", "encargo", "acc_owned", "acc_equipped"]:
 		if not d.has(key):
 			return {}
 	return d

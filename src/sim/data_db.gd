@@ -11,6 +11,7 @@ const JUICE_FILE: String = "juice.json"
 const AUDIO_FILE: String = "audio.json"
 const UPGRADES_FILE: String = "upgrades.json"
 const ECONOMY_FILE: String = "economy.json"
+const ACCESSORIES_FILE: String = "accessories.json"
 
 ## Campos requeridos y su tipo (TYPE_*) por archivo.
 const PHASE_FIELDS: Dictionary = {
@@ -70,7 +71,11 @@ const ECONOMY_FIELDS: Dictionary = {
 	"iron_heat_reach": TYPE_FLOAT, "boot_cooldown_seconds": TYPE_FLOAT, "boot_wave_k": TYPE_FLOAT,
 	"boot_wave_reach": TYPE_FLOAT, "reload_delay_manual": TYPE_FLOAT, "reload_delay_auto": TYPE_FLOAT, "chain_stamp_min": TYPE_INT,
 	"reveal_cost_fraction": TYPE_FLOAT, "reveal_free_below": TYPE_FLOAT,
-	"tool_matrix": TYPE_DICTIONARY, "wear": TYPE_DICTIONARY,
+	"tool_matrix": TYPE_DICTIONARY, "wear": TYPE_DICTIONARY, "chain_big_size": TYPE_INT,
+}
+const ACCESSORY_FIELDS: Dictionary = {
+	"id": TYPE_STRING, "slot": TYPE_STRING, "name_es": TYPE_STRING, "name_en": TYPE_STRING,
+	"desc_es": TYPE_STRING, "desc_en": TYPE_STRING, "cost": TYPE_INT, "effect": TYPE_DICTIONARY, "look": TYPE_DICTIONARY,
 }
 const TOOL_SHAPES: PackedStringArray = ["cell", "circle", "segment", "rect"]
 
@@ -82,6 +87,7 @@ var juice: Dictionary = {}
 var audio: Dictionary = {}
 var upgrades: Array[Dictionary] = []
 var economy: Dictionary = {}
+var accessories: Array[Dictionary] = []
 var errors: PackedStringArray = PackedStringArray()
 
 
@@ -96,6 +102,7 @@ func load_all(dir: String = "res://data") -> bool:
 	audio = _load_section(dir.path_join(AUDIO_FILE), "audio", AUDIO_FIELDS)
 	upgrades = _load_list(dir.path_join(UPGRADES_FILE), "upgrades", UPGRADE_FIELDS)
 	economy = _load_section(dir.path_join(ECONOMY_FILE), "economy", ECONOMY_FIELDS)
+	accessories = _load_list(dir.path_join(ACCESSORIES_FILE), "accessories", ACCESSORY_FIELDS)
 	_validate_phases()
 	_validate_tools()
 	_validate_bubbles()

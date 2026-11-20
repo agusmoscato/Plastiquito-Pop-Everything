@@ -11,6 +11,8 @@ const TYPE_ECHO: int = 4
 
 var db: DataDB
 var upgrades: Upgrades
+var acc: Accessories
+var acc_fx: Dictionary = {} ## efectos de los accesorios equipados (Accessories.aggregate)
 var state: GameState = GameState.new()
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var eco: Dictionary
@@ -76,6 +78,7 @@ func _init(p_db: DataDB, seed_value: int = 1) -> void:
 	db = p_db
 	eco = db.economy
 	upgrades = Upgrades.new(db)
+	acc = Accessories.new(db)
 	rng.seed = seed_value
 	combo.configure(eco)
 	refresh_stats()
@@ -109,6 +112,7 @@ func sheet_dimension() -> int:
 
 func refresh_stats() -> void:
 	stats = upgrades.global_stats(state)
+	acc_fx = acc.aggregate(state.acc_equipped)
 	var scales: Array = eco["phase_cost_scales"]
 	upgrades.cost_scale = scales[mini(phase(), scales.size()) - 1]
 	var discounted: bool = phase() >= 2 and state.run_buys < Cfg.integer(eco, "new_phase_discount_levels")
@@ -175,7 +179,7 @@ func _configure_tool(id: String) -> void:
 	var p: Dictionary = upgrades.tool_params(state, id, grid.spacing)
 	tm.shape = str(p["shape"])
 	tm.radius = Cfg.num(p, "radius")
-	tm.force_per_second = Cfg.num(p, "force_per_second")
+	tm.force_per_second = Cfg.num(p, "force_per_second") * (1.0 + Accessories.per(acc_fx, "tool_force", id))
 	tm.drag_entry_fraction = Cfg.num(p, "drag_entry_fraction")
 	tm.air_share = Cfg.num(p, "air_share")
 	tm.direction_bias = Cfg.num(p, "direction_bias")
@@ -190,7 +194,10 @@ func _configure_tool(id: String) -> void:
 	_configure_wear(id)
 	var mx: Dictionary = eco["tool_matrix"]
 	var row: Dictionary = mx[id]
-	tm.material_mult = PackedFloat32Array([Cfg.num(row, "thermal"), Cfg.num(row, "cold"), Cfg.num(row, "heavy")])
+	tm.material_mult = PackedFloat32Array([
+		Cfg.num(row, "thermal") * (1.0 + Accessories.per(acc_fx, "material_force", "thermal")),
+		Cfg.num(row, "cold") * (1.0 + Accessories.per(acc_fx, "material_force", "cold")),
+		Cfg.num(row, "heavy") * (1.0 + Accessories.per(acc_fx, "material_force", "heavy"))])
 	tm.wave_k = Cfg.num(eco, "boot_wave_k")
 	tm.wave_reach = Cfg.num(p, "wave_reach")
 	if tm.shape == "rect":
@@ -204,7 +211,10 @@ func _configure_wear(id: String) -> void:
 	var w: Dictionary = cfg[id]
 	var k: float = 1.0 + Cfg.num(cfg, "speed_gain") * float(state.level(id + "_speed"))
 	var wm: WearModel = wear[id]
-	wm.configure(Cfg.num(w, "capacity") * k, Cfg.num(w, "drain"), Cfg.num(w, "recover") * k, Cfg.num(w, "resume"))
+	var cap_mult: float = 1.0 + Accessories.per(acc_fx, "wear_capacity", id)
+	var rec_mult: float = 1.0 + Accessories.per(acc_fx, "wear_recover", id) + Accessories.per(acc_fx, "wear_recover", "all")
+	var drain_mult: float = maxf(0.2, 1.0 + Accessories.per(acc_fx, "wear_drain", id))
+	wm.configure(Cfg.num(w, "capacity") * k * cap_mult, Cfg.num(w, "drain") * drain_mult, Cfg.num(w, "recover") * k * rec_mult, Cfg.num(w, "resume"))
 
 
 ## Medidor de desgaste de una herramienta (0 fresca, 1 trabada). Manitos y rodillo: 0.
@@ -274,6 +284,16 @@ func _roll_encargo() -> void:
 	_sheet_finished = false
 
 
+func streak_cap() -> int:
+	var cfg: Dictionary = eco["encargos"]
+	return Cfg.integer(cfg, "streak_cap") + int(Accessories.flat(acc_fx, "streak_cap_add"))
+
+
+## Plazo de los pedidos grandes (multiplicador por accesorios).
+func big_order_time_mult() -> float:
+	return 1.0 + Accessories.flat(acc_fx, "big_order_time")
+
+
 ## Multiplicador de la racha de encargos (+streak_bonus por cada uno seguido).
 func streak_mult() -> float:
 	var cfg: Dictionary = eco["encargos"]
@@ -304,7 +324,7 @@ func _track_encargo() -> void:
 		state.pops += bonus
 		state.pops_run += bonus
 		state.pops_total += bonus
-		streak = mini(streak + 1, Cfg.integer(cfg, "streak_cap"))
+		streak = mini(streak + 1, streak_cap())
 		ev_encargo_done = true
 		ev_encargo_bonus = bonus
 	if _sheet_finished:
@@ -562,6 +582,8 @@ func _collect_events(auto: bool, direct: int = 0) -> void:
 		if i >= direct:
 			_dr_count += 1
 			v *= Economy.chain_factor(_dr_count, Cfg.integer(eco, "chain_dr_size"), Cfg.num(eco, "chain_dr_alpha"))
+			if _dr_count >= Cfg.integer(eco, "chain_big_size"):
+				v *= 1.0 + Accessories.flat(acc_fx, "chain_big")
 		if auto and i >= _hands_in_events and i < direct:
 			sum_b += v
 		else:
@@ -659,6 +681,42 @@ func can_afford_next(id: String) -> bool:
 		return false
 	var budget: float = state.pellets if upgrades.is_perm(id) else state.pops
 	return upgrades.next_cost(id, level) <= budget
+
+
+# --- Accesorios (permanentes: no se pierden al reciclar) ---------------------------------------
+
+## Compra un accesorio con Pellets. Si queda una ranura libre del tipo, lo equipa.
+func buy_accessory(id: String) -> bool:
+	if state.acc_owned.has(id) or acc.def(id).is_empty():
+		return false
+	var cost: float = float(acc.cost_of(id))
+	if state.pellets < cost:
+		return false
+	state.pellets -= cost
+	state.acc_owned[id] = true
+	for slot: String in Accessories.SLOTS:
+		if acc.fits(slot, id) and not state.acc_equipped.has(slot):
+			state.acc_equipped[slot] = id
+			break
+	refresh_stats()
+	return true
+
+
+## Equipa un accesorio comprado en la ranura (reemplaza al que estaba). false si no entra.
+func equip_accessory(slot: String, id: String) -> bool:
+	if not state.acc_owned.has(id) or not acc.fits(slot, id):
+		return false
+	for other: String in Accessories.SLOTS: # el mismo accesorio no puede estar en dos ranuras
+		if str(state.acc_equipped.get(other, "")) == id:
+			state.acc_equipped.erase(other)
+	state.acc_equipped[slot] = id
+	refresh_stats()
+	return true
+
+
+func unequip_accessory(slot: String) -> void:
+	state.acc_equipped.erase(slot)
+	refresh_stats()
 
 
 # --- Reciclado -----------------------------------------------------------------------------
