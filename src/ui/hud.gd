@@ -24,6 +24,8 @@ var night_stamp: NightStamp
 var flyers: FlyingNumbers
 var shop: ShopSheet
 var recycle_panel: RecyclePanel
+var hand_panel: HandPanel
+var _hand_button: StampButton
 var bubble_log: BubbleLog
 var special_card: SpecialCard
 var encargo_ticket: EncargoTicket
@@ -122,6 +124,10 @@ func setup(p_sim: GameSim, p_camera: Camera3D) -> void:
 	recycle_panel.recycle_requested.connect(func() -> void: recycle_confirmed.emit())
 	recycle_panel.perm_bought.connect(func(i: String, n: int) -> void: purchased.emit(i, n, false); PopAudio.play_ui("stamp"))
 	root.add_child(recycle_panel)
+	hand_panel = HandPanel.new()
+	hand_panel.setup(sim)
+	root.add_child(hand_panel)
+	recycle_panel.hand_requested.connect(hand_panel.open_panel)
 	_layout()
 	pops_panel.odometer.set_target(sim.state.pops)
 	pops_panel.odometer.snap()
@@ -129,7 +135,7 @@ func setup(p_sim: GameSim, p_camera: Camera3D) -> void:
 
 
 func is_modal_open() -> bool:
-	return recycle_panel.visible or offline_ticket.visible
+	return recycle_panel.visible or offline_ticket.visible or hand_panel.visible
 
 
 func open_recycle_panel() -> void:
@@ -179,6 +185,11 @@ func _build_recycle_button() -> void:
 	_log_button.font_size = 12
 	_log_button.pressed.connect(func() -> void: bubble_log.visible = not bubble_log.visible)
 	root.add_child(_log_button)
+	_hand_button = StampButton.new()
+	_hand_button.setup(Tx.t("my_hand"), Vector2(150.0, 40.0), UiKit.CARDBOARD_DARK)
+	_hand_button.font_size = 12
+	_hand_button.pressed.connect(hand_panel.open_panel)
+	root.add_child(_hand_button)
 
 
 ## Rectángulos fijos del HUD en una pantalla de `vp` (los mismos lugares que _layout). Sirve para
@@ -215,7 +226,8 @@ func _layout() -> void:
 	_recycle_button.position = Vector2(free_w - 210.0, vp.y - 84.0)
 	_reload_button.position = Vector2(free_w * 0.5 - _reload_button.size.x * 0.5 + 40.0, vp.y - 190.0)
 	_log_button.position = Vector2(free_w - 170.0, 76.0)
-	bubble_log.position = Vector2(free_w - 380.0, 124.0)
+	_hand_button.position = Vector2(free_w - 170.0, 124.0)
+	bubble_log.position = Vector2(free_w - 380.0, 176.0)
 	flyers.target = pops_panel.odometer_center()
 	flyers.blocked = _panel_rects()
 
@@ -332,7 +344,7 @@ func _handle_pops() -> void:
 ## Rectángulos de los paneles del HUD (los "+N" no se dibujan encima).
 func _panel_rects() -> Array[Rect2]:
 	var out: Array[Rect2] = []
-	for c: Control in [pops_panel, work_order, encargo_ticket, shop, combo, _recycle_button, _log_button, _reload_button]:
+	for c: Control in [pops_panel, work_order, encargo_ticket, shop, combo, _recycle_button, _log_button, _hand_button, _reload_button]:
 		if c.visible:
 			out.append(c.get_global_rect())
 	for id: String in _tool_buttons:

@@ -848,7 +848,38 @@ func _run_demo3(dir: String) -> void:
 		_shot(dir, "37_presentacion_%d" % ph)
 		await _wait(Cfg.num(db.juice, "intro_move_s") + Cfg.num(db.juice, "intro_hold_s") + Cfg.num(db.juice, "intro_hud_fade_s") + 0.4)
 		_shot(dir, "38_trabajo_%d" % ph)
+	await _demo_hand(dir)
 	PopAudio.quit_clean()
+
+
+## MI MANO y la mano en el juego con 0, 3 y todos los accesorios (sección 3 de la 0.7.0).
+func _demo_hand(dir: String) -> void:
+	_demo3_phase(3, 1.0e6)
+	sim.state.pellets = 500.0
+	sim.state.acc_owned = {}
+	sim.state.acc_equipped = {}
+	sim.refresh_stats()
+	var sets: Array = [[], ["ring_alpaca", "ring_sello", "ring_turquesa"],
+		["ring_alpaca", "ring_sello", "ring_turquesa", "bracelet_hilo", "watch_abuela", "glove_cocina"]]
+	var names: Array[String] = ["0", "3", "todos"]
+	for i: int in sets.size():
+		var list: Array = sets[i]
+		for id: Variant in list:
+			sim.buy_accessory(str(id))
+		sim.select_tool("palm" if i == 0 else "finger")
+		_refresh_tool_view()
+		await _wait(0.8)
+		_shot(dir, "40_mano_juego_%s" % names[i])
+		hud.hand_panel.open_panel()
+		await _wait(1.0)
+		_shot(dir, "41_mi_mano_%s" % names[i])
+		await _wait(1.6)
+		_shot(dir, "41_mi_mano_%s_b" % names[i])
+		hud.hand_panel.close_panel()
+	sim.state.acc_equipped = {}
+	sim.state.acc_owned = {}
+	sim.refresh_stats()
+	_refresh_tool_view()
 
 
 ## Capturas de las herramientas 3D: cada una sobre la lámina, suelta y apretando.

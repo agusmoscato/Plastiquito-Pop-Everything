@@ -6,6 +6,7 @@ extends Control
 
 signal recycle_requested
 signal closed
+signal hand_requested
 signal perm_bought(id: String, count: int)
 
 const W: float = 1000.0
@@ -23,6 +24,7 @@ var sim: GameSim
 var _cards: Dictionary = {} ## id -> PermCard
 var _recycle_button: StampButton
 var _close_button: StampButton
+var _hand_button: StampButton
 
 
 func setup(p_sim: GameSim) -> void:
@@ -41,6 +43,11 @@ func setup(p_sim: GameSim) -> void:
 	_recycle_button.font_size = 19
 	_recycle_button.pressed.connect(func() -> void: recycle_requested.emit())
 	add_child(_recycle_button)
+	_hand_button = StampButton.new()
+	_hand_button.setup(Tx.t("my_hand"), Vector2(170.0, 44.0), UiKit.CARDBOARD_DARK)
+	_hand_button.font_size = 14
+	_hand_button.pressed.connect(func() -> void: hand_requested.emit())
+	add_child(_hand_button)
 	_close_button = StampButton.new()
 	_close_button.setup(Tx.t("close"), Vector2(130.0, 44.0), UiKit.CARDBOARD_DARK)
 	_close_button.font_size = 14
@@ -71,6 +78,7 @@ func _layout() -> void:
 		card.position = o + p
 	_recycle_button.position = o + Vector2(36.0, H - 76.0)
 	_close_button.position = o + Vector2(W - 170.0, H - 72.0)
+	_hand_button.position = o + Vector2(W - 360.0, H - 72.0)
 
 
 func _process(_delta: float) -> void:
