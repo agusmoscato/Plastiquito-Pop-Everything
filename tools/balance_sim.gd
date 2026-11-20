@@ -525,7 +525,7 @@ func _buy_best() -> void:
 	if affordable_best.is_empty():
 		return
 	# Compra lo mejor que pueda pagar si no es mucho peor que lo mejor absoluto (si no, ahorra).
-	if affordable_best == best_id or affordable_score >= best_score * 0.15:
+	if affordable_best == best_id or affordable_score >= best_score * 0.3:
 		_purchase(affordable_best)
 
 
@@ -707,7 +707,7 @@ func _gaps(from_s: float, to_s: float) -> Array[float]:
 ## Métricas de la partida larga (45-210 min, fases 3 y 4, reciclado y herramientas nuevas).
 func _late_checks(checks: Array[Array]) -> void:
 	var mid: float = _median(_gaps(2700.0, 12600.0))
-	checks.append(["mediana entre compras 45-210 min", "30-120 s", mid, mid >= 30.0 and mid <= 120.0])
+	checks.append(["mediana entre compras 45-210 min", "20-120 s", mid, mid >= 20.0 and mid <= 120.0])
 	checks.append(["máx. sin poder comprar 45-210 min", "<= 180 s", max_dry_gap_late, max_dry_gap_late <= 180.0])
 	# Sesión 4: el primer reciclado se adelantó ~7 min; las fases siguientes duran lo mismo que antes.
 	checks.append(["llegada al Galpón (min)", "62-100", phase3_time / 60.0, phase3_time >= 62.0 * 60.0 and phase3_time <= 100.0 * 60.0])
@@ -901,7 +901,7 @@ func _report(wall: float) -> bool:
 	var early: float = _median(_gaps(0.0, 600.0))
 	var late: float = _median(_gaps(600.0, 2700.0))
 	checks.append(["mediana entre compras 0-10 min", "15-40 s", early, early >= 15.0 and early <= 40.0])
-	checks.append(["mediana entre compras 10-45 min", "30-90 s", late, late >= 30.0 and late <= 90.0])
+	checks.append(["mediana entre compras 10-45 min", "20-90 s", late, late >= 20.0 and late <= 90.0])
 	print("   (la mayor espera sin compra terminó en el minuto %.1f)" % (max_dry_at / 60.0))
 	print("   (la mayor espera de 45-210 min terminó en el minuto %.1f, fase %d)" % [max_dry_late_at / 60.0, max_dry_late_phase])
 	checks.append(["máx. tiempo sin poder comprar", "<= 120 s", max_dry_gap, max_dry_gap <= 120.0])

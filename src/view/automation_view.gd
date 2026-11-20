@@ -110,6 +110,36 @@ static func separate(points: PackedVector2Array, active: PackedByteArray, min_di
 	return out
 
 
+## La mano del jugador le da cuerda al rodillo y lo suelta: queda automático (sección 4 de la 0.7.1).
+func _start_winding() -> void:
+	var body: Node3D = _roller.get_node_or_null("Body") as Node3D
+	if body == null:
+		return
+	var rs: float = sim.roller.half_width * sim.grid.spacing * 2.0 / 0.26
+	ToolMeshes.add_hand_to(body, "grab", rs * 1.1, Vector3(0.0, 0.2 * rs, 0.0))
+	_wind_t = WIND_SECONDS
+
+
+const WIND_SECONDS: float = 1.8
+var _wind_t: float = 0.0
+
+
+func _animate_winding(delta: float) -> void:
+	if _wind_t <= 0.0 or _roller == null:
+		return
+	_wind_t -= delta
+	var body: Node3D = _roller.get_node_or_null("Body") as Node3D
+	var pivot: Node3D = body.get_node_or_null("HandPivot") as Node3D if body != null else null
+	if pivot == null:
+		return
+	if _wind_t <= 0.0:
+		pivot.queue_free() # lo suelta: ya anda solo
+		return
+	pivot.rotation.y += delta * 9.0 * clampf(_wind_t, 0.0, 1.0) # gira la manivela y afloja al final
+	var k: float = clampf(_wind_t / 0.4, 0.0, 1.0)
+	pivot.scale = Vector3.ONE * pivot.get_meta("base_scale", 1.0) * k if _wind_t < 0.4 else pivot.scale
+
+
 func _sync_roller() -> void:
 	if not sim.roller.enabled:
 		if _roller != null:
@@ -123,7 +153,9 @@ func _sync_roller() -> void:
 		_roller.rotation.y = PI * 0.5
 		add_child(_roller)
 		_roller_key = key
+		_start_winding()
 	_roller.visible = true
+	_animate_winding(get_process_delta_time())
 	var new_pos: Vector3 = Vector3(sim.roller.pos.x, 0.35, sim.roller.pos.y)
 	var moved: float = new_pos.x - _roller.position.x
 	if absf(moved) > 0.0001:

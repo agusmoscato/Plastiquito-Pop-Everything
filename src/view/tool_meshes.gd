@@ -207,6 +207,14 @@ static func _add_model(body: Node3D, file: String, scale_factor: float, color: C
 	body.add_child(m)
 
 
+## Agrega la mano del jugador agarrando algo (pose "grab") a un nodo ya armado.
+static func add_hand_to(body: Node3D, pose: String, scale_factor: float, pos: Vector3) -> void:
+	_add_hand(body, pose, 0, false, scale_factor, pos, Vector3.ZERO)
+	var pivot: Node3D = body.get_node("HandPivot") as Node3D
+	pivot.set_meta("base_scale", scale_factor)
+	ToyStyle.apply(pivot)
+
+
 static func _add_hand(body: Node3D, pose: String, _tier: int, ghost: bool, scale_factor: float, pos: Vector3, rot_deg: Vector3) -> void:
 	var pivot: Node3D = Node3D.new()
 	pivot.name = "HandPivot"

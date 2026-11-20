@@ -180,12 +180,12 @@ func _apply_to_sheet() -> void:
 		_configure_tool(id)
 	var hp: Dictionary = upgrades.hands_params(state)
 	hands.set_count(Cfg.integer(hp, "count"))
-	hands.rate = Cfg.num(hp, "rate")
+	hands.rate = Cfg.num(hp, "rate") * (1.0 + Accessories.flat(acc_fx, "auto_rate"))
 	hands.smart = Cfg.flag(hp, "smart")
 	hands_power = Cfg.num(hp, "power")
 	var rp: Dictionary = upgrades.roller_params(state)
 	roller.enabled = Cfg.flag(rp, "enabled")
-	roller.speed = Cfg.num(rp, "speed")
+	roller.speed = Cfg.num(rp, "speed") * (1.0 + Accessories.flat(acc_fx, "auto_rate"))
 	roller.half_width = Cfg.num(rp, "half_width")
 
 

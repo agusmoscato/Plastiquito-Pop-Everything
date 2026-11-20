@@ -20,6 +20,7 @@ var _current: String = "finger"
 var _mode_buttons: Array[StampButton] = []
 var _scroll: ScrollContainer
 var _clip_shake: float = 0.0
+var _future: Array[FutureTag] = []
 var ready_count: int = 0 ## mejoras que se pueden sellar ahora (todas las pestañas)
 
 
@@ -84,7 +85,32 @@ func _build_tabs() -> void:
 
 ## Muestra solo lo que ya está cerca (Upgrades.is_revealed): una pestaña aparece cuando tiene alguna
 ## mejora a la vista, y lleva un sello rojo con cuántas se pueden sellar ya.
+## Escenario en que se abre una mejora (0 si no depende de uno): el pedido de fase de la mejora o, en las de
+## una herramienta que todavía no existe, el de su desbloqueo.
+func _future_phase(id: String) -> int:
+	var req: Dictionary = sim.upgrades.def(id)["requires"]
+	if req.has("phase"):
+		return Cfg.integer(req, "phase")
+	var tool_id: String = str(sim.upgrades.def(id)["tool"])
+	for up_id: String in sim.upgrades.ids_for_tool(tool_id):
+		if str(sim.upgrades.def(up_id)["kind"]) == "unlock":
+			var ur: Dictionary = sim.upgrades.def(up_id)["requires"]
+			if ur.has("phase"):
+				return Cfg.integer(ur, "phase")
+	return 0
+
+
+func _refresh_future() -> void:
+	var shown: Dictionary = {}
+	for ft: FutureTag in _future:
+		var per_page: int = shown.get(ft.get_parent(), 0)
+		ft.visible = ft.phase > sim.phase() and not sim.upgrades.is_available(sim.state, ft.upgrade_id) and per_page < 3
+		if ft.visible:
+			shown[ft.get_parent()] = per_page + 1
+
+
 func refresh_tabs() -> void:
+	_refresh_future()
 	var ready_total: int = 0
 	for t: String in _tabs:
 		var b: StampButton = _tabs[t]
@@ -178,6 +204,13 @@ func _build_pages() -> void:
 			tag.became_affordable.connect(func(i: String) -> void: tag_affordable.emit(i))
 			page.add_child(tag)
 			_tags[id] = tag
+		for id: String in _ids_of_tab(t): # lo de escenarios futuros, grisado al final
+			var fp: int = _future_phase(id)
+			if fp > 1:
+				var ft: FutureTag = FutureTag.new()
+				ft.setup(sim, id, fp)
+				page.add_child(ft)
+				_future.append(ft)
 
 
 ## Id de la mejora más barata que todavía no se puede pagar (para la barra "siguiente pedido").

@@ -27,6 +27,7 @@ const T: Dictionary = {
 	"short_2": {"es": "Living", "en": "Living"},
 	"short_3": {"es": "Depósito", "en": "Store"},
 	"short_4": {"es": "Estac.", "en": "Parking"},
+	"future_in": {"es": "Próximamente en: %s", "en": "Coming soon in: %s"},
 	"unlocks_in": {"es": "Abre: %s", "en": "Opens: %s"},
 	"tool_tip_finger": {"es": "Dedo: preciso y casi no se cansa.", "en": "Finger: precise, hardly tires."},
 	"tool_tip_palm": {"es": "Palma: revienta un círculo; cansancio leve.", "en": "Palm: pops a circle; mild fatigue."},
