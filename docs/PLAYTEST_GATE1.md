@@ -39,6 +39,18 @@ Campos: duración, reventones totales, segundo del primer arrastre, clics suelto
 3. ¿Cómo describirías el sonido? (¿algo te sonó raro o fuerte?)
 4. ¿Cuánto le pondrías de 1 a 10 a lo bien que se siente reventar?
 
+## Datos nuevos del CSV (0.7.2)
+`uso_herramientas` (reventones por herramienta), `herramienta_trabada` (veces que se recalentó o se cansó cada una), `pedidos_grandes_cumplidos` / `pedidos_grandes_vencidos` (`escenario@minuto`), `compras_accesorios` (`id@minuto`), `minuto_apertura_escenarios` y `final_visto`. Cruzar con lo observado:
+- Una herramienta con casi todos los reventones y ninguna traba: el cansancio no está empujando a cambiar (ver el reparto en JORNADA.md).
+- Pedidos vencidos seguidos en el mismo escenario: plazo o meta demasiado duros (la espera máxima y la recuperación del casual están **pendientes de playtest humano**, congeladas hasta tener estos datos).
+- Escenarios abiertos muy rápido o muy tarde frente a los objetivos del simulador (Living ~20-35 min, Depósito ~62-100, Estacionamiento ~105-170).
+
+## Preguntas extra para la 0.7.2
+5. ¿Entendiste para qué sirve cada herramienta? ¿Cambiaste de herramienta por algo?
+6. ¿Viste los accesorios en la mano? ¿Cuáles tenías?
+7. ¿Se entiende qué hay que hacer para abrir el escenario siguiente?
+8. ¿La historia te hizo gracia? ¿Entendiste quién te escribe los memos?
+
 ## Criterio para aprobar
 - **Al menos 4 de 5** siguen jugando por su cuenta después del minuto 2.
 - **Nadie** menciona que el sonido moleste.
