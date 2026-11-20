@@ -98,14 +98,14 @@ func _draw_requirements(at: Vector2, n: int, current: int, far: bool, lang: Stri
 	var items: Array[Dictionary] = PhaseGate.list(sim.db, n, sim.state.big_done.has(str(n)), latched)
 	for i: int in items.size():
 		var ok: bool = items[i]["ok"] == true or n < current
-		var c: Vector2 = Vector2(at.x + 18.0, y + 20.0 + 24.0 * float(i))
+		var c: Vector2 = Vector2(at.x + 18.0, y + 20.0 + 30.0 * float(i))
 		if ok:
 			draw_polyline(PackedVector2Array([c + Vector2(-4.0, 0.0), c + Vector2(-1.0, 3.0), c + Vector2(5.0, -4.0)]), Color("#2F7A4C"), 2.0)
 		elif n == current:
 			draw_line(c + Vector2(-3.0, -3.0), c + Vector2(3.0, 3.0), UiKit.STAMP_RED, 2.0)
 			draw_line(c + Vector2(-3.0, 3.0), c + Vector2(3.0, -3.0), UiKit.STAMP_RED, 2.0)
 		var line: String = str(items[i][lang])
-		UiKit.draw_text(self, Vector2(at.x + 30.0, c.y + 4.0), line, UiKit.font_text(), UiKit.fit_size(UiKit.font_text(), line, 11, CARD_W - 40.0), UiKit.INK if not ok else UiKit.INK_SOFT)
+		UiKit.draw_paragraph(self, Vector2(at.x + 30.0, c.y + 3.0), line, UiKit.font_text(), 11, UiKit.INK if not ok else UiKit.INK_SOFT, CARD_W - 40.0, 12.0)
 
 
 ## Silueta del lugar: algo reconocible dibujado con formas simples (oscura si todavía no se conoce).

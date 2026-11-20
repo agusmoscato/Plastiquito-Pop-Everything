@@ -90,7 +90,7 @@ func _build_view() -> void:
 	_viewport.add_child(we)
 	var key: OmniLight3D = OmniLight3D.new()
 	key.light_color = Color("#FFD9A0")
-	key.light_energy = 0.7
+	key.light_energy = 0.5
 	key.omni_range = 2.0
 	key.position = Vector3(0.12, 0.35, 0.18)
 	_viewport.add_child(key)
@@ -306,9 +306,6 @@ func _draw_catalog(o: Vector2, lang: String) -> void:
 		var fs: int = UiKit.fit_size(UiKit.font_title(), title, 13, r.size.x - 120.0)
 		UiKit.draw_text(self, r.position + Vector2(38.0, 20.0), title, UiKit.font_title(), fs, UiKit.INK)
 		var desc: String = str(d["desc_" + lang])
-		var ds: int = UiKit.fit_size(UiKit.font_text(), desc, 10, r.size.x - 46.0)
-		UiKit.draw_text(self, r.position + Vector2(38.0, 38.0), desc, UiKit.font_text(), ds, UiKit.CARDBOARD_DARK)
-		var tag: String = Tx.t("hand_worn") if worn else (Tx.t("hand_owned") if owned else "%d" % cost)
+		UiKit.draw_paragraph(self, r.position + Vector2(38.0, 35.0), desc, UiKit.font_text(), 10, UiKit.CARDBOARD_DARK, r.size.x - 50.0, 11.0)
+		var tag: String = Tx.t("hand_worn") if worn else (Tx.t("hand_owned") if owned else "%d %s" % [cost, Tx.t("pellets").to_lower()])
 		UiKit.draw_text(self, r.position + Vector2(r.size.x - 74.0, 18.0), tag, UiKit.font_mono_bold(), 11, UiKit.STAMP_RED if not owned else UiKit.INK, HORIZONTAL_ALIGNMENT_RIGHT, 68.0)
-		if not owned:
-			UiKit.draw_text(self, r.position + Vector2(r.size.x - 62.0, 30.0), Tx.t("pellets").to_lower(), UiKit.font_mono(), 9, UiKit.INK_SOFT, HORIZONTAL_ALIGNMENT_RIGHT, 56.0)

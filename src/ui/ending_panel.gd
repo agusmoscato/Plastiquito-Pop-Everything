@@ -9,7 +9,7 @@ signal finished
 
 enum Step { TELEGRAM, STAMP, CREDITS, FREELANCE }
 
-const TELEGRAM_SIZE: Vector2 = Vector2(640.0, 430.0)
+const TELEGRAM_SIZE: Vector2 = Vector2(640.0, 360.0)
 const FRAME_W: float = 196.0
 
 
@@ -105,10 +105,10 @@ func _draw() -> void:
 			_draw_telegram(vp, lang)
 			_draw_frame(vp)
 		Step.CREDITS:
-			draw_rect(Rect2(Vector2.ZERO, vp), Color(0.05, 0.03, 0.02, 0.35)) # la lámina se sigue reventando atrás
+			draw_rect(Rect2(Vector2.ZERO, vp), Color(0.04, 0.025, 0.015, 0.78)) # la lámina se sigue reventando atrás, bien oscurecida
 			_draw_credits(vp, lang)
 		Step.FREELANCE:
-			draw_rect(Rect2(Vector2.ZERO, vp), Color(0.05, 0.03, 0.02, 0.35))
+			draw_rect(Rect2(Vector2.ZERO, vp), Color(0.04, 0.025, 0.015, 0.78))
 			var title: String = str(sim.db.story["freelance_title_" + lang])
 			UiKit.draw_stamp(self, Rect2(vp * 0.5 + Vector2(-330.0, -80.0), Vector2(660.0, 92.0)), title, UiKit.STAMP_RED, 36, -0.04)
 			UiKit.draw_text(self, vp * 0.5 + Vector2(-330.0, 30.0), Tx.t("ending_freelance_sub"), UiKit.font_text_bold(), 14, UiKit.PAPER, HORIZONTAL_ALIGNMENT_CENTER, 660.0)
@@ -124,7 +124,7 @@ func _draw_telegram(vp: Vector2, lang: String) -> void:
 	UiKit.draw_text(self, r.position + Vector2(30.0, 100.0), "%s: %s" % [Tx.t("ending_to"), sim.player_name(lang).to_upper()], UiKit.font_mono_bold(), 14, UiKit.INK)
 	var body: String = sim.story.telegram_body(lang)
 	# Cinta pegada: el texto va en una franja más clara, como un telegrama de verdad, con ajuste de línea.
-	draw_rect(Rect2(r.position + Vector2(26.0, 118.0), Vector2(r.size.x - 52.0, 240.0)), Color("#F7EFD2"))
+	draw_rect(Rect2(r.position + Vector2(26.0, 118.0), Vector2(r.size.x - 52.0, 190.0)), Color("#F7EFD2"))
 	var lines: PackedStringArray = UiKit.wrap_text(UiKit.font_mono_bold(), body, 15, r.size.x - 76.0)
 	var left: int = int(t * 70.0) if step == Step.TELEGRAM else 100000
 	for i: int in lines.size():
@@ -137,7 +137,7 @@ func _draw_telegram(vp: Vector2, lang: String) -> void:
 
 ## El cuadro de "EMPLEADO DEL MES" con tu foto: recibe el sello rojo "EX".
 func _draw_frame(vp: Vector2) -> void:
-	var at: Vector2 = Vector2(_group_left(vp), vp.y * 0.5 - 130.0)
+	var at: Vector2 = Vector2(_group_left(vp), vp.y * 0.5 - 118.0)
 	draw_rect(Rect2(at + Vector2(-8.0, -8.0), Vector2(196.0, 252.0)), Color("#5A3A1E"))
 	draw_rect(Rect2(at, Vector2(180.0, 236.0)), Color("#F4EFE6"))
 	var tt: String = Tx.t("employee_month")

@@ -75,17 +75,18 @@ func _draw() -> void:
 	var total: float = maxf(sim.big.seconds(st, sim.big_order_time_mult()), 1.0) if not st.is_empty() else 1.0
 	var urgent: bool = left < 15.0 and _stamp_t <= 0.0
 	var clock_col: Color = UiKit.STAMP_RED if urgent and int(Time.get_ticks_msec() / 300) % 2 == 0 else UiKit.INK
-	UiKit.draw_text(self, Vector2(rect.end.x - 118.0, 128.0), "%d:%02d" % [int(left) / 60, int(left) % 60], UiKit.font_mono_bold(), 16, clock_col, HORIZONTAL_ALIGNMENT_RIGHT, 80.0)
-	_draw_hourglass(Vector2(rect.end.x - 26.0, 112.0), clampf(left / total, 0.0, 1.0), clock_col)
+	if _stamp_t <= 0.0: # con el sello puesto, el reloj ya no importa: el sello ocupa su lugar
+		UiKit.draw_text(self, Vector2(rect.end.x - 122.0, 128.0), "%d:%02d" % [int(left) / 60, int(left) % 60], UiKit.font_mono_bold(), 16, clock_col, HORIZONTAL_ALIGNMENT_RIGHT, 80.0)
+		_draw_hourglass(Vector2(rect.end.x - 30.0, 112.0), clampf(left / total, 0.0, 1.0), clock_col)
 	var tries: int = st.get("tries", 0)
 	if tries > 0:
 		UiKit.draw_text(self, Vector2(ox, 150.0), Tx.t("big_retry") % tries, UiKit.font_mono(), 10, UiKit.INK_SOFT)
 	if _stamp_t > 0.0:
 		var t: float = clampf(_stamp_t, 0.0, 4.0)
 		var punch: float = 1.0 + maxf(0.0, t - 3.6) * 3.0
-		var r: Rect2 = Rect2(Vector2(rect.position.x + 54.0 - 8.0 * punch, 78.0 - 8.0 * punch), Vector2(210.0, 46.0) * punch)
-		UiKit.draw_stamp(self, r, Tx.t("enc_done") if _stamp_ok else Tx.t("big_failed"), UiKit.STAMP_RED if not _stamp_ok else Color("#2F7A4C"), int(22.0 * punch), -0.12, clampf(t, 0.0, 1.0))
-		UiKit.draw_text(self, Vector2(ox, 150.0), _note, UiKit.font_mono_bold(), 12, UiKit.STAMP_RED if not _stamp_ok else Color("#2F7A4C"))
+		var r: Rect2 = Rect2(Vector2(rect.end.x - 168.0 - 6.0 * punch, 102.0 - 6.0 * punch), Vector2(150.0, 36.0) * punch) # sobre el reloj, sin tapar el pedido
+		UiKit.draw_stamp(self, r, Tx.t("enc_done") if _stamp_ok else Tx.t("big_failed"), UiKit.STAMP_RED if not _stamp_ok else Color("#2F7A4C"), int(17.0 * punch), -0.1, clampf(t, 0.0, 1.0))
+		UiKit.draw_text(self, Vector2(ox, 152.0), _note, UiKit.font_mono_bold(), 13, UiKit.STAMP_RED if not _stamp_ok else Color("#2F7A4C"))
 
 
 ## Reloj de arena: dos triángulos y la arena que baja con el plazo.

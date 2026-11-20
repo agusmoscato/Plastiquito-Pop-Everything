@@ -94,7 +94,7 @@ func _draw() -> void:
 	var sy: float = size.y - 28.0
 	draw_polyline(PackedVector2Array([Vector2(size.x - 150.0, sy), Vector2(size.x - 138.0, sy - 12.0), Vector2(size.x - 128.0, sy + 3.0),
 		Vector2(size.x - 116.0, sy - 10.0), Vector2(size.x - 104.0, sy + 2.0), Vector2(size.x - 90.0, sy - 6.0), Vector2(size.x - 70.0, sy - 2.0)]), Color("#2B3F7A"), 1.8)
-	UiKit.draw_stamp(self, Rect2(Vector2(20.0, size.y - 44.0), Vector2(120.0, 26.0)), "PLASTIQUITO S.R.L.", UiKit.STAMP_RED, 9, -0.06, 0.8)
+	UiKit.draw_stamp(self, Rect2(Vector2(_text_x(), size.y - 44.0), Vector2(120.0, 26.0)), "PLASTIQUITO S.R.L.", UiKit.STAMP_RED, 9, -0.06, 0.8)
 	if _typed >= float(_text.length()):
 		UiKit.draw_text(self, Vector2(size.x - 128.0, size.y - 8.0), Tx.t("memo_close"), UiKit.font_mono(), 9, UiKit.INK_SOFT)
 
