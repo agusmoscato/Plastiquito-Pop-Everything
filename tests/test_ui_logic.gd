@@ -31,8 +31,8 @@ func test_effect_text_by_kind() -> void:
 	assert_eq(up.effect_text("global_special", 4, "en"), "+2.0%")
 	assert_eq(up.effect_text("global_tense", 2, "en"), "1.44")
 	assert_eq(up.effect_text("perm_bonus", 3, "en"), "+15%")
-	assert_eq(up.effect_text("perm_sheet", 0, "en"), "Table")
-	assert_eq(up.effect_text("perm_sheet", 1, "es"), "Piso")
+	assert_eq(up.effect_text("perm_sheet", 0, "en"), "Kitchen")
+	assert_eq(up.effect_text("perm_sheet", 1, "es"), "Living")
 
 
 func test_names_and_descriptions_in_both_languages() -> void:

@@ -13,6 +13,7 @@ var font_size: int = 16
 var disabled: bool = false
 var seed_id: String = ""
 var text_bottom: bool = false ## el texto va abajo (deja arriba lugar para un ícono)
+var locked: bool = false ## herramienta todavía bloqueada: candado
 var meter: float = -1.0 ## >= 0: medidor de desgaste de 0 (fresca) a 1 (trabada); < 0 no se dibuja
 var meter_locked: bool = false ## trabada (recalentada): el medidor queda rojo y parpadea
 var badge: int = 0 ## > 0: un círculo rojo con el número (cosas listas para sellar en esa pestaña)
@@ -77,8 +78,18 @@ func _draw() -> void:
 		UiKit.draw_text(self, Vector2(rect.position.x, ty + 15.0), sub_text, UiKit.font_mono(), 11, ink, HORIZONTAL_ALIGNMENT_CENTER, rect.size.x)
 	if meter >= 0.0:
 		_draw_meter(rect)
+	if locked:
+		_draw_padlock(Vector2(rect.end.x - 18.0, rect.position.y + 20.0))
 	if badge > 0:
 		_draw_badge(Vector2(rect.end.x - 4.0, rect.position.y + 4.0))
+
+
+## Candado dibujado: cuerpo, arco y ojo de cerradura.
+func _draw_padlock(c: Vector2) -> void:
+	draw_arc(c + Vector2(0.0, -4.0), 6.0, PI, TAU, 12, UiKit.INK_SOFT, 2.4)
+	draw_rect(Rect2(c + Vector2(-8.0, -4.0), Vector2(16.0, 12.0)), UiKit.INK_SOFT)
+	draw_circle(c + Vector2(0.0, 1.0), 2.0, UiKit.PAPER)
+	draw_rect(Rect2(c + Vector2(-0.8, 1.0), Vector2(1.6, 4.0)), UiKit.PAPER)
 
 
 ## Termómetro de desgaste en el borde izquierdo (al lado del ícono): tinta verde fresca, ámbar a mitad

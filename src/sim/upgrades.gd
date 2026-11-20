@@ -329,8 +329,8 @@ func effect_text(id: String, level: int, lang: String) -> String:
 		"iron_start", "boot_start", "palm_start", "pin_start":
 			return "+" + str(int(v)) + " niv" if lang == "es" else "+" + str(int(v)) + " lv"
 		"sheet_size":
-			var names_es: Array[String] = ["Mesa", "Piso", "Galpón", "Estacionamiento"]
-			var names_en: Array[String] = ["Table", "Floor", "Warehouse", "Parking lot"]
+			var names_es: Array[String] = ["Cocina", "Living", "Depósito", "Estacionamiento"]
+			var names_en: Array[String] = ["Kitchen", "Living room", "Storeroom", "Parking lot"]
 			return (names_es if lang == "es" else names_en)[clampi(level, 0, 3)]
 		"global_bonus":
 			return "+" + NumberFormat.decimal(v * 100.0, 0, lang) + "%"

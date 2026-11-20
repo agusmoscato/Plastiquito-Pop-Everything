@@ -25,10 +25,13 @@ var flyers: FlyingNumbers
 var shop: ShopSheet
 var recycle_panel: RecyclePanel
 var hand_panel: HandPanel
+var route_panel: RoutePanel
+var _route_button: StampButton
 var _hand_button: StampButton
 var bubble_log: BubbleLog
 var special_card: SpecialCard
 var encargo_ticket: EncargoTicket
+var big_ticket: BigOrderTicket
 var _intro_timer: float = 0.0
 
 var _tool_buttons: Dictionary = {} ## id -> StampButton
@@ -75,6 +78,9 @@ func setup(p_sim: GameSim, p_camera: Camera3D) -> void:
 	encargo_ticket = EncargoTicket.new()
 	encargo_ticket.setup(sim)
 	root.add_child(encargo_ticket)
+	big_ticket = BigOrderTicket.new()
+	big_ticket.setup(sim)
+	root.add_child(big_ticket)
 	combo = ComboMeter.new()
 	combo.setup()
 	root.add_child(combo)
@@ -128,6 +134,9 @@ func setup(p_sim: GameSim, p_camera: Camera3D) -> void:
 	hand_panel.setup(sim)
 	root.add_child(hand_panel)
 	recycle_panel.hand_requested.connect(hand_panel.open_panel)
+	route_panel = RoutePanel.new()
+	route_panel.setup(sim)
+	root.add_child(route_panel)
 	_layout()
 	pops_panel.odometer.set_target(sim.state.pops)
 	pops_panel.odometer.snap()
@@ -135,7 +144,7 @@ func setup(p_sim: GameSim, p_camera: Camera3D) -> void:
 
 
 func is_modal_open() -> bool:
-	return recycle_panel.visible or offline_ticket.visible or hand_panel.visible
+	return recycle_panel.visible or offline_ticket.visible or hand_panel.visible or route_panel.visible
 
 
 func open_recycle_panel() -> void:
@@ -190,6 +199,11 @@ func _build_recycle_button() -> void:
 	_hand_button.font_size = 12
 	_hand_button.pressed.connect(hand_panel.open_panel)
 	root.add_child(_hand_button)
+	_route_button = StampButton.new()
+	_route_button.setup(Tx.t("route"), Vector2(150.0, 40.0), UiKit.CARDBOARD_DARK)
+	_route_button.font_size = 12
+	_route_button.pressed.connect(route_panel.open_panel)
+	root.add_child(_route_button)
 
 
 ## Rectángulos fijos del HUD en una pantalla de `vp` (los mismos lugares que _layout). Sirve para
@@ -214,7 +228,8 @@ func _layout() -> void:
 	var free_w: float = vp.x - SHOP_W - 16.0
 	pops_panel.position = Vector2(14.0, 10.0)
 	work_order.position = Vector2(20.0, 148.0)
-	encargo_ticket.position = Vector2(20.0, 300.0)
+	encargo_ticket.position = Vector2(20.0, 148.0 + work_order.size.y + 10.0)
+	big_ticket.position = Vector2(20.0, encargo_ticket.position.y + encargo_ticket.size.y + 10.0)
 	shop.position = Vector2(vp.x - SHOP_W - 6.0, 8.0)
 	combo.position = Vector2(14.0, vp.y - 110.0)
 	night_stamp.position = Vector2(18.0, vp.y - 178.0)
@@ -227,7 +242,8 @@ func _layout() -> void:
 	_reload_button.position = Vector2(free_w * 0.5 - _reload_button.size.x * 0.5 + 40.0, vp.y - 190.0)
 	_log_button.position = Vector2(free_w - 170.0, 76.0)
 	_hand_button.position = Vector2(free_w - 170.0, 124.0)
-	bubble_log.position = Vector2(free_w - 380.0, 176.0)
+	_route_button.position = Vector2(free_w - 170.0, 172.0)
+	bubble_log.position = Vector2(free_w - 380.0, 224.0)
 	flyers.target = pops_panel.odometer_center()
 	flyers.blocked = _panel_rects()
 
@@ -238,6 +254,7 @@ func _layout() -> void:
 func on_sim_step(delta: float) -> void:
 	_handle_pops()
 	encargo_ticket.on_sim_step()
+	big_ticket.on_sim_step()
 	if sim.ev_encargo_done:
 		PopAudio.play_ui("milestone", 1.15, -4.0)
 		flyers.spawn(encargo_ticket.get_global_rect().get_center(), sim.ev_encargo_bonus)
@@ -344,7 +361,7 @@ func _handle_pops() -> void:
 ## Rectángulos de los paneles del HUD (los "+N" no se dibujan encima).
 func _panel_rects() -> Array[Rect2]:
 	var out: Array[Rect2] = []
-	for c: Control in [pops_panel, work_order, encargo_ticket, shop, combo, _recycle_button, _log_button, _hand_button, _reload_button]:
+	for c: Control in [pops_panel, work_order, encargo_ticket, big_ticket, shop, combo, _recycle_button, _log_button, _hand_button, _route_button, _reload_button]:
 		if c.visible:
 			out.append(c.get_global_rect())
 	for id: String in _tool_buttons:
@@ -475,6 +492,7 @@ func _process(delta: float) -> void:
 	if _refresh_timer <= 0.0:
 		_refresh_timer = 0.2
 		work_order.refresh()
+		_layout()
 	_update_toolbar()
 	_update_recycle_button()
 	_update_intros(delta)
@@ -501,7 +519,11 @@ func _update_toolbar() -> void:
 		var b: StampButton = _tool_buttons[id]
 		var unlocked: bool = sim.upgrades.tool_unlocked(sim.state, id)
 		b.disabled = not unlocked
-		b.visible = unlocked or id == "finger" or _unlock_revealed(id) # lo que todavía está lejos no ocupa lugar
+		b.visible = true # las herramientas bloqueadas se ven desde el principio, con candado y dónde se abren
+		b.locked = not unlocked
+		b.tooltip_text = Tx.t("tool_tip_" + id)
+		if not unlocked:
+			b.sub_text = Tx.t("unlocks_in") % _unlock_place(id)
 		b.toggled_on = sim.state.selected_tool == id
 		var tires: bool = unlocked and sim.wear.has(id) and sim.wear[id].tires()
 		b.meter = sim.wear_fraction(id) if tires else -1.0
@@ -516,6 +538,21 @@ func _update_toolbar() -> void:
 		if id == "boot" and unlocked and not b.meter_locked:
 			var tm: ToolModel = sim.tools["boot"]
 			b.sub_text = Tx.t("boot_ready") if tm.cooldown_left <= 0.0 else "%.1f s" % tm.cooldown_left
+
+
+## Dónde se abre una herramienta (el escenario de su mejora de desbloqueo).
+func _unlock_place(tool_id: String) -> String:
+	var n: int = 1
+	for up_id: String in sim.upgrades.ids_for_tool(tool_id):
+		var d: Dictionary = sim.upgrades.def(up_id)
+		if str(d["kind"]) == "unlock":
+			var req: Dictionary = d["requires"]
+			if req.has("phase"):
+				n = Cfg.integer(req, "phase")
+	for p: Dictionary in sim.db.phases:
+		if Cfg.integer(p, "number") == n:
+			return str(p["name_" + Settings.language])
+	return "?"
 
 
 func _unlock_revealed(tool_id: String) -> bool:
@@ -534,6 +571,9 @@ func _update_recycle_button() -> void:
 		_recycle_button.text = Tx.t("recycle")
 		_recycle_button.sub_text = "+%d %s" % [sim.recycle_gain(), Tx.t("pellets")]
 		_recycle_button.color = UiKit.STAMP_RED
+		if sim.nothing_left_to_buy(): # no queda nada para comprar en este escenario: RECICLAR late
+			var kk: float = 1.0 + 0.06 * sin(Time.get_ticks_msec() * 0.011)
+			_recycle_button.scale = Vector2(kk, kk)
 		if sim.next_phase_ready(): # alcanza para la fase siguiente: que se note
 			_recycle_button.sub_text = Tx.t("recycle_opens") % Tx.t("phase_%d" % (sim.phase() + 1)).to_upper()
 			var k: float = 1.0 + 0.05 * sin(Time.get_ticks_msec() * 0.009)

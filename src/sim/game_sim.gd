@@ -805,6 +805,23 @@ func can_afford_next(id: String) -> bool:
 	return upgrades.next_cost(id, level) <= budget
 
 
+## true si en este escenario ya no queda nada razonable para comprar: todo lo disponible está al máximo o
+## lo más barato cuesta más de `nothing_left_minutes` minutos de ingreso. La orden de trabajo lo dice y
+## RECICLAR late.
+func nothing_left_to_buy() -> bool:
+	var bases: Array = eco["phase_base_values"]
+	var base: float = bases[mini(phase(), bases.size()) - 1]
+	var income: float = maxf(norm_rate * base, 0.001)
+	var cheapest: float = INF
+	for id: String in upgrades.order:
+		if upgrades.is_perm(id) or not upgrades.is_available(state, id):
+			continue
+		var lv: int = state.level(id)
+		if lv < upgrades.max_level(id):
+			cheapest = minf(cheapest, upgrades.next_cost(id, lv))
+	return cheapest == INF or cheapest / income > Cfg.num(eco, "nothing_left_minutes") * 60.0
+
+
 # --- Accesorios (permanentes: no se pierden al reciclar) ---------------------------------------
 
 ## Compra un accesorio con Pellets. Si queda una ranura libre del tipo, lo equipa.

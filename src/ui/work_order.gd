@@ -9,6 +9,7 @@ var title: String = ""
 var ratio: float = 0.0
 var detail: String = ""
 var why: String = "" ## para qué sirve la meta (una línea)
+var reqs: Array[Dictionary] = [] ## requisitos para abrir el escenario siguiente, con check o cruz
 
 
 func setup(p_sim: GameSim) -> void:
@@ -46,6 +47,12 @@ func refresh() -> void:
 	why = Tx.t("why_" + goal)
 	if goal == "phase" and sim.next_phase_ready():
 		why = Tx.t("why_phase_ready")
+	reqs = [] if goal in ["hold", "reload", "palm"] else sim.phase_requirements()
+	if not (goal in ["hold", "reload", "palm"]) and sim.nothing_left_to_buy():
+		why = Tx.t("nothing_left") % Tx.t("client_%d" % sim.phase())
+	elif goal == "phase" and not reqs.is_empty() and not sim.phase_gate_ok():
+		why = Tx.t("why_requirements")
+	size.y = 142.0 + 17.0 * float(reqs.size()) + (6.0 if not reqs.is_empty() else 0.0)
 	queue_redraw()
 
 
@@ -92,3 +99,15 @@ func _draw() -> void:
 	UiKit.draw_ink_bar(self, Rect2(Vector2(20.0, 102.0), Vector2(size.x - 48.0, 12.0)), ratio, UiKit.STAMP_RED if ratio >= 1.0 else UiKit.INK)
 	UiKit.draw_text(self, Vector2(20.0, 132.0), detail, UiKit.font_mono(), 12, UiKit.INK)
 	UiKit.draw_text(self, Vector2(size.x - 80.0, 132.0), "%d%%" % int(ratio * 100.0), UiKit.font_mono_bold(), 12, UiKit.STAMP_RED, HORIZONTAL_ALIGNMENT_RIGHT, 52.0)
+	var lang: String = Settings.language
+	for i: int in reqs.size():
+		var ok: bool = reqs[i]["ok"] == true
+		var y: float = 152.0 + 17.0 * float(i)
+		var mark: Vector2 = Vector2(28.0, y - 4.0)
+		if ok:
+			draw_polyline(PackedVector2Array([mark + Vector2(-5.0, 0.0), mark + Vector2(-1.0, 4.0), mark + Vector2(6.0, -5.0)]), Color("#2F7A4C"), 2.2)
+		else:
+			draw_line(mark + Vector2(-4.0, -4.0), mark + Vector2(4.0, 4.0), UiKit.STAMP_RED, 2.2)
+			draw_line(mark + Vector2(-4.0, 4.0), mark + Vector2(4.0, -4.0), UiKit.STAMP_RED, 2.2)
+		var line: String = str(reqs[i][lang])
+		UiKit.draw_text(self, Vector2(42.0, y), line, UiKit.font_text(), UiKit.fit_size(UiKit.font_text(), line, 12, size.x - 62.0), UiKit.INK if not ok else UiKit.INK_SOFT)

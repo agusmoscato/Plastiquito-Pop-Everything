@@ -849,7 +849,50 @@ func _run_demo3(dir: String) -> void:
 		await _wait(Cfg.num(db.juice, "intro_move_s") + Cfg.num(db.juice, "intro_hold_s") + Cfg.num(db.juice, "intro_hud_fade_s") + 0.4)
 		_shot(dir, "38_trabajo_%d" % ph)
 	await _demo_hand(dir)
+	await _demo_orders(dir)
 	PopAudio.quit_clean()
+
+
+## Pedido grande (activo, cumplido, vencido), requisitos, herramientas bloqueadas, RUTA y "ya tenés todo".
+func _demo_orders(dir: String) -> void:
+	_demo3_phase(2, 5.0e6)
+	sim.state.phase_sheets = 4
+	sim.step(0.1, sim.center(), false)
+	sim.state.big["progress"] = 0.55 * float(sim.big.target(sim.state.big))
+	sim.state.big["left"] = 40.0
+	hud.on_sim_step(0.1)
+	await _wait(1.2)
+	_shot(dir, "42_pedido_grande_activo")
+	sim.state.big["progress"] = 9999.0
+	sim.step(0.1, sim.center(), false)
+	hud.on_sim_step(0.1)
+	await _wait(0.6)
+	_shot(dir, "43_pedido_cumplido")
+	await _wait(4.2)
+	_demo3_phase(3, 5.0e6)
+	sim.state.phase_sheets = 4
+	sim.step(0.1, sim.center(), false)
+	sim.state.big["left"] = 0.05
+	sim.step(0.1, sim.center(), false)
+	hud.on_sim_step(0.1)
+	await _wait(0.6)
+	_shot(dir, "44_pedido_vencido")
+	await _wait(4.2)
+	hud.route_panel.open_panel()
+	await _wait(0.5)
+	_shot(dir, "45_ruta")
+	hud.route_panel.close_panel()
+	_demo3_phase(1, 0.0)
+	sim.state.levels = {}
+	sim.state.recycles = 1
+	sim.state.pops_run = 5.0e6
+	sim.state.pellets = 3.0
+	sim.refresh_stats()
+	await _wait(1.0)
+	_shot(dir, "46_bloqueadas_y_requisitos")
+	sim.norm_rate = 0.0001
+	await _wait(1.0)
+	_shot(dir, "47_ya_tenes_todo")
 
 
 ## MI MANO y la mano en el juego con 0, 3 y todos los accesorios (sección 3 de la 0.7.0).
