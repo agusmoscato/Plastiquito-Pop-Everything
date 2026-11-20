@@ -211,12 +211,12 @@ func _build_recycle_button() -> void:
 	_hand_button = StampButton.new()
 	_hand_button.setup(Tx.t("my_hand"), Vector2(150.0, 40.0), UiKit.CARDBOARD_DARK)
 	_hand_button.font_size = 12
-	_hand_button.pressed.connect(hand_panel.open_panel)
+	_hand_button.pressed.connect(func() -> void: hand_panel.open_panel())
 	root.add_child(_hand_button)
 	_route_button = StampButton.new()
 	_route_button.setup(Tx.t("route"), Vector2(150.0, 40.0), UiKit.CARDBOARD_DARK)
 	_route_button.font_size = 12
-	_route_button.pressed.connect(route_panel.open_panel)
+	_route_button.pressed.connect(func() -> void: route_panel.open_panel())
 	root.add_child(_route_button)
 
 
