@@ -1,0 +1,2 @@
+APROBADO smoke
+SMOKE OK | 300 s | fase 4 | pops 9449032339 | capturas 26 | {"buys":5,"drags":17,"phase_jumps":3,"recycles":5,"taps":88,"tool_switches":0}
