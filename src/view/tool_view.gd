@@ -57,6 +57,23 @@ func set_tool(id: String, p_radius: float, p_tier: int, speed01: float, force_ra
 	_depth_scale = clampf(0.85 + 0.05 * force_ratio, 0.85, 1.25)
 	if key == _built_key:
 		return
+	if _swap_out > 0.0: # ya está soltando la anterior: la nueva que pidieron es la última
+		_pending = {"id": id, "radius": p_radius, "tier": p_tier, "key": key}
+		return
+	if id != tool_id and _holder != null and not Settings.reduce_motion:
+		# Cambio de herramienta (0,3-0,4 s): la mano suelta la que tenía y agarra la nueva.
+		_swap_out = SWAP_OUT_S
+		_pending = {"id": id, "radius": p_radius, "tier": p_tier, "key": key}
+		return
+	_rebuild(id, p_radius, p_tier, key)
+
+
+const SWAP_OUT_S: float = 0.16
+var _swap_out: float = 0.0
+var _pending: Dictionary = {}
+
+
+func _rebuild(id: String, p_radius: float, p_tier: int, key: String) -> void:
 	var grew: bool = id == tool_id and p_radius > radius
 	tool_id = id
 	radius = p_radius
@@ -217,6 +234,14 @@ func _process(delta: float) -> void:
 	_press = lerpf(_press, _press_target, 1.0 - exp(-_press_rate * delta))
 	_squish_boost = maxf(0.0, _squish_boost - delta * 6.0)
 	_grow = lerpf(_grow, 1.0, 1.0 - exp(-9.0 * delta))
+	if _swap_out > 0.0:
+		_swap_out -= delta
+		_grow = clampf(_swap_out / SWAP_OUT_S, 0.0, 1.0) # suelta la herramienta: se achica
+		if _swap_out <= 0.0:
+			var p_radius: float = _pending["radius"]
+			var p_tier: int = _pending["tier"]
+			_rebuild(str(_pending["id"]), p_radius, p_tier, str(_pending["key"]))
+			_grow = 0.3 # agarra la nueva: crece con rebote
 	var spring: Vector2 = SpringMath.step(Vector2(_offset, _velocity), stiffness, damping, delta)
 	_offset = spring.x
 	_velocity = spring.y

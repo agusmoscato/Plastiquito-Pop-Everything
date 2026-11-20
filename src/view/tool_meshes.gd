@@ -171,7 +171,10 @@ static func build(tool_id: String, radius: float, tier: int = 0, icon: bool = fa
 			tilt.rotation_degrees = Vector3(-35.0, 0.0, 0.0)
 			body.add_child(tilt)
 			_add_model(tilt, "boot", half * 1.95 / 0.33 * 1.1, color, amount, metal) # la suela cubre el pisotón; 8-15 % del alto
-			(tilt.get_child(0) as Node3D).rotation_degrees = Vector3(0.0, -80.0, 0.0)
+			var boot_m: Node3D = tilt.get_child(0) as Node3D
+			boot_m.rotation_degrees = Vector3(0.0, -80.0, 0.0)
+			# La mano del jugador agarra la bota de la caña y la pisotea como un sello (sección 3, 0.7.0).
+			_add_hand(boot_m, "grab", tier, false, 1.3, Vector3(0.0, 0.205, 0.075), Vector3(0.0, 0.0, 0.0))
 		"auto_roller":
 			# El rodillo gira sobre el centro de su cilindro (Tilt): AutomationView inclina el mango
 			# hacia atrás del avance, como se usa uno de verdad (parado tapaba media lámina).
