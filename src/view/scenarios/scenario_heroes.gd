@@ -1,7 +1,7 @@
 class_name ScenarioHeroes
 extends RefCounted
 ## La utilería argentina de cada escenario, ubicada donde se ve (sesión 0.6.2). Cada escenario tiene una
-## pareja protagonista (Mesa: mate y termo; Piso: pelota y sifón; Galpón: garrafa y cajón de naranjas;
+## pareja protagonista (Mesa: mate y termo; Living: pelota, botella de cola y control remoto; Depósito: garrafa, cajón de verdura, pizarrita y bolsa de papas;
 ## Estacionamiento: chulengo con humo) que va en la franja de pantalla que el HUD deja libre con la cámara
 ## de trabajo de esa fase: a la derecha de la lámina (antes de la hoja de pedidos) o abajo a la izquierda.
 ## Se proyecta con las cuentas de CameraRig (sin nodos) y se escala para que entre; la misma escala se usa
@@ -22,9 +22,9 @@ static var _scale_cache: Dictionary = {}
 
 ## Pareja protagonista de cada fase: [archivo, desplazamiento en cm a escala 1, giro].
 const HEROES: Dictionary = {
-	1: [["prop_mate", Vector3(0.0, 0.0, 0.0), 200.0], ["prop_termo", Vector3(2.0, 0.0, -17.0), -25.0], ["prop_yerba", Vector3(-12.0, 0.0, -6.0), 20.0]],
-	2: [["prop_pelota", Vector3(0.0, 0.0, 0.0), 30.0], ["prop_sifon", Vector3(4.0, 0.0, -26.0), -20.0], ["prop_alpargatas", Vector3(-6.0, 0.0, 20.0), 70.0]],
-	3: [["prop_cajon", Vector3(0.0, 0.0, 0.0), 90.0], ["prop_garrafa", Vector3(4.0, 0.0, -48.0), 30.0]],
+	1: [["prop_mate", Vector3(0.0, 0.0, 0.0), 200.0], ["prop_termo", Vector3(2.0, 0.0, -17.0), -25.0], ["prop_yerba", Vector3(-12.0, 0.0, -6.0), 20.0], ["prop_bizcochos", Vector3(12.0, 0.0, 14.0), 0.0]],
+	2: [["prop_pelota", Vector3(0.0, 0.0, 0.0), 30.0], ["prop_cola", Vector3(4.0, 0.0, -26.0), -20.0], ["prop_control", Vector3(14.0, 0.0, 16.0), 70.0]],
+	3: [["prop_cajon", Vector3(0.0, 0.0, 0.0), 90.0], ["prop_garrafa", Vector3(4.0, 0.0, -48.0), 30.0], ["prop_pizarra", Vector3(4.0, 0.0, 44.0), 0.0], ["prop_bolsa", Vector3(-16.0, 0.0, 22.0), 0.0]],
 	4: [["prop_chulengo", Vector3(0.0, 0.0, 0.0), 180.0], ["prop_conservadora", Vector3(-10.0, 0.0, 62.0), 15.0]],
 }
 

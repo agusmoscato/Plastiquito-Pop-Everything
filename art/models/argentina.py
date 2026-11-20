@@ -940,7 +940,124 @@ def conservadora():
     return [body, lid, handle, latch, stripe]
 
 
+# --- Escenas nuevas de la 0.7.0 (clientes de la empresa) -------------------------------------------------
+
+def text_mesh(name, body, size, loc, color_mat, rot=(0, 0, 0), extrude=0.0015):
+    """Texto de cartel (fuente por defecto de Blender, propia): se convierte a malla."""
+    bpy.ops.object.text_add(location=loc, rotation=rot)
+    t = bpy.context.active_object
+    t.data.body = body
+    t.data.size = size
+    t.data.extrude = extrude
+    t.data.align_x = "CENTER"
+    t.data.align_y = "CENTER"
+    t.name = name
+    bpy.ops.object.convert(target="MESH")
+    o = bpy.context.active_object
+    o.data.materials.append(color_mat)
+    return o
+
+
+def cola():
+    # Botella de vidrio de litro retornable: cuerpo recto o levemente cónico (NO la silueta curva de ninguna
+    # marca), gaseosa oscura con burbujas, tapita corona roja y etiqueta genérica "COLA".
+    glass = mat("cola_vidrio", "#BFD6CC", rough=0.05, alpha=0.28)
+    liquid = mat("cola_liquido", "#2A1208", rough=0.15)
+    cap = mat("cola_tapa", "#C23A2E", rough=0.35, metal=0.5)
+    label = mat("cola_etiqueta", "#EFE4C8", rough=0.7)
+    ink = mat("cola_tinta", "#9C2A20", rough=0.6)
+    body = revolve("botella", [(0.0, 0.0), (0.034, 0.0), (0.036, 0.006), (0.037, 0.02), (0.0385, 0.20), (0.0375, 0.26),
+                               (0.030, 0.285), (0.017, 0.305), (0.0135, 0.32), (0.0135, 0.345), (0.0155, 0.352), (0.0, 0.352)], 40)
+    lib.subsurf(body, 1)
+    give(body, glass)
+    fill = revolve("gaseosa", [(0.0, 0.004), (0.0325, 0.004), (0.0355, 0.02), (0.0365, 0.20), (0.0345, 0.255), (0.0, 0.255)], 36)
+    give(fill, liquid)
+    crown = revolve("corona", [(0.0, 0.352), (0.0175, 0.352), (0.0190, 0.358), (0.0168, 0.362), (0.0, 0.362)], 24)
+    give(crown, cap)
+    band = revolve("etiqueta", [(0.0388, 0.09), (0.0393, 0.09), (0.0393, 0.175), (0.0388, 0.175)], 40, closed=True)
+    give(band, label)
+    lib.apply_modifiers(body)
+    letters = text_mesh("cola_texto", "COLA", 0.026, (0.0, -0.0398, 0.132), ink, rot=(math.radians(90), 0, 0))
+    bpy.ops.object.select_all(action="DESELECT")
+    return [body, fill, crown, band, letters]
+
+
+def control():
+    # Control remoto genérico: caja negra redondeada con botones de colores y un led.
+    shell = mat("control_cuerpo", "#25262B", rough=0.45)
+    body = rbox("control", (0.045, 0.165, 0.018), (0.0, 0.0, 0.009), 0.006)
+    give(body, shell)
+    parts = [body]
+    for i, col in enumerate(("#C23A2E", "#3A8A4C", "#E0B030", "#3A63B8")):
+        b = rbox("boton%d" % i, (0.009, 0.009, 0.004), (-0.012 + 0.008 * (i % 3) - 0.004, 0.05 - 0.016 * (i // 3), 0.019), 0.002)
+        give(b, mat("btn%d" % i, col, rough=0.4))
+        parts.append(b)
+    for r in range(3):
+        for k in range(3):
+            b = rbox("tecla%d_%d" % (r, k), (0.009, 0.009, 0.0035), (-0.012 + 0.012 * k, -0.005 - 0.014 * r, 0.0188), 0.002)
+            give(b, mat("tecla", "#8E9096", rough=0.4))
+            parts.append(b)
+    led = lib.sphere("led", 0.0035, loc=(0.0, 0.078, 0.018), segs=10, rings=6)
+    give(led, mat("led", "#FF3B2E", rough=0.3, emission=hx("#FF3B2E")))
+    parts.append(led)
+    return parts
+
+
+def bizcochos():
+    # Platito de loza con bizcochitos de grasa (rosquitas doradas).
+    plate = revolve("platito", [(0.0, 0.0), (0.060, 0.0), (0.085, 0.012), (0.090, 0.016), (0.084, 0.016), (0.058, 0.006), (0.0, 0.006)], 40)
+    give(plate, mat("platito", "#E8E2D2", rough=0.35))
+    parts = [plate]
+    rng = random.Random(3)
+    bis = mat("bizcocho", "#D79B4E", rough=0.75)
+    for i in range(7):
+        ang = 2.0 * math.pi * i / 7.0 if i < 6 else 0.0
+        r = 0.040 if i < 6 else 0.0
+        b = revolve("bizcocho%d" % i, [(0.012, 0.0), (0.020, 0.0), (0.022, 0.007), (0.018, 0.013), (0.012, 0.013), (0.006, 0.010), (0.006, 0.003)], 18, closed=True)
+        b.location = (r * math.cos(ang), r * math.sin(ang), 0.008 + (0.012 if i == 6 else 0.0))
+        b.rotation_euler = (rng.uniform(-0.12, 0.12), rng.uniform(-0.12, 0.12), rng.uniform(0, 6.28))
+        give(b, bis)
+        parts.append(b)
+    return parts
+
+
+def pizarra():
+    # Pizarrita de almacén con precios a tiza, apoyada sobre un caballete de madera.
+    wood = mat("pizarra_madera", "#8A5A32", rough=0.8)
+    board = mat("pizarra_negra", "#27342E", rough=0.9)
+    chalk = mat("tiza", "#F2EFE4", rough=0.9)
+    frame = rbox("marco", (0.46, 0.025, 0.36), (0.0, 0.0, 0.30), 0.006)
+    give(frame, wood)
+    face = rbox("pizarra", (0.40, 0.012, 0.30), (0.0, -0.011, 0.30), 0.003)
+    give(face, board)
+    parts = [frame, face]
+    for s in (-1, 1):
+        leg = rbox("pata", (0.03, 0.03, 0.34), (s * 0.19, 0.045, 0.17), 0.004, rot=(math.radians(-14), 0, 0))
+        give(leg, wood)
+        parts.append(leg)
+    for k, (txt, z) in enumerate((("PAPAS  $300", 0.38), ("YERBA  $900", 0.31), ("FIDEOS  $250", 0.24))):
+        t = text_mesh("precio%d" % k, txt, 0.04, (0.0, -0.0185, z), chalk, rot=(math.radians(90), 0, 0), extrude=0.0008)
+        parts.append(t)
+    return parts
+
+
+def bolsa():
+    # Bolsa de papa de arpillera: cuerpo panzón, boca atada con un piolín y arruguitas.
+    cloth = tinted("bolsa_arpillera", "#C9A872", rough=0.95)
+    twine = mat("piolin", "#6B4A26", rough=0.9)
+    prof = [(0.0, 0.0), (0.10, 0.0), (0.14, 0.02), (0.165, 0.10), (0.165, 0.20), (0.14, 0.30), (0.085, 0.37), (0.055, 0.395),
+            (0.075, 0.42), (0.085, 0.46), (0.05, 0.47), (0.0, 0.47)]
+    body = revolve("bolsa", prof, 36)
+    paint(body, lambda c: 0.86 + 0.14 * math.sin(c.z * 70.0 + math.atan2(c.y, c.x) * 5.0) ** 2)
+    lib.subsurf(body, 1)
+    give(body, cloth)
+    tie = revolve("piolin", [(0.052, 0.388), (0.060, 0.388), (0.060, 0.400), (0.052, 0.400)], 24, closed=True)
+    give(tie, twine)
+    return [body, tie]
+
+
 BUILD = {"mate": mate, "termo": termo, "yerba": yerba_pack, "pelota": pelota, "alpargatas": alpargatas,
-         "sifon": sifon, "garrafa": garrafa, "cajon": cajon, "chulengo": chulengo, "conservadora": conservadora}
+         "sifon": sifon, "garrafa": garrafa, "cajon": cajon, "chulengo": chulengo, "conservadora": conservadora,
+         "cola": cola, "control": control, "bizcochos": bizcochos, "pizarra": pizarra, "bolsa": bolsa}
 parts = BUILD[which]()
 finish(parts, "prop_" + which, angle=15.0 if which == "sifon" else 40.0)

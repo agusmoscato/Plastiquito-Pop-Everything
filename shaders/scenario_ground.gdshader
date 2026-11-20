@@ -57,6 +57,46 @@ vec3 wood(vec2 p, out float rough) {
 	return col * (0.35 + 0.65 * seam) * (0.8 + 0.2 * joint);
 }
 
+// 1 · Cocina de Doña Marta: mantel de hule a cuadros (rojo oscuro y crema apagada), con brillo de hule.
+vec3 gingham(vec2 p, out float rough) {
+	float size = 3.4;
+	vec2 q = p / size;
+	float px = fwidth(q.x) + fwidth(q.y);
+	float far_k = smoothstep(0.3, 0.8, px);
+	float bx = step(0.5, fract(q.x));
+	float by = step(0.5, fract(q.y));
+	float amount = mix(0.5 * bx + 0.5 * by, 0.5, far_k);
+	vec3 cream = vec3(0.36, 0.30, 0.22);
+	vec3 red = vec3(0.34, 0.07, 0.065);
+	vec3 col = mix(cream, red, amount);
+	col *= 0.93 + 0.14 * fbm(p * 0.5); // arrugas y uso
+	float fold = smoothstep(0.78, 0.9, fbm(p * 0.07 + 5.0));
+	col *= 1.0 - 0.18 * fold;
+	rough = 0.35; // hule: algo de brillo
+	return col;
+}
+
+// 2 · Living de los Gómez: parquet en espiga de roble oscuro.
+vec3 parquet(vec2 p, out float rough) {
+	float s = 6.0;
+	vec2 q = p / s;
+	vec2 id = floor(q);
+	vec2 f = fract(q);
+	float flip = mod(id.x + id.y, 2.0);
+	vec2 g = flip < 0.5 ? f : f.yx;
+	float plank = floor(g.y * 4.0);
+	float pf = fract(g.y * 4.0);
+	float px = fwidth(q.x) + fwidth(q.y);
+	float far_k = smoothstep(0.25, 0.7, px);
+	float seam = smoothstep(0.0, 0.07, pf) * smoothstep(0.0, 0.07, 1.0 - pf) * smoothstep(0.0, 0.03, g.x) * smoothstep(0.0, 0.03, 1.0 - g.x);
+	float tone = hash21(id * 7.0 + plank);
+	float grain = vnoise(vec2(g.x * 6.0, g.y * 28.0 + tone * 9.0));
+	vec3 col = mix(vec3(0.17, 0.095, 0.055), vec3(0.30, 0.17, 0.09), tone) * (0.85 + 0.3 * grain);
+	col = mix(col * (0.4 + 0.6 * seam), vec3(0.23, 0.13, 0.07), far_k);
+	rough = 0.4;
+	return col;
+}
+
 vec3 tiles(vec2 p, out float rough) {
 	float size = 3.2;
 	vec2 q = p / size;
@@ -81,7 +121,7 @@ vec3 tiles(vec2 p, out float rough) {
 vec3 concrete(vec2 p, out float rough) {
 	float n = fbm(p * 0.22);
 	float fine = vnoise(p * 6.0);
-	vec3 col = vec3(0.12, 0.25, 0.19) * (0.8 + 0.4 * n) * (0.94 + 0.1 * fine); // epoxi verde
+	vec3 col = vec3(0.27, 0.22, 0.17) * (0.8 + 0.4 * n) * (0.94 + 0.1 * fine); // cemento alisado del depósito, tibio
 	float stain = smoothstep(0.62, 0.8, fbm(p * 0.09 + 11.0));
 	col = mix(col, vec3(0.07, 0.12, 0.10), stain * 0.6); // manchas y desgaste
 	vec2 j = abs(fract(p / 13.0) - 0.5);
@@ -113,13 +153,13 @@ vec3 asphalt(vec2 p, out float rough) {
 
 vec3 ground(int kind, vec2 p, out float rough) {
 	if (kind == 2) {
-		return tiles(p, rough);
+		return parquet(p, rough);
 	} else if (kind == 3) {
 		return concrete(p, rough);
 	} else if (kind == 4) {
 		return asphalt(p, rough);
 	}
-	return wood(p, rough);
+	return gingham(p, rough);
 }
 
 void fragment() {
