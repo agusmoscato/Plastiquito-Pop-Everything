@@ -479,7 +479,22 @@ func _on_purchased(id: String, count: int, _milestone: bool) -> void:
 
 # --- Después de cada paso de la sim ----------------------------------------------------------------------
 
+## Registro de sesión de lo nuevo: trabas de herramienta, pedidos grandes, escenarios abiertos y el final.
+func _log_new_events() -> void:
+	var minute: float = sim.state.playtime_s / 60.0
+	if sim.ev_tool_locked != "":
+		Playtest.log.tool_locked(sim.ev_tool_locked)
+	if sim.ev_big_done:
+		Playtest.log.big_order(sim.phase(), true, minute)
+	if sim.ev_big_failed:
+		Playtest.log.big_order(sim.phase(), false, minute)
+	Playtest.log.phase_opened(sim.phase(), minute)
+	if sim.ending_pending:
+		Playtest.log.ending()
+
+
 func _after_step(_holding: bool, delta: float) -> void:
+	_log_new_events()
 	if sim.ev_reloaded:
 		_celebrate_sheet()
 		world.rebind_game_sheet(true)
@@ -965,6 +980,10 @@ func _demo_story(dir: String) -> void:
 func _demo_orders(dir: String) -> void:
 	_demo3_phase(2, 5.0e6)
 	sim.state.phase_sheets = 4
+	sim.state.big_done.erase("2")
+	sim.state.big = {}
+	sim.select_tool("palm") # la palma está prohibida en este pedido: las cadenas no cuentan y el pedido sigue activo
+	_refresh_tool_view()
 	sim.step(0.1, sim.center(), false)
 	sim.state.big["progress"] = 0.55 * float(sim.big.target(sim.state.big))
 	sim.state.big["left"] = 40.0
@@ -991,7 +1010,7 @@ func _demo_orders(dir: String) -> void:
 	_shot(dir, "45_ruta")
 	hud.route_panel.close_panel()
 	_demo3_phase(1, 0.0)
-	sim.state.levels = {}
+	sim.state.levels = {"global_hold": 1, "global_reload": 1, "unlock_palm": 1}
 	sim.state.recycles = 1
 	sim.state.pops_run = 5.0e6
 	sim.state.pellets = 3.0

@@ -354,7 +354,7 @@ func _build_plane() -> void:
 	pm.size = extents() + Vector2(grid.spacing, grid.spacing)
 	var m: StandardMaterial3D = StandardMaterial3D.new()
 	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	m.albedo_color = Color(0.74, 0.9, 1.0, 0.14) # film transparente: se nota el borde de la lámina sobre el piso oscuro
+	m.albedo_color = Color(0.86, 0.94, 1.0, 0.34) # film transparente: se nota el borde de la lámina sobre el piso oscuro
 	m.roughness = 0.6 # mate: casi espejo reflejaba franjas claras que cruzaban todas las burbujas
 	m.metallic_specular = 0.2
 	ToyStyle.toonify(m)

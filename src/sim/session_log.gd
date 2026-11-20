@@ -18,6 +18,12 @@ var purchases: int = 0
 var max_chain: int = 0
 var first_recycle_min: float = -1.0
 var tool_uses: Dictionary = {} ## herramienta -> reventones
+var tool_locks: Dictionary = {} ## herramienta -> veces que se trabó (recalentada / cansada)
+var big_done: PackedStringArray = PackedStringArray() ## pedidos grandes cumplidos: "escenario@minuto"
+var big_failed: PackedStringArray = PackedStringArray() ## pedidos grandes vencidos: "escenario@minuto"
+var accessories_bought: PackedStringArray = PackedStringArray() ## "id@minuto"
+var phase_open_min: Dictionary = {} ## escenario -> minuto de juego en que se abrió
+var ending_seen: bool = false ## se vio el final (telegrama)
 
 var _pressing: bool = false
 var _press_is_drag: bool = false
@@ -75,6 +81,28 @@ func tool_pops(tool_id: String, count: int) -> void:
 	tool_uses[tool_id] = cur + count
 
 
+func tool_locked(tool_id: String) -> void:
+	var cur: int = tool_locks.get(tool_id, 0)
+	tool_locks[tool_id] = cur + 1
+
+
+func big_order(phase: int, done: bool, minute: float) -> void:
+	(big_done if done else big_failed).append("%d@%.1f" % [phase, minute])
+
+
+func accessory(id: String, minute: float) -> void:
+	accessories_bought.append("%s@%.1f" % [id, minute])
+
+
+func phase_opened(phase: int, minute: float) -> void:
+	if not phase_open_min.has(phase):
+		phase_open_min[phase] = minute
+
+
+func ending() -> void:
+	ending_seen = true
+
+
 func zoomed() -> void:
 	zoom_uses += 1
 
@@ -108,4 +136,22 @@ func to_csv(duration_s: float) -> String:
 		var uses_n: int = tool_uses[k]
 		uses.append("%s:%d" % [str(k), uses_n])
 	rows.append("uso_herramientas,%s" % ";".join(uses))
+	var locks: PackedStringArray = PackedStringArray()
+	var lk: Array = tool_locks.keys()
+	lk.sort()
+	for k2: Variant in lk:
+		var n2: int = tool_locks[k2]
+		locks.append("%s:%d" % [str(k2), n2])
+	rows.append("herramienta_trabada,%s" % ";".join(locks))
+	rows.append("pedidos_grandes_cumplidos,%s" % ";".join(big_done))
+	rows.append("pedidos_grandes_vencidos,%s" % ";".join(big_failed))
+	rows.append("compras_accesorios,%s" % ";".join(accessories_bought))
+	var opens: PackedStringArray = PackedStringArray()
+	var pk: Array = phase_open_min.keys()
+	pk.sort()
+	for k3: Variant in pk:
+		var m3: float = phase_open_min[k3]
+		opens.append("%s@%.1f" % [str(k3), m3])
+	rows.append("minuto_apertura_escenarios,%s" % ";".join(opens))
+	rows.append("final_visto,%s" % ("si" if ending_seen else "no"))
 	return "\n".join(rows) + "\n"

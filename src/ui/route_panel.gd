@@ -7,7 +7,7 @@ extends Control
 signal closed
 
 const W: float = 1180.0
-const H: float = 560.0
+const H: float = 620.0
 const CARD_W: float = 156.0
 const CARD_GAP: float = 10.0
 
@@ -44,7 +44,7 @@ func _origin() -> Vector2:
 func _process(_delta: float) -> void:
 	if not visible:
 		return
-	_close_button.position = _origin() + Vector2(W - 160.0, H - 62.0)
+	_close_button.position = _origin() + Vector2(W - 160.0, H - 56.0)
 	queue_redraw()
 
 
@@ -66,7 +66,7 @@ func _draw_card(at: Vector2, p: Dictionary, current: int, lang: String) -> void:
 	var far: bool = n > current + 1 # los muy lejanos son un misterio
 	var reached: bool = n <= current
 	var route: Dictionary = p["route"]
-	var r: Rect2 = Rect2(at, Vector2(CARD_W, 400.0))
+	var r: Rect2 = Rect2(at, Vector2(CARD_W, 456.0))
 	var base: Color = Color("#FFF6D8") if reached else UiKit.PAPER_SHADE
 	UiKit.draw_sheet(self, r, base, "route_%d" % n, 1.0 if n == current else 0.0, 1.0)
 	if n == current:
@@ -108,30 +108,19 @@ func _draw_requirements(at: Vector2, n: int, current: int, far: bool, lang: Stri
 		UiKit.draw_paragraph(self, Vector2(at.x + 30.0, c.y + 3.0), line, UiKit.font_text(), 11, UiKit.INK if not ok else UiKit.INK_SOFT, CARD_W - 40.0, 12.0)
 
 
-## Silueta del lugar: algo reconocible dibujado con formas simples (oscura si todavía no se conoce).
+const ROUTE_ICONS: Dictionary = {1: ["finger", "route_mate"], 2: ["rolling_pin", "route_pelota"], 3: ["iron", "route_garrafa"], 4: ["boot", "route_chulengo"]}
+
+
+## Íconos pre-renderizados de Blender: la herramienta del escenario y su objeto protagonista (mate, pelota, garrafa,
+## chulengo). Los escenarios que todavía no se conocen muestran un signo de pregunta.
 func _draw_silhouette(at: Vector2, n: int, known: bool) -> void:
-	var ink: Color = UiKit.INK if known else Color(0.2, 0.18, 0.16, 0.55)
 	var box: Rect2 = Rect2(at, Vector2(CARD_W - 24.0, 80.0))
 	draw_rect(box, Color(0.0, 0.0, 0.0, 0.06))
-	var c: Vector2 = box.get_center()
-	match n:
-		1: # mesa con termo y mate
-			draw_rect(Rect2(c + Vector2(-50.0, 14.0), Vector2(100.0, 8.0)), ink)
-			draw_rect(Rect2(c + Vector2(-34.0, -22.0), Vector2(14.0, 36.0)), ink)
-			draw_circle(c + Vector2(10.0, 4.0), 12.0, ink)
-		2: # pelota y sillón
-			draw_circle(c + Vector2(-20.0, 8.0), 14.0, ink)
-			draw_rect(Rect2(c + Vector2(8.0, -4.0), Vector2(44.0, 26.0)), ink)
-			draw_rect(Rect2(c + Vector2(8.0, -16.0), Vector2(44.0, 12.0)), ink)
-		3: # estantes y garrafa
-			draw_rect(Rect2(c + Vector2(-50.0, -22.0), Vector2(100.0, 5.0)), ink)
-			draw_rect(Rect2(c + Vector2(-50.0, 4.0), Vector2(100.0, 5.0)), ink)
-			draw_rect(Rect2(c + Vector2(-34.0, 9.0), Vector2(18.0, 28.0)), ink)
-			draw_rect(Rect2(c + Vector2(10.0, -14.0), Vector2(26.0, 18.0)), ink)
-		4: # parrilla y humo
-			draw_rect(Rect2(c + Vector2(-34.0, 0.0), Vector2(68.0, 18.0)), ink)
-			draw_line(c + Vector2(-28.0, 18.0), c + Vector2(-34.0, 36.0), ink, 3.0)
-			draw_line(c + Vector2(28.0, 18.0), c + Vector2(34.0, 36.0), ink, 3.0)
-			draw_arc(c + Vector2(0.0, -12.0), 10.0, PI, TAU, 10, ink, 3.0)
-		_: # lugar desconocido
-			UiKit.draw_text(self, box.position + Vector2(0.0, 52.0), "?", UiKit.font_title(), 52, ink, HORIZONTAL_ALIGNMENT_CENTER, box.size.x)
+	if not known or not ROUTE_ICONS.has(n):
+		UiKit.draw_text(self, box.position + Vector2(0.0, 58.0), "?", UiKit.font_title(), 52, Color(0.2, 0.18, 0.16, 0.55), HORIZONTAL_ALIGNMENT_CENTER, box.size.x)
+		return
+	var names: Array = ROUTE_ICONS[n]
+	for k: int in 2:
+		var tex: Texture2D = load("res://assets/icons/%s.png" % str(names[k])) as Texture2D
+		if tex != null:
+			draw_texture_rect(tex, Rect2(box.position + Vector2(4.0 + float(k) * 64.0, 6.0), Vector2(64.0, 68.0)), false)

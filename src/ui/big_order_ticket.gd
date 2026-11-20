@@ -37,7 +37,7 @@ func on_sim_step() -> void:
 	if sim.ev_big_failed:
 		_stamp_t = 4.0
 		_stamp_ok = false
-		_note = "-" + NumberFormat.pops(sim.ev_big_fine, Settings.language)
+		_note = Tx.t("big_fine") % NumberFormat.pops(sim.ev_big_fine, Settings.language)
 		PopAudio.play_ui("fail")
 	if sim.big.is_active(sim.state.big):
 		_hold_state = sim.state.big

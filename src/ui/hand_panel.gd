@@ -8,7 +8,7 @@ signal closed
 
 const W: float = 1020.0
 const H: float = 700.0
-const CARD: Vector2 = Vector2(246.0, 58.0)
+const CARD: Vector2 = Vector2(246.0, 68.0)
 const VIEW: Vector2 = Vector2(430.0, 470.0)
 const SLOT_LABEL: Dictionary = {
 	"ring0": {"es": "ANILLO · ÍNDICE", "en": "RING · INDEX"}, "ring1": {"es": "ANILLO · MEDIO", "en": "RING · MIDDLE"},
@@ -202,6 +202,7 @@ func _click(id: String) -> void:
 		_message = Tx.t("hand_put_on") % acc_name
 		return
 	if sim.buy_accessory(id):
+		Playtest.log.accessory(id, sim.state.playtime_s / 60.0)
 		PopAudio.play_ui("clink", randf_range(0.95, 1.08))
 		_message = Tx.t("hand_bought") % acc_name
 	else:
@@ -303,9 +304,8 @@ func _draw_catalog(o: Vector2, lang: String) -> void:
 		draw_circle(r.position + Vector2(20.0, r.size.y * 0.5), 9.0, Color(str(look["color"])))
 		draw_arc(r.position + Vector2(20.0, r.size.y * 0.5), 9.0, 0.0, TAU, 16, UiKit.INK, 1.5)
 		var title: String = str(d["name_" + lang])
-		var fs: int = UiKit.fit_size(UiKit.font_title(), title, 13, r.size.x - 120.0)
-		UiKit.draw_text(self, r.position + Vector2(38.0, 20.0), title, UiKit.font_title(), fs, UiKit.INK)
+		var title_h: float = UiKit.draw_paragraph(self, r.position + Vector2(38.0, 17.0), title, UiKit.font_title(), 12, UiKit.INK, r.size.x - 124.0, 13.0)
 		var desc: String = str(d["desc_" + lang])
-		UiKit.draw_paragraph(self, r.position + Vector2(38.0, 35.0), desc, UiKit.font_text(), 10, UiKit.CARDBOARD_DARK, r.size.x - 50.0, 11.0)
+		UiKit.draw_paragraph(self, r.position + Vector2(38.0, 20.0 + title_h), desc, UiKit.font_text(), 10, UiKit.CARDBOARD_DARK, r.size.x - 50.0, 11.0)
 		var tag: String = Tx.t("hand_worn") if worn else (Tx.t("hand_owned") if owned else "%d %s" % [cost, Tx.t("pellets").to_lower()])
 		UiKit.draw_text(self, r.position + Vector2(r.size.x - 74.0, 18.0), tag, UiKit.font_mono_bold(), 11, UiKit.STAMP_RED if not owned else UiKit.INK, HORIZONTAL_ALIGNMENT_RIGHT, 68.0)

@@ -964,28 +964,30 @@ def cola():
     glass = mat("cola_vidrio", "#D8D2C4", rough=0.04, alpha=0.18)
     liquid = mat("cola_liquido", "#3A1808", rough=0.2)
     cap = mat("cola_tapa", "#C23A2E", rough=0.35, metal=0.5)
-    label = mat("cola_etiqueta", "#EFE4C8", rough=0.7)
-    ink = mat("cola_tinta", "#9C2A20", rough=0.6)
-    body = revolve("botella", [(0.0, 0.0), (0.034, 0.0), (0.036, 0.006), (0.037, 0.02), (0.0385, 0.20), (0.0375, 0.26),
-                               (0.030, 0.285), (0.017, 0.305), (0.0135, 0.32), (0.0135, 0.345), (0.0155, 0.352), (0.0, 0.352)], 40)
+    label = mat("cola_etiqueta", "#C8322B", rough=0.6)
+    ink = mat("cola_tinta", "#F6EEDA", rough=0.6)
+    body = revolve("botella", [(0.0, 0.0), (0.034, 0.0), (0.036, 0.006), (0.037, 0.02), (0.0385, 0.24), (0.0375, 0.30),
+                               (0.030, 0.33), (0.016, 0.36), (0.0125, 0.385), (0.0125, 0.43), (0.0150, 0.438), (0.0, 0.438)], 40)
     lib.subsurf(body, 1)
     give(body, glass)
-    fill = revolve("gaseosa", [(0.0, 0.004), (0.0325, 0.004), (0.0355, 0.02), (0.0372, 0.20), (0.0360, 0.26), (0.028, 0.285), (0.015, 0.305), (0.0, 0.305)], 36)
+    fill = revolve("gaseosa", [(0.0, 0.004), (0.0325, 0.004), (0.0355, 0.02), (0.0372, 0.24), (0.0360, 0.30), (0.028, 0.33), (0.014, 0.36), (0.0, 0.36)], 36)
     give(fill, liquid)
-    crown = revolve("corona", [(0.0, 0.352), (0.0175, 0.352), (0.0190, 0.358), (0.0168, 0.362), (0.0, 0.362)], 24)
+    crown = revolve("corona", [(0.0, 0.438), (0.0170, 0.438), (0.0185, 0.444), (0.0163, 0.449), (0.0, 0.449)], 24)
     give(crown, cap)
-    band = revolve("etiqueta", [(0.0388, 0.09), (0.0393, 0.09), (0.0393, 0.175), (0.0388, 0.175)], 40, closed=True)
+    band = revolve("etiqueta", [(0.0388, 0.085), (0.0396, 0.085), (0.0396, 0.200), (0.0388, 0.200)], 40, closed=True)
     give(band, label)
     lib.apply_modifiers(body)
-    letters = text_mesh("cola_texto", "COLA", 0.026, (0.0, -0.0398, 0.132), ink, rot=(math.radians(90), 0, 0))
+    letters = text_mesh("cola_texto", "COLA", 0.036, (0.0, -0.0402, 0.1425), ink, rot=(math.radians(90), 0, 0))
+    shine = rbox("brillo", (0.006, 0.004, 0.17), (-0.026, -0.0345, 0.28), 0.0015, rot=(0, 0, math.radians(-40)))
+    give(shine, mat("cola_brillo", "#FFFFFF", rough=0.2, emission=hx("#FFFFFF")))
     bpy.ops.object.select_all(action="DESELECT")
     foam = mat("cola_espuma", "#E8D9BE", rough=0.9)
-    parts = [body, fill, crown, band, letters]
+    parts = [body, fill, crown, band, letters, shine]
     rng = random.Random(5)
     for k in range(14): # burbujitas que suben
-        b = lib.sphere("burbuja%d" % k, rng.uniform(0.0025, 0.0045), loc=(rng.uniform(-0.02, 0.02), rng.uniform(-0.02, 0.02), rng.uniform(0.05, 0.28)), segs=8, rings=5)
-        give(b, foam)
-        parts.append(b)
+        bb = lib.sphere("burbuja%d" % k, rng.uniform(0.0025, 0.0045), loc=(rng.uniform(-0.02, 0.02), rng.uniform(-0.02, 0.02), rng.uniform(0.05, 0.32)), segs=8, rings=5)
+        give(bb, foam)
+        parts.append(bb)
     return parts
 
 

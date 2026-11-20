@@ -77,7 +77,7 @@ func test_csv_format() -> void:
 	log.sheet_reloaded()
 	var lines: PackedStringArray = log.to_csv(125.0).strip_edges().split("\n")
 	assert_eq(lines[0], "campo,valor")
-	assert_eq(lines.size(), 16)
+	assert_eq(lines.size(), 22)
 	assert_true(lines.has("version,0.1.0"))
 	assert_true(lines.has("duracion_s,125.0"))
 	assert_true(lines.has("reventones_totales,4"))
@@ -97,3 +97,24 @@ func test_csv_counts_press_in_progress() -> void:
 	log.press_started()
 	log.press_moved_to_new_cell(2.0)
 	assert_true(log.to_csv(3.0).contains("arrastres,1"))
+
+
+func test_session_log_records_wear_orders_accessories_scenarios_and_ending() -> void:
+	var log: SessionLog = SessionLog.new()
+	log.tool_locked("iron")
+	log.tool_locked("iron")
+	log.tool_locked("boot")
+	log.big_order(1, true, 12.5)
+	log.big_order(2, false, 40.0)
+	log.accessory("ring_alpaca", 30.0)
+	log.phase_opened(1, 0.0)
+	log.phase_opened(2, 22.4)
+	log.phase_opened(2, 99.0) # solo vale la primera apertura
+	log.ending()
+	var csv: String = log.to_csv(60.0)
+	assert_string_contains(csv, "herramienta_trabada,boot:1;iron:2")
+	assert_string_contains(csv, "pedidos_grandes_cumplidos,1@12.5")
+	assert_string_contains(csv, "pedidos_grandes_vencidos,2@40.0")
+	assert_string_contains(csv, "compras_accesorios,ring_alpaca@30.0")
+	assert_string_contains(csv, "minuto_apertura_escenarios,1@0.0;2@22.4")
+	assert_string_contains(csv, "final_visto,si")

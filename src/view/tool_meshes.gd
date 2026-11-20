@@ -55,6 +55,9 @@ static func hand_material() -> Material:
 	m.albedo_color = Color.WHITE
 	m.vertex_color_use_as_albedo = true
 	m.roughness = 0.6
+	m.emission_enabled = true # emisión de piel fija: el tono no cambia con las luces de cada pantalla (juego, MI MANO, íconos)
+	m.emission = Color("#B98467")
+	m.emission_energy_multiplier = 0.3
 	ToyStyle.toonify(m)
 	return m
 

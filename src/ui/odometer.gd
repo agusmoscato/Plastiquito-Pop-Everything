@@ -50,15 +50,17 @@ func _update_wheels() -> void:
 		queue_redraw()
 		return
 	_label = ""
+	var at_rest: bool = absf(target - shown) < 0.0001 # quieto: cada dígito centrado en su ventana (nunca a media altura)
+	var value_now: float = floorf(shown) if at_rest else shown
 	var digits: int = maxi(6, str(int(shown)).length())
 	_layout(digits)
 	for i: int in digits:
 		var place: float = pow(10.0, float(digits - 1 - i))
-		var digit_f: float = fmod(shown / place, 10.0)
+		var digit_f: float = fmod(value_now / place, 10.0)
 		var w: DigitWheel = _wheels[i]
 		var frac: float = digit_f - floorf(digit_f)
 		w.value = floorf(digit_f) + smoothstep(0.82, 1.0, frac)
-		w.dim = shown < place and i < digits - 1
+		w.dim = value_now < place and i < digits - 1
 		w.queue_redraw()
 
 

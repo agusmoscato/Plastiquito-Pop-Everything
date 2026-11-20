@@ -147,6 +147,18 @@ vec3 asphalt(vec2 p, out float rough) {
 	float paint = max(stall, band) * outside;
 	float wear = smoothstep(0.08, 0.4, fbm(p * 0.7 + 3.0));
 	col = mix(col, vec3(0.86, 0.84, 0.74), paint * wear);
+	// Grietas (líneas finas oscuras de ruido), manchas de aceite y una tapa de alcantarilla cada tanto.
+	float crack_n = abs(fbm(p * 0.045 + 7.0) - 0.5);
+	float cracks = 1.0 - smoothstep(0.004, 0.012 + aa * 0.2, crack_n);
+	col = mix(col, vec3(0.04, 0.04, 0.045), cracks * 0.8 * outside);
+	float oil = smoothstep(0.62, 0.74, fbm(p * 0.018 + 21.0));
+	col = mix(col, vec3(0.05, 0.05, 0.08), oil * 0.65 * outside);
+	vec2 mq = mod(p + vec2(300.0, 150.0), vec2(1700.0, 1300.0)) - vec2(850.0, 650.0);
+	float md = length(mq);
+	float manhole = (1.0 - smoothstep(42.0, 46.0, md)) * outside;
+	float ring_m = smoothstep(31.0, 33.0, md) * (1.0 - smoothstep(34.0, 36.0, md));
+	col = mix(col, vec3(0.20, 0.17, 0.15), manhole);
+	col = mix(col, vec3(0.08, 0.07, 0.06), manhole * (ring_m + step(0.5, fract(md * 0.18)) * 0.25));
 	rough = 0.9;
 	return col;
 }

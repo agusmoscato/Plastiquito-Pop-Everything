@@ -99,19 +99,61 @@ func attach_accessories(equipped: Dictionary, material: Material) -> void:
 		skeleton.add_child(holder)
 		var piece: MeshInstance3D = src.duplicate() as MeshInstance3D
 		piece.position = Vector3(0.0, y, 0.0)
+		piece.scale = Vector3.ONE * ACC_SCALE # 1,4 veces el tamaño real: se leen desde la cámara de juego
+		_make_vivid(piece)
 		holder.add_child(piece)
+		_sparkle(holder, piece)
 		if slot == "glove":
 			_dress_glove(id, material)
 	lib.free()
+
+
+const ACC_SCALE: float = 1.4
+
+
+## Colores más saturados y con algo de brillo propio.
+func _make_vivid(piece: MeshInstance3D) -> void:
+	var mesh_res: Mesh = piece.mesh
+	for i: int in mesh_res.get_surface_count():
+		var base: StandardMaterial3D = mesh_res.surface_get_material(i) as StandardMaterial3D
+		if base == null:
+			continue
+		var m: StandardMaterial3D = base.duplicate() as StandardMaterial3D
+		var c: Color = m.albedo_color
+		m.albedo_color = Color.from_hsv(c.h, minf(c.s * 1.35 + 0.1, 1.0), minf(c.v * 1.1 + 0.05, 1.0), c.a)
+		m.emission_enabled = true
+		m.emission = m.albedo_color
+		m.emission_energy_multiplier = 0.35
+		piece.set_surface_override_material(i, m)
+
+
+## Un destello corto cada tanto (más rápido si la mano se mueve: el brillo se renueva al agarrar o soltar).
+func _sparkle(holder: Node, piece: MeshInstance3D) -> void:
+	var tw: Tween = holder.create_tween().set_loops()
+	tw.tween_interval(randf_range(0.6, 1.8))
+	tw.tween_callback(func() -> void: _flash_piece(piece, 1.4))
+	tw.tween_interval(0.12)
+	tw.tween_callback(func() -> void: _flash_piece(piece, 0.35))
+	tw.tween_interval(1.6)
+
+
+func _flash_piece(piece: MeshInstance3D, energy: float) -> void:
+	if not is_instance_valid(piece):
+		return
+	for i: int in piece.mesh.get_surface_count():
+		var m: StandardMaterial3D = piece.get_surface_override_material(i) as StandardMaterial3D
+		if m != null:
+			m.emission_energy_multiplier = energy
 
 
 ## Guante: la mano toma el color del material del guante y, si es de lana, engorda un poco.
 func _dress_glove(id: String, material: Material) -> void:
 	var sm: StandardMaterial3D = material as StandardMaterial3D
 	if sm != null:
-		var tint: Dictionary = {"glove_cocina": Color("#EFE6D2"), "glove_lana": Color("#D8805C"), "glove_latex": Color("#F2D43C")}
+		var tint: Dictionary = {"glove_cocina": Color("#E5392E"), "glove_lana": Color("#F08A2E"), "glove_latex": Color("#FFD81F")}
 		var c: Color = tint.get(id, Color.WHITE)
-		sm.albedo_color = Color.WHITE.lerp(c, 0.7)
+		sm.albedo_color = Color.WHITE.lerp(c, 0.92) # toda la mano cambia de color, bien visible
+		sm.emission = c.lerp(Color("#B98467"), 0.5)
 	if id == "glove_lana":
 		mesh.scale = Vector3(1.06, 1.0, 1.06)
 
