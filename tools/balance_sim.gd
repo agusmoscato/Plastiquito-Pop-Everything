@@ -394,6 +394,9 @@ func _accessory_order() -> Array[String]:
 
 func _buy_accessories() -> void:
 	for id: String in _accessory_order():
+		var reserve: float = _perm_sheet_cost()
+		if sim.state.pellets - float(sim.acc.cost_of(id)) < (reserve if reserve < INF else 0.0):
+			continue # primero abrir el escenario siguiente; los accesorios con lo que sobra
 		if sim.buy_accessory(id):
 			_log("compra_accesorio", id)
 	lock_counts.clear()

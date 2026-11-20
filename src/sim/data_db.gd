@@ -12,6 +12,7 @@ const AUDIO_FILE: String = "audio.json"
 const UPGRADES_FILE: String = "upgrades.json"
 const ECONOMY_FILE: String = "economy.json"
 const ACCESSORIES_FILE: String = "accessories.json"
+const BIG_ORDERS_FILE: String = "big_orders.json"
 
 ## Campos requeridos y su tipo (TYPE_*) por archivo.
 const PHASE_FIELDS: Dictionary = {
@@ -77,6 +78,12 @@ const ACCESSORY_FIELDS: Dictionary = {
 	"id": TYPE_STRING, "slot": TYPE_STRING, "name_es": TYPE_STRING, "name_en": TYPE_STRING,
 	"desc_es": TYPE_STRING, "desc_en": TYPE_STRING, "cost": TYPE_INT, "effect": TYPE_DICTIONARY, "look": TYPE_DICTIONARY,
 }
+const BIG_ORDER_FIELDS: Dictionary = {
+	"phase": TYPE_INT, "kind": TYPE_STRING, "n": TYPE_INT, "seconds": TYPE_FLOAT, "tool": TYPE_STRING, "material": TYPE_STRING,
+	"trigger_sheets": TYPE_INT, "retry_sheets": TYPE_INT, "easier": TYPE_FLOAT, "fine": TYPE_FLOAT, "reward_mult": TYPE_FLOAT,
+	"reward_pellets": TYPE_INT, "client_es": TYPE_STRING, "client_en": TYPE_STRING, "title_es": TYPE_STRING, "title_en": TYPE_STRING,
+	"text_es": TYPE_STRING, "text_en": TYPE_STRING,
+}
 const TOOL_SHAPES: PackedStringArray = ["cell", "circle", "segment", "rect"]
 
 var phases: Array[Dictionary] = []
@@ -88,6 +95,7 @@ var audio: Dictionary = {}
 var upgrades: Array[Dictionary] = []
 var economy: Dictionary = {}
 var accessories: Array[Dictionary] = []
+var big_orders: Array[Dictionary] = []
 var errors: PackedStringArray = PackedStringArray()
 
 
@@ -103,6 +111,7 @@ func load_all(dir: String = "res://data") -> bool:
 	upgrades = _load_list(dir.path_join(UPGRADES_FILE), "upgrades", UPGRADE_FIELDS)
 	economy = _load_section(dir.path_join(ECONOMY_FILE), "economy", ECONOMY_FIELDS)
 	accessories = _load_list(dir.path_join(ACCESSORIES_FILE), "accessories", ACCESSORY_FIELDS)
+	big_orders = _load_list(dir.path_join(BIG_ORDERS_FILE), "orders", BIG_ORDER_FIELDS)
 	_validate_phases()
 	_validate_tools()
 	_validate_bubbles()

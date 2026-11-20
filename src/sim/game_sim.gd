@@ -12,6 +12,7 @@ const TYPE_ECHO: int = 4
 var db: DataDB
 var upgrades: Upgrades
 var acc: Accessories
+var big: BigOrder
 var acc_fx: Dictionary = {} ## efectos de los accesorios equipados (Accessories.aggregate)
 var state: GameState = GameState.new()
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
@@ -46,6 +47,14 @@ var ev_auto_from: int = 0 ## desde este índice de ev_* los reventones son de la
 var ev_cracked: PackedInt32Array = PackedInt32Array() ## doble film que se rompió (siguen enteras)
 var ev_encargo_done: bool = false ## el encargo se cumplió en este paso
 var ev_encargo_bonus: float = 0.0
+var ev_big_started: bool = false ## apareció el pedido grande del escenario
+var ev_big_done: bool = false ## se cumplió
+var ev_big_failed: bool = false ## venció el plazo (multa)
+var ev_big_fine: float = 0.0
+var norm_rate: float = 0.0 ## ritmo de Pops por segundo en burbujas equivalentes (Pops/s / valor base)
+var _rate_acc: float = 0.0
+var _rate_t: float = 0.0
+var _stomp_heavy: int = 0
 var ev_encargo_failed: bool = false ## la lámina terminó sin cumplir el encargo (se cortó la racha)
 
 var encargo: Encargo ## el pedido de la lámina en curso
@@ -79,6 +88,7 @@ func _init(p_db: DataDB, seed_value: int = 1) -> void:
 	eco = db.economy
 	upgrades = Upgrades.new(db)
 	acc = Accessories.new(db)
+	big = BigOrder.new(db)
 	rng.seed = seed_value
 	combo.configure(eco)
 	refresh_stats()
@@ -113,6 +123,7 @@ func sheet_dimension() -> int:
 func refresh_stats() -> void:
 	stats = upgrades.global_stats(state)
 	acc_fx = acc.aggregate(state.acc_equipped)
+	stats["value_mult"] = Cfg.num(stats, "value_mult") * big_mult()
 	var scales: Array = eco["phase_cost_scales"]
 	upgrades.cost_scale = scales[mini(phase(), scales.size()) - 1]
 	var discounted: bool = phase() >= 2 and state.run_buys < Cfg.integer(eco, "new_phase_discount_levels")
@@ -337,6 +348,7 @@ func _track_encargo() -> void:
 
 func _on_reload_requested() -> void:
 	_sheet_finished = true
+	state.phase_sheets += 1
 	state.sheets_done += 1
 	if auto_reload():
 		reload_timer = Cfg.num(eco, "reload_delay_auto")
@@ -402,6 +414,7 @@ func step(dt: float, pointer: Vector2, pressing: bool) -> void:
 	if tm.shape == ToolModel.SHAPE_STOMP:
 		if press_edge and live:
 			popped = tm.stomp(pointer, chain.k)
+			_stomp_heavy = _count_material(popped, SheetModel.MAT_HEAVY)
 			_enqueue_overloaded(tm.last_wave_cells)
 	elif click_only and not touched.is_empty():
 		popped = tm.step(touched, tm.resistance / maxf(tm.force_per_second, 0.01) + 0.001, tm.last_weights, Vector2.ZERO) # un clic, un reventón
@@ -434,6 +447,8 @@ func step(dt: float, pointer: Vector2, pressing: bool) -> void:
 	_tick_echoes(dt)
 	_track_chain()
 	_track_encargo()
+	_track_rate(dt)
+	_track_big(dt)
 
 
 ## Gasta el desgaste de la herramienta en uso y deja descansar a las demás.
@@ -545,6 +560,11 @@ func _do_reload() -> void:
 func _clear_events() -> void:
 	ev_burned = PackedInt32Array()
 	ev_tool_locked = ""
+	ev_big_started = false
+	ev_big_done = false
+	ev_big_failed = false
+	ev_big_fine = 0.0
+	_stomp_heavy = 0
 	ev_idx = PackedInt32Array()
 	ev_value = PackedFloat64Array()
 	ev_pressure = PackedFloat32Array()
@@ -597,7 +617,102 @@ func _collect_events(auto: bool, direct: int = 0) -> void:
 		state.pops += v
 		state.pops_run += v
 		state.pops_total += v
+		_rate_acc += v
 	_credit_tools(auto, sum_a, sum_b)
+
+
+func _count_material(cells: PackedInt32Array, mat: int) -> int:
+	var n: int = 0
+	for idx: int in cells:
+		if sheet.material[idx] == mat:
+			n += 1
+	return n
+
+
+## Ritmo en burbujas equivalentes por segundo (promediado) y requisitos de escenario que ya se demostraron.
+func _track_rate(dt: float) -> void:
+	_rate_t += dt
+	if _rate_t < 1.0:
+		return
+	var bases: Array = eco["phase_base_values"]
+	var base: float = bases[mini(phase(), bases.size()) - 1]
+	norm_rate = lerpf(norm_rate, _rate_acc / _rate_t / base, 0.35)
+	_rate_acc = 0.0
+	_rate_t = 0.0
+	_check_latches()
+
+
+func _check_latches() -> void:
+	var ph: int = phase()
+	var tool_level: int = 0
+	for e: Dictionary in db.phases:
+		if Cfg.integer(e, "number") == ph and e.has("requires"):
+			var req: Dictionary = e["requires"]
+			if req.has("tool"):
+				var t: Dictionary = req["tool"]
+				tool_level = state.level(str(t["upgrade"]))
+	for key: String in PhaseGate.newly_met(db, ph, tool_level, norm_rate):
+		state.latched[key] = true
+
+
+## Requisitos del escenario actual para abrir el siguiente: [{"id", "ok", "es", "en"}] (con el pedido grande).
+func phase_requirements() -> Array[Dictionary]:
+	return PhaseGate.list(db, phase(), state.big_done.has(str(phase())), state.latched)
+
+
+func phase_gate_ok() -> bool:
+	return PhaseGate.all_ok(phase_requirements())
+
+
+## Pedido grande: aparece a mitad de camino, tiene plazo, paga al cumplirse y multa al vencer.
+func _track_big(dt: float) -> void:
+	var ph: int = phase()
+	if not big.has_order(ph) or state.big_done.has(str(ph)):
+		return
+	var d: Dictionary = big.def_for(ph)
+	var shown_phase: int = state.big.get("phase", 0)
+	if shown_phase != ph:
+		state.big = BigOrder.fresh(ph, Cfg.integer(d, "trigger_sheets"))
+	if big.should_start(state.big, state.phase_sheets, false):
+		big.start(state.big, big_order_time_mult())
+		ev_big_started = true
+	if not big.is_active(state.big):
+		return
+	state.big["left"] = Cfg.num(state.big, "left") - dt
+	big.observe(state.big, _big_step())
+	if big.is_met(state.big):
+		_complete_big(d)
+	elif Cfg.num(state.big, "left") <= 0.0:
+		ev_big_fine = state.pops * Cfg.num(d, "fine")
+		state.pops -= ev_big_fine
+		big.expire(state.big, state.phase_sheets)
+		ev_big_failed = true
+
+
+func _big_step() -> Dictionary:
+	var counts: Array[float] = [0.0, 0.0, 0.0, 0.0]
+	for idx: int in ev_idx:
+		counts[sheet.material[idx]] += 1.0
+	var mats: Dictionary = {"thermal": counts[SheetModel.MAT_THERMAL], "cold": counts[SheetModel.MAT_COLD], "heavy": counts[SheetModel.MAT_HEAVY]}
+	return {"pops": float(ev_idx.size()), "material": mats, "chain": float(maxi(chain_count, ev_chain_ended_count)),
+		"tool": state.selected_tool, "heavy_stomp": float(_stomp_heavy)}
+
+
+func _complete_big(d: Dictionary) -> void:
+	state.big_done[str(phase())] = true
+	state.pellets += float(Cfg.integer(d, "reward_pellets"))
+	state.big["status"] = BigOrder.IDLE
+	ev_big_done = true
+	refresh_stats() # el multiplicador permanente del pedido entra al valor global
+
+
+## Multiplicador permanente por pedidos grandes cumplidos.
+func big_mult() -> float:
+	var m: float = 1.0
+	for o: Dictionary in db.big_orders:
+		if state.big_done.has(str(Cfg.integer(o, "phase"))):
+			m *= 1.0 + Cfg.num(o, "reward_mult")
+	return m
 
 
 func _credit_tools(auto: bool, sum_a: float, sum_b: float) -> void:
@@ -646,6 +761,8 @@ func buy(id: String, count: int) -> Dictionary:
 	var out: Dictionary = {"bought": 0, "milestone": false, "level": 0}
 	if not upgrades.is_available(state, id):
 		return out
+	if id == "perm_sheet" and not phase_gate_ok():
+		return out # faltan requisitos del escenario (pedido grande, herramienta, ritmo)
 	var perm: bool = upgrades.is_perm(id)
 	var level: int = upgrades.level_of(state, id)
 	out["level"] = level
@@ -669,12 +786,17 @@ func buy(id: String, count: int) -> Dictionary:
 	out["milestone"] = (level + n) / every > level / every
 	out["bought"] = n
 	out["level"] = level + n
+	if id == "perm_sheet": # escenario nuevo: el contador de láminas y el pedido grande empiezan de cero
+		state.phase_sheets = 0
+		state.big = {}
 	refresh_stats()
 	return out
 
 
 func can_afford_next(id: String) -> bool:
 	if not upgrades.is_available(state, id):
+		return false
+	if id == "perm_sheet" and not phase_gate_ok():
 		return false
 	var level: int = upgrades.level_of(state, id)
 	if level >= upgrades.max_level(id):
@@ -736,7 +858,7 @@ func next_phase_cost() -> float:
 ## true si reciclando ahora alcanza para abrir la fase siguiente.
 func next_phase_ready() -> bool:
 	var cost: float = next_phase_cost()
-	return cost > 0.0 and can_recycle() and state.pellets + float(recycle_gain()) >= cost
+	return cost > 0.0 and can_recycle() and state.pellets + float(recycle_gain()) >= cost and phase_gate_ok()
 
 
 func can_recycle() -> bool:
@@ -754,6 +876,9 @@ func recycle() -> int:
 	_apply_memory(previous)
 	_keep_after_recycle(previous)
 	grant_factory_gifts()
+	if big.is_active(state.big): # reciclar con el pedido en curso lo cancela sin multa (vuelve en la próxima lámina)
+		state.big["status"] = BigOrder.IDLE
+		state.big["next_at"] = state.phase_sheets + 1
 	combo.reset()
 	streak = 0 # la racha es de la corrida: reciclar empieza de cero
 	refresh_stats()

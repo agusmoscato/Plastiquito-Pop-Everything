@@ -251,6 +251,10 @@ func test_recycle_flow_and_permanent_upgrades() -> void:
 	assert_eq(sim.state.level("finger_force"), 0, "las mejoras normales se pierden")
 	assert_eq(sim.state.recycles, 1)
 	assert_ne(sim.sheet, sheets_before)
+	assert_eq(_int(sim.buy("perm_sheet", 1), "bought"), 0, "sin los requisitos del escenario no se abre el siguiente")
+	sim.state.big_done["1"] = true
+	sim.state.latched["1:tool"] = true
+	sim.state.latched["1:rate"] = true
 	assert_eq(_int(sim.buy("perm_sheet", 1), "bought"), 1)
 	assert_eq(sim.phase(), 2)
 	sim.state.pellets += 5.0

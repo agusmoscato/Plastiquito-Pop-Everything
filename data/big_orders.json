@@ -1,0 +1,22 @@
+{
+ "version": 1,
+ "_note": "Pedido grande de cada escenario (sección 4 de la 0.7.0): un objetivo difícil con plazo en segundos que aparece a mitad de camino (después de trigger_sheets láminas terminadas en el escenario). Cumplirlo: multiplicador permanente (reward_mult) y Pellets, y es requisito para abrir el escenario siguiente. Vencerlo: multa en Pops (fine = fracción de los Pops actuales) y vuelve después de retry_sheets láminas, más fácil (easier por intento). Tipos: bubbles (N burbujas), chain_no_tool (cadena de N sin usar la herramienta `tool`), heavy_one_stomp (N pesadas con una sola pisada), material_pops (N burbujas del material `material`).",
+ "orders": [
+  {"phase": 1, "kind": "bubbles", "n": 420, "seconds": 90, "tool": "", "material": "", "trigger_sheets": 4, "retry_sheets": 3, "easier": 0.8, "fine": 0.10, "reward_mult": 0.15, "reward_pellets": 2,
+   "client_es": "Doña Marta", "client_en": "Mrs. Marta",
+   "title_es": "El almuerzo de los nietos", "title_en": "The grandkids' lunch",
+   "text_es": "Doña Marta necesita %d burbujas reventadas antes de que llegue la familia.", "text_en": "Mrs. Marta needs %d bubbles popped before the family arrives."},
+  {"phase": 2, "kind": "chain_no_tool", "n": 45, "seconds": 150, "tool": "palm", "material": "", "trigger_sheets": 4, "retry_sheets": 3, "easier": 0.8, "fine": 0.10, "reward_mult": 0.2, "reward_pellets": 4,
+   "client_es": "Los Gómez", "client_en": "The Gómez family",
+   "title_es": "Partido en el living", "title_en": "Match in the living room",
+   "text_es": "Los Gómez piden una cadena de %d sin usar la palma: el partido empieza ya.", "text_en": "The Gómez family wants a chain of %d without the palm: the match starts now."},
+  {"phase": 3, "kind": "material_pops", "n": 60, "seconds": 180, "tool": "", "material": "thermal", "trigger_sheets": 4, "retry_sheets": 3, "easier": 0.8, "fine": 0.10, "reward_mult": 0.25, "reward_pellets": 6,
+   "client_es": "Don Tito", "client_en": "Don Tito",
+   "title_es": "Mercadería envuelta", "title_en": "Wrapped goods",
+   "text_es": "Don Tito necesita %d burbujas de film térmico reventadas antes de que llegue el camión.", "text_en": "Don Tito needs %d thermal-film bubbles popped before the truck arrives."},
+  {"phase": 4, "kind": "heavy_one_stomp", "n": 3, "seconds": 240, "tool": "boot", "material": "heavy", "trigger_sheets": 4, "retry_sheets": 3, "easier": 0.67, "fine": 0.10, "reward_mult": 0.3, "reward_pellets": 8,
+   "client_es": "El Club", "client_en": "The Club",
+   "title_es": "Asado de la subcomisión", "title_en": "Committee barbecue",
+   "text_es": "El Club pide reventar %d gigantes con una sola pisada.", "text_en": "The Club asks you to pop %d giants with a single stomp."}
+ ]
+}

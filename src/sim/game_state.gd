@@ -27,6 +27,10 @@ var offline_total: float = 0.0 ## Pops ganados sin conexión (estadística)
 var run_buys: int = 0 ## niveles comprados desde el último reciclado (descuento de las primeras compras)
 var streak: int = 0 ## encargos cumplidos seguidos
 var encargo: Dictionary = {} ## Encargo.to_dict() de la lámina en curso
+var big: Dictionary = {} ## pedido grande en curso (BigOrder): fase, estado, plazo, progreso, intentos
+var big_done: Dictionary = {} ## fase (como String) -> true: pedidos grandes cumplidos (permanentes)
+var phase_sheets: int = 0 ## láminas terminadas en el escenario actual (dispara el pedido grande)
+var latched: Dictionary = {} ## requisitos de escenario ya demostrados ("fase:tool", "fase:rate")
 var acc_owned: Dictionary = {} ## accesorios comprados (id -> true); permanentes, sobreviven al reciclado
 var acc_equipped: Dictionary = {} ## ranura (ring0, ring1, ring2, bracelet, watch, glove) -> id de accesorio
 
@@ -61,6 +65,7 @@ func to_dict() -> Dictionary:
 		"max_unix_seen": max_unix_seen, "offline_total": offline_total, "run_buys": run_buys,
 		"streak": streak, "encargo": encargo.duplicate(),
 		"acc_owned": acc_owned.duplicate(), "acc_equipped": acc_equipped.duplicate(),
+		"big": big.duplicate(true), "big_done": big_done.duplicate(), "phase_sheets": phase_sheets, "latched": latched.duplicate(),
 	}
 
 
@@ -103,6 +108,13 @@ func from_dict(data: Dictionary) -> bool:
 	acc_owned = ao.duplicate()
 	var ae: Dictionary = d["acc_equipped"]
 	acc_equipped = ae.duplicate()
+	var bg: Dictionary = d["big"]
+	big = bg.duplicate(true)
+	var bd: Dictionary = d["big_done"]
+	big_done = bd.duplicate()
+	phase_sheets = Cfg.integer(d, "phase_sheets")
+	var lt: Dictionary = d["latched"]
+	latched = lt.duplicate()
 	return true
 
 
@@ -145,13 +157,17 @@ static func migrate(data: Dictionary) -> Dictionary:
 		d["version"] = 6
 		d["acc_owned"] = {}
 		d["acc_equipped"] = {}
+		d["big"] = {}
+		d["big_done"] = {}
+		d["phase_sheets"] = 0
+		d["latched"] = {}
 		version = 6
 	if version != SAVE_VERSION:
 		return {}
 	for key: String in ["pops", "pops_run", "pops_total", "pellets", "levels", "perm", "discovered",
 			"selected_tool", "playtime_s", "run_time_s", "recycles", "first_recycle_s", "max_chain",
 			"sheets_done", "tool_pops", "sheet", "last_levels", "saved_at_unix", "max_unix_seen", "offline_total", "run_buys",
-			"streak", "encargo", "acc_owned", "acc_equipped"]:
+			"streak", "encargo", "acc_owned", "acc_equipped", "big", "big_done", "phase_sheets", "latched"]:
 		if not d.has(key):
 			return {}
 	return d
