@@ -1,0 +1,22 @@
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+Vulkan 1.4.335 - Forward+ - Using Device #0: Unknown - llvmpipe (LLVM 21.1.8, 256 bits)
+
+demo: 30_galpon_plancha_manitos
+demo: 31_tienda_iconos
+demo: 32_estacionamiento_bota
+demo: 33_estacionamiento_rodillo
+demo: 34_tablero_corcho
+demo: 35_bienvenida
+demo: 36_escenario_1
+demo: 36_escenario_2
+demo: 36_escenario_3
+demo: 36_escenario_4
+demo: 37_presentacion_1
+demo: 38_trabajo_1
+demo: 37_presentacion_2
+demo: 38_trabajo_2
+demo: 37_presentacion_3
+demo: 38_trabajo_3
+demo: 37_presentacion_4
+demo: 38_trabajo_4
+exit_code=0
