@@ -1,0 +1,41 @@
+FALLÓ demo3 (exit_code=0)
+      1 998:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 996:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 993:SCRIPT ERROR: Invalid assignment of property or key 'position' with value of type 'Vector2' on a base object of type 'Nil'.
+      1 991:SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+      1 98:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 989:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 987:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 985:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 983:SCRIPT ERROR: Invalid assignment of property or key 'position' with value of type 'Vector2' on a base object of type 'Nil'.
+      1 981:SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+      1 979:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 977:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 975:SCRIPT ERROR: Invalid assignment of property or key 'position' with value of type 'Vector2' on a base object of type 'Nil'.
+      1 973:SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+      1 971:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 96:SCRIPT ERROR: Invalid assignment of property or key 'position' with value of type 'Vector2' on a base object of type 'Nil'.
+      1 969:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 967:SCRIPT ERROR: Invalid assignment of property or key 'position' with value of type 'Vector2' on a base object of type 'Nil'.
+      1 965:SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+      1 963:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 961:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 959:SCRIPT ERROR: Invalid assignment of property or key 'position' with value of type 'Vector2' on a base object of type 'Nil'.
+      1 957:SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+      1 955:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 953:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 951:SCRIPT ERROR: Invalid assignment of property or key 'position' with value of type 'Vector2' on a base object of type 'Nil'.
+      1 94:SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+      1 949:SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+      1 947:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 945:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 943:SCRIPT ERROR: Invalid assignment of property or key 'position' with value of type 'Vector2' on a base object of type 'Nil'.
+      1 941:SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+      1 939:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 937:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 935:SCRIPT ERROR: Invalid assignment of property or key 'position' with value of type 'Vector2' on a base object of type 'Nil'.
+      1 933:SCRIPT ERROR: Trying to assign an array of type "Array" to a variable of type "Array[Dictionary]".
+      1 931:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 92:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 929:SCRIPT ERROR: Invalid access to property or key 'visible' on a base object of type 'Nil'.
+      1 927:SCRIPT ERROR: Invalid assignment of property or key 'position' with value of type 'Vector2' on a base object of type 'Nil'.
