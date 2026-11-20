@@ -24,6 +24,9 @@ var press_timer: float = 0.0
 var click_cell: int = -1
 var reload_wait: float = -1.0 ## segundos que tarda el bot en tirar la lámina nueva del rollo
 var manual_reloads: int = 0
+var big_done_count: int = 0
+var big_failed_count: int = 0
+var big_first_try: Array[int] = [] ## por escenario: 1 si se cumplió al primer intento, 0 si no
 
 # Registro
 var csv: PackedStringArray = PackedStringArray(["segundo,evento,detalle,pops,pops_por_s,pops_total"])
@@ -300,10 +303,34 @@ func _rested_enough(id: String) -> bool:
 		return false
 	if sim.tool_locked(id):
 		return false
+	if _forbidden_tool() == id:
+		return false
 	if id == "iron" and _material_share(SheetModel.MAT_THERMAL) > 0.08:
 		return false # el film térmico no lo derrite la plancha
 	var limit: float = 0.9 if sim.state.selected_tool == id else 0.3
 	return sim.wear_fraction(id) < limit or id == "finger"
+
+
+## Mejora de herramienta que pide el escenario actual para abrir el siguiente ("" si ya está trabada).
+func _required_upgrade() -> String:
+	var ph: int = sim.phase()
+	if sim.state.latched.has("%d:tool" % ph):
+		return ""
+	for e: Dictionary in sim.db.phases:
+		if Cfg.integer(e, "number") == ph and e.has("requires"):
+			var req: Dictionary = e["requires"]
+			if req.has("tool"):
+				var t: Dictionary = req["tool"]
+				return str(t["upgrade"])
+	return ""
+
+
+## Herramienta que el pedido grande en curso prohíbe ("" si no hay).
+func _forbidden_tool() -> String:
+	if not sim.big.is_active(sim.state.big):
+		return ""
+	var d: Dictionary = sim.big.def_for(sim.phase())
+	return str(d["tool"]) if str(d["kind"]) == "chain_no_tool" else ""
 
 
 ## Fracción de la lámina que es de `mat` y sigue entera (el bot "mira" la lámina).
@@ -339,7 +366,7 @@ func _should_recycle() -> bool:
 	# Con las fases abiertas, cuando el reciclado rinde bastante más y pasó un buen rato.
 	var cost: float = _perm_sheet_cost()
 	if cost < INF:
-		return sim.state.pellets + float(sim.recycle_gain()) >= cost
+		return sim.phase_gate_ok() and sim.state.pellets + float(sim.recycle_gain()) >= cost
 	return sim.recycle_gain() >= 2 + 2 * sim.state.recycles and sim.state.run_time_s > 20.0 * 60.0
 
 
@@ -478,6 +505,8 @@ func _buy_best() -> void:
 		var d: Dictionary = sim.upgrades.def(id)
 		var cost: float = sim.upgrades.next_cost(id, level)
 		var score: float = _gain(str(d["kind"]), level) / cost
+		if id == _required_upgrade():
+			score *= 25.0 # el requisito de herramienta para abrir el escenario siguiente
 		if score > best_score:
 			best_score = score
 			best_id = id
@@ -518,6 +547,12 @@ func _purchase(id: String) -> void:
 # --- Seguimiento --------------------------------------------------------------------------
 
 func _after_step(_was_phase: int) -> void:
+	if sim.ev_big_done:
+		big_done_count += 1
+		_log("pedido_grande", "cumplido escenario %d" % sim.phase())
+	if sim.ev_big_failed:
+		big_failed_count += 1
+		_log("pedido_grande", "vencido escenario %d" % sim.phase())
 	if sim.ev_tool_locked != "":
 		lock_counts[sim.ev_tool_locked] = (lock_counts[sim.ev_tool_locked] if lock_counts.has(sim.ev_tool_locked) else 0) + 1
 	total_pop_events += sim.ev_idx.size()
@@ -795,6 +830,12 @@ func _report(wall: float) -> bool:
 	print("   pops_total=%.0f pops=%.0f compras=%d cadena_max=%d reciclados=%d recargas a mano=%d" % [
 		sim.state.pops_total, sim.state.pops, purchase_times.size(), sim.state.max_chain, sim.state.recycles, manual_reloads])
 	print("   reventones=%d (herramienta %d, %.0f%% por cadena) cadenas>=10: %d" % [total_pop_events, tool_pop_events, 100.0 * float(total_pop_events - tool_pop_events) / maxf(float(total_pop_events), 1.0), chain_events])
+	var gate: String = ""
+	for r: Dictionary in sim.phase_requirements():
+		gate += " [%s %s]" % [str(r["id"]), "ok" if r["ok"] == true else "FALTA"]
+	var tries: int = sim.state.big.get("tries", 0)
+	print("   escenario %d, requisitos:%s  ritmo=%.1f  pedido grande: estado=%s intentos=%d cumplidos=%d fallidos=%d" % [
+		sim.phase(), gate, sim.norm_rate, str(sim.state.big.get("status", "-")), tries, big_done_count, big_failed_count])
 	var full: bool = minutes >= 200.0
 	var src_total: float = maxf(1.0, source_value["directo"] + source_value["cadena"] + source_value["automatico"])
 	print("   Galpón por origen: directo %.0f%%  cadena %.0f%%  automático %.0f%%" % [100.0 * source_value["directo"] / src_total, 100.0 * source_value["cadena"] / src_total, 100.0 * source_value["automatico"] / src_total])
