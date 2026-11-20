@@ -231,7 +231,7 @@ func _still_pressing() -> bool:
 	for n: int in sim.grid.cells_in_circle(sim.grid.cell_to_world(click_cell), tm.radius):
 		if sim.sheet.state[n] != SheetModel.STATE_POPPED:
 			left += 1
-	return left > 2
+	return left > 0
 
 
 ## Casual: ~3 clics por segundo cerca del centro. Mira la lámina: casi siempre elige una
@@ -865,6 +865,25 @@ func _report(wall: float) -> bool:
 	print("   pops_total=%.0f pops=%.0f compras=%d cadena_max=%d reciclados=%d recargas a mano=%d" % [
 		sim.state.pops_total, sim.state.pops, purchase_times.size(), sim.state.max_chain, sim.state.recycles, manual_reloads])
 	print("   reventones=%d (herramienta %d, %.0f%% por cadena) cadenas>=10: %d" % [total_pop_events, tool_pop_events, 100.0 * float(total_pop_events - tool_pop_events) / maxf(float(total_pop_events), 1.0), chain_events])
+	print("   depuración: bloqueada=%s desgaste=%.2f espera_recarga=%s reload_timer=%.2f press_timer=%.2f ev_fase=%d" % [
+		str(sim.tool_locked(sim.state.selected_tool)), sim.wear_fraction(sim.state.selected_tool), str(sim.awaiting_reload), sim.reload_timer, press_timer, sim.phase()])
+	var left_by_mat: Array[int] = [0, 0, 0, 0]
+	for i: int in sim.sheet.cell_count():
+		if sim.sheet.state[i] != SheetModel.STATE_POPPED:
+			left_by_mat[sim.sheet.material[i]] += 1
+	print("   depuración2: celdas enteras por material %s, hold=%s pointer=%s click_cell=%d click_timer=%.2f" % [str(left_by_mat), str(sim.hold_unlocked()), str(pointer), click_cell, click_timer])
+	print("   depuración3: popped_ratio=%.3f señal=%s umbral=%.2f cell_count=%d conectado=%s" % [sim.sheet.popped_ratio(), str(sim.sheet._reload_signaled), sim.sheet.reload_threshold, sim.sheet.cell_count(), str(sim.sheet.reload_requested.is_connected(sim._on_reload_requested))])
+	var probe: int = -1
+	for i: int in sim.sheet.cell_count():
+		if sim.sheet.state[i] != SheetModel.STATE_POPPED:
+			probe = i
+			break
+	if probe >= 0:
+		var before_pops: int = sim.sheet.count_popped()
+		for k: int in 40:
+			sim.step(0.05, sim.grid.cell_to_world(probe), true)
+			sim.step(0.001, sim.grid.cell_to_world(probe), false)
+		print("   depuración4: sonda en celda %d (estado %d, material %d, presión %.2f): reventadas antes %d después %d, herramienta %s" % [probe, sim.sheet.state[probe], sim.sheet.material[probe], sim.sheet.pressure[probe], before_pops, sim.sheet.count_popped(), sim.state.selected_tool])
 	var gate: String = ""
 	for r: Dictionary in sim.phase_requirements():
 		gate += " [%s %s]" % [str(r["id"]), "ok" if r["ok"] == true else "FALTA"]
