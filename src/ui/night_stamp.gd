@@ -36,3 +36,4 @@ func _draw() -> void:
 	var s: float = 1.0 + _punch * 0.22
 	var r: Rect2 = Rect2(SIZE * 0.5 - SIZE * 0.5 * s, SIZE * s)
 	UiKit.draw_stamp(self, r, Tx.t("night_shift"), UiKit.INK, 22, 0.05, _alpha * 0.9)
+	UiKit.audit_box(self, Rect2(position + r.position, r.size), Tx.t("night_shift"), ChainStamp.AUDIT_LAYER) # en coordenadas del HUD

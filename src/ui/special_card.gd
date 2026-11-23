@@ -73,6 +73,13 @@ func _process(delta: float) -> void:
 		queue_redraw()
 
 
+## Lo que ocupa la tarjeta en pantalla (vacío si no se ve). Los números flotantes la esquivan.
+func screen_rect() -> Rect2:
+	if not is_busy():
+		return Rect2()
+	return _card_rect().grow(8.0) # mismas coordenadas que el sello y los números (todos ocupan la raíz del HUD)
+
+
 func _card_rect() -> Rect2:
 	var w: float = 500.0
 	var play_w: float = size.x - 452.0
@@ -87,6 +94,7 @@ func _draw() -> void:
 	rect.position.y += (1.0 - clampf(age * 3.0, 0.0, 1.0)) * -30.0 if _thanks <= 0.0 else 0.0
 	modulate = Color(1, 1, 1, a)
 	UiKit.draw_sheet(self, rect, UiKit.PAPER, "special_card", 2.0, 1.4)
+	UiKit.audit_box(self, rect, Tx.t(key), ChainStamp.AUDIT_LAYER)
 	UiKit.draw_tape(self, Vector2(rect.position.x + 30.0, rect.position.y + 4.0), -0.5, 44.0, 14.0)
 	UiKit.draw_tape(self, Vector2(rect.end.x - 30.0, rect.position.y + 4.0), 0.5, 44.0, 14.0)
 	var dot: Vector2 = rect.position + Vector2(46.0, 58.0)

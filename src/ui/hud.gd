@@ -374,6 +374,16 @@ func _handle_pops() -> void:
 
 
 ## Rectángulos de los paneles del HUD (los "+N" no se dibujan encima).
+## El sello CADENA y la ficha de lo nuevo, para que los "+N" no se dibujen encima.
+func _update_overlays() -> void:
+	var out: Array[Rect2] = []
+	var night: Rect2 = night_stamp.get_global_rect().grow(8.0) if night_stamp.active else Rect2()
+	for r: Rect2 in [chain_stamp.screen_rect(), special_card.screen_rect(), night]:
+		if r.has_area():
+			out.append(r)
+	flyers.overlays = out
+
+
 func _panel_rects() -> Array[Rect2]:
 	var out: Array[Rect2] = []
 	for c: Control in [pops_panel, work_order, encargo_ticket, big_ticket, shop, combo, _recycle_button, _log_button, _hand_button, _route_button, _reload_button]:
@@ -480,8 +490,14 @@ func _process(delta: float) -> void:
 	flyers.blocked = _panel_rects() # los paneles tiemblan y se mueven: se actualiza cada frame
 	var vp_size: Vector2 = get_viewport().get_visible_rect().size
 	chain_stamp.free_rect = Rect2(Vector2(10.0, 150.0), Vector2(vp_size.x - SHOP_W - 30.0, vp_size.y - 280.0))
-	chain_stamp.blocked = flyers.blocked
+	var stamp_blocked: Array[Rect2] = flyers.blocked.duplicate()
+	if special_card.is_busy():
+		stamp_blocked.append(special_card.screen_rect()) # el sello no tapa la ficha de lo nuevo (DOBLE FILM...)
+	if night_stamp.active:
+		stamp_blocked.append(night_stamp.get_global_rect().grow(10.0)) # ni el cartel TURNO NOCHE
+	chain_stamp.blocked = stamp_blocked
 	chain_stamp.max_width = (vp_size.x - SHOP_W) * ChainStamp.MAX_PLAY_FRACTION
+	_update_overlays()
 	_tic_cooldown = maxf(0.0, _tic_cooldown - delta)
 	if _arrow_t > 0.0:
 		_arrow_t -= delta

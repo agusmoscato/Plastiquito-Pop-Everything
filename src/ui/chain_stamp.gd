@@ -16,6 +16,7 @@ var max_width: float = 0.0 ## ancho máximo del sello (35 % del área de juego);
 const ALPHA: float = 0.85 ## mientras dura: deja ver la ola por debajo
 const BASE_W: float = 300.0 ## ancho del sello a escala 1
 const MAX_PLAY_FRACTION: float = 0.35 ## el sello ocupa como mucho este ancho del área de juego
+const AUDIT_LAYER: String = "hud_float" ## capa de la auditoría de textos: sello, ficha y números flotantes
 const LIFT: float = 95.0 ## distancia mínima entre el origen de la cadena y el borde de abajo del sello
 
 var _slam: float = 0.0
@@ -70,18 +71,42 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 
-func _draw() -> void:
-	if _fade <= 0.01 or count < 2:
-		return
-	var scale_f: float = capped_scale(1.0 + minf(float(count) / 60.0, 1.2) + _slam * 0.55, max_width)
+func is_showing() -> bool:
+	return _fade > 0.01 and count >= 2
+
+
+func _scale() -> float:
+	return capped_scale(1.0 + minf(float(count) / 60.0, 1.2) + _slam * 0.55, max_width)
+
+
+## Rectángulos del sello y del bloque (sello + total de abajo), sin el temblor: [sello, bloque].
+func _layout(scale_f: float) -> Array[Rect2]:
 	var w: float = BASE_W * scale_f
 	var h: float = 76.0 * scale_f
 	var block: Vector2 = Vector2(w, h + (44.0 * minf(scale_f, 1.8) if not growing else 0.0)) # sello + total abajo
 	var block_c: Vector2 = place(anchor, block, free_rect, blocked, Vector2(size.x * 0.5 - 150.0, 250.0))
-	var center: Vector2 = block_c - Vector2(0.0, (block.y - h) * 0.5) + _shake
-	var r: Rect2 = Rect2(center - Vector2(w, h) * 0.5, Vector2(w, h))
+	var center: Vector2 = block_c - Vector2(0.0, (block.y - h) * 0.5)
+	return [Rect2(center - Vector2(w, h) * 0.5, Vector2(w, h)), Rect2(block_c - block * 0.5, block)]
+
+
+## Lo que ocupa en pantalla el sello con su total (vacío si no se ve). Los números flotantes lo esquivan.
+func screen_rect() -> Rect2:
+	if not is_showing():
+		return Rect2()
+	var block: Rect2 = _layout(_scale())[1]
+	return block.grow(12.0) # temblor del golpe y la inclinación del sello
+
+
+func _draw() -> void:
+	if not is_showing():
+		return
+	var scale_f: float = _scale()
+	var r: Rect2 = _layout(scale_f)[0]
+	r.position += _shake
+	var center: Vector2 = r.get_center()
 	var label: String = banner if banner != "" else "%s x%d" % [Tx.t("chain"), count]
 	UiKit.draw_stamp(self, r, label, UiKit.STAMP_RED, int(30.0 * scale_f), -0.09, _fade * ALPHA)
+	UiKit.audit_box(self, r, label, AUDIT_LAYER)
 	if not growing and total_text != "":
 		var font: Font = UiKit.font_mono_bold()
 		var fs: int = int(26.0 * minf(scale_f, 1.8))
@@ -89,6 +114,7 @@ func _draw() -> void:
 		var pos: Vector2 = Vector2(center.x - ts.x * 0.5, r.end.y + 34.0)
 		draw_string(font, pos + Vector2(2.0, 2.0), total_text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, fs, Color(UiKit.PAPER.r, UiKit.PAPER.g, UiKit.PAPER.b, _fade))
 		draw_string(font, pos, total_text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, fs, Color(UiKit.INK.r, UiKit.INK.g, UiKit.INK.b, _fade))
+		UiKit.audit_box(self, Rect2(Vector2(pos.x, pos.y - float(fs) * 0.78), Vector2(ts.x, float(fs) * 0.98)), total_text, AUDIT_LAYER)
 
 
 ## Centro del sello: arriba del origen de la cadena (para no tapar la ola), dentro de la zona libre.

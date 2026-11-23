@@ -207,11 +207,28 @@ static func _audit_record(ci: CanvasItem, pos: Vector2, text: String, font: Font
 	var cont: Rect2 = Rect2()
 	if ci is Control:
 		cont = Rect2(Vector2.ZERO, (ci as Control).size)
-	_audit.append({"id": ci.get_instance_id(), "who": str(ci.name) + ":" + ci.get_class(), "rect": box, "text": text, "limit": width, "container": cont, "w": w})
+	_audit.append({"id": ci.get_instance_id(), "who": str(ci.name) + ":" + ci.get_class(), "rect": box, "text": text, "limit": width, "container": cont, "w": w, "layer": ""})
+
+
+## Registra un texto que no pasa por draw_text (sellos, números flotantes) con su rectángulo en pantalla.
+## Los textos de una misma `layer` se comparan entre sí aunque los dibujen nodos distintos.
+static func audit_box(ci: CanvasItem, rect: Rect2, text: String, layer: String) -> void:
+	if not audit_on or text == "":
+		return
+	_audit.append({"id": ci.get_instance_id(), "who": str(ci.name) + ":" + ci.get_class(), "rect": rect, "text": text, "limit": -1.0, "container": Rect2(), "w": rect.size.x, "layer": layer})
 
 
 static func audit_count() -> int:
 	return _audit.size()
+
+
+## Cuántos textos registrados hay en la capa `layer` (para que un test sepa que de verdad se dibujaron).
+static func audit_count_layer(layer: String) -> int:
+	var n: int = 0
+	for a: Dictionary in _audit:
+		if str(a["layer"]) == layer:
+			n += 1
+	return n
 
 
 ## Problemas de lo dibujado desde la última llamada (y vacía el registro).
@@ -232,8 +249,11 @@ static func audit_take() -> PackedStringArray:
 				out.append("%s: '%s' se sale del contenedor %s (texto %s)" % [a["who"], a["text"], str(cont.size), str(r)])
 		for j: int in range(i + 1, _audit.size()):
 			var b: Dictionary = _audit[j]
-			if b["id"] != a["id"]:
-				continue
+			var a_layer: String = a["layer"]
+			if a_layer != str(b["layer"]):
+				continue # un rectángulo de capa (sello, ficha) no se compara con los renglones de adentro
+			if b["id"] != a["id"] and a_layer == "":
+				continue # sin capa: solo se comparan textos del mismo nodo
 			var rb: Rect2 = b["rect"]
 			if a["text"] == b["text"]:
 				continue # el mismo texto dibujado dos veces en el mismo lugar (dos frames), no es un encime

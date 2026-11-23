@@ -15,6 +15,7 @@ const POP_IN_S: float = 0.12 ## al nacer el número crece de golpe y se asienta
 
 var target: Vector2 = Vector2(150.0, 80.0)
 var blocked: Array[Rect2] = [] ## paneles del HUD: ahí no se dibuja ningún "+N"
+var overlays: Array[Rect2] = [] ## sello CADENA y ficha nueva (DOBLE FILM...): el "+N" nace debajo y no se dibuja encima
 
 var _items: Array[Dictionary] = []
 
@@ -47,7 +48,7 @@ func spawn(from: Vector2, value: float) -> void:
 		return
 	var dur: float = randf_range(0.55, 0.8)
 	var side: float = randf_range(-90.0, 90.0)
-	var start: Vector2 = outside_panels(from)
+	var start: Vector2 = below_overlays(outside_panels(from))
 	_items.append({"from": start, "value": value, "t": 0.0, "dur": dur, "bump": 0.0, "ctrl": start.lerp(target, 0.35) + Vector2(side, -randf_range(60.0, 140.0))})
 
 
@@ -86,9 +87,26 @@ func outside_panels(p: Vector2) -> Vector2:
 	return p
 
 
+## Si el punto cae dentro del sello o de la ficha, lo baja hasta debajo de ese rectángulo.
+func below_overlays(p: Vector2) -> Vector2:
+	var out: Vector2 = p
+	for r: Rect2 in overlays:
+		if r.has_point(out):
+			out.y = r.end.y + 30.0
+	return out
+
+
 func _inside_panel(p: Vector2) -> bool:
 	for r: Rect2 in blocked:
 		if r.grow(4.0).has_point(p):
+			return true
+	return false
+
+
+## El "+N" (su caja de texto) toca el sello o la ficha: ese frame no se dibuja (pasa por detrás).
+func _hits_overlay(box: Rect2) -> bool:
+	for r: Rect2 in overlays:
+		if r.intersects(box):
 			return true
 	return false
 
@@ -107,28 +125,83 @@ func _process(delta: float) -> void:
 		var bump: float = it.get("bump", 0.0)
 		it["bump"] = maxf(0.0, bump - delta * 6.0)
 		keep.append(it)
+	var n: int = -1
+	while keep.size() != n: # al sumarse el número crece y puede tocar a otro: se repite hasta que no cambie
+		n = keep.size()
+		keep = merge_crossing(keep)
 	_items = keep
 	queue_redraw()
+
+
+## Dos "+N" que se cruzan en vuelo se suman en el que va más adelantado (nunca se dibujan encimados).
+func merge_crossing(items: Array[Dictionary]) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	var boxes: Array[Rect2] = []
+	for it: Dictionary in items:
+		var box: Rect2 = _text_box(it).grow(4.0)
+		var into: int = -1
+		for j: int in boxes.size():
+			if boxes[j].intersects(box):
+				into = j
+				break
+		if into < 0:
+			out.append(it)
+			boxes.append(box)
+			continue
+		var host: Dictionary = out[into]
+		var hv: float = host["value"]
+		var iv: float = it["value"]
+		host["value"] = hv + iv
+		host["bump"] = 1.0
+	return out
+
+
+func _pos(it: Dictionary) -> Vector2:
+	var t: float = it["t"]
+	var dur: float = it["dur"]
+	var k: float = t / dur
+	var e: float = k * k * (3.0 - 2.0 * k)
+	var a: Vector2 = it["from"]
+	var c: Vector2 = it["ctrl"]
+	return a.lerp(c, e).lerp(c.lerp(target, e), e)
+
+
+func _font_size(it: Dictionary) -> int:
+	var t: float = it["t"]
+	var v: float = it["value"]
+	var pop_in: float = clampf(1.0 - t / POP_IN_S, 0.0, 1.0)
+	var bump: float = it.get("bump", 0.0)
+	var grow: float = 1.0 + 0.45 * pop_in * pop_in + 0.25 * bump
+	return clampi(int((14.0 + log(maxf(v, 1.0)) / log(10.0) * 3.0) * grow), 14, 44)
+
+
+func _text(it: Dictionary) -> String:
+	var v: float = it["value"]
+	return "+" + NumberFormat.pops(v, Settings.language)
+
+
+## Caja de la letra del "+N" en pantalla (lo que la auditoría compara).
+func _text_box(it: Dictionary) -> Rect2:
+	var p: Vector2 = _pos(it)
+	var fs: int = _font_size(it)
+	var w: float = UiKit.font_mono_bold().get_string_size(_text(it), HORIZONTAL_ALIGNMENT_LEFT, -1.0, fs).x
+	return Rect2(Vector2(p.x, p.y - float(fs) * 0.78), Vector2(w, float(fs) * 0.98))
 
 
 func _draw() -> void:
 	var font: Font = UiKit.font_mono_bold()
 	for it: Dictionary in _items:
-		var t: float = it["t"]
-		var dur: float = it["dur"]
-		var k: float = t / dur
-		var e: float = k * k * (3.0 - 2.0 * k)
-		var a: Vector2 = it["from"]
-		var c: Vector2 = it["ctrl"]
-		var p: Vector2 = a.lerp(c, e).lerp(c.lerp(target, e), e)
+		var p: Vector2 = _pos(it)
 		if _inside_panel(p):
 			continue
-		var v: float = it["value"]
-		var pop_in: float = clampf(1.0 - t / POP_IN_S, 0.0, 1.0)
-		var bump: float = it.get("bump", 0.0)
-		var grow: float = 1.0 + 0.45 * pop_in * pop_in + 0.25 * bump
-		var fs: int = clampi(int((14.0 + log(maxf(v, 1.0)) / log(10.0) * 3.0) * grow), 14, 44)
-		var text: String = "+" + NumberFormat.pops(v, Settings.language)
-		var alpha: float = clampf((1.0 - k) * 2.2, 0.0, 1.0)
+		var box: Rect2 = _text_box(it)
+		if _hits_overlay(box.grow(float(OUTLINE))):
+			continue
+		var t: float = it["t"]
+		var dur: float = it["dur"]
+		var alpha: float = clampf((1.0 - t / dur) * 2.2, 0.0, 1.0)
+		var fs: int = _font_size(it)
+		var text: String = _text(it)
+		UiKit.audit_box(self, box, text, ChainStamp.AUDIT_LAYER)
 		draw_string_outline(font, p, text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, fs, OUTLINE, Color(UiKit.PAPER.r, UiKit.PAPER.g, UiKit.PAPER.b, alpha))
 		draw_string(font, p, text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, fs, Color(UiKit.INK.r, UiKit.INK.g, UiKit.INK.b, alpha))

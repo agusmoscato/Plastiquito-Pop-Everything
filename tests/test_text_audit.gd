@@ -147,6 +147,44 @@ func test_hud_is_tidy_in_every_scenario() -> void:
 			hud.free()
 
 
+## Sello CADENA, ficha DOBLE FILM, cartel TURNO NOCHE y números flotantes (dibujados con draw_string directo):
+## nacen todos juntos sobre la lámina y ninguno se pisa con otro.
+func test_floating_texts_do_not_overlap() -> void:
+	var s: GameSim = GameSim.new(db, 3)
+	s.state.perm["perm_sheet"] = 2
+	s.refresh_stats()
+	for lang: String in ["es", "en"]:
+		Settings.language = lang
+		var cam: Camera3D = Camera3D.new()
+		add_child_autofree(cam)
+		var hud: Hud = Hud.new()
+		add_child_autofree(hud)
+		hud.setup(s, cam)
+		await _frames(2)
+		var vp: Vector2 = get_viewport().get_visible_rect().size
+		var spot: Vector2 = Vector2((vp.x - Hud.SHOP_W) * 0.45, vp.y * 0.55)
+		hud.special_card.start_intro(SpecialCard.ARMOR)
+		hud.night_stamp.set_active(true)
+		hud.chain_stamp.anchor = spot
+		hud.chain_stamp.chain_ended(48, 1.25e6)
+		await _frames(2)
+		var stamp: Rect2 = hud.chain_stamp.screen_rect()
+		var card: Rect2 = hud.special_card.screen_rect()
+		assert_false(stamp.intersects(card), "el sello CADENA no tapa la ficha DOBLE FILM (%s)" % lang)
+		for i: int in 8: # justo encima del sello, de la ficha y del origen de la cadena
+			hud.flyers.spawn(stamp.get_center() + Vector2(float(i) * 9.0, 0.0), 1000.0 * float(i + 1))
+			hud.flyers.spawn(card.get_center() + Vector2(0.0, float(i) * 3.0), 31.0 * float(i + 1))
+			hud.flyers.spawn(spot + Vector2(float(i) * 120.0 - 400.0, 0.0), 7.0e5)
+		for f: int in 12:
+			UiKit.audit_take()
+			await _frames(1)
+			assert_gt(UiKit.audit_count_layer(ChainStamp.AUDIT_LAYER), 1, "se dibujan sello y ficha (%s)" % lang)
+			var problems: PackedStringArray = UiKit.audit_take()
+			assert_eq(problems.size(), 0, "textos flotantes frame %d (%s): %s" % [f, lang, "; ".join(problems)])
+		remove_child(hud)
+		hud.free()
+
+
 func test_audit_really_runs_the_draw_code() -> void:
 	var c: MemoCard = MemoCard.new()
 	c.setup(sim)
