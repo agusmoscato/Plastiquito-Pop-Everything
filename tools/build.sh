@@ -23,6 +23,10 @@ mkdir -p "$OUT/windows" "$OUT/linux"
 "$GODOT_BIN" --headless --path . --export-release "Linux" "$OUT/linux/Plastiquito.x86_64" > "$OUT/export_linux.log" 2>&1
 [ -f "$OUT/windows/Plastiquito.exe" ] || { echo "build: falló la exportación de Windows (ver $OUT/export_windows.log)" >&2; exit 1; }
 [ -f "$OUT/linux/Plastiquito.x86_64" ] || { echo "build: falló la exportación de Linux (ver $OUT/export_linux.log)" >&2; exit 1; }
+# Solo para pruebas del dueño: Windows con Steam encendido (tag "steam", App ID 480). Las de playtest van con Steam apagado.
+mkdir -p "$OUT/steamtest"
+"$GODOT_BIN" --headless --path . --export-release "Windows Steamtest" "$OUT/steamtest/Plastiquito.exe" > "$OUT/export_steamtest.log" 2>&1
+[ -f "$OUT/steamtest/Plastiquito.exe" ] || { echo "build: falló la exportación steamtest (ver $OUT/export_steamtest.log)" >&2; exit 1; }
 
 echo "== 3/5 Zips portables"
 STAGE="$OUT/_stage"
@@ -30,6 +34,7 @@ rm -rf "$STAGE"
 for OS in windows linux; do
   mkdir -p "$STAGE/$OS"
   cp "$OUT/$OS"/Plastiquito.* "$STAGE/$OS/"
+  cp "$OUT/$OS"/*.dll "$OUT/$OS"/*.so "$STAGE/$OS/" 2> /dev/null || true # GodotSteam (GDExtension)
   if [ "$OS" = "windows" ]; then
     DATA='%APPDATA%\Plastiquito\playtest'
     RUN='Hacé doble clic en Plastiquito.exe.'
@@ -57,6 +62,13 @@ TXT
   python3 tools/zip_dir.py "$STAGE/$OS" "$OUT/Plastiquito_${VERSION}_${OS}.zip" "Plastiquito_${VERSION}_${OS}" > /dev/null 2>&1 \
     || python tools/zip_dir.py "$STAGE/$OS" "$OUT/Plastiquito_${VERSION}_${OS}.zip" "Plastiquito_${VERSION}_${OS}" > /dev/null
 done
+mkdir -p "$STAGE/steamtest"
+cp "$OUT/steamtest"/Plastiquito.exe "$OUT/steamtest"/*.dll "$STAGE/steamtest/"
+cat > "$STAGE/steamtest/LEEME.txt" <<TXT
+Plastiquito $VERSION - build de prueba CON STEAM (App ID 480 de prueba). Solo para el desarrollador: no repartir.
+Con el cliente de Steam abierto usa tu nombre y tu foto; si Steam está cerrado sigue con la ficha de nombre.
+TXT
+python3 tools/zip_dir.py "$STAGE/steamtest" "$OUT/Plastiquito_${VERSION}_steamtest.zip" "Plastiquito_${VERSION}_steamtest" > /dev/null 2>&1   || python tools/zip_dir.py "$STAGE/steamtest" "$OUT/Plastiquito_${VERSION}_steamtest.zip" "Plastiquito_${VERSION}_steamtest" > /dev/null
 rm -rf "$STAGE"
 
 echo "== 4/5 Instalador de Windows"

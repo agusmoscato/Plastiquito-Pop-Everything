@@ -32,6 +32,7 @@ foreach ($os in "windows", "linux") {
   $stage = "$out/_stage/$os"
   New-Item -ItemType Directory -Force $stage | Out-Null
   Copy-Item "$out/$os/Plastiquito.*" $stage
+  Copy-Item "$out/$os/*.dll", "$out/$os/*.so" $stage -ErrorAction SilentlyContinue # GodotSteam (GDExtension)
   if ($os -eq "windows") { $data = '%APPDATA%\Plastiquito\playtest'; $run = 'Hacé doble clic en Plastiquito.exe.' }
   else { $data = '~/.local/share/Plastiquito/playtest'; $run = 'Abrí una terminal en esta carpeta y corré: ./Plastiquito.x86_64' }
   @"

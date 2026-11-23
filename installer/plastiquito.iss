@@ -45,6 +45,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "{#BuildDir}\Plastiquito.exe"; DestDir: "{app}"; Flags: ignoreversion
+; GodotSteam (GDExtension): el export deja sus DLL al lado del .exe
+Source: "{#BuildDir}\*.dll"; DestDir: "{app}"; Flags: ignoreversion skipifsourcedoesntexist
 
 [Icons]
 Name: "{autoprograms}\Plastiquito"; Filename: "{app}\Plastiquito.exe"

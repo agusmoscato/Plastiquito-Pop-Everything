@@ -4,7 +4,8 @@ extends RefCounted
 ## cliente están, y si no una ficha donde el jugador escribe su nombre ("Empleado N° 4417" si no lo hace) y
 ## una silueta dibujada. PRIVACIDAD: el nombre y la foto se usan solo en esta PC; nunca se suben ni se
 ## guardan fuera del guardado local.
-## PENDIENTE: el App ID 480 (de prueba de Steam) se usa solo en builds de desarrollo hasta que haya App ID propio.
+## Steam se usa solo en desarrollo y en la build "steamtest" (PlaytestMode.steam_allowed), con el App ID 480 de prueba.
+## PENDIENTE: App ID propio.
 
 const DEV_APP_ID: int = 480
 
@@ -22,14 +23,20 @@ static var steam_status: String = "" ## resultado del init, para el registro (""
 ## GodotSteam 4.24: steamInitEx(app_id, embed_callbacks) -> {status, verbal}; con embed_callbacks corre los
 ## callbacks solo cada frame, que es lo que entrega el avatar (señal avatar_loaded).
 static func try_steam(tags: PackedStringArray) -> void:
-	if _asked or not Engine.has_singleton("Steam"):
+	if _asked:
 		return
 	_asked = true
+	if not PlaytestMode.steam_allowed(tags): # build de playtest: Steam apagado, ficha "¿Cómo te llamás?"
+		steam_status = "desactivado"
+		print("Steam: desactivado en esta build")
+		return
+	if not Engine.has_singleton("Steam"):
+		steam_status = "sin GodotSteam"
+		return
 	var steam: Object = Engine.get_singleton("Steam")
-	var app_id: int = 0 if PlaytestMode.is_playtest(tags) else DEV_APP_ID # en desarrollo: App ID de prueba
-	if app_id != 0:
-		OS.set_environment("SteamAppId", str(app_id))
-		OS.set_environment("SteamGameId", str(app_id))
+	var app_id: int = DEV_APP_ID # App ID de prueba (480) hasta que haya uno propio
+	OS.set_environment("SteamAppId", str(app_id))
+	OS.set_environment("SteamGameId", str(app_id))
 	if not steam.has_method("steamInitEx"):
 		steam_status = "sin steamInitEx"
 		return
@@ -45,6 +52,14 @@ static func try_steam(tags: PackedStringArray) -> void:
 	steam_name = str(steam.call("getPersonaName"))
 	steam.connect("avatar_loaded", Callable(PlayerIdentity, "_on_avatar_loaded"))
 	steam.call("getPlayerAvatar", 3, steam.call("getSteamID")) # 3 = avatar grande
+
+
+## Vuelve al estado inicial (solo para tests).
+static func reset() -> void:
+	_asked = false
+	steam_name = ""
+	steam_status = ""
+	photo = null
 
 
 static func _on_avatar_loaded(_id: int, size: int, buffer: PackedByteArray) -> void:
