@@ -961,8 +961,8 @@ def text_mesh(name, body, size, loc, color_mat, rot=(0, 0, 0), extrude=0.0015):
 def cola():
     # Botella de vidrio de litro retornable: cuerpo recto o levemente cónico (NO la silueta curva de ninguna
     # marca), gaseosa oscura con burbujas, tapita corona roja y etiqueta genérica "COLA".
-    glass = mat("cola_vidrio", "#D8D2C4", rough=0.04, alpha=0.18)
-    liquid = mat("cola_liquido", "#3A1808", rough=0.2)
+    glass = mat("cola_vidrio", "#4A3326", rough=0.04, alpha=0.12) # vidrio oscuro: de lejos se lee la gaseosa negra
+    liquid = mat("cola_liquido", "#22100A", rough=0.15)
     cap = mat("cola_tapa", "#C23A2E", rough=0.35, metal=0.5)
     label = mat("cola_etiqueta", "#C8322B", rough=0.6)
     ink = mat("cola_tinta", "#F6EEDA", rough=0.6)
@@ -1085,28 +1085,55 @@ def silla():
     return parts
 
 
+def _painted_panel(name, w, h, loc, rng, color_mat):
+    """Rectángulo pintado a pincel sobre la pared: bordes irregulares (no es un cartel impreso)."""
+    pts = []
+    n = 10
+    for i in range(n): # abajo, de izquierda a derecha
+        pts.append((-w / 2 + w * i / n, -h / 2 + rng.uniform(-0.008, 0.008)))
+    for i in range(n): # derecha
+        pts.append((w / 2 + rng.uniform(-0.008, 0.008), -h / 2 + h * i / n))
+    for i in range(n): # arriba
+        pts.append((w / 2 - w * i / n, h / 2 + rng.uniform(-0.008, 0.008)))
+    for i in range(n): # izquierda
+        pts.append((-w / 2 + rng.uniform(-0.008, 0.008), h / 2 - h * i / n))
+    o = extrude_outline(name, pts, 0.0, 0.004)
+    o.rotation_euler = (math.radians(90), 0, 0)
+    o.location = loc
+    give(o, color_mat)
+    return o
+
+
 def paredon():
-    # Paredón de club de barrio con un escudo INVENTADO (turquesa y naranja; ninguna camiseta real): muro de
-    # ladrillo pintado con zócalo, escudo en forma de blasón con franja y estrella, y el nombre del club.
+    # Paredón de club de barrio (0.7.3: más identidad). Escudo INVENTADO (turquesa y naranja; ninguna camiseta
+    # real), cartel pintado a mano con el nombre del club ("Club Social y Deportivo Villa Burbuja", inventado) y
+    # una guirnalda de banderines con los colores del club colgada de dos palitos.
     wall = mat("paredon_pared", "#CDBFA2", rough=0.9)
     base = mat("paredon_zocalo", "#5E6B73", rough=0.85)
     teal = mat("escudo_turquesa", "#1E9A94", rough=0.5)
     orange = mat("escudo_naranja", "#E0782C", rough=0.5)
     cream = mat("escudo_crema", "#F3EBD3", rough=0.5)
-    W, H, T = 1.0, 0.70, 0.06
+    navy = mat("cartel_azul", "#1F3A68", rough=0.7)
+    red = mat("cartel_rojo", "#B8302A", rough=0.7)
+    pole = mat("banderines_palo", "#8A6A44", rough=0.8)
+    string = mat("banderines_hilo", "#EDE6D6", rough=0.8)
+    rng = random.Random(19)
+    W, H, T = 1.4, 0.75, 0.06
+    front = -T / 2
     body = rbox("muro", (W, T, H), (0.0, 0.0, H / 2), 0.006)
     give(body, wall)
     zoc = rbox("zocalo", (W + 0.01, T + 0.01, 0.12), (0.0, 0.0, 0.06), 0.004)
     give(zoc, base)
     parts = [body, zoc]
+    sx = -0.48 # el escudo a la izquierda, el cartel a la derecha
     shield_pts = [(-0.14, 0.18), (0.14, 0.18), (0.14, -0.02), (0.08, -0.12), (0.0, -0.17), (-0.08, -0.12), (-0.14, -0.02)]
     sh = extrude_outline("escudo", shield_pts, 0.0, 0.012)
     sh.rotation_euler = (math.radians(90), 0, 0)
-    sh.location = (0.0, -T / 2 - 0.002, 0.43)
+    sh.location = (sx, front - 0.002, 0.43)
     give(sh, teal)
     band = extrude_outline("franja", [(-0.14, 0.07), (0.14, 0.07), (0.14, 0.00), (-0.14, 0.00)], 0.0, 0.016)
     band.rotation_euler = (math.radians(90), 0, 0)
-    band.location = (0.0, -T / 2 - 0.004, 0.43)
+    band.location = (sx, front - 0.004, 0.43)
     give(band, orange)
     star_pts = []
     for i in range(10):
@@ -1115,10 +1142,120 @@ def paredon():
         star_pts.append((r * math.cos(a), r * math.sin(a) + 0.095))
     star = extrude_outline("estrella", star_pts, 0.0, 0.018)
     star.rotation_euler = (math.radians(90), 0, 0)
-    star.location = (0.0, -T / 2 - 0.006, 0.43)
+    star.location = (sx, front - 0.006, 0.43)
     give(star, cream)
-    name = text_mesh("club_nombre", "CLUB BURBUJA", 0.07, (0.0, -T / 2 - 0.003, 0.20), cream, rot=(math.radians(90), 0, 0), extrude=0.004)
-    return parts + [sh, band, star, name]
+    parts += [sh, band, star]
+    # Cartel pintado a mano: fondo crema a pincel, renglones apenas torcidos y un subrayado de brocha.
+    cx, cz = 0.2, 0.42
+    parts.append(_painted_panel("cartel_fondo", 0.86, 0.46, (cx, front - 0.002, cz), rng, cream))
+    parts.append(text_mesh("cartel_l1", "CLUB SOCIAL Y DEPORTIVO", 0.052, (cx, front - 0.008, cz + 0.13), navy, rot=(math.radians(90), math.radians(1.5), 0), extrude=0.003))
+    parts.append(text_mesh("cartel_l2", "VILLA", 0.085, (cx - 0.005, front - 0.008, cz + 0.035), red, rot=(math.radians(90), math.radians(-2.0), 0), extrude=0.004))
+    parts.append(text_mesh("cartel_l3", "BURBUJA", 0.11, (cx + 0.01, front - 0.008, cz - 0.08), red, rot=(math.radians(90), math.radians(1.0), 0), extrude=0.004))
+    stroke = tube("brochazo", [(cx - 0.3 + 0.6 * i / 8, front - 0.009, cz - 0.165 + 0.006 * math.sin(i * 1.7)) for i in range(9)], [0.007] * 9, sides=6, squash=0.35)
+    give(stroke, navy)
+    parts.append(stroke)
+    # Guirnalda de banderines: dos palitos atados a los costados del paredón y un hilo que cae en curva.
+    top = H + 0.32
+    for x in (-W / 2 + 0.03, W / 2 - 0.03):
+        stick = tube("palito", [(x, front - 0.03, H - 0.1), (x, front - 0.03, top)], [0.008, 0.007], sides=8)
+        give(stick, pole)
+        parts.append(stick)
+    n_pts = 25
+    line = []
+    for i in range(n_pts):
+        t = i / (n_pts - 1)
+        x = -W / 2 + 0.03 + (W - 0.06) * t
+        z = top - 0.16 * math.sin(math.pi * t) # cae en el medio
+        line.append((x, front - 0.04, z))
+    hilo = tube("hilo", line, [0.0025] * n_pts, sides=6)
+    give(hilo, string)
+    parts.append(hilo)
+    colors = [teal, orange, cream]
+    n_flags = 13
+    for k in range(n_flags):
+        t = (k + 0.5) / n_flags
+        x = -W / 2 + 0.03 + (W - 0.06) * t
+        z = top - 0.16 * math.sin(math.pi * t)
+        fw, fh = 0.085, 0.12
+        flag = extrude_outline("banderin%d" % k, [(-fw / 2, 0.0), (fw / 2, 0.0), (0.0, -fh)], 0.0, 0.003)
+        flag.rotation_euler = (math.radians(90 + rng.uniform(-14, 14)), 0, math.radians(rng.uniform(-6, 6))) # se mecen
+        flag.location = (x, front - 0.04, z)
+        give(flag, colors[k % 3])
+        parts.append(flag)
+    return parts
+
+
+def tablon():
+    # Mesa de tablón del asado: tabla sobre dos caballetes, flautas de pan, frasco de chimichurri con tapa roja,
+    # tabla de picar con chorizo cortado y un cuchillo. Todo genérico (sin marcas).
+    wood = mat("tablon_madera", "#B98A55", rough=0.85)
+    wood2 = mat("caballete_madera", "#8E6538", rough=0.85)
+    crust = mat("pan_corteza", "#C98A3C", rough=0.75)
+    crumb = mat("pan_miga", "#F1DDB0", rough=0.9)
+    glass = mat("frasco_vidrio", "#DCE6E0", rough=0.05, alpha=0.3)
+    herb = mat("chimichurri", "#5E8A1E", rough=0.4)
+    lid = mat("frasco_tapa", "#C0392B", rough=0.35, metal=0.4)
+    board_m = mat("tabla_picar", "#D9B47E", rough=0.8)
+    meat = mat("chorizo_cortado", "#8E3A22", rough=0.6)
+    steel = mat("cuchillo_hoja", "#C9CDD2", rough=0.25, metal=0.9)
+    rng = random.Random(23)
+    L, D, Hh = 1.0, 0.36, 0.72
+    parts = []
+    top = rbox("tablon", (L, D, 0.03), (0.0, 0.0, Hh + 0.015), 0.004)
+    give(top, wood)
+    paint(top, lambda c: 0.86 + 0.14 * math.sin(c.x * 60.0 + noise3(c, 9.0) * 2.0) ** 2) # vetas
+    parts.append(top)
+    for x in (-L / 2 + 0.14, L / 2 - 0.14): # caballetes en A
+        bar = rbox("caballete_barra", (0.07, D + 0.06, 0.05), (x, 0.0, Hh - 0.025), 0.004)
+        give(bar, wood2)
+        parts.append(bar)
+        for sy in (-1, 1):
+            for sxx in (-1, 1):
+                leg = tube("pata", [(x + sxx * 0.09, sy * (D / 2 + 0.02), 0.0), (x + sxx * 0.02, sy * (D / 2 - 0.02), Hh - 0.05)], [0.018, 0.016], sides=6)
+                give(leg, wood2)
+                parts.append(leg)
+    zt = Hh + 0.03
+    for k, (x, y, yaw) in enumerate(((-0.30, -0.08, 6.0), (-0.28, 0.0, -4.0), (-0.32, 0.08, 9.0))): # flautas
+        bread = lib.sphere("flauta%d" % k, 0.032, loc=(x + 0.1, y, zt + 0.026), segs=16, rings=10, scale=(7.0, 1.0, 0.85))
+        bread.rotation_euler = (0, 0, math.radians(yaw))
+        give(bread, crust)
+        parts.append(bread)
+        for c in range(4): # cortes de la corteza
+            off = -0.15 + 0.1 * c
+            cut = rbox("corte%d_%d" % (k, c), (0.007, 0.034, 0.003), (x + 0.1 + off * math.cos(math.radians(yaw)), y + off * math.sin(math.radians(yaw)), zt + 0.052), 0.001, rot=(0, 0, math.radians(yaw + 55)))
+            give(cut, crumb)
+            parts.append(cut)
+    for k in range(3): # rodajas de pan
+        sl = lib.sphere("rodaja%d" % k, 0.035, loc=(-0.12 + 0.05 * k, -0.12, zt + 0.006), segs=12, rings=6, scale=(1.0, 0.8, 0.18))
+        give(sl, crumb)
+        parts.append(sl)
+    jar = revolve("frasco", [(0.0, 0.0), (0.045, 0.0), (0.047, 0.01), (0.047, 0.11), (0.04, 0.125), (0.04, 0.135), (0.0, 0.135)], 28)
+    jar.location = (0.12, 0.06, zt)
+    give(jar, glass)
+    fill = revolve("chimichurri", [(0.0, 0.004), (0.043, 0.004), (0.044, 0.09), (0.0, 0.09)], 24)
+    fill.location = (0.12, 0.06, zt)
+    give(fill, herb)
+    paint(fill, lambda c: 0.65 + 0.35 * max(0.0, noise3(c, 140.0))) # hierbas picadas
+    cap = revolve("tapa", [(0.0, 0.135), (0.043, 0.135), (0.044, 0.16), (0.0, 0.16)], 24)
+    cap.location = (0.12, 0.06, zt)
+    give(cap, lid)
+    spoon = tube("cuchara", [(0.12, 0.06, zt + 0.17), (0.15, 0.09, zt + 0.24)], [0.004, 0.004], sides=6)
+    give(spoon, steel)
+    parts += [jar, fill, cap, spoon]
+    board = rbox("tabla", (0.28, 0.18, 0.018), (0.32, -0.03, zt + 0.009), 0.004, rot=(0, 0, math.radians(-8)))
+    give(board, board_m)
+    parts.append(board)
+    for k in range(7): # rodajas de chorizo
+        piece = revolve("rodaja_chorizo%d" % k, [(0.0, 0.0), (0.017, 0.0), (0.017, 0.012), (0.0, 0.012)], 14)
+        piece.location = (0.25 + 0.03 * k + rng.uniform(-0.005, 0.005), -0.04 + rng.uniform(-0.03, 0.03), zt + 0.018)
+        give(piece, meat)
+        parts.append(piece)
+    blade = rbox("cuchillo", (0.16, 0.025, 0.003), (0.36, 0.06, zt + 0.02), 0.001, rot=(0, 0, math.radians(-20)))
+    give(blade, steel)
+    handle = rbox("cabo", (0.09, 0.022, 0.016), (0.24, 0.103, zt + 0.02), 0.004, rot=(0, 0, math.radians(-20)))
+    give(handle, wood2)
+    parts += [blade, handle]
+    return parts
 
 
 def lampara():
@@ -1141,6 +1278,6 @@ def lampara():
 
 BUILD = {"mate": mate, "termo": termo, "yerba": yerba_pack, "pelota": pelota, "alpargatas": alpargatas,
          "sifon": sifon, "garrafa": garrafa, "cajon": cajon, "chulengo": chulengo, "conservadora": conservadora,
-         "lampara": lampara, "silla": silla, "paredon": paredon, "cola": cola, "control": control, "bizcochos": bizcochos, "pizarra": pizarra, "bolsa": bolsa}
+         "lampara": lampara, "silla": silla, "paredon": paredon, "cola": cola, "control": control, "bizcochos": bizcochos, "pizarra": pizarra, "bolsa": bolsa, "tablon": tablon}
 parts = BUILD[which]()
 finish(parts, "prop_" + which, angle=15.0 if which == "sifon" else 40.0)

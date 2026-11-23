@@ -16,6 +16,9 @@ uniform float base_alpha : hint_range(0.0, 1.0) = 0.16; // el centro del domo ca
 uniform float rim_alpha : hint_range(0.0, 1.0) = 0.85;
 uniform float glint_strength : hint_range(0.0, 3.0) = 1.4; // reflejos nítidos de la ventana
 uniform float seam_alpha : hint_range(0.0, 1.0) = 0.42; // el aro soldado de la base
+uniform vec3 edge_color : source_color = vec3(0.2, 0.32, 0.47); // contorno del domo: lo que se lee de lejos (0.7.3)
+uniform float edge_strength : hint_range(0.0, 1.0) = 0.7;
+uniform float edge_alpha : hint_range(0.0, 1.0) = 0.75;
 uniform float popped_alpha : hint_range(0.0, 1.0) = 0.2; // reventadas: apagadas, para que la vista vaya a las enteras
 uniform float spec_strength : hint_range(0.0, 2.0) = 1.3;
 uniform float inflate_per_pressure = 0.30;
@@ -136,6 +139,9 @@ void fragment() {
 	// El aro soldado de la base: una línea más blanca donde el domo se pega al film (UV.y = 1 es la base).
 	float seam = smoothstep(0.72, 0.98, UV.y) * (1.0 - popped * 0.6);
 	ALBEDO = mix(col, vec3(0.92, 0.97, 1.0), seam * 0.5);
+	// Contorno: el borde de afuera del domo, más oscuro. A 200 px cada burbuja es un circulito marcado.
+	float edge = smoothstep(0.7, 0.9, UV.y) * (1.0 - popped * 0.75);
+	ALBEDO = mix(ALBEDO, edge_color, edge * edge_strength);
 	// Doble film: plástico lechoso y grueso, con un segundo aro (hay que aplastarla dos veces).
 	float ring2 = smoothstep(0.35, 0.45, UV.y) * (1.0 - smoothstep(0.45, 0.55, UV.y));
 	ALBEDO = mix(ALBEDO, vec3(0.93, 0.95, 0.97), v_armor * (0.55 + 0.35 * ring2) * (1.0 - popped));
@@ -159,6 +165,7 @@ void fragment() {
 
 	float a = mix(base_alpha, rim_alpha, fres);
 	a = max(a, seam * seam_alpha);
+	a = max(a, edge * edge_alpha);
 	a = mix(a, 0.72, v_armor * (1.0 - popped));
 	a = mix(a, 0.82, step(0.5, v_mat) * (1.0 - popped));
 	a = mix(a, max(a, 0.66), vein); // el plástico es casi transparente: sin esto el ámbar no se veía

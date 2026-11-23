@@ -71,3 +71,8 @@ func test_employee_frame_is_clear_of_the_hud() -> void:
 		assert_false(fr.intersects(ScenarioHeroes._sheet_screen(cam, c, e)), "cuadro fuera de la lámina (%d)" % int(start))
 		for h: Rect2 in hud:
 			assert_false(fr.intersects(h), "cuadro %s contra panel %s (lámina %d)" % [str(fr), str(h), int(start)])
+
+
+## La botella de cola puede ir más grande que la real para leerse, pero nunca más del doble (0.7.3).
+func test_cola_is_at_most_twice_real_size() -> void:
+	assert_between(ScenarioHeroes.COLA_SIZE, 1.0, 2.0)

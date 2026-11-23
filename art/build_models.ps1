@@ -16,3 +16,5 @@ Run "hand_mpfb" "hand" @()
 foreach ($m in "pin", "iron", "boot", "roller") { Run $m $m @() }
 foreach ($w in "gem", "bomb", "line") { Run "specials" "special_$w" @("--which", $w) }
 foreach ($w in "cup", "pencil", "chair_leg", "shelf", "cone") { Run "props" "prop_$w" @("--which", $w) }
+# Utilería argentina (mesa, living, depósito, el club y la mesa del asado de la 0.7.3).
+foreach ($w in "mate", "termo", "yerba", "pelota", "alpargatas", "sifon", "garrafa", "cajon", "chulengo", "conservadora", "lampara", "silla", "paredon", "cola", "control", "bizcochos", "pizarra", "bolsa", "tablon") { Run "argentina" "prop_$w" @("--which", $w) }

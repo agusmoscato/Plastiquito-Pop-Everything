@@ -19,3 +19,5 @@ for w in gem bomb line; do run specials "special_$w" --which "$w"; done
 for w in cup pencil chair_leg shelf cone; do run props "prop_$w" --which "$w"; done
 # Utilería argentina de los escenarios (mate, termo, yerba, pelota, alpargatas, sifón, garrafa, cajón, chulengo, conservadora).
 for w in mate termo yerba pelota alpargatas sifon garrafa cajon chulengo conservadora; do run argentina "prop_$w" --which "$w"; done
+# 0.7.0 en adelante: clientes nuevos, el club y la mesa del asado (0.7.3).
+for w in lampara silla paredon cola control bizcochos pizarra bolsa tablon; do run argentina "prop_$w" --which "$w"; done

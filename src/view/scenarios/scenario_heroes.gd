@@ -2,7 +2,7 @@ class_name ScenarioHeroes
 extends RefCounted
 ## La utilería argentina de cada escenario, ubicada donde se ve (sesión 0.6.2). Cada escenario tiene una
 ## pareja protagonista (Mesa: mate y termo; Living: pelota, botella de cola y control remoto; Depósito: garrafa, cajón de verdura, pizarrita y bolsa de papas;
-## Estacionamiento: chulengo con humo) que va en la franja de pantalla que el HUD deja libre con la cámara
+## Estacionamiento: chulengo con humo, mesa de tablón con pan y chimichurri, paredón del club con cartel y banderines) que va en la franja de pantalla que el HUD deja libre con la cámara
 ## de trabajo de esa fase: a la derecha de la lámina (antes de la hoja de pedidos) o abajo a la izquierda.
 ## Se proyecta con las cuentas de CameraRig (sin nodos) y se escala para que entre; la misma escala se usa
 ## en toda la utilería argentina del escenario, así el mate y la yerba guardan proporción.
@@ -25,16 +25,17 @@ static var phase_starts: Array = [8, 20, 56, 80]
 static var _scale_cache: Dictionary = {}
 static var sim_ref: GameSim ## para el cuadro de "Empleado del mes" (nombre y sello EX)
 
-## Pareja protagonista de cada fase: [archivo, desplazamiento en cm a escala 1, giro].
+const COLA_SIZE: float = 1.8 ## la botella de cola, más grande que la real (tope: el doble) para leerse desde la cámara de juego
+
+## Pareja protagonista de cada fase: [archivo, desplazamiento en cm a escala 1, giro, tamaño opcional (1 = real)].
 const HEROES: Dictionary = {
 	1: [["prop_mate", Vector3(0.0, 0.0, 0.0), 200.0], ["prop_termo", Vector3(2.0, 0.0, -17.0), -25.0], ["prop_yerba", Vector3(-12.0, 0.0, -6.0), 20.0], ["prop_bizcochos", Vector3(12.0, 0.0, 14.0), 0.0]],
-	2: [["prop_pelota", Vector3(0.0, 0.0, 0.0), 30.0], ["prop_cola", Vector3(4.0, 0.0, -26.0), -20.0], ["prop_control", Vector3(14.0, 0.0, 16.0), 70.0],
+	2: [["prop_pelota", Vector3(0.0, 0.0, 0.0), 30.0], ["prop_cola", Vector3(-12.0, 0.0, -28.0), -20.0, COLA_SIZE], ["prop_control", Vector3(14.0, 0.0, 16.0), 70.0],
 		["prop_chair_leg", Vector3(-36.0, 0.0, -8.0), 20.0]],
 	3: [["prop_cajon", Vector3(0.0, 0.0, 0.0), 90.0], ["prop_garrafa", Vector3(4.0, 0.0, -48.0), 30.0], ["prop_pizarra", Vector3(4.0, 0.0, 44.0), 0.0], ["prop_bolsa", Vector3(-16.0, 0.0, 22.0), 0.0],
 		["prop_lampara", Vector3(-30.0, 80.0, 10.0), 0.0]],
-	4: [["prop_chulengo", Vector3(0.0, 0.0, 0.0), 180.0], ["prop_conservadora", Vector3(-8.0, 0.0, 44.0), 15.0],
-		["prop_paredon", Vector3(30.0, 0.0, -42.0), 0.0], ["prop_silla", Vector3(-34.0, 0.0, 22.0), 200.0], ["prop_silla", Vector3(30.0, 0.0, 52.0), 150.0],
-		["prop_cone", Vector3(-30.0, 0.0, -16.0), 0.0], ["prop_cone", Vector3(10.0, 0.0, 70.0), 0.0]],
+	4: [["prop_chulengo", Vector3(0.0, 0.0, 0.0), 180.0], ["prop_conservadora", Vector3(30.0, 0.0, 40.0), 15.0],
+		["prop_paredon", Vector3(-6.0, 0.0, 86.0), 0.0], ["prop_tablon", Vector3(-48.0, 0.0, 4.0), 90.0]],
 }
 
 
@@ -165,7 +166,10 @@ static func _build_group(phase: int) -> Node3D:
 		var file: String = d[0]
 		var off: Vector3 = d[1]
 		var yaw: float = d[2]
-		var m: Node3D = ScenarioProps.glb_node(file, off, yaw)
+		var mult: float = 1.0 # tamaño respecto del real (la cola va más grande)
+		if d.size() > 3:
+			mult = d[3]
+		var m: Node3D = ScenarioProps.glb_node(file, off, yaw, 100.0 * mult)
 		m.set_meta(META_ARG, true)
 		group.add_child(m)
 	return group

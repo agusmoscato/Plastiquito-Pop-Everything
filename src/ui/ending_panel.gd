@@ -157,6 +157,9 @@ func _stamp_text() -> String:
 	return str(tg["stamp_" + Settings.language])
 
 
+const CREDITS_W: float = 0.56 ## ancho de la columna de créditos (fracción de la pantalla, desde la izquierda)
+
+
 func _draw_credits(vp: Vector2, lang: String) -> void:
 	var lines: Array = sim.story.credits(lang)
 	for i: int in lines.size():
@@ -164,4 +167,8 @@ func _draw_credits(vp: Vector2, lang: String) -> void:
 		if y < -40.0 or y > vp.y + 40.0:
 			continue
 		var big: bool = i == 0
-		UiKit.draw_text(self, Vector2(0.0, y), str(lines[i]), UiKit.font_title() if big else UiKit.font_text_bold(), 34 if big else 20, UiKit.PAPER, HORIZONTAL_ALIGNMENT_CENTER, vp.x)
+		var col_w: float = vp.x * CREDITS_W # a la izquierda del cuadro de empleado del mes (está en el ~59 % del ancho)
+		var text: String = str(lines[i])
+		var font: Font = UiKit.font_title() if big else UiKit.font_text_bold()
+		var fs: int = UiKit.fit_size(font, text, 34 if big else 20, col_w - 24.0)
+		UiKit.draw_text(self, Vector2(0.0, y), text, font, fs, UiKit.PAPER, HORIZONTAL_ALIGNMENT_CENTER, col_w)
