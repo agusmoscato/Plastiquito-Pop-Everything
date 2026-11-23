@@ -13,6 +13,7 @@ const CARD_GAP: float = 10.0
 
 var sim: GameSim
 var _close_button: StampButton
+var _icons: Dictionary = {} ## nombre -> Texture2D, cargadas en setup (cargadas dentro de _draw salen blancas)
 
 
 func setup(p_sim: GameSim) -> void:
@@ -25,6 +26,10 @@ func setup(p_sim: GameSim) -> void:
 	_close_button.font_size = 14
 	_close_button.pressed.connect(close_panel)
 	add_child(_close_button)
+	for n: int in ROUTE_ICONS:
+		var pair: Array = ROUTE_ICONS[n]
+		for icon: Variant in pair:
+			_icons[str(icon)] = load("res://assets/icons/%s.png" % str(icon)) as Texture2D
 
 
 func open_panel() -> void:
@@ -121,6 +126,9 @@ func _draw_silhouette(at: Vector2, n: int, known: bool) -> void:
 		return
 	var names: Array = ROUTE_ICONS[n]
 	for k: int in 2:
-		var tex: Texture2D = load("res://assets/icons/%s.png" % str(names[k])) as Texture2D
+		var key: String = str(names[k])
+		var tex: Texture2D = null
+		if _icons.has(key):
+			tex = _icons[key]
 		if tex != null:
 			draw_texture_rect(tex, Rect2(box.position + Vector2(4.0 + float(k) * 64.0, 6.0), Vector2(64.0, 68.0)), false)
