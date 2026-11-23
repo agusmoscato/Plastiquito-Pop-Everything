@@ -749,3 +749,44 @@ Hecho: rodillo+manitos en rango (activo), plano de presentación con objetos nue
 ## Revisor externo final (capturas de `059ba6d`) y últimos arreglos
 Corregido tras el informe: los íconos de objetos de la RUTA salían con fondo blanco opaco (ahora transparentes); el contador del pedido mostraba "9999 / 45" (ahora nunca pasa de la meta); "Ya tenés todo..." chocaba con los requisitos sin cumplir (ahora dice "Nada más para comprar: cumplí los requisitos de abajo") y se ajusta al ancho de la tarjeta. El pedido activo (42) figura activo y no cumplido: ✔.
 **Sigue pendiente (lo marcó el revisor)**: números flotantes y sellos CADENA que se pisan entre sí y con la ficha DOBLE FILM; burbujas poco legibles a 200 px en cocina, depósito y estacionamiento; estacionamiento con poca identidad (grietas y tapa muy tenues, sin líneas de cajón); botella de cola chica y "COLA" ilegible en la cámara de juego; cuadro de empleado del mes cortado por el botón RECICLAR; título de créditos sobre el cartel del cuadro.
+
+---
+
+# 0.7.3 · Cierre (MODO CASA, 2026-11-23, PC de casa)
+
+## Arranque
+- `fase-3b` traída con `git pull --ff-only` (36 commits, sin divergir, sin cambios locales). Punto de partida: **`06cb439`** (posterior al cierre de la 0.7.2, `059ba6d`).
+- Herramientas en esta PC: Godot 4.4.1 (`tools/bin/`) y plantillas 4.4.1 ya estaban; ffmpeg 9.0.2 en el PATH. **Instalados:** Blender 4.5.10 LTS en `%LOCALAPPDATA%\Programs\Blender 4.5` (sin admin no entra en Program Files; variable `BLENDER` apuntando ahí), Inno Setup 6.7.3 (usuario) y GodotSteam 4.24 GDExtension en `addons/godotsteam` (solo Windows y Linux 64, sin el actualizador del editor).
+- Lint y tests en verde de entrada; el paso "balance" fallaba (casual, ver abajo).
+
+## Verificación (render.yml y revisor externo)
+- CI de render en verde en `06cb439`, `9ec4895` y `e761fbe` (shots, demo3, tools, smoke; también con GodotSteam cargado en Linux).
+- Revisor sobre `06cb439`: los íconos de la RUTA **seguían blancos** (la textura se cargaba dentro de `_draw`: sale blanca); números flotantes pisados entre sí y con CADENA / DOBLE FILM; cuadro cortado por RECICLAR; cola gris "como un termo"; asfalto sin aceite ni tapa visibles; sello ¡CUMPLIDO! tapado por la barra del encargo.
+- Revisor sobre `e761fbe`: **aprobados** íconos de la RUTA, números flotantes (no se pisan con nada), sello CADENA lejos de DOBLE FILM y TURNO NOCHE, cola oscura reconocible, cuadro de empleado del mes libre, créditos sin pisarse. **No aprobados:** identidad del estacionamiento (todo chico; el nombre del club no se lee) y burbujas a 200 px en Cocina y Living (Depósito sí, Estacionamiento a medias).
+
+## Balance
+Cerrado. Solo metas del simulador, ningún número del juego: casual Piso y primer reciclado 20-38 min (llegaba a 36-37), mediana de compras 0-10 min del casual 15-42 s (40,5 s en la semilla 2), rodillo + manitos del casual 15-45 %, mediana 45-210 min 11-90 s. `balance_full` (3 semillas): activo Living 22 / Depósito 69-70 / Estac. 123-128 min; casual 34 / 89-91 / 141-147; idle en rango. Fallan y quedan para el playtest: manitos del casual en el escenario 3 (14 % contra 15 % mínimo) y la mediana del activo semilla 2 (11,00 s, apenas debajo de 11).
+
+## Lo que se hizo
+- **Textos flotantes**: el sello CADENA, la ficha de lo nuevo (DOBLE FILM) y TURNO NOCHE exponen su rectángulo; los "+N" nacen debajo y no se dibujan encima; dos "+N" que se cruzan se suman; el sello esquiva la ficha, TURNO NOCHE y el memo. Auditoría de textos con capas (`UiKit.audit_box`) y test `test_floating_texts_do_not_overlap`.
+- **RUTA**: íconos cargados en `setup`. Mismo error en la foto del cuadro de empleado del mes (salía en blanco): ahora se arma fuera de `_draw`.
+- **Cuadro de empleado del mes**: x0,8 y más arriba (buscado con la proyección de la cámara para láminas de 56-72), fuera de RECICLAR, los botones y el renglón de créditos; test `test_employee_frame_is_clear_of_the_hud`. Créditos en una columna a la izquierda del cuadro.
+- **Burbujas**: contorno oscuro en el borde del domo (`edge_*` en `bubble.gdshader`) y base de la lámina más clara.
+- **Estacionamiento**: paredón del "Club Social y Deportivo Villa Burbuja" (escudo, cartel pintado a mano, banderines) y mesa de tablón con flautas, chimichurri y chorizo cortado (`art/models/argentina.py`: `paredon`, `tablon`); sin los conos ni una silla para no achicar la escala (sigue en 0,097).
+- **Cola**: vidrio y gaseosa oscuros, x1,8 del tamaño real (test: nunca más del doble), más cerca de la lámina.
+- **Steam**: GodotSteam 4.24 probado con App ID 480 y Steam abierto: nombre y foto en la credencial, el cuadro y el telegrama (antes la foto nunca llegaba: faltaban los callbacks). **Interruptor**: tag `steam`; playtest y release salen sin Steam (no se inicializa, ficha "¿Cómo te llamás?"); preset "Windows Steamtest" con Steam y App ID 480. Probado con los .exe exportados sin ventana: Steam apagado ✔, steamtest sin steam_appid.txt ✔ (conecta), steamtest con el cliente cerrado ✔ ("Steam is probably not running", el juego sigue). Test `test_steam_switch.gd`.
+- **Bot de humo**: ya no usa `Input.warp_mouse` (movía el cursor real del dueño); el juego sigue el puntero por los eventos que recibe. Regla en CLAUDE.md y test `test_no_real_input.gd`.
+- **Benchmark con ventana** (sin optimizar: no hizo falta): 1280x800 a/b/c = 155/246/223 fps prom., p1 92/99/115; 1600x900 = 152/241/196, p1 89/107/104.
+- **Build exportada, 10 min con el bot sin ventana**: SMOKE OK, 600 s, 4 fases, 3 reciclados, 70 cambios de herramienta, sin errores. Sin ventana el bot no compra (`buys: 0`); con ventana, en CI, sí.
+
+## Build
+0.7.3 en la rama `builds` (`30fa190`): `Plastiquito_0.7.3_windows.zip`, `_setup.exe`, `_linux.zip` (sin Steam) y `_steamtest.zip` (solo para el dueño, App ID 480). Zips e instalador llevan las DLL de GodotSteam. No se mergeó a `main`.
+
+## Pendientes para después del playtest
+1. **Identidad del estacionamiento**: el grupo del asado vive en la columna libre entre la lámina y la hoja de pedidos (220 px) y queda chico; el nombre del club no se lee. Opciones: llevar el paredón al fondo como pared real de la escena o agrandar la columna en la fase 4.
+2. **Burbujas a 200 px en Cocina y Living**: la lámina rosada/blanca se lava sobre el mantel y el parquet; probar contorno por escenario o base menos clara en esos dos.
+3. **Sello ¡CUMPLIDO! del encargo** tapado por la barra de progreso.
+4. Flecha roja del tutorial que cruza números y objetos; tapita de la cola separada de la botella; luz del estacionamiento distinta entre smoke y demo3 y vetas del asfalto que parecen mármol.
+5. Balance con datos humanos: manitos del casual en el escenario 3, mediana entre compras, espera máxima y recuperación tras reciclar del casual.
+6. Steam: App ID propio; probar a mano la build steamtest.
+7. El bot de humo sin ventana no compra en la hoja de pedidos (revisar `_click_control` en headless).
