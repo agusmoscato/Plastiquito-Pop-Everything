@@ -13,30 +13,45 @@ static var photo: Image = null ## avatar grande de Steam, tal cual (se estiliza 
 static var _asked: bool = false
 
 
-## Intenta conectarse a Steam (si el singleton "Steam" de GodotSteam existe). No hace nada en el CI ni sin Steam.
+static var photo_version: int = 0 ## sube cada vez que llega la foto (la credencial y el cuadro se redibujan)
+static var steam_status: String = "" ## resultado del init, para el registro ("" = no se intentó)
+
+
+## Intenta conectarse a Steam (si el singleton "Steam" de GodotSteam existe). Sin el cliente de Steam abierto el
+## init falla y no se pide nada más (el CI y las PCs sin Steam usan la ficha de nombre y la silueta).
+## GodotSteam 4.24: steamInitEx(app_id, embed_callbacks) -> {status, verbal}; con embed_callbacks corre los
+## callbacks solo cada frame, que es lo que entrega el avatar (señal avatar_loaded).
 static func try_steam(tags: PackedStringArray) -> void:
 	if _asked or not Engine.has_singleton("Steam"):
 		return
 	_asked = true
 	var steam: Object = Engine.get_singleton("Steam")
-	if not PlaytestMode.is_playtest(tags): # en desarrollo: App ID de prueba
-		OS.set_environment("SteamAppId", str(DEV_APP_ID))
-		OS.set_environment("SteamGameId", str(DEV_APP_ID))
-	if steam.has_method("steamInitEx"):
-		steam.call("steamInitEx")
-	elif steam.has_method("steamInit"):
-		steam.call("steamInit")
-	if steam.has_method("getPersonaName"):
-		steam_name = str(steam.call("getPersonaName"))
-	if steam.has_signal("avatar_loaded"):
-		steam.connect("avatar_loaded", Callable(PlayerIdentity, "_on_avatar_loaded"))
-	if steam.has_method("getPlayerAvatar") and steam.has_method("getSteamID"):
-		steam.call("getPlayerAvatar", 3, steam.call("getSteamID")) # 3 = avatar grande
+	var app_id: int = 0 if PlaytestMode.is_playtest(tags) else DEV_APP_ID # en desarrollo: App ID de prueba
+	if app_id != 0:
+		OS.set_environment("SteamAppId", str(app_id))
+		OS.set_environment("SteamGameId", str(app_id))
+	if not steam.has_method("steamInitEx"):
+		steam_status = "sin steamInitEx"
+		return
+	var res: Variant = steam.call("steamInitEx", app_id, true)
+	var status: int = -1
+	if res is Dictionary:
+		var d: Dictionary = res
+		status = int(str(d.get("status", -1)))
+		steam_status = str(d.get("verbal", ""))
+	print("Steam: init %d %s" % [status, steam_status])
+	if status != 0: # 0 = STEAM_API_INIT_RESULT_OK
+		return
+	steam_name = str(steam.call("getPersonaName"))
+	steam.connect("avatar_loaded", Callable(PlayerIdentity, "_on_avatar_loaded"))
+	steam.call("getPlayerAvatar", 3, steam.call("getSteamID")) # 3 = avatar grande
 
 
 static func _on_avatar_loaded(_id: int, size: int, buffer: PackedByteArray) -> void:
 	if size > 0 and buffer.size() >= size * size * 4:
 		photo = Image.create_from_data(size, size, false, Image.FORMAT_RGBA8, buffer)
+		photo_version += 1
+		print("Steam: foto %d px" % size)
 
 
 ## Foto carnet: un poco desaturada y cálida, con borde de papel (nunca el avatar crudo). Sin foto, la silueta.

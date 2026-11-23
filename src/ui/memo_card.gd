@@ -15,6 +15,7 @@ var _shown_id: String = ""
 var _typed: float = 0.0
 var _text: String = ""
 var _photo: ImageTexture
+var _photo_seen: int = -1 ## PlayerIdentity.photo_version con la que se armó _photo
 
 
 func setup(p_sim: GameSim) -> void:
@@ -60,11 +61,15 @@ func _process(delta: float) -> void:
 		_typed = 0.0
 		_text = sim.memo_text_now(Settings.language)
 		_photo = PlayerIdentity.id_texture(112)
+		_photo_seen = PlayerIdentity.photo_version
 		var tw: float = size.x - _text_x() - 22.0
 		var n_lines: int = UiKit.wrap_text(UiKit.font_mono(), _text, 12, tw).size()
 		size.y = maxf(196.0 if _with_credential() else 150.0, 112.0 + 16.0 * float(n_lines))
 		pivot_offset = size * 0.5
 		PopAudio.play_ui("tic", 0.8, -8.0)
+	if _photo_seen != PlayerIdentity.photo_version: # llegó la foto de Steam con el memo abierto
+		_photo = PlayerIdentity.id_texture(112)
+		_photo_seen = PlayerIdentity.photo_version
 	var before: int = int(_typed)
 	_typed = minf(float(_text.length()), _typed + delta * 55.0)
 	if floori(_typed / 3.0) != floori(float(before) / 3.0) and int(_typed) < _text.length():

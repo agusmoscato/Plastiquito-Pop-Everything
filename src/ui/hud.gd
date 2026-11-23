@@ -386,7 +386,7 @@ func _update_overlays() -> void:
 
 func _panel_rects() -> Array[Rect2]:
 	var out: Array[Rect2] = []
-	for c: Control in [pops_panel, work_order, encargo_ticket, big_ticket, shop, combo, _recycle_button, _log_button, _hand_button, _route_button, _reload_button]:
+	for c: Control in [pops_panel, work_order, encargo_ticket, big_ticket, shop, combo, _recycle_button, _log_button, _hand_button, _route_button, _reload_button, memo_card]:
 		if c.visible:
 			out.append(c.get_global_rect())
 	for id: String in _tool_buttons:

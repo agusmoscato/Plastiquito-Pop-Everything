@@ -47,6 +47,14 @@ func refresh() -> void:
 
 class FrameCanvas extends Control:
 	var sim: GameSim
+	var _photo_seen: int = -1
+	var _photo: ImageTexture ## se arma fuera de _draw (una textura creada dentro de _draw sale en blanco)
+
+	func _process(_delta: float) -> void:
+		if PlayerIdentity.photo_version != _photo_seen: # la foto de Steam llega unos frames después del arranque
+			_photo_seen = PlayerIdentity.photo_version
+			_photo = PlayerIdentity.id_texture(160)
+			queue_redraw()
 
 	func _draw() -> void:
 		var w: float = size.x
@@ -55,8 +63,8 @@ class FrameCanvas extends Control:
 		draw_rect(Rect2(10.0, 10.0, w - 20.0, h - 20.0), Color("#F4EFE6"))
 		var tt: String = Tx.t("employee_month")
 		UiKit.draw_text(self, Vector2(0.0, 52.0), tt, UiKit.font_title(), UiKit.fit_size(UiKit.font_title(), tt, 22, w - 32.0), UiKit.INK, HORIZONTAL_ALIGNMENT_CENTER, w)
-		var photo: ImageTexture = PlayerIdentity.id_texture(160)
-		draw_texture_rect(photo, Rect2(48.0, 68.0, 160.0, 160.0), false)
+		if _photo != null:
+			draw_texture_rect(_photo, Rect2(48.0, 68.0, 160.0, 160.0), false)
 		var nm: String = sim.player_name(Settings.language) if sim != null else ""
 		UiKit.draw_text(self, Vector2(0.0, 262.0), nm, UiKit.font_text_bold(), UiKit.fit_size(UiKit.font_text_bold(), nm, 20, w - 36.0), UiKit.INK, HORIZONTAL_ALIGNMENT_CENTER, w)
 		UiKit.draw_text(self, Vector2(0.0, 292.0), Tx.t("memo_company"), UiKit.font_mono(), 12, UiKit.INK_SOFT, HORIZONTAL_ALIGNMENT_CENTER, w)

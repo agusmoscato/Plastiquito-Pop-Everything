@@ -945,7 +945,7 @@ func _run_demo3(dir: String) -> void:
 func _demo_story(dir: String) -> void:
 	_demo3_phase(1, 1.0e6)
 	hud.memo_card.suppressed = false
-	sim.state.employee_name = "Juan"
+	sim.state.employee_name = PlayerIdentity.steam_name if PlayerIdentity.steam_name != "" else "Juan" # con Steam abierto: el nombre real
 	sim.memo_queue = ["welcome"]
 	await _wait(2.8)
 	_shot(dir, "50_memo_bienvenida")
