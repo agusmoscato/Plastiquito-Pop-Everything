@@ -178,6 +178,20 @@ func _start_smoke(dir: String) -> void:
 	add_child(bot)
 
 
+## Último lugar del puntero según los eventos de mouse que recibe el juego (no el cursor de Windows): así el bot
+## de humo apunta inyectando eventos, sin mover el cursor real (Input.warp_mouse está prohibido, ver CLAUDE.md).
+var _pointer_screen: Vector2 = Vector2(-1.0, -1.0)
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouse:
+		_pointer_screen = (event as InputEventMouse).position
+
+
+func _pointer() -> Vector2:
+	return _pointer_screen if _pointer_screen.x >= 0.0 else get_viewport().get_mouse_position()
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey:
 		var key: InputEventKey = event
@@ -402,7 +416,7 @@ func _update_cursor() -> void:
 	if _demo:
 		tool_view.visible = true
 		return
-	var screen: Vector2 = get_viewport().get_mouse_position()
+	var screen: Vector2 = _pointer()
 	var p: Vector2 = world.camera_rig.screen_to_plane(screen)
 	_cursor_valid = p.is_finite()
 	if _cursor_valid:

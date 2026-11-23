@@ -1,6 +1,7 @@
 class_name SmokeBot
 extends Node
-## Prueba de humo: juega el juego real con eventos de entrada verdaderos (mouse y teclado).
+## Prueba de humo: juega el juego real con eventos de entrada (mouse y teclado) inyectados SOLO dentro del juego
+## con Input.parse_input_event: nunca mueve el cursor ni el teclado reales de Windows (nada de Input.warp_mouse).
 ## Aprieta, arrastra, compra haciendo clic en la hoja de pedidos, cambia de herramienta, recicla
 ## y salta de fase con el modo DEV. Saca una captura cada `shot_every` segundos y al final imprime
 ## "SMOKE OK" con un resumen. Se activa con  -- --smoke=<carpeta> [--minutes=N] [--shot-every=S].
@@ -207,7 +208,6 @@ func _mouse_to_world(p: Vector2) -> void:
 
 
 func _mouse_to_screen(sp: Vector2) -> void:
-	Input.warp_mouse(sp)
 	var ev: InputEventMouseMotion = InputEventMouseMotion.new()
 	ev.position = sp
 	ev.global_position = sp

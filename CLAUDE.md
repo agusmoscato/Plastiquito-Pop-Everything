@@ -34,6 +34,11 @@ Si se agregan clases con `class_name` nuevas, `run_tests.sh` ya corre `godot --h
 
 - `./tools/balance_full.sh` corre el simulador hasta 3 h 30 (activo, casual e idle); tarda unos 5 minutos y hoy el casual y el idle no cumplen todas las métricas (ver docs/CHANGELOG.md, Fase 3). Las partes de render y escenarios tienen su documentación en docs/BENCHMARK_FASE3.md y docs/CLIPS.md.
 
+## Pruebas automáticas y la PC del dueño
+
+- El bot de humo y cualquier prueba automática **nunca** usan `Input.warp_mouse` ni nada que mueva el cursor o el teclado reales de Windows. Con o sin ventana, el bot inyecta eventos solo dentro del juego (`Input.parse_input_event`); el juego sigue el puntero por los eventos que recibe (`PlastiquitoMain._pointer`). `tests/test_no_real_input.gd` lo verifica.
+- Aunque esté activo el MODO CASA, **no abrir el juego con ventana para pruebas largas** (bot de humo, partidas de minutos) sin preguntarle antes al dueño si está usando la PC. Las pruebas largas van con `--headless` (también el .exe exportado) o en CI.
+
 ## Builds de playtest
 
 - `./tools/build.sh` (o `tools/build.ps1`): lint + tests, export Windows/Linux, zips y, si hay Inno Setup, instalador. Salida en `builds/<versión>/` (ignorada por git).
