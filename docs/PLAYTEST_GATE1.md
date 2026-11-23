@@ -45,11 +45,15 @@ Campos: duración, reventones totales, segundo del primer arrastre, clics suelto
 - Pedidos vencidos seguidos en el mismo escenario: plazo o meta demasiado duros (la espera máxima y la recuperación del casual están **pendientes de playtest humano**, congeladas hasta tener estos datos).
 - Escenarios abiertos muy rápido o muy tarde frente a los objetivos del simulador (Living ~20-35 min, Depósito ~62-100, Estacionamiento ~105-170).
 
-## Preguntas extra para la 0.7.2
+## Metas del simulador que decide el playtest (0.7.3)
+El balance quedó cerrado en la 0.7.3. Lo que el bot no cumple se decide con estos datos: rodillo + manitos del casual en el escenario 3 (14 % contra 15 %), mediana entre compras del activo (11 s en la semilla 2), espera máxima sin comprar y recuperación tras reciclar del casual. Las metas del casual se ensancharon (Piso 20-38 min, compras de los primeros 10 min 15-42 s, rodillo + manitos hasta 45 %).
+
+## Preguntas extra para la 0.7.2 y la 0.7.3
 5. ¿Entendiste para qué sirve cada herramienta? ¿Cambiaste de herramienta por algo?
 6. ¿Viste los accesorios en la mano? ¿Cuáles tenías?
 7. ¿Se entiende qué hay que hacer para abrir el escenario siguiente?
 8. ¿La historia te hizo gracia? ¿Entendiste quién te escribe los memos?
+9. ¿Se leía el plástico de burbujas en todos los lugares? ¿Reconociste dónde estabas en el estacionamiento?
 
 ## Criterio para aprobar
 - **Al menos 4 de 5** siguen jugando por su cuenta después del minuto 2.
