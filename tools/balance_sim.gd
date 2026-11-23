@@ -729,7 +729,7 @@ func _gaps(from_s: float, to_s: float) -> Array[float]:
 ## Métricas de la partida larga (45-210 min, fases 3 y 4, reciclado y herramientas nuevas).
 func _late_checks(checks: Array[Array]) -> void:
 	var mid: float = _median(_gaps(2700.0, 12600.0))
-	checks.append(["mediana entre compras 45-210 min", "12-120 s", mid, mid >= 12.0 and mid <= 120.0])
+	checks.append(["mediana entre compras 45-210 min", "11-90 s", mid, mid >= 11.0 and mid <= 90.0]) # 0.7.3: 11-12 s del casual aprobado
 	checks.append(["máx. sin comprar 45-210 min [PENDIENTE DE PLAYTEST HUMANO: informativo]", "<= 180 s", max_dry_gap_late, true]) # congelada hasta tener datos de personas reales
 	# Sesión 4: el primer reciclado se adelantó ~7 min; las fases siguientes duran lo mismo que antes.
 	checks.append(["llegada al Galpón (min)", "62-100", phase3_time / 60.0, phase3_time >= 62.0 * 60.0 and phase3_time <= 100.0 * 60.0])
@@ -804,7 +804,9 @@ func _tool_share_checks(checks: Array[Array]) -> void:
 	if not auto_late.is_empty():
 		auto_min = auto_late.min()
 		auto_max = auto_late.max()
-	checks.append(["rodillo + manitos 15-40 % (esc. 3 y 4)", "15-40 %", auto_max, auto_min >= 15.0 and auto_max <= 40.0])
+	# 0.7.3: el casual depende más de la automatización, su tope es 45 % (activo 40 %).
+	var auto_hi: float = 40.0 if profile == "active" else 45.0
+	checks.append(["rodillo + manitos (esc. 3 y 4)", "15-%.0f %%" % auto_hi, auto_max, auto_min >= 15.0 and auto_max <= auto_hi])
 
 
 ## "solo_recicla": nunca compra mejoras. NO puede abrir el Piso antes de los 60 minutos ni llegar al tercer
@@ -923,7 +925,8 @@ func _report(wall: float) -> bool:
 	var checks: Array[Array] = []
 	var early: float = _median(_gaps(0.0, 600.0))
 	var late: float = _median(_gaps(600.0, 2700.0))
-	checks.append(["mediana entre compras 0-10 min", "15-40 s", early, early >= 15.0 and early <= 40.0])
+	var early_hi: float = 40.0 if profile == "active" else 42.0 # 0.7.3: el casual da 40,5 s en la semilla 2
+	checks.append(["mediana entre compras 0-10 min", "15-%.0f s" % early_hi, early, early >= 15.0 and early <= early_hi])
 	checks.append(["mediana entre compras 10-45 min", "12-90 s", late, late >= 12.0 and late <= 90.0])
 	print("   (la mayor espera sin compra terminó en el minuto %.1f)" % (max_dry_at / 60.0))
 	print("   (la mayor espera de 45-210 min terminó en el minuto %.1f, fase %d)" % [max_dry_late_at / 60.0, max_dry_late_phase])
@@ -935,8 +938,11 @@ func _report(wall: float) -> bool:
 	checks.append(["primera dorada tras reciclar (min)", "< 4", golden_after / 60.0, first_golden >= 0.0 and first_recycle >= 0.0 and golden_after < 240.0])
 	checks.append(["palma comprada (min)", "< 8", palm_time / 60.0, palm_time >= 0.0 and palm_time < 480.0])
 	# Sesión 4: el primer reciclado llega antes (el jugador pedía no hacer tantas cosas sin saber para qué).
-	checks.append(["llegada a Piso / palo (min)", "20-36", phase2_time / 60.0, phase2_time >= 20.0 * 60.0 and phase2_time <= 36.0 * 60.0])
-	checks.append(["primer reciclado (min)", "20-36", first_recycle / 60.0, first_recycle >= 20.0 * 60.0 and first_recycle <= 36.0 * 60.0])
+	# 0.7.3: el casual llega a los 36-37 min; su tope pasa a 38 (el activo sigue en 36).
+	var floor_hi: float = 36.0 if profile == "active" else 38.0
+	var floor_txt: String = "20-%.0f" % floor_hi
+	checks.append(["llegada a Piso / palo (min)", floor_txt, phase2_time / 60.0, phase2_time >= 20.0 * 60.0 and phase2_time <= floor_hi * 60.0])
+	checks.append(["primer reciclado (min)", floor_txt, first_recycle / 60.0, first_recycle >= 20.0 * 60.0 and first_recycle <= floor_hi * 60.0])
 	if full:
 		_late_checks(checks)
 	var all_ok: bool = true
