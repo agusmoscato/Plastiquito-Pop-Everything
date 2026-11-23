@@ -10,6 +10,10 @@ extends RefCounted
 
 const META_ARG: String = "arg_prop" ## marca los objetos argentinos (el plano de presentación los encuadra)
 const META_HERO: String = "hero_prop"
+## Cuadro de EMPLEADO DEL MES en el Depósito: buscado con la proyección de la cámara de trabajo para láminas de
+## 56, 64 y 72 (0.7.3): no toca RECICLAR, los botones, la lámina ni el título de los créditos, y tapa <= 12 % de la utilería.
+const FRAME_POS: Vector3 = Vector3(-20.0, 0.0, 76.0)
+const FRAME_SCALE: float = 0.8
 const SCREEN: Vector2 = Vector2(1600.0, 900.0) ## pantalla de referencia (la del juego y las capturas)
 
 ## Cámara de trabajo (las fija ToyWorld con data/juice.json; los valores por defecto son los del juego).
@@ -47,14 +51,28 @@ static func place(root: Node3D, phase: int, c: Vector2, e: Vector2) -> Node3D:
 	if phase == 3 and sim_ref != null: # el cuadro de EMPLEADO DEL MES con tu foto, apoyado junto a la pizarra
 		var frame: EmployeeFrame = EmployeeFrame.new()
 		frame.setup(sim_ref)
-		frame.position = Vector3(-4.0, 0.0, 104.0)
+		frame.position = FRAME_POS
 		frame.rotation_degrees = Vector3(0.0, 8.0, 0.0)
+		frame.scale = Vector3.ONE * FRAME_SCALE
 		hero.add_child(frame)
 	if phase == 4: # el humo del chulengo sale siempre de la parrilla
 		var smoke: GPUParticles3D = ScenarioProps.smoke(hero.position + Vector3(0.0, 95.0 * s, 0.0), s)
 		smoke.set_meta(META_ARG, true)
 		root.add_child(smoke)
 	return hero
+
+
+## Rectángulo de pantalla del cuadro de EMPLEADO DEL MES (Sprite3D de EmployeeFrame) con la utilería puesta con `hero_xf`.
+static func frame_screen_rect(hero_xf: Transform3D, cam: Transform3D) -> Rect2:
+	var fxf: Transform3D = hero_xf * Transform3D(Basis.from_euler(Vector3(0.0, deg_to_rad(8.0), 0.0)).scaled(Vector3.ONE * FRAME_SCALE), FRAME_POS)
+	var size: Vector2 = EmployeeFrame.WORLD_SIZE
+	var sxf: Transform3D = fxf * Transform3D(Basis.from_euler(Vector3(deg_to_rad(EmployeeFrame.TILT_DEG), 0.0, 0.0)), EmployeeFrame.sprite_offset())
+	var pts: PackedVector2Array = PackedVector2Array()
+	for cx: float in [-0.5, 0.5]:
+		for cy: float in [-0.5, 0.5]:
+			var p: Vector3 = CameraRig.project(cam, sxf * Vector3(cx * size.x, cy * size.y, 0.0), SCREEN)
+			pts.append(Vector2(p.x, p.y))
+	return _rect_of(pts)
 
 
 ## Escala de la utilería argentina: la que hace entrar la pareja protagonista en su franja con la cámara

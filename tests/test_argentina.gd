@@ -49,3 +49,25 @@ func test_intro_shot_shows_every_argentine_prop_whole() -> void:
 			assert_true(screen.encloses(r), "fase %d: %s entero en el plano de presentación" % [phase, node.name])
 		assert_gt(count, 1, "fase %d tiene utilería argentina" % phase)
 		props.free()
+
+
+## El cuadro de EMPLEADO DEL MES del Depósito no queda detrás de RECICLAR ni de otro panel, ni sobre la lámina, ni
+## en el renglón del título de los créditos (0.7.3: el revisor lo veía cortado por RECICLAR).
+func test_employee_frame_is_clear_of_the_hud() -> void:
+	var screen: Vector2 = ScenarioHeroes.SCREEN
+	var hud: Array[Rect2] = Hud.layout_rects(screen)
+	var free_w: float = screen.x - Hud.SHOP_W - 16.0
+	hud.append(Rect2(free_w - 170.0, 76.0, 150.0, 136.0)) # burbujario, mi mano, ruta
+	hud.append(Rect2(380.0, 820.0, 840.0, 80.0)) # título de los créditos
+	for start: float in [56.0, 64.0, 72.0]:
+		var e: Vector2 = Vector2(start, start * 0.866)
+		var c: Vector2 = e * 0.5
+		var cam: Transform3D = ScenarioHeroes._work_cam(3, c, e)
+		var group: Node3D = ScenarioHeroes._build_group(3)
+		var hxf: Transform3D = ScenarioHeroes._placement(group, cam, ScenarioHeroes.free_zone(3, c, e), ScenarioHeroes.scale_for(3, e), c, e)
+		group.free()
+		var fr: Rect2 = ScenarioHeroes.frame_screen_rect(hxf, cam)
+		assert_true(Rect2(Vector2.ZERO, screen).encloses(fr), "cuadro dentro de la pantalla (lámina %d): %s" % [int(start), str(fr)])
+		assert_false(fr.intersects(ScenarioHeroes._sheet_screen(cam, c, e)), "cuadro fuera de la lámina (%d)" % int(start))
+		for h: Rect2 in hud:
+			assert_false(fr.intersects(h), "cuadro %s contra panel %s (lámina %d)" % [str(fr), str(h), int(start)])

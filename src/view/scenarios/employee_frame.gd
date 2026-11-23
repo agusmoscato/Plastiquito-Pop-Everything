@@ -7,6 +7,7 @@ extends Node3D
 
 const TEX_SIZE: Vector2i = Vector2i(256, 320)
 const WORLD_SIZE: Vector2 = Vector2(40.0, 50.0) ## cm
+const TILT_DEG: float = -52.0 ## apoyado inclinado hacia atrás: de frente a la cámara de trabajo
 
 var _viewport: SubViewport
 var _canvas: FrameCanvas
@@ -27,11 +28,15 @@ func setup(p_sim: GameSim) -> void:
 	_sprite = Sprite3D.new()
 	_sprite.texture = _viewport.get_texture()
 	_sprite.pixel_size = WORLD_SIZE.x / float(TEX_SIZE.x)
-	_sprite.position = Vector3(0.0, WORLD_SIZE.y * 0.5 * 0.62, -WORLD_SIZE.y * 0.22)
-	_sprite.rotation_degrees = Vector3(-52.0, 0.0, 0.0) # apoyado inclinado hacia atrás: de frente a la cámara de trabajo
+	_sprite.position = sprite_offset()
+	_sprite.rotation_degrees = Vector3(TILT_DEG, 0.0, 0.0)
 	_sprite.shaded = false
 	_sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
 	add_child(_sprite)
+
+
+static func sprite_offset() -> Vector3:
+	return Vector3(0.0, WORLD_SIZE.y * 0.5 * 0.62, -WORLD_SIZE.y * 0.22)
 
 
 ## Vuelve a dibujar el cuadro (por ejemplo, cuando recibe el sello EX).
